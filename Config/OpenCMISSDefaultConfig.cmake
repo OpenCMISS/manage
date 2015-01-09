@@ -2,6 +2,9 @@
 # Build configuration
 # ==============================
 SET(OCM_USE_IRON YES)
+SET(IRON_BRANCH master)
+SET(IRON_REPO https://github.com/OpenCMISS/cm.git)
+
 SET(OCM_USE_ZINC NO)
 
 # Use architecture information paths
@@ -102,7 +105,6 @@ SET(SUNDIALS_VERSION 2.5)
 SET(SUPERLU_VERSION 4.3)
 SET(SUPERLU_DIST_VERSION 3.3)
 SET(ZLIB_VERSION 1.2.3)
-SET(IRON_VERSION 1.0)
 
 # ==========================================================================================
 # Single module configuration
