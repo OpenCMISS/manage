@@ -1,5 +1,11 @@
 include(ExternalProject)
 
+if(WIN32)
+    SET(GIT_COMMAND cmd /c git)
+else()
+    SET(GIT_COMMAND git)
+endif()
+
 MACRO(ADD_COMPONENT COMPONENT_NAME)
     
     # Get lowercase folder name from project name
@@ -62,21 +68,32 @@ MACRO(ADD_COMPONENT COMPONENT_NAME)
     SET(DOWNLOAD_CMDS )
     # Developer mode
     if (${${COMPONENT_NAME}_DEVEL})
-        if (NOT ${COMPONENT_NAME}_REPO)
-             if(NOT GITHUB_USERNAME)
-                SET(GITHUB_USERNAME ${GITHUB_ORGANIZATION})
+        # Check if there already is a git repo at the source location
+        execute_process(COMMAND ${GIT_COMMAND} status
+            RESULT_VARIABLE RES_VAR
+            OUTPUT_VARIABLE RES
+            ERROR_VARIABLE RES_ERR
+            WORKING_DIRECTORY ${COMPONENT_SOURCE}
+            OUTPUT_STRIP_TRAILING_WHITESPACE)
+            
+        if(NOT RES_VAR EQUAL 0)
+            if (NOT ${COMPONENT_NAME}_REPO)
+                 if(NOT GITHUB_USERNAME)
+                    SET(GITHUB_USERNAME ${GITHUB_ORGANIZATION})
+                endif()
+                if (GITHUB_USE_SSL)
+                    SET(GITHUB_PROTOCOL "git@github.com:")
+                else()
+                    SET(GITHUB_PROTOCOL "https://github.com/")
+                endif()
+                set(${COMPONENT_NAME}_REPO ${GITHUB_PROTOCOL}${GITHUB_USERNAME}/${FOLDER_NAME})
             endif()
-            if (GITHUB_USE_SSL)
-                SET(GITHUB_PROTOCOL "git@github.com:")
-            else()
-                SET(GITHUB_PROTOCOL "https://github.com/")
-            endif()
-            set(${COMPONENT_NAME}_REPO ${GITHUB_PROTOCOL}${GITHUB_USERNAME}/${FOLDER_NAME})
+            SET(DOWNLOAD_CMDS
+                GIT_REPOSITORY ${${COMPONENT_NAME}_REPO}
+                GIT_TAG ${${COMPONENT_NAME}_BRANCH}
+            )
         endif()
-        SET(DOWNLOAD_CMDS
-            GIT_REPOSITORY ${${COMPONENT_NAME}_REPO}
-            GIT_TAG ${${COMPONENT_NAME}_BRANCH}
-        )
+    
     # Default: Download the current version branch as zip of no development flag is set
     else()
         SET(DOWNLOAD_CMDS
@@ -128,11 +145,7 @@ MACRO(ADD_DOWNSTREAM_DEPS PACKAGE)
     endif()
 ENDMACRO()
 
-if(WIN32)
-    SET(GIT_COMMAND cmd /c git)
-else()
-    SET(GIT_COMMAND git)
-endif()
+
 
 macro(GET_BUILD_COMMANDS BUILD_CMD_VAR INSTALL_CMD_VAR DIR PARALLEL)
     

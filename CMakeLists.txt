@@ -20,7 +20,7 @@ LIST(APPEND CMAKE_MODULE_PATH
     ${OPENCMISS_SETUP_DIR}/CMakeScripts
     ${OPENCMISS_SETUP_DIR}/Config)
 
-# Check utilities first (this ensures that CMake is new enough and other tools are available)
+# This ensures that CMake is new enough before anything
 include(CMakeCheck)
 
 ########################################################################
@@ -65,7 +65,7 @@ if(OCM_USE_MT)
     find_package(OpenMP REQUIRED)
 endif()
 
-####################################
+########################################################################
 # Checks for known issues
 if (CMAKE_COMPILER_IS_GNUC AND MPI STREQUAL intel)
     message(FATAL_ERROR "Invalid compiler/MPI combination: Cannot build with GNU compiler and Intel MPI.")
@@ -78,18 +78,18 @@ get_architecture_path(ARCHITECTURE_PATH)
 # this is the <kickoff> part / main build tree configuration part 
 get_filename_component(BUILDNAME ${CMAKE_CURRENT_BINARY_DIR} NAME)
 
-#####################################
+########################################################################
 # Build tree location for components
 SET(OPENCMISS_COMPONENTS_BINARY_DIR ${OPENCMISS_ROOT}/build/${BUILDNAME}/${ARCHITECTURE_PATH})
 
-#####################################
+########################################################################
 # Install dir
 # Extra path segment for single configuration case - will give release/debug/...
 get_build_type_extra(BUILDTYPEEXTRA)
 # everything from the OpenCMISS main project goes into install/
 SET(OPENCMISS_COMPONENTS_INSTALL_PREFIX ${OPENCMISS_ROOT}/install/${BUILDNAME}/${ARCHITECTURE_PATH}/${BUILDTYPEEXTRA})
 
-#####################################
+########################################################################
 # Collect the common arguments for any package/component
 include(CollectComponentDefinitions)
 #message(STATUS "OpenCMISS components common definitions:\n${COMPONENT_COMMON_DEFS}")
@@ -98,7 +98,6 @@ include(OCMSetupBuildMacros)
 
 ########################################################################
 # Utilities
-########################################################################
 include(Utilities)
 
 ########################################################################
@@ -107,17 +106,4 @@ include(Dependencies)
 
 ########################################################################
 # Iron
-if (OCM_USE_IRON)
-    include(Iron)
-endif()
-
-########################################################################
-# Remove the CMake Cache of subprojects when calling make clean!
-# Otherwise, changes in the localconfig wont be propagated
-# Any better idea?!
-#set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-#    PROPERTY ADDITIONAL_MAKE_CLEAN_FILES 
-#    ${OPENCMISS_UTILITIES_BINARY_DIR}/CMakeCache.txt
-#    ${OPENCMISS_DEPENDENCIES_BINARY_DIR}/CMakeCache.txt
-#    ${IRON_BINARY_DIR}/CMakeCache.txt
-#)
+include(Iron)
