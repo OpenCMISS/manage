@@ -14,13 +14,47 @@ MACRO(ADD_COMPONENT COMPONENT_NAME)
     
     message(STATUS "Building OpenCMISS component ${COMPONENT_NAME} in ${COMPONENT_BUILD_DIR}...")
     
+    SET(COMPONENT_DEFS ${COMPONENT_COMMON_DEFS})
+    # OpenMP multithreading
+    foreach(DEP ${OPENCMISS_COMPONENTS_WITH_OPENMP})
+        if(${DEP} STREQUAL ${COMPONENT_NAME})
+            LIST(APPEND COMPONENT_DEFS
+                -DWITH_OPENMP=${OCM_USE_MT}
+            )
+        endif()
+    endforeach()
+    
+    # check if MPI compilers should be forwarded/set
+    # so that the local FindMPI uses that
+    foreach(DEP ${OPENCMISS_COMPONENTS_WITHMPI})
+        if(${DEP} STREQUAL ${COMPONENT_NAME})
+            if (MPI)
+                LIST(APPEND COMPONENT_DEFS
+                    -DMPI=${MPI}
+                )
+            endif()
+            if (MPI_HOME)
+                LIST(APPEND COMPONENT_DEFS
+                    -DMPI_HOME=${MPI_HOME}
+                )
+            endif()
+            foreach(lang C CXX Fortran)
+                if(MPI_${lang}_COMPILER)
+                    LIST(APPEND COMPONENT_DEFS
+                        -DMPI_${lang}_COMPILER=${MPI_${lang}_COMPILER}
+                    )
+                endif()
+            endforeach()
+        endif()
+    endforeach()
+    
 	# Forward any other variables
     foreach(extra_def ${ARGN})
-        LIST(APPEND COMPONENT_COMMON_DEFS -D${extra_def})
+        LIST(APPEND COMPONENT_DEFS -D${extra_def})
         #message(STATUS "${COMPONENT_NAME}: Using extra definition -D${extra_def}")
     endforeach()
     
-    #message(STATUS "OpenCMISS component ${COMPONENT_NAME} extra args:\n${COMPONENT_COMMON_DEFS}")
+    #message(STATUS "OpenCMISS component ${COMPONENT_NAME} extra args:\n${COMPONENT_DEFS}")
 
 	GET_BUILD_COMMANDS(BUILD_COMMAND INSTALL_COMMAND ${COMPONENT_BUILD_DIR} TRUE)
     #GET_SUBMODULE_STATUS(SUBMOD_STATUS REV_ID ${OpenCMISS_Dependencies_SOURCE_DIR} ${MODULE_PATH})

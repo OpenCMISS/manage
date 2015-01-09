@@ -31,7 +31,12 @@ unset(_CONFIG_FOUND)
 # Postprocessing
 foreach(OCM_COMP ${OPENCMISS_COMPONENTS})
     # Set default version number branch unless e.g. IRON_BRANCH is specified
-    if(NOT ${${OCM_COMP}_BRANCH})
+    if(NOT ${OCM_COMP}_BRANCH)
         set(${OCM_COMP}_BRANCH "v${${OCM_COMP}_VERSION}")
     endif()
+    # All local enabled? Set to local search.
+    if (OCM_ALL_LOCAL)
+        SET(OCM_${OCM_COMP}_LOCAL YES)
+    endif()
+    message(STATUS "OpenCMISS component ${OCM_COMP}: Enabled ${OCM_USE_${OCM_COMP}}, Local lookup ${OCM_${OCM_COMP}_LOCAL}, Branch '${${OCM_COMP}_BRANCH}'")
 endforeach()

@@ -1,8 +1,8 @@
 # ==============================
 # Build configuration
 # ==============================
-option(BUILD_IRON "Build OpenCMISS-Iron" YES)
-option(BUILD_ZINC "Build OpenCMISS-Zinc" NO)
+SET(OCM_USE_IRON YES)
+SET(OCM_USE_ZINC NO)
 
 # Use architecture information paths
 SET(OCM_USE_ARCHITECTURE_PATH YES)
@@ -69,27 +69,30 @@ option(OCM_USE_MPI "Use MPI in OpenCMISS (not cared about eveywhere yet)!" YES)
 #SET(MPI_CXX_COMPILER mpic++)
 #SET(MPI_Fortran_COMPILER mpif77)
 
-# Force to use all OpenCMISS dependencies - long compilation, but will work
-SET(FORCE_OCM_ALLDEPS NO)
-
 # To enforce use of the shipped package, set OCM_FORCE_<PACKAGE>=YES e.g.
 #  SET(OCM_FORCE_BLAS YES)
 # for BLAS libraries.
 
 # Default: Build all dependencies
 # This is changeable in the OpenCMISSLocalConfig file
-FOREACH(OCM_DEP ${OCM_DEPS})
+FOREACH(OCM_DEP ${OPENCMISS_COMPONENTS})
     SET(OCM_USE_${OCM_DEP} YES)
 ENDFOREACH()
+
+# Look for local BLAS/LAPACK packages by default; the rest is built
+SET(OCM_BLAS_LOCAL YES)
+SET(OCM_LAPACK_LOCAL YES)
 
 SET(BLAS_VERSION 3.5.0)
 SET(HYPRE_VERSION 2.9.0)
 SET(LAPACK_VERSION 3.5.0)
+SET(LIBCELLML_VERSION 1.0)
 SET(METIS_VERSION 5.1)
 SET(MUMPS_VERSION 4.10.0)
 SET(PASTIX_VERSION 5.2.2.16)
 SET(PARMETIS_VERSION 4.0.3)
 SET(PETSC_VERSION 3.5)
+SET(PLAPACK_VERSION 3.0)
 SET(PTSCOTCH_VERSION 6.0.3)
 SET(SCALAPACK_VERSION 2.8)
 SET(SCOTCH_VERSION 6.0.3)
@@ -99,6 +102,7 @@ SET(SUNDIALS_VERSION 2.5)
 SET(SUPERLU_VERSION 4.3)
 SET(SUPERLU_DIST_VERSION 3.3)
 SET(ZLIB_VERSION 1.2.3)
+SET(IRON_VERSION 1.0)
 
 # ==========================================================================================
 # Single module configuration

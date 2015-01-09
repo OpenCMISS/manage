@@ -31,44 +31,11 @@ foreach(lang C CXX Fortran)
     endif()
 endforeach()
 
-# OpenMP multithreading
-foreach(DEP ${OCM_DEPS_WITH_OPENMP})
-    if(${DEP} STREQUAL ${PROJECT_NAME})
-        LIST(APPEND COMPONENT_COMMON_DEFS
-            -DWITH_OPENMP=${OCM_USE_MT}
-        )
-    endif()
-endforeach()
-
-# check if MPI compilers should be forwarded/set
-# so that the local FindMPI uses that
-foreach(DEP ${OCM_DEPS_WITHMPI})
-    if(${DEP} STREQUAL ${PROJECT_NAME})
-        if (MPI)
-            LIST(APPEND COMPONENT_COMMON_DEFS
-                -DMPI=${MPI}
-            )
-        endif()
-        if (MPI_HOME)
-            LIST(APPEND COMPONENT_COMMON_DEFS
-                -DMPI_HOME=${MPI_HOME}
-            )
-        endif()
-        foreach(lang C CXX Fortran)
-            if(MPI_${lang}_COMPILER)
-                LIST(APPEND COMPONENT_COMMON_DEFS
-                    -DMPI_${lang}_COMPILER=${MPI_${lang}_COMPILER}
-                )
-            endif()
-        endforeach()
-    endif()
-endforeach()
-
-# Pass on force flags (consumed by find_package calls)
-foreach(DEP ${${PROJECT_NAME}_DEPS})
-    if (OCM_FORCE_${DEP})
+# Pass on local lookup flags (consumed by find_package calls)
+foreach(COMP ${OPENCMISS_COMPONENTS})
+    if (OCM_${COMP}_LOCAL)
 	    LIST(APPEND COMPONENT_COMMON_DEFS 
-	        -DOCM_FORCE_${DEP}=${OCM_FORCE_${DEP}}
+	        -DOCM_${COMP}_LOCAL=${OCM_${COMP}_LOCAL}
 	    )
 	endif()
 endforeach()

@@ -9,13 +9,16 @@ SET(OPENCMISS_SETUP_DIR ${CMAKE_CURRENT_SOURCE_DIR})
 if (NOT OPENCMISS_ROOT)
     SET(OPENCMISS_ROOT ${OPENCMISS_SETUP_DIR}/..)
 endif()
+get_filename_component(OPENCMISS_ROOT ${OPENCMISS_ROOT} ABSOLUTE)
+message(STATUS "Having OpenCMISS root at ${OPENCMISS_ROOT}")
 
 # Set up include path
 LIST(APPEND CMAKE_MODULE_PATH 
     ${OPENCMISS_SETUP_DIR}
     ${OPENCMISS_SETUP_DIR}/CMakeFindModuleWrappers
     ${OPENCMISS_SETUP_DIR}/CMakeModules
-    ${OPENCMISS_SETUP_DIR}/CMakeScripts)
+    ${OPENCMISS_SETUP_DIR}/CMakeScripts
+    ${OPENCMISS_SETUP_DIR}/Config)
 
 # Check utilities first (this ensures that CMake is new enough and other tools are available)
 include(CMakeCheck)
@@ -35,11 +38,7 @@ endif()
 if(NOT OPENCMISS_CONFIG_DIR)
     SET(OPENCMISS_CONFIG_DIR ${CMAKE_CURRENT_BINARY_DIR})
 endif()
-# Make sure a localconfig file exists
-if (NOT EXISTS ${OPENCMISS_CONFIG_DIR}/OpenCMISSLocalConfig.cmake)
-    configure_file(${OPENCMISS_SETUP_DIR}/Config/OpenCMISSLocalConfig.template.cmake
-        ${OPENCMISS_CONFIG_DIR}/OpenCMISSLocalConfig.cmake COPYONLY)
-endif()
+include(CreateLocalConfig)
 
 # This includes the configuration, both default and local
 include(OpenCMISSConfig)
@@ -108,7 +107,7 @@ include(Dependencies)
 
 ########################################################################
 # Iron
-if (BUILD_IRON)
+if (OCM_USE_IRON)
     include(Iron)
 endif()
 
