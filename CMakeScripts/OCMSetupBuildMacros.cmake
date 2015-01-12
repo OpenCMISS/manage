@@ -1,5 +1,3 @@
-include(ExternalProject)
-
 if(WIN32)
     SET(GIT_COMMAND cmd /c git)
 else()
@@ -21,6 +19,7 @@ MACRO(ADD_COMPONENT COMPONENT_NAME)
     message(STATUS "Building OpenCMISS component ${COMPONENT_NAME} in ${COMPONENT_BUILD_DIR}...")
     
     SET(COMPONENT_DEFS ${COMPONENT_COMMON_DEFS})
+    
     # OpenMP multithreading
     foreach(DEP ${OPENCMISS_COMPONENTS_WITH_OPENMP})
         if(${DEP} STREQUAL ${COMPONENT_NAME})
@@ -60,7 +59,7 @@ MACRO(ADD_COMPONENT COMPONENT_NAME)
         #message(STATUS "${COMPONENT_NAME}: Using extra definition -D${extra_def}")
     endforeach()
     
-    #message(STATUS "OpenCMISS component ${COMPONENT_NAME} extra args:\n${COMPONENT_DEFS}")
+    message(STATUS "OpenCMISS component ${COMPONENT_NAME} extra args:\n${COMPONENT_DEFS}")
 
 	GET_BUILD_COMMANDS(BUILD_COMMAND INSTALL_COMMAND ${COMPONENT_BUILD_DIR} TRUE)
     #GET_SUBMODULE_STATUS(SUBMOD_STATUS REV_ID ${OpenCMISS_Dependencies_SOURCE_DIR} ${MODULE_PATH})
@@ -115,7 +114,7 @@ MACRO(ADD_COMPONENT COMPONENT_NAME)
 		CMAKE_COMMAND ${CMAKE_COMMAND} --no-warn-unused-cli # disables warnings for unused cmdline options
 		SOURCE_DIR ${COMPONENT_SOURCE}
 		BINARY_DIR ${COMPONENT_BUILD_DIR}
-		CMAKE_ARGS ${COMPONENT_COMMON_DEFS}
+		CMAKE_ARGS ${COMPONENT_DEFS}
 		
 		#--Build step-----------------
 		BUILD_COMMAND ${BUILD_COMMAND}

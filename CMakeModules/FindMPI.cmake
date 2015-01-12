@@ -711,7 +711,9 @@ find_program(MPIEXEC
   PATH_SUFFIXES ${_BIN_SUFFIX}
   ${PATHOPT}
   DOC "Executable for running MPI programs.")
-message("Found MPI executable: ${MPIEXEC}")
+if (MPIEXEC)
+    message("MPI executable: ${MPIEXEC}")
+endif()
 
 # call get_filename_component twice to remove mpiexec and the directory it exists in (typically bin).
 # This gives us a fairly reliable base directory to search for /bin /lib and /include from.
@@ -796,8 +798,10 @@ foreach (lang C CXX Fortran)
     set(MPI_${lang}_FIND_VERSION ${MPI_FIND_VERSION})
     set(MPI_${lang}_FIND_VERSION_EXACT ${MPI_FIND_VERSION_EXACT})
     
-    message(STATUS "MPI ${lang} Libs: ${MPI_${lang}_LIBRARIES}")
-    message(STATUS "MPI ${lang} Path: ${MPI_${lang}_INCLUDE_PATH}")
+    if (MPI_${lang}_FOUND)
+        message(STATUS "MPI ${lang} Libs: ${MPI_${lang}_LIBRARIES}")
+        message(STATUS "MPI ${lang} Path: ${MPI_${lang}_INCLUDE_PATH}")
+    endif()
     
     # Check if the found version matches with the desired one
     # (Applies only if MPI variable is set!)

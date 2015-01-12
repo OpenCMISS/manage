@@ -1,4 +1,4 @@
-CMAKE_MINIMUM_REQUIRED(VERSION 2.4 FATAL_ERROR)
+CMAKE_MINIMUM_REQUIRED(VERSION 2.6 FATAL_ERROR)
 
 #include(CMakeScripts/FunctionDefinitions.cmake)
 #PRINT_VARS()
@@ -56,10 +56,14 @@ include(OpenCMISSConfig)
 #    SET(CMAKE_${lang}_FLAGS "-m${ABI} ${CMAKE_${lang}_FLAGS}")
 #endforeach()
 
-if (OCM_USE_MPI)
-    find_package(MPI MODULE QUIET)
+include(ExternalProject)
+
+########################################################################
+# Utilities (Wrappers, MPI, ...)
+include(Utilities)
+if(BUILDING_MPI)
+    return()
 endif()
-#message(STATUS "MPI_C_COMPILER: ${MPI_C_COMPILER}, MPI_CXX_COMPILER: ${MPI_CXX_COMPILER}")
 
 if(OCM_USE_MT)
     find_package(OpenMP REQUIRED)
@@ -95,11 +99,6 @@ include(CollectComponentDefinitions)
 #message(STATUS "OpenCMISS components common definitions:\n${COMPONENT_COMMON_DEFS}")
 
 include(OCMSetupBuildMacros)
-
-########################################################################
-# Utilities
-include(Utilities)
-
 ########################################################################
 # Dependencies
 include(Dependencies)

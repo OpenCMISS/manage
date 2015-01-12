@@ -23,7 +23,7 @@ SET(ZLIB_FWD_DEPS SCOTCH PTSCOTCH IRON)
 # ================================
 # Postprocessing
 # ================================
-FOREACH(OCM_DEP ${OPENCMISS_COMPONENTS})
+#FOREACH(OCM_DEP ${OPENCMISS_COMPONENTS})
     # Make a dependency check and enable other packages if required
     #if (${OCM_DEP}_FWD_DEPS)
     #    foreach(FWD_DEP ${${OCM_DEP}_FWD_DEPS})
@@ -33,7 +33,7 @@ FOREACH(OCM_DEP ${OPENCMISS_COMPONENTS})
     #        endif() 
     #    endforeach()
     #endif()
-ENDFOREACH()
+#ENDFOREACH()
 
 # ================================
 # Package creation
@@ -264,7 +264,7 @@ endif()
 
 # CellML
 if (OCM_USE_LIBCELLML)
-    ADD_COMPONENT(LIBCELLML libcellml)
+    ADD_COMPONENT(LIBCELLML)
 endif()
 
 # Notes:

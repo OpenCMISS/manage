@@ -56,6 +56,12 @@ option(OCM_USE_MPI "Use MPI in OpenCMISS (not cared about eveywhere yet)!" YES)
 # poe: 
 # @@@ windows @@@
 # mpich, mpich2: fixed directory
+
+# Prefer local MPI versions over shipped one
+SET(OCM_MPI_LOCAL YES)
+# Version to use if must build ourselves
+SET(OPENMPI_VERSION 1.8.4)
+
 #SET(MPI mpich)
 #SET(MPI mpich2)
 #SET(MPI openmpi)
@@ -86,6 +92,7 @@ ENDFOREACH()
 SET(OCM_BLAS_LOCAL YES)
 SET(OCM_LAPACK_LOCAL YES)
 
+# Dependencies
 SET(BLAS_VERSION 3.5.0)
 SET(HYPRE_VERSION 2.9.0)
 SET(LAPACK_VERSION 3.5.0)
@@ -132,3 +139,5 @@ SET(SUPERLU_DIST_WITH_PARMETIS YES)
 SET(PASTIX_USE_THREADS YES)
 SET(PASTIX_USE_METIS YES)
 SET(PASTIX_USE_PTSCOTCH YES)
+
+SET(IRON_WITH_CELLML YES)

@@ -9,10 +9,15 @@
 # ==============================
 # Global MPI flag
 #SET(OCM_USE_MPI NO)
+
+# Choose your MPI type (beta status)
 #SET(MPI mpich)
 #SET(MPI mpich2)
 #SET(MPI openmpi)
 #SET(MPI intel)
+
+# If you want to use only the shipped version of MPI and not the (default) local version, uncomment the following line.
+#SET(OCM_MPI_LOCAL NO)
 
 # Enter a custom mpi root directory here for a different mpi implementation.
 # Leave as-is to use default system mpi.
@@ -24,6 +29,8 @@
 #SET(MPI_C_COMPILER mpicc)
 #SET(MPI_CXX_COMPILER mpic++)
 #SET(MPI_Fortran_COMPILER mpif77)
+
+
 
 ###########################################################################
 # Component configuration

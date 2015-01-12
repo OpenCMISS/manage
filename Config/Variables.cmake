@@ -8,7 +8,7 @@ SET(OPENCMISS_COMPONENTS BLAS LAPACK PLAPACK SCALAPACK PARMETIS
 # Used to determine when MPI compilers etc should be passed down to packages
 SET(OPENCMISS_COMPONENTS_WITHMPI MUMPS PARMETIS PASTIX PETSC
     PLAPACK SCALAPACK SCOTCH SUITESPARSE
-    SUNDIALS SUPERLU_DIST SLEPC HYPRE)
+    SUNDIALS SUPERLU_DIST SLEPC HYPRE IRON)
     
 # Components using OPENMP local threading
 # Used to determine which dependencies get the WITH_OPENMP flag
