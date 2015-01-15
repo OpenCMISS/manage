@@ -8,6 +8,21 @@ foreach(PACKAGE_NAME ${PACKAGES_WITH_TARGETS})
     #endif()
 endforeach()
 
+# Fortran mangling - only detect if not already set manually.
+if (NOT FORTRAN_MANGLING)
+    include(FortranCInterface)
+    FortranCInterface_VERIFY()
+    FortranCInterface_VERIFY(CXX)#[QUIET]
+    if (FortranCInterface_GLOBAL_SUFFIX STREQUAL _ AND FortranCInterface_GLOBAL_CASE STREQUAL LOWER)
+        SET(FORTRAN_MANGLING Add_)
+    elseif(FortranCInterface_GLOBAL_SUFFIX STREQUAL "" AND FortranCInterface_GLOBAL_CASE STREQUAL UPPER)
+        SET(FORTRAN_MANGLING UpCase)
+    endif()
+    if (NOT FORTRAN_MANGLING)
+        message(FATAL_ERROR "Fortran mangling autodetection: case not implemented yet.")
+    endif()
+endif()
+
 ########################################################################
 # MPI
 if(OCM_USE_MPI)
