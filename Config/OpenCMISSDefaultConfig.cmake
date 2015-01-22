@@ -78,10 +78,6 @@ SET(OPENMPI_VERSION 1.8.4)
 #SET(MPI_CXX_COMPILER mpic++)
 #SET(MPI_Fortran_COMPILER mpif77)
 
-# To enforce use of the shipped package, set OCM_FORCE_<PACKAGE>=YES e.g.
-#  SET(OCM_FORCE_BLAS YES)
-# for BLAS libraries.
-
 # Default: Build all dependencies
 # This is changeable in the OpenCMISSLocalConfig file
 FOREACH(OCM_DEP ${OPENCMISS_COMPONENTS})

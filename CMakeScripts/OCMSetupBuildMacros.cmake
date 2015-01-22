@@ -1,7 +1,10 @@
-if(WIN32)
-    SET(GIT_COMMAND cmd /c git)
-else()
-    SET(GIT_COMMAND git)
+find_program(GIT_EXECUTABLE git)
+if (GIT_EXECUTABLE)
+    if(WIN32)
+        SET(GIT_COMMAND cmd /c ${GIT_EXECUTABLE})
+    else()
+        SET(GIT_COMMAND ${GIT_EXECUTABLE})
+    endif()
 endif()
 
 MACRO(ADD_COMPONENT COMPONENT_NAME)
@@ -59,7 +62,7 @@ MACRO(ADD_COMPONENT COMPONENT_NAME)
         #message(STATUS "${COMPONENT_NAME}: Using extra definition -D${extra_def}")
     endforeach()
     
-    message(STATUS "OpenCMISS component ${COMPONENT_NAME} extra args:\n${COMPONENT_DEFS}")
+    #message(STATUS "OpenCMISS component ${COMPONENT_NAME} extra args:\n${COMPONENT_DEFS}")
 
 	GET_BUILD_COMMANDS(BUILD_COMMAND INSTALL_COMMAND ${COMPONENT_BUILD_DIR} TRUE)
     #GET_SUBMODULE_STATUS(SUBMOD_STATUS REV_ID ${OpenCMISS_Dependencies_SOURCE_DIR} ${MODULE_PATH})
@@ -67,6 +70,11 @@ MACRO(ADD_COMPONENT COMPONENT_NAME)
     SET(DOWNLOAD_CMDS )
     # Developer mode
     if (${${COMPONENT_NAME}_DEVEL})
+        # Need git only for development modes. So scream here if not found!
+        if(NOT GIT_EXECUTABLE)
+            message(FATAL_ERROR "Development of OpenCMISS components like ${COMPONENT_NAME} requires the GIT executable to be available to cmake (check PATH etc).")
+        endif()
+        
         # Check if there already is a git repo at the source location
         execute_process(COMMAND ${GIT_COMMAND} status
             RESULT_VARIABLE RES_VAR
@@ -189,24 +197,24 @@ endmacro()
 # REV_VAR: Variable name to store the revision
 # REPO_DIR: Repo directory that contains the submodule
 # MODULE_PATH: Path to the submodule relative to REPO_DIR
-macro(GET_SUBMODULE_STATUS STATUS_VAR REV_VAR REPO_DIR MODULE_PATH)
-    
-    execute_process(COMMAND ${GIT_COMMAND} submodule status ${MODULE_PATH}
-        RESULT_VARIABLE RES_VAR
-        OUTPUT_VARIABLE RES
-        ERROR_VARIABLE RES_ERR
-        WORKING_DIRECTORY ${REPO_DIR}
-        OUTPUT_STRIP_TRAILING_WHITESPACE)
-    if(NOT RES_VAR EQUAL 0)
-        message(FATAL_ERROR "Process returned nonzero result: ${RES_VAR}. Additional error: ${RES_ERR}")
-    endif()
-    string(SUBSTRING ${RES} 0 1 ${STATUS_VAR})
-    string(SUBSTRING ${RES} 1 40 ${REV_VAR})
-    unset(RES_VAR)
-    unset(RES)
-    unset(RES_ERR)
-    unset(_cmd)
-endmacro()
+#macro(GET_SUBMODULE_STATUS STATUS_VAR REV_VAR REPO_DIR MODULE_PATH)
+#    
+#    execute_process(COMMAND ${GIT_COMMAND} submodule status ${MODULE_PATH}
+#        RESULT_VARIABLE RES_VAR
+#        OUTPUT_VARIABLE RES
+#        ERROR_VARIABLE RES_ERR
+#        WORKING_DIRECTORY ${REPO_DIR}
+#        OUTPUT_STRIP_TRAILING_WHITESPACE)
+#    if(NOT RES_VAR EQUAL 0)
+#        message(FATAL_ERROR "Process returned nonzero result: ${RES_VAR}. Additional error: ${RES_ERR}")
+#    endif()
+#    string(SUBSTRING ${RES} 0 1 ${STATUS_VAR})
+#    string(SUBSTRING ${RES} 1 40 ${REV_VAR})
+#    unset(RES_VAR)
+#    unset(RES)
+#    unset(RES_ERR)
+#    unset(_cmd)
+#endmacro()
 
 # Recursively updates a submodule and switches to a specified branch, if given. 
 #macro(OCM_DEVELOPER_SUBMODULE_UPDATE REPO_ROOT MODULE_PATH BRANCH)
@@ -232,16 +240,16 @@ endmacro()
 #endmacro()
 
 # Recursively inits a submodule and switches to a specified branch, if given. 
-macro(OCM_DEVELOPER_SUBMODULE_INIT REPO_ROOT MODULE_PATH)
-    message(STATUS "Initializing git submodule ${MODULE_PATH}..")
-    execute_process(COMMAND ${GIT_COMMAND} submodule init ${MODULE_PATH}
-        RESULT_VARIABLE RETCODE
-        ERROR_VARIABLE UPDATE_CMD_ERR
-        WORKING_DIRECTORY ${REPO_ROOT})
-    if (NOT RETCODE EQUAL 0)
-        message(FATAL_ERROR "Error initializing submodule '${MODULE_PATH}' (code: ${RETCODE}): ${UPDATE_CMD_ERR}")
-    endif()
-endmacro()
+#macro(OCM_DEVELOPER_SUBMODULE_INIT REPO_ROOT MODULE_PATH)
+#    message(STATUS "Initializing git submodule ${MODULE_PATH}..")
+#    execute_process(COMMAND ${GIT_COMMAND} submodule init ${MODULE_PATH}
+#        RESULT_VARIABLE RETCODE
+#        ERROR_VARIABLE UPDATE_CMD_ERR
+#        WORKING_DIRECTORY ${REPO_ROOT})
+#    if (NOT RETCODE EQUAL 0)
+#        message(FATAL_ERROR "Error initializing submodule '${MODULE_PATH}' (code: ${RETCODE}): ${UPDATE_CMD_ERR}")
+#    endif()
+#endmacro()
 
 # Adds extra steps to the external projects for submodule updates and checkout.
 macro(ADD_SUBMODULE_CHECKOUT_STEPS PROJECT REPO_ROOT MODULE_PATH BRANCH) 
