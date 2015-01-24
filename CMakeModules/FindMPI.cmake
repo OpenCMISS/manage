@@ -166,8 +166,10 @@ set(_MPI_PREFIX_PATH )
 
 # For 64bit environments, look in bin64 folders first!
 SET(_BIN_SUFFIX bin)
-if (${CMAKE_SYSTEM_PROCESSOR} MATCHES 64)
+SET(PROGRAM_FILES_PATH "Program\ Files (x86)")
+if (CMAKE_SYSTEM_PROCESSOR MATCHES "64")
     LIST(INSERT _BIN_SUFFIX 0 bin64)
+    SET(PROGRAM_FILES_PATH "Program\ Files")
 endif()
 
 # Check if a mpi mnemonic is given
@@ -177,13 +179,13 @@ if(MPI)
         #LIST(APPEND _MPI_PREFIX_PATH /usr/lib/mpich /usr/lib64/mpich /usr/local/lib/mpich /usr/local/lib64/mpich)
         LIST(APPEND _MPI_PREFIX_PATH mpich)
         if(WIN32)
-            LIST(APPEND _MPI_PREFIX_PATH "C:/Program\ Files/MPICH" "C:/Program\ Files/mpich")
+            LIST(APPEND _MPI_PREFIX_PATH "C:/${PROGRAM_FILES_PATH}/MPICH" "C:/${PROGRAM_FILES_PATH}/mpich")
         endif()
     elseif(MPI STREQUAL mpich2)
         #LIST(APPEND _MPI_PREFIX_PATH /usr/lib/mpich2 /usr/lib64/mpich2 /usr/local/lib/mpich2 /usr/local/lib64/mpich2)
         LIST(APPEND _MPI_PREFIX_PATH mpich2)
         if(WIN32)
-            LIST(APPEND _MPI_PREFIX_PATH "C:/Program\ Files/MPICH2" "C:/Program\ Files/mpich2")
+            LIST(APPEND _MPI_PREFIX_PATH "C:/${PROGRAM_FILES_PATH}/MPICH2" "C:/${PROGRAM_FILES_PATH}/mpich2")
         endif()
     elseif(MPI STREQUAL intel)
         LIST(APPEND _MPI_PREFIX_PATH /opt/intel/impi/latest)
@@ -239,7 +241,7 @@ if(MPI)
 endif()
 
 # Grab the path to MPI from the registry if we're on windows.
-if(WIN32)
+if(WIN32 AND NOT MPI_HOME)
   list(APPEND _MPI_PREFIX_PATH "[HKEY_LOCAL_MACHINE\\SOFTWARE\\MPICH\\SMPD;binary]/..")
   list(APPEND _MPI_PREFIX_PATH "[HKEY_LOCAL_MACHINE\\SOFTWARE\\MPICH2;Path]")
   list(APPEND _MPI_PREFIX_PATH "$ENV{ProgramW6432}/MPICH2/")
@@ -314,7 +316,7 @@ function (interrogate_mpi_compiler lang try_libs)
           OUTPUT_VARIABLE  MPI_LINK_CMDLINE OUTPUT_STRIP_TRAILING_WHITESPACE
           ERROR_VARIABLE   MPI_LINK_CMDLINE ERROR_STRIP_TRAILING_WHITESPACE
           RESULT_VARIABLE  MPI_COMPILER_RETURN)
-
+          
         if (MPI_COMPILER_RETURN EQUAL 0)
           # We probably have -showme:incdirs and -showme:libdirs as well,
           # so grab that while we're at it.
@@ -376,6 +378,7 @@ function (interrogate_mpi_compiler lang try_libs)
           ERROR_VARIABLE   MPI_COMPILE_CMDLINE ERROR_STRIP_TRAILING_WHITESPACE
           RESULT_VARIABLE  MPI_COMPILER_RETURN)
       endif()
+      
 
       if (MPI_COMPILER_RETURN EQUAL 0)
         # We have our command lines, but we might need to copy MPI_COMPILE_CMDLINE
@@ -603,7 +606,7 @@ function(try_regular_compiler lang success)
 endfunction()
 
 # This function has been added here from GetPrerequisites.
-# It has been modified to resolve symlinks on linux so that the "file"
+# It has been modified to resolve symlinks on linux
 function(is_file_executable file result_var)
   #
   # A file is not executable until proven otherwise:
@@ -747,8 +750,13 @@ foreach (lang C CXX)
 
   # Special handling for MPI_LIBRARY and MPI_EXTRA_LIBRARY, which we nixed in the
   # new FindMPI.  These need to be merged into MPI_<lang>_LIBRARIES
-  if (NOT MPI_${lang}_LIBRARIES AND (MPI_LIBRARY OR MPI_EXTRA_LIBRARY))
-    set(MPI_${lang}_LIBRARIES ${MPI_LIBRARY} ${MPI_EXTRA_LIBRARY})
+  if (NOT MPI_${lang}_LIBRARIES)
+    if (MPI_LIBRARY)
+        LIST(APPEND MPI_${lang}_LIBRARIES ${MPI_LIBRARY})
+    endif()
+    if (MPI_EXTRA_LIBRARY)
+        LIST(APPEND MPI_${lang}_LIBRARIES ${MPI_EXTRA_LIBRARY})
+    endif()
   endif()
 endforeach()
 #=============================================================================
@@ -812,7 +820,9 @@ foreach (lang C CXX Fortran)
         foreach(IDX RANGE 3)
             LIST(GET MNEMONICS ${IDX} MNEMONIC)
             LIST(GET PATTERNS ${IDX} PATTERN)
-            if (MPI STREQUAL ${MNEMONIC} AND NOT MPI_${lang}_INCLUDE_PATH MATCHES ${PATTERN})
+            # Case insensitive match not possible with cmake regex :-(
+            STRING(TOLOWER ${MPI_${lang}_INCLUDE_PATH} INC_PATH)
+            if (MPI STREQUAL ${MNEMONIC} AND NOT INC_PATH MATCHES ${PATTERN})
                 message(STATUS "An MPI_${lang} compiler '${MPI_${lang}_COMPILER}' was found but the MPI_${lang}_INCLUDE_PATH")
                 message(STATUS "'${MPI_${lang}_INCLUDE_PATH}' does not match the requested MPI implementation '${MPI}'.")
                 message(STATUS "Check your include paths (searched in that order with suffixes '${_BIN_SUFFIX}'):")

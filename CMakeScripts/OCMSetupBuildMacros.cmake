@@ -71,19 +71,20 @@ MACRO(ADD_COMPONENT COMPONENT_NAME)
     # Developer mode
     if (${${COMPONENT_NAME}_DEVEL})
         # Need git only for development modes. So scream here if not found!
-        if(NOT GIT_EXECUTABLE)
-            message(FATAL_ERROR "Development of OpenCMISS components like ${COMPONENT_NAME} requires the GIT executable to be available to cmake (check PATH etc).")
-        endif()
+        #if(NOT GIT_EXECUTABLE)
+        #    message(FATAL_ERROR "Development of OpenCMISS components like ${COMPONENT_NAME} requires the GIT executable to be available to cmake (check PATH etc).")
+        #endif()
         
         # Check if there already is a git repo at the source location
-        execute_process(COMMAND ${GIT_COMMAND} status
-            RESULT_VARIABLE RES_VAR
-            OUTPUT_VARIABLE RES
-            ERROR_VARIABLE RES_ERR
-            WORKING_DIRECTORY ${COMPONENT_SOURCE}
-            OUTPUT_STRIP_TRAILING_WHITESPACE)
+        #message(STATUS "Running ${GIT_COMMAND} in ${COMPONENT_SOURCE}")
+        #execute_process(COMMAND ${GIT_COMMAND} status
+        #    RESULT_VARIABLE RES_VAR
+        #    OUTPUT_VARIABLE RES
+        #    ERROR_VARIABLE RES_ERR
+        #    WORKING_DIRECTORY ${COMPONENT_SOURCE}
+        #    OUTPUT_STRIP_TRAILING_WHITESPACE)
             
-        if(NOT RES_VAR EQUAL 0)
+        #if(NOT RES_VAR EQUAL 0)
             if (NOT ${COMPONENT_NAME}_REPO)
                  if(NOT GITHUB_USERNAME)
                     SET(GITHUB_USERNAME ${GITHUB_ORGANIZATION})
@@ -99,7 +100,9 @@ MACRO(ADD_COMPONENT COMPONENT_NAME)
                 GIT_REPOSITORY ${${COMPONENT_NAME}_REPO}
                 GIT_TAG ${${COMPONENT_NAME}_BRANCH}
             )
-        endif()
+        #else()
+        #    message(STATUS "Git returned output '${RES}' / error '${RES_ERR}'")
+        #endif()
     
     # Default: Download the current version branch as zip of no development flag is set
     else()
@@ -113,7 +116,7 @@ MACRO(ADD_COMPONENT COMPONENT_NAME)
 		DEPENDS ${${COMPONENT_NAME}_DEPS}
 		PREFIX ${COMPONENT_BUILD_DIR}
 		TMP_DIR ${COMPONENT_BUILD_DIR}/ep_tmp
-		STAMP_DIR ${COMPONENT_BUILD_DIR}/ep_stamp
+		STAMP_DIR ${OPENCMISS_ROOT}/build/cmake_ep_stamps
 		
 		#--Download step--------------
         ${DOWNLOAD_CMDS}
@@ -172,7 +175,9 @@ macro(GET_BUILD_COMMANDS BUILD_CMD_VAR INSTALL_CMD_VAR DIR PARALLEL)
             SET(GENERATOR_MATCH_VISUAL_STUDIO TRUE)
         elseif(CMAKE_GENERATOR MATCHES "^NMake Makefiles$")
             SET(GENERATOR_MATCH_NMAKE TRUE)
-        elseif(CMAKE_GENERATOR MATCHES "^Unix Makefiles$")
+        elseif(CMAKE_GENERATOR MATCHES "^Unix Makefiles$"
+            OR CMAKE_GENERATOR MATCHES "^MinGW Makefiles$"
+            OR CMAKE_GENERATOR MATCHES "^MSYS Makefiles$")
             SET(GENERATOR_MATCH_MAKE TRUE)
         endif()
         
