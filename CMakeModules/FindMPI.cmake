@@ -215,16 +215,13 @@ foreach (lang C CXX Fortran)
     endif()
     unset(_MPI_${id}_${lang}_COMPILER_NAMES)    # clean up the namespace here
   endforeach()
-  #if (NOT MPI) # dont display twice if we're still adding stuff below
-  #    message(STATUS "FindMPI: MPI_${lang}_COMPILER_NAMES=${_MPI_${lang}_COMPILER_NAMES}")
-  #endif()
 endforeach()
 
 # Names to try for MPI exec
 set(_MPI_EXEC_NAMES mpiexec mpirun lamexec srun)
 
 # For systems with "alternatives" management: prepend the mnemonic name to the executable names
-# (they match, by coincidence/common sence, but hey, they match at least for mpich2/openmpi).
+# (they match, by coincidence/common sense, but hey, they match at least for mpich2/openmpi).
 if(MPI)
     foreach (lang C CXX Fortran)
         foreach(compname ${_MPI_${lang}_COMPILER_NAMES})
@@ -531,6 +528,26 @@ function (interrogate_mpi_compiler lang try_libs)
         set(MPI_LIB "MPI_LIB-NOTFOUND" CACHE FILEPATH "Cleared" FORCE)
         find_library(MPI_LIB
           NAMES         mpi++ mpicxx cxx mpi_cxx
+          HINTS         ${_MPI_BASE_DIR} ${_MPI_PREFIX_PATH}
+          PATH_SUFFIXES lib)
+        if (MPI_LIBRARIES_WORK AND MPI_LIB)
+          list(APPEND MPI_LIBRARIES_WORK ${MPI_LIB})
+        endif()
+      endif()
+      
+      # Added by Daniel Wirtz - support to find MPICH2 fortran libraries on windows
+      if (${lang} STREQUAL Fortran)
+        set(MPI_LIB "MPI_LIB-NOTFOUND" CACHE FILEPATH "Cleared" FORCE)
+        message(STATUS "Looking for fmpich2g in ${_MPI_BASE_DIR} ${_MPI_PREFIX_PATH}")
+        if (CMAKE_${lang}_COMPILER_ID STREQUAL GNU)
+            # This version exports lower case & underscore_ names
+            SET(FORTRAN_LIBNAMES fmpich2g fmpichg)
+        else()
+            # This version has UPPERCASE symbols
+            SET(FORTRAN_LIBNAMES fmpich2 fmpich)
+        endif()
+        find_library(MPI_LIB
+          NAMES         ${FORTRAN_LIBNAMES}
           HINTS         ${_MPI_BASE_DIR} ${_MPI_PREFIX_PATH}
           PATH_SUFFIXES lib)
         if (MPI_LIBRARIES_WORK AND MPI_LIB)
