@@ -3,6 +3,7 @@
 # system. here, the actual dependency list is filled "as we go" and actually build
 # packages locally, see ADD_DOWNSTREAM_DEPS in BuildMacros.cmake
 SET(HYPRE_FWD_DEPS PETSC IRON)
+SET(PLAPACK_FWD_DEPS IRON)
 SET(LAPACK_FWD_DEPS SCALAPACK SUITESPARSE MUMPS
         SUPERLU SUPERLU_DIST PARMETIS HYPRE SUNDIALS PASTIX PLAPACK PETSC IRON)
 SET(LIBCELLML_FWD_DEPS IRON)
