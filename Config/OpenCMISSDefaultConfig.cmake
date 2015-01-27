@@ -27,6 +27,7 @@ SET(BUILD_TESTS ON)
 
 # Type of libraries to build
 option(BUILD_SHARED_LIBS "Build shared libraries" NO)
+option(OCM_POSITION_INDEPENDENT_CODE "Always generate position independent code (-fPIC flag)" NO)
 
 # ==============================
 # Compiler

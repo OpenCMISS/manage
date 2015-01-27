@@ -89,6 +89,13 @@ function(get_architecture_path VARNAME)
         GET_COMPILER_NAME(COMPILER)
         SET(ARCHPATH ${ARCHPATH}/${COMPILER})
         
+        # Library type (static/shared)
+        if (BUILD_SHARED_LIBS)
+            SET(ARCHPATH ${ARCHPATH}/shared)    
+        else()
+            SET(ARCHPATH ${ARCHPATH}/static)
+        endif()
+        
     else()
         SET(ARCHPATH .)
     endif()
