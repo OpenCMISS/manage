@@ -19,7 +19,7 @@ LIST(APPEND CMAKE_MODULE_PATH
     ${OPENCMISS_SETUP_DIR}/CMakeModules
     ${OPENCMISS_SETUP_DIR}/CMakeScripts
     ${OPENCMISS_SETUP_DIR}/Config)
-
+  
 # This ensures that CMake is new enough before anything
 include(CMakeCheck)
 

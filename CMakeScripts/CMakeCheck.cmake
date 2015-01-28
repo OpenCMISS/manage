@@ -5,6 +5,16 @@ if (CMAKE_VERSION VERSION_LESS ${CMAKE_MIN_VERSION})
     if (WIN32)
         message(FATAL_ERROR "Your CMake version is ${CMAKE_VERSION}.\nAt least version ${CMAKE_MIN_VERSION} is required for OpenCMISS.\nPlease download & install from http://www.cmake.org/download/")
     else()
+        # Fixes the library detection, somehow those variables are empty by default
+        # other platforms need to be catered for as we go.
+        if (UNIX)
+            SET(CMAKE_FIND_LIBRARY_SUFFIXES ${CMAKE_FIND_LIBRARY_SUFFIXES} .a .so)
+            SET(CMAKE_FIND_LIBRARY_PREFIXES ${CMAKE_FIND_LIBRARY_PREFIXES} lib)
+        endif()
+        find_package(OpenSSL QUIET)
+        if (NOT OPENSSL_FOUND)
+            message(FATAL_ERROR "No OpenSSL could be found on your system. Building CMake required OpenSSL to be available.")
+        endif()
         
         SET(CMAKE_INSTALL_DIR ${OPENCMISS_ROOT}/install/utilities/cmake)
         SET(MY_CMAKE_EXECUTABLE ${CMAKE_INSTALL_DIR}/bin/cmake${CMAKE_EXECUTABLE_SUFFIX})
@@ -41,13 +51,8 @@ if (CMAKE_VERSION VERSION_LESS ${CMAKE_MIN_VERSION})
         SET(CMAKE_SRC_DIR "${CMAKE_SRC_DIR}/cmake-${CMAKE_MIN_VERSION}")
         
         # Build config
-        SET(CMAKE_DEFS "-DCMAKE_INSTALL_PREFIX=${CMAKE_INSTALL_DIR}")
-        find_package(OpenSSL QUIET)
-        if (OPENSSL_FOUND)
-            LIST(APPEND CMAKE_DEFS "-DCMAKE_USE_OPENSSL=YES")
-        else()
-            message(WARNING "Building CMake 3.xx: OpenSSL could not be located on your system. See the OpenCMISS documentation for details.")
-        endif()
+        SET(CMAKE_DEFS -DCMAKE_INSTALL_PREFIX=${CMAKE_INSTALL_DIR}
+            -DCMAKE_USE_OPENSSL=YES)
         
         # Create dir
         SET(CMAKEBUILD_BINARY_DIR ${OPENCMISS_ROOT}/build/utilities/cmake)
