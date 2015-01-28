@@ -8,7 +8,7 @@ SET(IRON_REPO https://github.com/OpenCMISS/cm.git)
 SET(OCM_USE_ZINC NO)
 
 # Use architecture information paths
-SET(OCM_USE_ARCHITECTURE_PATH YES)
+SET(OCM_USE_ARCHITECTURE_PATH NO)
 
 # Precision to build (if applicable)
 # Valid choices are s,d,c,z and any combinations.

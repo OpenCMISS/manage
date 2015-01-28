@@ -48,6 +48,9 @@ if (OCM_POSITION_INDEPENDENT_CODE)
 endif()
 
 # For shared libs, use the correct install RPATH to enable binaries to find the shared libs.
+# See http://www.cmake.org/Wiki/CMake_RPATH_handling
 if (BUILD_SHARED_LIBS)
-    list(APPEND COMPONENT_COMMON_DEFS -DCMAKE_INSTALL_RPATH=${OPENCMISS_COMPONENTS_INSTALL_PREFIX}/lib)
+    list(APPEND COMPONENT_COMMON_DEFS 
+        -DCMAKE_INSTALL_RPATH=${OPENCMISS_COMPONENTS_INSTALL_PREFIX}/lib
+        -DCMAKE_INSTALL_RPATH_USE_LINK_PATH=TRUE)
 endif()
