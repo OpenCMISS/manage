@@ -46,3 +46,8 @@ endforeach()
 if (OCM_POSITION_INDEPENDENT_CODE)
     list(APPEND COMPONENT_COMMON_DEFS -DCMAKE_POSITION_INDEPENDENT_CODE=YES)
 endif()
+
+# For shared libs, use the correct install RPATH to enable binaries to find the shared libs.
+if (BUILD_SHARED_LIBS)
+    list(APPEND COMPONENT_COMMON_DEFS -DCMAKE_INSTALL_RPATH=${OPENCMISS_COMPONENTS_INSTALL_PREFIX}/lib)
+endif()

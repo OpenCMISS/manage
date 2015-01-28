@@ -116,7 +116,8 @@ MACRO(ADD_COMPONENT COMPONENT_NAME)
 		DEPENDS ${${COMPONENT_NAME}_DEPS}
 		PREFIX ${COMPONENT_BUILD_DIR}
 		TMP_DIR ${COMPONENT_BUILD_DIR}/ep_tmp
-		STAMP_DIR ${OPENCMISS_ROOT}/build/cmake_ep_stamps
+		#STAMP_DIR ${OPENCMISS_ROOT}/build/cmake_ep_stamps
+		STAMP_DIR ${COMPONENT_BUILD_DIR}/ep_stamps
 		
 		#--Download step--------------
         ${DOWNLOAD_CMDS}
