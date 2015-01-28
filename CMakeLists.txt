@@ -80,18 +80,23 @@ endif()
 include(OCMSetupArchitecture)
 get_architecture_path(ARCHITECTURE_PATH)
 # this is the <kickoff> part / main build tree configuration part 
-get_filename_component(BUILDNAME ${CMAKE_CURRENT_BINARY_DIR} NAME)
+# DISABLED - kickoff
+#get_filename_component(BUILDNAME ${CMAKE_CURRENT_BINARY_DIR} NAME)
 
 ########################################################################
 # Build tree location for components
-SET(OPENCMISS_COMPONENTS_BINARY_DIR ${OPENCMISS_ROOT}/build/${BUILDNAME}/${ARCHITECTURE_PATH})
+SET(OPENCMISS_COMPONENTS_BINARY_DIR ${OPENCMISS_ROOT}/build/${ARCHITECTURE_PATH})
+# DISABLED - kickoff
+#SET(OPENCMISS_COMPONENTS_BINARY_DIR ${OPENCMISS_ROOT}/build/${BUILDNAME}/${ARCHITECTURE_PATH})
 
 ########################################################################
 # Install dir
 # Extra path segment for single configuration case - will give release/debug/...
 get_build_type_extra(BUILDTYPEEXTRA)
 # everything from the OpenCMISS main project goes into install/
-SET(OPENCMISS_COMPONENTS_INSTALL_PREFIX ${OPENCMISS_ROOT}/install/${BUILDNAME}/${ARCHITECTURE_PATH}/${BUILDTYPEEXTRA})
+SET(OPENCMISS_COMPONENTS_INSTALL_PREFIX ${OPENCMISS_ROOT}/install/${ARCHITECTURE_PATH}/${BUILDTYPEEXTRA})
+# DISABLED - kickoff
+#SET(OPENCMISS_COMPONENTS_INSTALL_PREFIX ${OPENCMISS_ROOT}/install/${BUILDNAME}/${ARCHITECTURE_PATH}/${BUILDTYPEEXTRA})
 
 ########################################################################
 # Collect the common arguments for any package/component
