@@ -1,4 +1,6 @@
+build/
 default/
 CMakeFindModuleWrappers/
 OpenCMISSDeveloper.cmake
-src/
+test/
+unix/
