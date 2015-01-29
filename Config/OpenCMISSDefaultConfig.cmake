@@ -2,13 +2,12 @@
 # Build configuration
 # ==============================
 SET(OCM_USE_IRON YES)
-SET(IRON_BRANCH master)
+# will be "master" finally
+SET(IRON_BRANCH iron)
+# Needs to be here until the repo's name is "iron", then it's compiled automatically (see Iron.cmake/BuildMacros)
 SET(IRON_REPO https://github.com/OpenCMISS/cm.git)
 
 SET(OCM_USE_ZINC NO)
-
-# Use architecture information paths
-SET(OCM_USE_ARCHITECTURE_PATH NO)
 
 # Precision to build (if applicable)
 # Valid choices are s,d,c,z and any combinations.
@@ -43,7 +42,7 @@ option(OCM_USE_MT "Use multithreading in OpenCMISS (where applicable)" NO)
 # MPI
 # ==============================
 # Global MPI flag
-option(OCM_USE_MPI "Use MPI in OpenCMISS (not cared about eveywhere yet)!" YES)
+option(OCM_USE_MPI "Use MPI in OpenCMISS (not cared about everywhere yet)!" YES)
 # @@@ linux @@@
 # mpich: gnu
 # mpich2: gnu
