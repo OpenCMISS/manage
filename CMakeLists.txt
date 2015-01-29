@@ -1,9 +1,5 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 2.6 FATAL_ERROR)
 
-#include(CMakeScripts/FunctionDefinitions.cmake)
-#PRINT_VARS()
-#return()
-
 SET(OPENCMISS_SETUP_DIR ${CMAKE_CURRENT_SOURCE_DIR})
 # The default opencmiss root is the parent directory of /setup
 if (NOT OPENCMISS_ROOT)
@@ -20,7 +16,7 @@ LIST(APPEND CMAKE_MODULE_PATH
     ${OPENCMISS_SETUP_DIR}/CMakeScripts
     ${OPENCMISS_SETUP_DIR}/Config)
   
-# This ensures that CMake is new enough before anything
+# This ensures that CMake is new enough before anything else is done
 include(CMakeCheck)
 
 ########################################################################
