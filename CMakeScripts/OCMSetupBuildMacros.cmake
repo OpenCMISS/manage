@@ -100,15 +100,26 @@ MACRO(ADD_COMPONENT COMPONENT_NAME)
                 GIT_REPOSITORY ${${COMPONENT_NAME}_REPO}
                 GIT_TAG ${${COMPONENT_NAME}_BRANCH}
             )
+            message(STATUS "DOWNLOAD_CMDS=${DOWNLOAD_CMDS}")
         #else()
         #    message(STATUS "Git returned output '${RES}' / error '${RES_ERR}'")
         #endif()
     
     # Default: Download the current version branch as zip of no development flag is set
     else()
+        ################@TEMP@#################
+        # Temporary fix to also adhere to "custom" repository locations when in user mode.
+        # Should be removed in final version.
+        if (NOT ${COMPONENT_NAME}_REPO)
+            SET(${COMPONENT_NAME}_REPO https://github.com/${GITHUB_ORGANIZATION}/${FOLDER_NAME})
+        endif()
+        ################@TEMP@#################
         SET(DOWNLOAD_CMDS
             DOWNLOAD_DIR ${COMPONENT_SOURCE}/src-download
-            URL https://github.com/${GITHUB_ORGANIZATION}/${FOLDER_NAME}/archive/${${COMPONENT_NAME}_BRANCH}.zip
+            #URL https://github.com/${GITHUB_ORGANIZATION}/${FOLDER_NAME}/archive/${${COMPONENT_NAME}_BRANCH}.zip
+            ################@TEMP@#################
+            URL ${${COMPONENT_NAME}_REPO}/archive/${${COMPONENT_NAME}_BRANCH}.zip
+            ################@TEMP@#################
         )
     endif()
     
