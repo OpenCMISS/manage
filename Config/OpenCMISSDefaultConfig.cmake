@@ -5,7 +5,7 @@ SET(OCM_USE_IRON YES)
 # will be "master" finally
 SET(IRON_BRANCH iron)
 # Needs to be here until the repo's name is "iron", then it's compiled automatically (see Iron.cmake/BuildMacros)
-SET(IRON_REPO https://github.com/OpenCMISS/cm.git)
+SET(IRON_REPO https://github.com/OpenCMISS/cm)
 
 SET(OCM_USE_ZINC NO)
 
