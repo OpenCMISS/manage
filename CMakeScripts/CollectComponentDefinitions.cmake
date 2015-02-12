@@ -26,6 +26,14 @@ foreach(lang C CXX Fortran)
             -DCMAKE_${lang}_FLAGS=${CMAKE_${lang}_FLAGS}
         )
     endif()
+    # Also forward build-type specific flags
+    foreach(BUILDTYPE RELEASE DEBUG)
+        if (CMAKE_${lang}_FLAGS_${BUILDTYPE})
+            LIST(APPEND COMPONENT_COMMON_DEFS
+                -DCMAKE_${lang}_FLAGS_${BUILDTYPE}=${CMAKE_${lang}_FLAGS_${BUILDTYPE}}
+            )
+        endif()
+    endforeach()
     if(CMAKE_${lang}_COMPILER)
         LIST(APPEND COMPONENT_COMMON_DEFS
             -DCMAKE_${lang}_COMPILER=${CMAKE_${lang}_COMPILER}

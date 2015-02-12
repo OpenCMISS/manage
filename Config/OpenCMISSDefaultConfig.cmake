@@ -1,6 +1,11 @@
 # ==============================
 # Build configuration
 # ==============================
+if (NOT WIN32 AND NOT CMAKE_BUILD_TYPE)
+    SET(CMAKE_BUILD_TYPE RELEASE)
+    message(STATUS "No CMAKE_BUILD_TYPE has been defined. Using RELEASE.")
+endif()
+
 SET(OCM_USE_IRON YES)
 # will be "master" finally
 SET(IRON_BRANCH iron)
@@ -29,8 +34,11 @@ option(BUILD_SHARED_LIBS "Build shared libraries" NO)
 option(OCM_POSITION_INDEPENDENT_CODE "Always generate position independent code (-fPIC flag)" NO)
 
 # ==============================
-# Compiler
+# Compilers
 # ==============================
+# Flag for DEBUG configuration builds only! 
+SET(OCM_WARN_ALL YES)
+SET(OCM_CHECK_ALL YES)
 
 # ==============================
 # Multithreading

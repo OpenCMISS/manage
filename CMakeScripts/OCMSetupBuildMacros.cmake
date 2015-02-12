@@ -19,7 +19,7 @@ MACRO(ADD_COMPONENT COMPONENT_NAME)
     get_build_type_extra(BUILDTYPEEXTRA)
     SET(COMPONENT_BUILD_DIR ${OPENCMISS_COMPONENTS_BINARY_DIR}/${SUBGROUP_PATH}/${FOLDER_NAME}/${BUILDTYPEEXTRA})
     
-    message(STATUS "Building OpenCMISS component ${COMPONENT_NAME} in ${COMPONENT_BUILD_DIR}...")
+    message(STATUS "Configuring build of ${COMPONENT_NAME} in ${COMPONENT_BUILD_DIR}...")
     
     SET(COMPONENT_DEFS ${COMPONENT_COMMON_DEFS})
     
@@ -65,7 +65,6 @@ MACRO(ADD_COMPONENT COMPONENT_NAME)
     #message(STATUS "OpenCMISS component ${COMPONENT_NAME} extra args:\n${COMPONENT_DEFS}")
 
 	GET_BUILD_COMMANDS(BUILD_COMMAND INSTALL_COMMAND ${COMPONENT_BUILD_DIR} TRUE)
-    #GET_SUBMODULE_STATUS(SUBMOD_STATUS REV_ID ${OpenCMISS_Dependencies_SOURCE_DIR} ${MODULE_PATH})
 
     SET(DOWNLOAD_CMDS )
     # Developer mode
@@ -100,7 +99,7 @@ MACRO(ADD_COMPONENT COMPONENT_NAME)
                 GIT_REPOSITORY ${${COMPONENT_NAME}_REPO}
                 GIT_TAG ${${COMPONENT_NAME}_BRANCH}
             )
-            message(STATUS "DOWNLOAD_CMDS=${DOWNLOAD_CMDS}")
+            #message(STATUS "DOWNLOAD_CMDS=${DOWNLOAD_CMDS}")
         #else()
         #    message(STATUS "Git returned output '${RES}' / error '${RES_ERR}'")
         #endif()

@@ -20,15 +20,6 @@ LIST(APPEND CMAKE_MODULE_PATH
 include(CMakeCheck)
 
 ########################################################################
-# Start actual setup
-CMAKE_MINIMUM_REQUIRED(VERSION 3.0 FATAL_ERROR)
-project(OpenCMISS-Setup VERSION 1.0 LANGUAGES C CXX Fortran)
-if (NOT WIN32 AND NOT CMAKE_BUILD_TYPE)
-    SET(CMAKE_BUILD_TYPE RELEASE)
-    message(STATUS "No CMAKE_BUILD_TYPE has been defined. Using RELEASE.")
-endif()
-
-########################################################################
 # Read configuration (defaults & local)
 # If no configuration dir is passed, use the current build location
 if(NOT OPENCMISS_CONFIG_DIR)
@@ -38,6 +29,14 @@ include(CreateLocalConfig)
 
 # This includes the configuration, both default and local
 include(OpenCMISSConfig)
+
+# Between reading the config and starting the setup project.. this is the time for compiler stuff!
+include(CompilerSetup)
+
+########################################################################
+# Start actual setup
+CMAKE_MINIMUM_REQUIRED(VERSION 3.0 FATAL_ERROR)
+project(OpenCMISS-Setup VERSION 1.0 LANGUAGES C CXX Fortran)
 
 # ABI detection
 #if (NOT ABI)
