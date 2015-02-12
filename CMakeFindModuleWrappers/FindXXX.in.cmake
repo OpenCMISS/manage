@@ -142,7 +142,7 @@ SET(@PACKAGE_NAME@_FOUND NO)
     
 # The default way is to look for components in the current PREFIX_PATH, e.g. own build components.
 # If a LOCAL flag is set for a package, the MODULE and CONFIG modes are tried outside the PREFIX PATH first.
-if (NOT OCM_@PACKAGE_NAME@_LOCAL)
+if (NOT OCM_SYSTEM_@PACKAGE_NAME@)
      find_package(@PACKAGE_NAME@ ${@PACKAGE_NAME@_FIND_VERSION} CONFIG
         PATHS ${CMAKE_PREFIX_PATH}
         QUIET
@@ -150,7 +150,7 @@ if (NOT OCM_@PACKAGE_NAME@_LOCAL)
 else()
     # If local lookup is enabled, try to look for packages in old-fashioned module mode and then config modes 
     
-    message(STATUS "Local search of component @PACKAGE_NAME@ enabled")
+    message(STATUS "System search of component @PACKAGE_NAME@ enabled")
     # Remove all paths resolving to this one here so that recursive calls wont search here again
     SET(_MODPATHCOPY ${CMAKE_MODULE_PATH})
     SET(_READDME )

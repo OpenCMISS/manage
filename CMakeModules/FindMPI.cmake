@@ -175,6 +175,7 @@ endif()
 # Check if a mpi mnemonic is given
 # Standard local paths will be added below later
 if(MPI)
+    message(STATUS "FindMPI: Trying to find ${MPI}-MPI implementation")
     if (MPI STREQUAL mpich)
         #LIST(APPEND _MPI_PREFIX_PATH /usr/lib/mpich /usr/lib64/mpich /usr/local/lib/mpich /usr/local/lib64/mpich)
         LIST(APPEND _MPI_PREFIX_PATH mpich)
@@ -203,7 +204,6 @@ if(MPI)
     elseif(MPI STREQUAL cray)
         LIST(APPEND _MPI_PREFIX_PATH /opt/cray/mpt/4.1.1/xt/seastar/mpich2-gnu)
     endif()
-    message(STATUS "FindMPI: MPI=${MPI}")
 endif()
 
 # append vendor-specific compilers to the list if we either don't know the compiler id,
@@ -856,10 +856,10 @@ foreach (lang C CXX Fortran)
             LIST(GET MNEMONICS ${IDX} MNEMONIC)
             LIST(GET PATTERNS ${IDX} PATTERN)
             # Case insensitive match not possible with cmake regex :-(
-            STRING(TOLOWER ${MPI_${lang}_INCLUDE_PATH} INC_PATH)
+            STRING(TOLOWER "${MPI_${lang}_INCLUDE_PATH}" INC_PATH)
             if (MPI STREQUAL ${MNEMONIC} AND NOT INC_PATH MATCHES ${PATTERN})
                 message(STATUS "An MPI_${lang} compiler '${MPI_${lang}_COMPILER}' was found but the MPI_${lang}_INCLUDE_PATH")
-                message(STATUS "'${MPI_${lang}_INCLUDE_PATH}' does not match the requested MPI implementation '${MPI}'.")
+                message(STATUS "'${INC_PATH}' does not match the requested MPI implementation '${MNEMONIC}'.")
                 message(STATUS "Check your include paths (searched in that order with suffixes '${_BIN_SUFFIX}'):")
                 message(STATUS "PATH1 (CMAKE_PREFIX_PATH): ${CMAKE_PREFIX_PATH}")
                 message(STATUS "PATH2 (MPI_HOME + OWN GUESS/HINTS): ${_MPI_PREFIX_PATH} ${MPI_HOME} $ENV{MPI_HOME}")

@@ -25,6 +25,7 @@ include(CMakeCheck)
 if(NOT OPENCMISS_CONFIG_DIR)
     SET(OPENCMISS_CONFIG_DIR ${CMAKE_CURRENT_BINARY_DIR})
 endif()
+# Create a local config file if not exists
 include(CreateLocalConfig)
 
 # This includes the configuration, both default and local
@@ -37,19 +38,6 @@ include(CompilerSetup)
 # Start actual setup
 CMAKE_MINIMUM_REQUIRED(VERSION 3.0 FATAL_ERROR)
 project(OpenCMISS-Setup VERSION 1.0 LANGUAGES C CXX Fortran)
-
-# ABI detection
-#if (NOT ABI)
-    # Rough detection if not specified..
-#    if (${CMAKE_SYSTEM_PROCESSOR} MATCHES 64)
-#        SET(ABI 64)
-#    else()
-#        SET(ABI 32)
-#    endif()
-#endif()
-#foreach(lang C CXX Fortran)
-#    SET(CMAKE_${lang}_FLAGS "-m${ABI} ${CMAKE_${lang}_FLAGS}")
-#endforeach()
 
 include(ExternalProject)
 

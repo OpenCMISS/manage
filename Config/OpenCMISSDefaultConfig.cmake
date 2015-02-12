@@ -51,29 +51,47 @@ option(OCM_USE_MT "Use multithreading in OpenCMISS (where applicable)" NO)
 # ==============================
 # Global MPI flag
 option(OCM_USE_MPI "Use MPI in OpenCMISS (not cared about everywhere yet)!" YES)
-# @@@ linux @@@
-# mpich: gnu
-# mpich2: gnu
-# openmpi: gnu
-# intel: needs I_MPI_ROOT
-#  - also needs to know if GNU or INTEL compiler
-# mvapich2: works only with MPI_INSTALL_DIR defined
-# poe: not implemented
-# cray: have special path
-# @@@ aix @@@
-# poe: 
-# @@@ windows @@@
-# mpich, mpich2: fixed directory
 
-# Prefer local MPI versions over shipped one
-SET(OCM_MPI_LOCAL YES)
+# Unless MPI is already specified (e.g. on command line), try to suggest 
+if (NOT DEFINED MPI)
+    # Detect the current operating system and set "our" default MPI versions.
+    if (UNIX)
+        if (NOT DEFINED LINUX_DISTRIBUTION)
+            SET(LINUX_DISTRIBUTION FALSE CACHE STRING "Distribution information")
+            find_program(LSB lsb_release 
+                DOC "Distribution information tool")
+            if (LSB)
+                execute_process(COMMAND ${LSB} -i
+                    RESULT_VARIABLE RETFLAG 
+                    OUTPUT_VARIABLE DISTINFO
+                    ERROR_VARIABLE ERRDISTINFO
+                    OUTPUT_STRIP_TRAILING_WHITESPACE
+                )
+                if (NOT RETFLAG)
+                    STRING(SUBSTRING ${DISTINFO} 16 -1 LINUX_DISTRIBUTION)
+                endif()
+            endif() 
+        endif()
+        if (LINUX_DISTRIBUTION STREQUAL "Ubuntu" OR LINUX_DISTRIBUTION STREQUAL "Scientific")
+            SET(MPI openmpi)
+        elseif(LINUX_DISTRIBUTION STREQUAL "Fedora" OR LINUX_DISTRIBUTION STREQUAL "RedHat")
+            SET(MPI mpich)
+        else()
+            SET(MPI )
+        endif()
+        if (MPI)
+            message(STATUS "Using suggested MPI '${MPI}' on Linux/${LINUX_DISTRIBUTION}")
+        else()
+            message(WARNING "Unknown distribution '${LINUX_DISTRIBUTION}': No default MPI recommendation")
+        endif()
+    endif()
+endif()
+
+# Prefer system MPI versions over shipped one (try to find the version set by MPI mnemonic!)
+SET(OCM_SYSTEM_MPI YES)
+
 # Version to use if must build ourselves
 SET(OPENMPI_VERSION 1.8.4)
-
-#SET(MPI mpich)
-#SET(MPI mpich2)
-#SET(MPI openmpi)
-#SET(MPI intel)
 
 # Enter a custom mpi root directory here for a different mpi implementation.
 # Leave as-is to use default system mpi.
@@ -90,11 +108,12 @@ SET(OPENMPI_VERSION 1.8.4)
 # This is changeable in the OpenCMISSLocalConfig file
 FOREACH(OCM_DEP ${OPENCMISS_COMPONENTS})
     SET(OCM_USE_${OCM_DEP} YES)
+    SET(OCM_SYSTEM_${OCM_DEP} NO)
 ENDFOREACH()
 
 # Look for local BLAS/LAPACK packages by default; the rest is built
-SET(OCM_BLAS_LOCAL YES)
-SET(OCM_LAPACK_LOCAL YES)
+SET(OCM_SYSTEM_BLAS YES)
+SET(OCM_SYSTEM_LAPACK YES)
 
 # Dependencies
 SET(BLAS_VERSION 3.5.0)

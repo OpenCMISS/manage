@@ -45,10 +45,10 @@ foreach(OCM_COMP ${OPENCMISS_COMPONENTS})
     endif()
     
     # All local enabled? Set to local search.
-    if (OCM_ALL_LOCAL)
-        SET(OCM_${OCM_COMP}_LOCAL YES)
+    if (OCM_SYSTEM_ALL)
+        SET(OCM_SYSTEM_${OCM_COMP} YES)
     endif()
-    message(STATUS "OpenCMISS component ${OCM_COMP}: Enabled ${OCM_USE_${OCM_COMP}}, Local lookup ${OCM_${OCM_COMP}_LOCAL}, Branch '${${OCM_COMP}_BRANCH}'")
+    message(STATUS "OpenCMISS component ${OCM_COMP}: Enabled ${OCM_USE_${OCM_COMP}}, System search ${OCM_SYSTEM_${OCM_COMP}}, Version '${${OCM_COMP}_VERSION}'")
     
     # All developer enabled?
     if (OCM_ALL_DEVEL)

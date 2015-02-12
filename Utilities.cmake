@@ -28,7 +28,7 @@ endif()
 if(OCM_USE_MPI)
     
     # Look for local one if allowed (default)
-    if (OCM_MPI_LOCAL)
+    if (OCM_SYSTEM_MPI)
         find_package(MPI QUIET)
     endif()
     #message(STATUS "MPI_C_COMPILER: ${MPI_C_COMPILER}, MPI_CXX_COMPILER: ${MPI_CXX_COMPILER}")

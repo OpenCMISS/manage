@@ -1,4 +1,3 @@
-#SET(OCM_USE_ARCHITECTURE_PATH NO)
 #SET(BUILD_PRECISION sdcz)
 #SET(INT_TYPE int32)
 #SET(BUILD_TESTS ON)
@@ -31,7 +30,7 @@
 
 # By default, the default/only MPI on the local machine is looked for and used if compatible.
 # To have the manage system also build MPI, uncomment the following line. 
-#SET(OCM_MPI_LOCAL NO)
+#SET(OCM_MPI_SYSTEM NO)
 
 # Choose your MPI type my mnemonic
 # If you change those variables, YOU SHOULD KNOW WHY!!!!
@@ -55,13 +54,13 @@
 # Component configuration
 ###########################################################################
 
-# Allow all components to be looked for locally at first
-# In default config, this holds only for BLAS/LAPACK
-#SET(OCM_ALL_LOCAL YES)
+# Allow all components to be searched for on the local system first.
+# In default config, this holds only for BLAS/LAPACK/MPI
+#SET(OCM_SYSTEM_ALL YES)
 
 # To enable local lookup of single components, set
-# OCM_<COMPONENT_NAME>_LOCAL to YES
-${OCM_LOCAL_FLAGS}
+# OCM_SYSTEM_<COMPONENT_NAME> to YES
+${OCM_USE_SYSTEM_FLAGS}
 
 # To disable the use of selected components, uncomment the appropriate lines
 # The default is to build all.
