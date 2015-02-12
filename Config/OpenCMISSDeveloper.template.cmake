@@ -1,6 +1,7 @@
 # We recommend using the architecture path for OpenCMISS developers.
 SET(OCM_USE_ARCHITECTURE_PATH YES)
 
+# Set this to YES to build with the -p profiling flags.
 SET(OCM_WITH_PROFILING NO)
 
 # If you set a github username, cmake will automatically try and locate all the components as repositories under that github account.
