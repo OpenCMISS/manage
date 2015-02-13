@@ -38,6 +38,10 @@ include(CompilerSetup)
 # Start actual setup
 CMAKE_MINIMUM_REQUIRED(VERSION 3.0 FATAL_ERROR)
 project(OpenCMISS-Setup VERSION 1.0 LANGUAGES C CXX Fortran)
+if (NOT WIN32 AND CMAKE_BUILD_TYPE STREQUAL "")
+    SET(CMAKE_BUILD_TYPE RELEASE)
+    message(STATUS "No CMAKE_BUILD_TYPE has been defined. Using RELEASE.")
+endif()
 
 include(ExternalProject)
 

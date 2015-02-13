@@ -1,11 +1,6 @@
 # ==============================
 # Build configuration
 # ==============================
-if (NOT WIN32 AND NOT CMAKE_BUILD_TYPE)
-    SET(CMAKE_BUILD_TYPE RELEASE)
-    message(STATUS "No CMAKE_BUILD_TYPE has been defined. Using RELEASE.")
-endif()
-
 SET(OCM_USE_IRON YES)
 # will be "master" finally
 SET(IRON_BRANCH iron)
