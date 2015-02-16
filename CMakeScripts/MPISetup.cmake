@@ -2,7 +2,7 @@
 # This is supported yet only on Unix systems
 if (UNIX)
 
-    # Set the forward dependencies of MPI only if we build it ourselves
+    # Set the forward dependencies of MPI only if we build it ourselve
     SET(MPI_FWD_DEPS ${OPENCMISS_COMPONENTS_WITHMPI})
     # The choice is ... 
     if (MPI STREQUAL openmpi)

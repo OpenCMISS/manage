@@ -48,7 +48,9 @@ foreach(OCM_COMP ${OPENCMISS_COMPONENTS})
     if (OCM_SYSTEM_ALL)
         SET(OCM_SYSTEM_${OCM_COMP} YES)
     endif()
-    message(STATUS "OpenCMISS component ${OCM_COMP}: Enabled ${OCM_USE_${OCM_COMP}}, System search ${OCM_SYSTEM_${OCM_COMP}}, Version '${${OCM_COMP}_VERSION}'")
+    if (NOT OCM_COMP STREQUAL MPI) # Dont show that for MPI - have different implementations
+        message(STATUS "OpenCMISS component ${OCM_COMP}: Enabled ${OCM_USE_${OCM_COMP}}, System search ${OCM_SYSTEM_${OCM_COMP}}, Version '${${OCM_COMP}_VERSION}'")
+    endif()
     
     # All developer enabled?
     if (OCM_ALL_DEVEL)

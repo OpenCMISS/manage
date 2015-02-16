@@ -30,7 +30,7 @@
 
 # By default, the default/only MPI on the local machine is looked for and used if compatible.
 # To have the manage system also build MPI, uncomment the following line. 
-#SET(OCM_MPI_SYSTEM NO)
+#SET(OCM_SYSTEM_MPI NO)
 
 # Choose your MPI type my mnemonic
 # If you change those variables, YOU SHOULD KNOW WHY!!!!
