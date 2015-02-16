@@ -85,8 +85,9 @@ endif()
 # Prefer system MPI versions over shipped one (try to find the version set by MPI mnemonic!)
 SET(OCM_SYSTEM_MPI YES)
 
-# Version to use if must build ourselves
+# Versions to use if we build a local version ourselves
 SET(OPENMPI_VERSION 1.8.4)
+SET(MPICH2_VERSION 3.1.3)
 
 # Enter a custom mpi root directory here for a different mpi implementation.
 # Leave as-is to use default system mpi.
