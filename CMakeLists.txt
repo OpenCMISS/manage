@@ -46,11 +46,8 @@ endif()
 include(ExternalProject)
 
 ########################################################################
-# Utilities (Wrappers, MPI, ...)
+# Utilities (Wrappers, MPI-pre-check, ...)
 include(Utilities)
-if(BUILDING_MPI)
-    return()
-endif()
 
 if(OCM_USE_MT)
     find_package(OpenMP REQUIRED)

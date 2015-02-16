@@ -848,7 +848,7 @@ foreach (lang C CXX Fortran)
     
     # Check if the found version matches with the desired one
     # (Applies only if MPI variable is set!)
-    if(MPI)
+    if(MPI AND MPI_${lang}_FOUND)
         SET(MNEMONICS mpich mpich2 openmpi intel)
         # Patterns to match the include path
         SET(PATTERNS ".*mpich([/|-].*|$)" ".*mpich(2)?([/|-].*|$)" ".*openmpi([/|-].*|$)" ".*(intel|impi)[/|-].*")

@@ -18,12 +18,7 @@ MACRO(GET_COMPILER_NAME VARNAME)
 	    if (NOT RES EQUAL 0)
 	        SET(VERSION "0.0")
 	    endif()
-	    SET(${VARNAME} gcc-${VERSION})
-	    #if( CMAKE_COMPILER_IS_GNUCC )
-	    #    SET(${VARNAME} gcc-${VERSION})
-	    #else()
-	    #    SET(${VARNAME} gxx-${VERSION})
-	    #endif()
+	    SET(${VARNAME} gnu-${VERSION})
 	ELSEIF(${CMAKE_C_COMPILER} MATCHES icc 
 	    OR ${CMAKE_CXX_COMPILER} MATCHES icpc
 	    OR ${CMAKE_Fortran_COMPILER} MATCHES ifort)
@@ -34,7 +29,7 @@ MACRO(GET_COMPILER_NAME VARNAME)
 ENDMACRO()
 
 # This function assembles the architecture path
-# We have [ARCH][MPI][MT][COMPILER] so far
+# We have [ARCH][COMPILER][MPI][MT][STATIC|SHARED]
 function(get_architecture_path VARNAME)
     SET(ARCHPATH )
     
@@ -48,46 +43,22 @@ function(get_architecture_path VARNAME)
         #    SET(ARCHPATH ${ARCHPATH}/${ABI}bit)
         #endif()
         
+        # Compiler
+        GET_COMPILER_NAME(COMPILER)
+        SET(ARCHPATH ${ARCHPATH}/${COMPILER})
+        
         # MPI version information
-        SET(MPI_PART )
         if (OCM_USE_MPI)
-            if (MPI)
-                # Take the MPI mnemonic if set
-                SET(MPI_PART ${MPI})
-            else()
-                SET(MNEMONICS mpich mpich2 openmpi intel)
-                # Patterns to match the include path
-                SET(PATTERNS ".*mpich([/|-].*|$)" ".*mpich2([/|-].*|$)" ".*openmpi([/|-].*|$)" ".*(intel|impi)[/|-].*")
-                foreach(IDX RANGE 3)
-                    LIST(GET MNEMONICS ${IDX} MNEMONIC)
-                    LIST(GET PATTERNS ${IDX} PATTERN)
-                    #message(STATUS "Architecture: checking '${MPI_C_INCLUDE_PATH} MATCHES ${PATTERN} OR ${MPI_CXX_INCLUDE_PATH} MATCHES ${PATTERN}'")
-                    if ("${MPI_C_INCLUDE_PATH}" MATCHES ${PATTERN} OR "${MPI_CXX_INCLUDE_PATH}" MATCHES ${PATTERN})
-                        #message(STATUS "Architecture: match!")
-                        SET(MPI_PART ${MNEMONIC})
-                        break()
-                    endif()
-                endforeach()
-                if (NOT MPI_PART)
-                    get_filename_component(COMP_NAME ${MPI_C_COMPILER} NAME)
-                    STRING(TOLOWER MPI_PART "unknown_${COMP_NAME}")
-                endif()
-            endif()
+            SET(MPI_PART ${MPI})
         else()
             SET(MPI_PART "sequential")
         endif()
-        if (MPI_PART)
-            SET(ARCHPATH ${ARCHPATH}/${MPI_PART})
-        endif()
+        SET(ARCHPATH ${ARCHPATH}/${MPI_PART})
         
         # Multithreading
         if (OCM_USE_MT)
             SET(ARCHPATH ${ARCHPATH}/mt)
         endif()
-        
-        # Compiler
-        GET_COMPILER_NAME(COMPILER)
-        SET(ARCHPATH ${ARCHPATH}/${COMPILER})
         
         # Library type (static/shared)
         if (BUILD_SHARED_LIBS)

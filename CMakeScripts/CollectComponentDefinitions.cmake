@@ -12,7 +12,7 @@ STRING(REPLACE ";" "$<SEMICOLON>" CMAKE_MODULE_PATH_ESC "${CMAKE_MODULE_PATH}")
 # install trees also have the build type as subfolders. As the config-files generated natively create differently named files
 # for each build type, they can be collected in a common subfolder. As the build type subfolder-element is the last in line,
 # we simply use the parent folder of the component's CMAKE_INSTALL_PREFIX to place the cmake package config files.
-SET(COMMON_PACKAGE_CONFIG_DIR ../cmake)
+SET(COMMON_PACKAGE_CONFIG_DIR cmake) #../cmake
 LIST(APPEND COMPONENT_COMMON_DEFS
     -DCMAKE_INSTALL_PREFIX=${OPENCMISS_COMPONENTS_INSTALL_PREFIX}
     -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
@@ -23,7 +23,7 @@ LIST(APPEND COMPONENT_COMMON_DEFS
     -DBUILD_SHARED_LIBS=${BUILD_SHARED_LIBS}
     -DFORTRAN_MANGLING=${FORTRAN_MANGLING}
     -DINT_TYPE=${INT_TYPE}
-    -DPACKAGE_CONFIG_DIR=${COMMON_PACKAGE_CONFIG_DIR} 
+    -DPACKAGE_CONFIG_DIR=${COMMON_PACKAGE_CONFIG_DIR}
 )
 
 # Add compilers and flags

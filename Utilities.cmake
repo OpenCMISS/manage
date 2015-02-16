@@ -24,81 +24,40 @@ if (NOT FORTRAN_MANGLING)
 endif()
 
 ########################################################################
-# MPI
-if(OCM_USE_MPI)
-    
+# MPI pre check
+#
+# This bit makes sure that if no MPI was set in the configuration we infer the detected MPI from the include path.
+if(OCM_USE_MPI AND NOT DEFINED MPI)
     # Look for local one if allowed (default)
     if (OCM_SYSTEM_MPI)
         find_package(MPI QUIET)
-    endif()
-    #message(STATUS "MPI_C_COMPILER: ${MPI_C_COMPILER}, MPI_CXX_COMPILER: ${MPI_CXX_COMPILER}")
-        
-    if (NOT MPI_FOUND)
-        if (UNIX)
-            SET(OPENMPI_INSTALL_DIR ${OPENCMISS_ROOT}/install/utilities/openmpi)        
-            
-            # Check if already installed locally
-            SET(MPI_HOME ${OPENMPI_INSTALL_DIR})
-            find_package(MPI QUIET)
-            
-            if (MPI_FOUND)
-                SET(MPI openmpi)
-            else()
-                message(STATUS "
-                    @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-                    MPI is requested but no local MPI implementation could be found.
-                    Adding default OpenMPI...
-                    You will need to re-start setup (cmake & make) after MPI has been compiled.
-                    @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-                    "
-                )
-                
-                SET(OPENMPI_SOURCE_DIR ${OPENCMISS_ROOT}/src/utilities/openmpi)
-                SET(OPENMPI_BINARY_DIR ${OPENCMISS_ROOT}/build/utilities/openmpi)                
-                SET(OPENMPI_BRANCH v${OPENMPI_VERSION})
-                # Set the MPI_HOME variable to our built version
-                SET(MPI openmpi)
-            
-                ExternalProject_Add(OPENMPI
-            		#DEPENDS ${${COMPONENT_NAME}_DEPS}
-            		PREFIX ${OPENMPI_BINARY_DIR}
-            		TMP_DIR ${OPENMPI_BINARY_DIR}/ep_tmp
-            		STAMP_DIR ${OPENMPI_BINARY_DIR}/ep_stamp
-            		
-            		#--Download step--------------
-            		DOWNLOAD_DIR ${OPENMPI_SOURCE_DIR}/src-download
-                    URL https://github.com/OpenCMISS-Utilities/openmpi/archive/${OPENMPI_BRANCH}.zip 
-                    #http://www.open-mpi.org/software/ompi/v1.8/downloads/openmpi-1.8.4.tar.gz
-                    #URL_HASH SHA1=22002fc226f55e188e21be0fdc3602f8d024e7ba
-                     
-            		#--Configure step-------------
-            		SOURCE_DIR ${OPENMPI_SOURCE_DIR}
-            		CONFIGURE_COMMAND ${OPENMPI_SOURCE_DIR}/configure 
-            		    --prefix ${OPENMPI_INSTALL_DIR}
-            		    CC=${CMAKE_C_COMPILER}
-            		    CXX=${CMAKE_CXX_COMPILER}
-            		    Fortran=${CMAKE_Fortran_COMPILER}
-            		#BINARY_DIR ${OPENMPI_BINARY_DIR}
-            		
-            		#--Build step-----------------
-            		BUILD_COMMAND make -j12
-            		BUILD_IN_SOURCE 1
-            		
-            		#--Install step---------------
-            		# currently set as extra arg (above), somehow does not work
-            		#INSTALL_DIR ${OPENMPI_INSTALL_DIR}
-            		INSTALL_COMMAND make install
-            		
-            		LOG_CONFIGURE 1
-            		LOG_BUILD 1
-            		LOG_INSTALL 1
-            	)
-            	SET(BUILDING_MPI TRUE)
-        	endif()
+        #message(STATUS "MPI_C_COMPILER: ${MPI_C_COMPILER}, MPI_CXX_COMPILER: ${MPI_CXX_COMPILER}")
+        if (MPI_FOUND)
+            SET(MNEMONICS mpich mpich2 openmpi intel)
+            # Patterns to match the include path
+            SET(PATTERNS ".*mpich([/|-].*|$)" ".*mpich2([/|-].*|$)" ".*openmpi([/|-].*|$)" ".*(intel|impi)[/|-].*")
+            foreach(IDX RANGE 3)
+                LIST(GET MNEMONICS ${IDX} MNEMONIC)
+                LIST(GET PATTERNS ${IDX} PATTERN)
+                STRING(TOLOWER "${MPI_C_INCLUDE_PATH}" C_INC_PATH)
+                STRING(TOLOWER "${MPI_CXX_INCLUDE_PATH}" CXX_INC_PATH)
+                #message(STATUS "Architecture: checking '${MPI_C_INCLUDE_PATH} MATCHES ${PATTERN} OR ${MPI_CXX_INCLUDE_PATH} MATCHES ${PATTERN}'")
+                if (C_INC_PATH MATCHES ${PATTERN} OR CXX_INC_PATH MATCHES ${PATTERN})
+                    SET(MPI ${MNEMONIC})
+                    break()
+                endif()
+            endforeach()
+            if (NOT MPI)
+                if (MPI_C_COMPILER)
+                    get_filename_component(COMP_NAME ${MPI_C_COMPILER} NAME)
+                    STRING(TOLOWER MPI "unknown_${COMP_NAME}")
+                else()
+                    SET(MPI "unknown-mpi")
+                endif()
+                message(WARNING "MPI compiler '${MPI_C_COMPILER}' with include path '${MPI_C_INCLUDE_PATH}' not recognized.")
+            endif()
         else()
-            message(FATAL_ERROR "OpenMPI installation support not implemented for this platform.")
+            message(FATAL_ERROR "OCM_USE_MPI flag is ON but neither MPI is set or a system MPI could be found. Please specify the desired MPI directly or install an MPI implementation available on CMake's PATH")
         endif()
     endif()
 endif()
-
-# ... gtest, ..

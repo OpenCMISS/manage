@@ -49,6 +49,18 @@ set(GITHUB_ORGANIZATION OpenCMISS-Dependencies)
 # i.e. mumps may need scotch so scotch has to be processed first on order to be added to the 
 # external project dependencies list of any following package
 
+# MPI implementations first!
+if(OCM_USE_MPI)    
+    # Look for system one
+    if (OCM_SYSTEM_MPI)
+        find_package(MPI QUIET)
+    endif()
+    # If no system MPI is found, invoke the MPISetup script (externally as quite large)
+    if (NOT MPI_FOUND)
+        include(MPISetup)
+    endif()
+endif()
+
 # LAPACK (includes BLAS)
 if (OCM_USE_BLAS OR OCM_USE_LAPACK)
     if(OCM_SYSTEM_BLAS)
