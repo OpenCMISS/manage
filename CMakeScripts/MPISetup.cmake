@@ -7,11 +7,9 @@ if (UNIX)
     # The choice is ... 
     if (MPI STREQUAL openmpi)
         SET(_MPI_VERSION ${OPENMPI_VERSION})
-        SET(_MPI_FORTRAN_COMPILER_DEFNAME Fortran)
         SET(_MPI_EXTRA_PARAMS )
-    elseif (MPI STREQUAL mpich2)
-        SET(_MPI_VERSION ${MPICH2_VERSION})
-        SET(_MPI_FORTRAN_COMPILER_DEFNAME FC)
+    elseif (MPI STREQUAL mpich)
+        SET(_MPI_VERSION ${MPICH_VERSION})
         if (CMAKE_BUILD_TYPE STREQUAL RELEASE)
             SET(_MPI_EXTRA_PARAMS "--enable-fast=O3,ndebug --disable-error-checking --without-timing --without-mpit-pvars")
         elseif(CMAKE_BUILD_TYPE STREQUAL DEBUG)
@@ -54,7 +52,7 @@ if (UNIX)
     		    --prefix ${_MPI_INSTALL_DIR}
     		    CC=${CMAKE_C_COMPILER}
     		    CXX=${CMAKE_CXX_COMPILER}
-    		    ${_MPI_FORTRAN_COMPILER_DEFNAME}=${CMAKE_Fortran_COMPILER}
+    		    FC=${CMAKE_Fortran_COMPILER}
     		    ${_MPI_EXTRA_PARAMS}
     		BINARY_DIR ${_MPI_BINARY_DIR}
     		
