@@ -32,7 +32,7 @@ include(CreateLocalConfig)
 include(OpenCMISSConfig)
 
 # Between reading the config and starting the setup project.. this is the time for compiler stuff!
-include(CompilerSetup)
+include(ToolchainSetup)
 
 ########################################################################
 # Start actual setup
