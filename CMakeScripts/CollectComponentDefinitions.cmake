@@ -58,7 +58,10 @@ foreach(COMP ${OPENCMISS_COMPONENTS})
 endforeach()
 
 # fPIC flag
-if (OCM_POSITION_INDEPENDENT_CODE)
+# if BUILD_SHARED_LIBS is set to true, the POSITION_INDEPENDENT_CODE property is set automatically for EXECUTABLE and SHARED library targets.
+# However, OBJECT targets wont automatically have POSITION_INDEPENDENT_CODE if BUILD_SHARED_LIBS is set to true, so we manually set this
+# if we build shared libraries to enable linking of object libraries into shared libraries.
+if (BUILD_SHARED_LIBS OR OCM_POSITION_INDEPENDENT_CODE)
     list(APPEND COMPONENT_COMMON_DEFS -DCMAKE_POSITION_INDEPENDENT_CODE=YES)
 endif()
 
