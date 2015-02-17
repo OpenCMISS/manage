@@ -189,7 +189,7 @@ if(MPI)
             LIST(APPEND _MPI_PREFIX_PATH "C:/${PROGRAM_FILES_PATH}/MPICH2" "C:/${PROGRAM_FILES_PATH}/mpich2")
         endif()
     elseif(MPI STREQUAL intel)
-        LIST(APPEND _MPI_PREFIX_PATH /opt/intel/impi/latest)
+        LIST(APPEND _MPI_PREFIX_PATH /opt/intel/impi_latest)
     elseif(MPI STREQUAL openmpi)
         #LIST(APPEND _MPI_PREFIX_PATH /usr/lib64/compat-openmpi /usr/lib/compat-openmpi
         #    /usr/lib64/openmpi /usr/lib/openmpi
