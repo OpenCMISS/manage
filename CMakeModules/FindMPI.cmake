@@ -174,7 +174,8 @@ endif()
 
 # Check if a mpi mnemonic is given
 # Standard local paths will be added below later
-if(MPI)
+message(STATUS "IM HEREEEEEEEEEEEEEEEEEEEEEE: ${MPI}")
+if(DEFINED MPI)
     message(STATUS "FindMPI: Trying to find ${MPI}-MPI implementation")
     if (MPI STREQUAL mpich)
         #LIST(APPEND _MPI_PREFIX_PATH /usr/lib/mpich /usr/lib64/mpich /usr/local/lib/mpich /usr/local/lib64/mpich)
@@ -196,13 +197,15 @@ if(MPI)
         #    /usr/local/openmpi /usr/local/lib/openmpi)
         LIST(APPEND _MPI_PREFIX_PATH compat-openmpi openmpi)
     elseif(MPI STREQUAL mvapich2)
-        if(NOT MPI_HOME)
+        if(NOT DEFINED MPI_HOME)
             message(WARNING "mvapich2 requested but not MPI_HOME is set")
         endif()
     elseif(MPI STREQUAL poe)
         LIST(APPEND _MPI_PREFIX_PATH /usr/lpp/ppe.poe)
     elseif(MPI STREQUAL cray)
         LIST(APPEND _MPI_PREFIX_PATH /opt/cray/mpt/4.1.1/xt/seastar/mpich2-gnu)
+    else()
+        message(STATUS "MPI '${MPI}' not recognized")
     endif()
 endif()
 
@@ -498,6 +501,7 @@ function (interrogate_mpi_compiler lang try_libs)
       endif()
 
     elseif(try_libs)
+      message("FindMPI: Falling back to classic library search as no MPI_${lang}_COMPILER is set")
       # If we didn't have an MPI compiler script to interrogate, attempt to find everything
       # with plain old find functions.  This is nasty because MPI implementations have LOTS of
       # different library names, so this section isn't going to be very generic.  We need to
