@@ -88,6 +88,9 @@ include(CollectComponentDefinitions)
 #message(STATUS "OpenCMISS components common definitions:\n${COMPONENT_COMMON_DEFS}")
 
 include(OCMSetupBuildMacros)
+SET(_OCM_REQUIRED_SOURCES )
+SET(_OCM_NEED_INITIAL_SOURCE_DOWNLOAD NO)
+
 ########################################################################
 # Dependencies
 include(Dependencies)
@@ -95,3 +98,18 @@ include(Dependencies)
 ########################################################################
 # Iron
 include(Iron)
+
+# Finally, create the download target that depends on all other downloads
+SET(_ADDTOALL )
+if (_OCM_NEED_INITIAL_SOURCE_DOWNLOAD)
+    SET(_ADDTOALL ALL)
+endif()
+add_custom_target(update
+    ${_ADDTOALL} 
+    DEPENDS ${_OCM_REQUIRED_SOURCES}
+)
+# I already foresee that we will have to have "download" and "update" targets for the less insighted user.
+# So lets just give it to them. Does the same as external project has initial download and update steps.
+#add_custom_target(download 
+#    DEPENDS ${OCM_REQUIRED_SOURCES}
+#)

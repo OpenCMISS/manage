@@ -53,7 +53,7 @@ foreach(OCM_COMP ${OPENCMISS_COMPONENTS})
     endif()
     
     # All developer enabled?
-    if (OCM_ALL_DEVEL)
-        SET(${OCM_COMP}_DEVEL YES)
+    if (OCM_DEVEL_ALL)
+        SET(OCM_DEVEL_${OCM_COMP} YES)
     endif()
 endforeach()

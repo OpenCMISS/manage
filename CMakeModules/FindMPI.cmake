@@ -109,6 +109,7 @@
 # include this to handle the QUIETLY and REQUIRED arguments
 include(FindPackageHandleStandardArgs)
 #include(GetPrerequisites)
+message(STATUS "FindMPI: Entering script")
 
 #
 # This part detects MPI compilers, attempting to wade through the mess of compiler names in

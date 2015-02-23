@@ -2,11 +2,6 @@
 # Build configuration
 # ==============================
 SET(OCM_USE_IRON YES)
-# will be "master" finally
-SET(IRON_BRANCH iron)
-# Needs to be here until the repo's name is "iron", then it's compiled automatically (see Iron.cmake/BuildMacros)
-SET(IRON_REPO https://github.com/OpenCMISS/cm)
-
 SET(OCM_USE_ZINC NO)
 
 # Precision to build (if applicable)
@@ -48,39 +43,39 @@ option(OCM_USE_MT "Use multithreading in OpenCMISS (where applicable)" NO)
 option(OCM_USE_MPI "Use MPI in OpenCMISS (not cared about everywhere yet)!" YES)
 
 # Unless MPI is already specified (e.g. on command line), try to suggest 
-if (NOT DEFINED MPI)
+#if (NOT DEFINED MPI)
     # Detect the current operating system and set "our" default MPI versions.
-    if (UNIX)
-        if (NOT DEFINED LINUX_DISTRIBUTION)
-            SET(LINUX_DISTRIBUTION FALSE CACHE STRING "Distribution information")
-            find_program(LSB lsb_release 
-                DOC "Distribution information tool")
-            if (LSB)
-                execute_process(COMMAND ${LSB} -i
-                    RESULT_VARIABLE RETFLAG 
-                    OUTPUT_VARIABLE DISTINFO
-                    ERROR_VARIABLE ERRDISTINFO
-                    OUTPUT_STRIP_TRAILING_WHITESPACE
-                )
-                if (NOT RETFLAG)
-                    STRING(SUBSTRING ${DISTINFO} 16 -1 LINUX_DISTRIBUTION)
-                endif()
-            endif() 
-        endif()
-        if (LINUX_DISTRIBUTION STREQUAL "Ubuntu" OR LINUX_DISTRIBUTION STREQUAL "Scientific")
-            SET(MPI openmpi CACHE STRING "MPI implementation type")
-        elseif(LINUX_DISTRIBUTION STREQUAL "Fedora" OR LINUX_DISTRIBUTION STREQUAL "RedHat")
-            SET(MPI mpich CACHE STRING "MPI implementation type")
-        else()
-            SET(MPI "" CACHE STRING "MPI implementation type")
-        endif()
-        if (MPI)
-            message(STATUS "Using suggested MPI '${MPI}' on Linux/${LINUX_DISTRIBUTION}")
-        else()
-            message(WARNING "Unknown distribution '${LINUX_DISTRIBUTION}': No default MPI recommendation")
-        endif()
-    endif()
-endif()
+#    if (UNIX)
+#        if (NOT DEFINED LINUX_DISTRIBUTION)
+#            SET(LINUX_DISTRIBUTION FALSE CACHE STRING "Distribution information")
+#            find_program(LSB lsb_release 
+#                DOC "Distribution information tool")
+#            if (LSB)
+#                execute_process(COMMAND ${LSB} -i
+#                    RESULT_VARIABLE RETFLAG 
+#                    OUTPUT_VARIABLE DISTINFO
+#                    ERROR_VARIABLE ERRDISTINFO
+#                    OUTPUT_STRIP_TRAILING_WHITESPACE
+#                )
+#                if (NOT RETFLAG)
+#                    STRING(SUBSTRING ${DISTINFO} 16 -1 LINUX_DISTRIBUTION)
+#                endif()
+#            endif() 
+#        endif()
+#        if (LINUX_DISTRIBUTION STREQUAL "Ubuntu" OR LINUX_DISTRIBUTION STREQUAL "Scientific")
+#            SET(MPI openmpi CACHE STRING "MPI implementation type")
+#        elseif(LINUX_DISTRIBUTION STREQUAL "Fedora" OR LINUX_DISTRIBUTION STREQUAL "RedHat")
+#            SET(MPI mpich CACHE STRING "MPI implementation type")
+#        else()
+#            SET(MPI "" CACHE STRING "MPI implementation type")
+#        endif()
+#        if (MPI)
+#            message(STATUS "Using suggested MPI '${MPI}' on Linux/${LINUX_DISTRIBUTION}")
+#        else()
+#            message(WARNING "Unknown distribution '${LINUX_DISTRIBUTION}': No default MPI recommendation")
+#        endif()
+#    endif()
+#endif()
 
 # Prefer system MPI versions over shipped one (try to find the version set by MPI mnemonic!)
 SET(OCM_SYSTEM_MPI YES)
@@ -104,8 +99,15 @@ SET(MPICH2_VERSION 1.5)
 # Default: Build all dependencies
 # This is changeable in the OpenCMISSLocalConfig file
 FOREACH(OCM_DEP ${OPENCMISS_COMPONENTS})
+    # Use everything by default
     SET(OCM_USE_${OCM_DEP} YES)
-    SET(OCM_SYSTEM_${OCM_DEP} NO)
+    # Look for some components on the system first before building 
+    LIST(FIND OPENCMISS_COMPONENTS_SYSTEM_BY_DEFAULT ${OCM_DEP} _COMP_POS)
+    SET(_VALUE NO)
+    if (_COMP_POS GREATER -1)
+        SET(_VALUE YES)
+    endif()
+    SET(OCM_SYSTEM_${OCM_DEP} ${_VALUE})
 ENDFOREACH()
 
 # Look for local BLAS/LAPACK packages by default; the rest is built
@@ -133,6 +135,12 @@ SET(SUNDIALS_VERSION 2.5)
 SET(SUPERLU_VERSION 4.3)
 SET(SUPERLU_DIST_VERSION 3.3)
 SET(ZLIB_VERSION 1.2.3)
+# Cellml
+SET(CELLML_VERSION 1.0) # any will do, not used
+# will be "master" finally
+SET(IRON_BRANCH iron)
+# Needs to be here until the repo's name is "iron", then it's compiled automatically (see Iron.cmake/BuildMacros)
+SET(IRON_REPO https://github.com/OpenCMISS/cm)
 
 # ==========================================================================================
 # Single module configuration

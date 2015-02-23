@@ -1,14 +1,4 @@
-find_program(GIT_EXECUTABLE git)
-if (GIT_EXECUTABLE)
-    if(WIN32)
-        SET(GIT_COMMAND cmd /c ${GIT_EXECUTABLE})
-    else()
-        SET(GIT_COMMAND ${GIT_EXECUTABLE})
-    endif()
-endif()
-
 MACRO(ADD_COMPONENT COMPONENT_NAME)
-    
     # Get lowercase folder name from project name
     string(TOLOWER ${COMPONENT_NAME} FOLDER_NAME) 
     
@@ -68,70 +58,78 @@ MACRO(ADD_COMPONENT COMPONENT_NAME)
 
     SET(DOWNLOAD_CMDS )
     # Developer mode
-    if (${${COMPONENT_NAME}_DEVEL})
-        # Need git only for development modes. So scream here if not found!
-        #if(NOT GIT_EXECUTABLE)
-        #    message(FATAL_ERROR "Development of OpenCMISS components like ${COMPONENT_NAME} requires the GIT executable to be available to cmake (check PATH etc).")
-        #endif()
-        
-        # Check if there already is a git repo at the source location
-        #message(STATUS "Running ${GIT_COMMAND} in ${COMPONENT_SOURCE}")
-        #execute_process(COMMAND ${GIT_COMMAND} status
-        #    RESULT_VARIABLE RES_VAR
-        #    OUTPUT_VARIABLE RES
-        #    ERROR_VARIABLE RES_ERR
-        #    WORKING_DIRECTORY ${COMPONENT_SOURCE}
-        #    OUTPUT_STRIP_TRAILING_WHITESPACE)
-            
-        #if(NOT RES_VAR EQUAL 0)
+    if (${OCM_DEVEL_${COMPONENT_NAME}})
+        find_package(Git)
+        if(GIT_FOUND)
+            #message(STATUS "GITHUB_ORGANIZATION=${GITHUB_ORGANIZATION}, GITHUB_USERNAME=${GITHUB_USERNAME}")
             if (NOT ${COMPONENT_NAME}_REPO)
-                 if(NOT GITHUB_USERNAME)
-                    SET(GITHUB_USERNAME ${GITHUB_ORGANIZATION})
+                if(GITHUB_USERNAME)
+                    SET(_GITHUB_USERNAME ${GITHUB_USERNAME})
+                else()
+                    SET(_GITHUB_USERNAME ${GITHUB_ORGANIZATION})
                 endif()
                 if (GITHUB_USE_SSL)
                     SET(GITHUB_PROTOCOL "git@github.com:")
                 else()
                     SET(GITHUB_PROTOCOL "https://github.com/")
                 endif()
-                set(${COMPONENT_NAME}_REPO ${GITHUB_PROTOCOL}${GITHUB_USERNAME}/${FOLDER_NAME})
+                set(${COMPONENT_NAME}_REPO ${GITHUB_PROTOCOL}${_GITHUB_USERNAME}/${FOLDER_NAME})
             endif()
             SET(DOWNLOAD_CMDS
                 GIT_REPOSITORY ${${COMPONENT_NAME}_REPO}
                 GIT_TAG ${${COMPONENT_NAME}_BRANCH}
             )
             #message(STATUS "DOWNLOAD_CMDS=${DOWNLOAD_CMDS}")
-        #else()
-        #    message(STATUS "Git returned output '${RES}' / error '${RES_ERR}'")
-        #endif()
+        else()
+            message(FATAL_ERROR "Could not find GIT. GIT is required for development mode of component ${COMPONENT_NAME}")
+        endif()
     
     # Default: Download the current version branch as zip of no development flag is set
     else()
         ################@TEMP@#################
         # Temporary fix to also adhere to "custom" repository locations when in user mode.
         # Should be removed in final version.
-        if (NOT ${COMPONENT_NAME}_REPO)
-            SET(${COMPONENT_NAME}_REPO https://github.com/${GITHUB_ORGANIZATION}/${FOLDER_NAME})
-        endif()
+        #if (NOT ${COMPONENT_NAME}_REPO)
+        #    SET(${COMPONENT_NAME}_REPO https://github.com/${GITHUB_ORGANIZATION}/${FOLDER_NAME})
+        #endif()
         ################@TEMP@#################
         SET(DOWNLOAD_CMDS
             DOWNLOAD_DIR ${COMPONENT_SOURCE}/src-download
-            #URL https://github.com/${GITHUB_ORGANIZATION}/${FOLDER_NAME}/archive/${${COMPONENT_NAME}_BRANCH}.zip
+            URL https://github.com/${GITHUB_ORGANIZATION}/${FOLDER_NAME}/archive/${${COMPONENT_NAME}_BRANCH}.zip
             ################@TEMP@#################
-            URL ${${COMPONENT_NAME}_REPO}/archive/${${COMPONENT_NAME}_BRANCH}.zip
+            #URL ${${COMPONENT_NAME}_REPO}/archive/${${COMPONENT_NAME}_BRANCH}.zip
             ################@TEMP@#################
         )
     endif()
+    
+    # Add source download/update project
+    LIST(APPEND _OCM_REQUIRED_SOURCES ${COMPONENT_NAME}_SRC)
+    # Collect still truly missing external projects so that the download target can be added
+    # to the ALL target for first runs
+    if (NOT EXISTS ${COMPONENT_SOURCE}/CMakeLists.txt)
+        SET(_OCM_NEED_INITIAL_SOURCE_DOWNLOAD YES)
+    endif()
+    ExternalProject_Add(${COMPONENT_NAME}_SRC
+        EXCLUDE_FROM_ALL 1
+        TMP_DIR ${OPENCMISS_ROOT}/src/download/tmp
+        STAMP_DIR ${OPENCMISS_ROOT}/src/download/stamps
+        #--Download step--------------
+        ${DOWNLOAD_CMDS}
+        SOURCE_DIR ${COMPONENT_SOURCE}
+        CONFIGURE_COMMAND ""
+        BUILD_COMMAND ""
+        INSTALL_COMMAND ""
+    )
     
 	ExternalProject_Add(${COMPONENT_NAME}
 		DEPENDS ${${COMPONENT_NAME}_DEPS}
 		PREFIX ${COMPONENT_BUILD_DIR}
 		TMP_DIR ${COMPONENT_BUILD_DIR}/ep_tmp
-		#STAMP_DIR ${OPENCMISS_ROOT}/build/cmake_ep_stamps
 		STAMP_DIR ${COMPONENT_BUILD_DIR}/ep_stamps
 		
-		#--Download step--------------
-        ${DOWNLOAD_CMDS}
-        
+		# Need empty download command, otherwise creation of external project fails with "no download info"
+		DOWNLOAD_COMMAND ""
+		
 		#--Configure step-------------
 		CMAKE_COMMAND ${CMAKE_COMMAND} --no-warn-unused-cli # disables warnings for unused cmdline options
 		SOURCE_DIR ${COMPONENT_SOURCE}
@@ -165,8 +163,6 @@ MACRO(ADD_DOWNSTREAM_DEPS PACKAGE)
         endforeach()
     endif()
 ENDMACRO()
-
-
 
 macro(GET_BUILD_COMMANDS BUILD_CMD_VAR INSTALL_CMD_VAR DIR PARALLEL)
     
@@ -204,68 +200,6 @@ macro(GET_BUILD_COMMANDS BUILD_CMD_VAR INSTALL_CMD_VAR DIR PARALLEL)
 	SET(${BUILD_CMD_VAR} ${BUILD_CMD})
 	SET(${INSTALL_CMD_VAR} ${INSTALL_CMD})
 endmacro()
-
-# Gets the revison of a submodule
-#
-# See http://git-scm.com/docs/git-submodule#status
-#
-# STATUS_VAR: Variable name to store the submodule status flag (-,+, ), see git-submodule
-# REV_VAR: Variable name to store the revision
-# REPO_DIR: Repo directory that contains the submodule
-# MODULE_PATH: Path to the submodule relative to REPO_DIR
-#macro(GET_SUBMODULE_STATUS STATUS_VAR REV_VAR REPO_DIR MODULE_PATH)
-#    
-#    execute_process(COMMAND ${GIT_COMMAND} submodule status ${MODULE_PATH}
-#        RESULT_VARIABLE RES_VAR
-#        OUTPUT_VARIABLE RES
-#        ERROR_VARIABLE RES_ERR
-#        WORKING_DIRECTORY ${REPO_DIR}
-#        OUTPUT_STRIP_TRAILING_WHITESPACE)
-#    if(NOT RES_VAR EQUAL 0)
-#        message(FATAL_ERROR "Process returned nonzero result: ${RES_VAR}. Additional error: ${RES_ERR}")
-#    endif()
-#    string(SUBSTRING ${RES} 0 1 ${STATUS_VAR})
-#    string(SUBSTRING ${RES} 1 40 ${REV_VAR})
-#    unset(RES_VAR)
-#    unset(RES)
-#    unset(RES_ERR)
-#    unset(_cmd)
-#endmacro()
-
-# Recursively updates a submodule and switches to a specified branch, if given. 
-#macro(OCM_DEVELOPER_SUBMODULE_UPDATE REPO_ROOT MODULE_PATH BRANCH)
-#    message(STATUS "Updating git submodule ${MODULE_PATH}..")
-#    execute_process(COMMAND ${GIT_COMMAND} submodule update --init --recursive ${MODULE_PATH}
-#        RESULT_VARIABLE RETCODE
-#        ERROR_VARIABLE UPDATE_CMD_ERR
-#        WORKING_DIRECTORY ${REPO_ROOT})
-#    if (NOT RETCODE EQUAL 0)
-#        message(FATAL_ERROR "Error updating submodule '${MODULE_PATH}' (code: ${RETCODE}): ${UPDATE_CMD_ERR}")
-#    endif()
-#    if (BRANCH)
-       # Check out opencmiss branch
-#       execute_process(COMMAND ${GIT_COMMAND} checkout ${BRANCH}
-#           WORKING_DIRECTORY ${REPO_ROOT}/${MODULE_PATH}
-#           RESULT_VARIABLE RETCODE
-#           ERROR_VARIABLE CHECKOUT_CMD_ERR
-#       )
-#       if (NOT RETCODE EQUAL 0)
-#           message(FATAL_ERROR "Error checking out submodule '${MODULE_PATH}' (code: ${RETCODE}): ${CHECKOUT_CMD_ERR}")
-#       endif()
-#    endif()
-#endmacro()
-
-# Recursively inits a submodule and switches to a specified branch, if given. 
-#macro(OCM_DEVELOPER_SUBMODULE_INIT REPO_ROOT MODULE_PATH)
-#    message(STATUS "Initializing git submodule ${MODULE_PATH}..")
-#    execute_process(COMMAND ${GIT_COMMAND} submodule init ${MODULE_PATH}
-#        RESULT_VARIABLE RETCODE
-#        ERROR_VARIABLE UPDATE_CMD_ERR
-#        WORKING_DIRECTORY ${REPO_ROOT})
-#    if (NOT RETCODE EQUAL 0)
-#        message(FATAL_ERROR "Error initializing submodule '${MODULE_PATH}' (code: ${RETCODE}): ${UPDATE_CMD_ERR}")
-#    endif()
-#endmacro()
 
 # Adds extra steps to the external projects for submodule updates and checkout.
 macro(ADD_SUBMODULE_CHECKOUT_STEPS PROJECT REPO_ROOT MODULE_PATH BRANCH) 

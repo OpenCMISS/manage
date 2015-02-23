@@ -50,13 +50,16 @@ set(GITHUB_ORGANIZATION OpenCMISS-Dependencies)
 # external project dependencies list of any following package
 
 # MPI implementations first!
-if(OCM_USE_MPI)    
+if(OCM_USE_MPI)
+    #message(STATUS "OCM_USE_MPI: YES")
     # Look for system one
     if (OCM_SYSTEM_MPI)
+        #message(STATUS "OCM_SYSTEM_MPI: YES")
         find_package(MPI QUIET)
     endif()
     # If no system MPI is found, invoke the MPISetup script (externally as quite large)
     if (NOT MPI_FOUND)
+        #message(STATUS "MPI_FOUND: NO")
         include(MPISetup)
     endif()
 endif()
@@ -254,7 +257,6 @@ if (OCM_USE_PETSC)
         ADD_COMPONENT(PETSC
             HYPRE_VERSION=${HYPRE_VERSION}
             MUMPS_VERSION=${MUMPS_VERSION}
-            OCM_MUMPS=${OCM_MUMPS}
             PARMETIS_VERSION=${PARMETIS_VERSION}
             PASTIX_VERSION=${PASTIX_VERSION}
             PTSCOTCH_VERSION=${PTSCOTCH_VERSION}
@@ -291,6 +293,14 @@ endif()
 if (OCM_USE_LIBCELLML)
     ADD_COMPONENT(LIBCELLML)
 endif()
+
+if (OCM_USE_CELLML)
+    # For now cellml is in OpenCMISS organization on GitHub
+    set(GITHUB_ORGANIZATION OpenCMISS)
+    ADD_COMPONENT(CELLML)
+endif()
+# Set back to 
+set(GITHUB_ORGANIZATION OpenCMISS-Dependencies)
 
 # Notes:
 # lapack: not sure if LAPACKE is build/required 
