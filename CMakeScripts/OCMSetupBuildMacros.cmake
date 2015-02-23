@@ -89,15 +89,15 @@ MACRO(ADD_COMPONENT COMPONENT_NAME)
         ################@TEMP@#################
         # Temporary fix to also adhere to "custom" repository locations when in user mode.
         # Should be removed in final version.
-        #if (NOT ${COMPONENT_NAME}_REPO)
-        #    SET(${COMPONENT_NAME}_REPO https://github.com/${GITHUB_ORGANIZATION}/${FOLDER_NAME})
-        #endif()
+        if (NOT ${COMPONENT_NAME}_REPO)
+            SET(${COMPONENT_NAME}_REPO https://github.com/${GITHUB_ORGANIZATION}/${FOLDER_NAME})
+        endif()
         ################@TEMP@#################
         SET(DOWNLOAD_CMDS
             DOWNLOAD_DIR ${COMPONENT_SOURCE}/src-download
-            URL https://github.com/${GITHUB_ORGANIZATION}/${FOLDER_NAME}/archive/${${COMPONENT_NAME}_BRANCH}.zip
+            #URL https://github.com/${GITHUB_ORGANIZATION}/${FOLDER_NAME}/archive/${${COMPONENT_NAME}_BRANCH}.zip
             ################@TEMP@#################
-            #URL ${${COMPONENT_NAME}_REPO}/archive/${${COMPONENT_NAME}_BRANCH}.zip
+            URL ${${COMPONENT_NAME}_REPO}/archive/${${COMPONENT_NAME}_BRANCH}.zip
             ################@TEMP@#################
         )
     endif()
