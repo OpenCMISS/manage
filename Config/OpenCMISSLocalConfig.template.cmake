@@ -4,14 +4,21 @@
 #SET(BUILD_SHARED_LIBS YES)
 
 # ==============================
+# Misc
+# ==============================
+# If you want more verbose output during builds, uncomment this line.
+#SET(CMAKE_VERBOSE_MAKEFILE ON)
+
+# ==============================
 # Compiler
 # ==============================
 # Usually you dont need to tell CMake which compilers to use.
 # If you change compilers here, YOU SHOULD KNOW WHY!!!
 # If by some chance you have to, first try to specify your desired toolchain via
-#SET(TOOLCHAIN GNU)
-#SET(TOOLCHAIN Intel)
-#SET(TOOLCHAIN IBM)
+#SET(TOOLCHAIN gnu) # gcc,g++ and gfortran compilers
+#SET(TOOLCHAIN intel) # icc, icpc, ifort compilers
+#SET(TOOLCHAIN ibm) # xlc, xlC, xlf95 compilers
+# Note that this variable will be used case-insensitive.
 
 # If still not functional, you can specify each compiler using the CMAKE_<lang>_COMPILER variables,
 # where <lang> can be each of "C","CXX" or "Fortran".

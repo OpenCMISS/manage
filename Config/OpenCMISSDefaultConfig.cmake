@@ -83,7 +83,7 @@ SET(OCM_SYSTEM_MPI YES)
 # Versions to use if we build a local version ourselves
 SET(OPENMPI_VERSION 1.8.4)
 SET(MPICH_VERSION 3.1.3)
-SET(MPICH2_VERSION 1.5)
+SET(MVAPICH2_VERSION 2.1)
 
 # Enter a custom mpi root directory here for a different mpi implementation.
 # Leave as-is to use default system mpi.
