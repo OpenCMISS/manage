@@ -109,7 +109,7 @@
 # include this to handle the QUIETLY and REQUIRED arguments
 include(FindPackageHandleStandardArgs)
 #include(GetPrerequisites)
-message(STATUS "FindMPI: Entering script")
+#message(STATUS "FindMPI: Entering script")
 
 #
 # This part detects MPI compilers, attempting to wade through the mess of compiler names in
@@ -175,7 +175,6 @@ endif()
 
 # Check if a mpi mnemonic is given
 # Standard local paths will be added below later
-message(STATUS "IM HEREEEEEEEEEEEEEEEEEEEEEE: ${MPI}")
 if(DEFINED MPI)
     message(STATUS "FindMPI: Trying to find ${MPI}-MPI implementation")
     if (MPI STREQUAL mpich)

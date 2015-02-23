@@ -103,7 +103,7 @@ MACRO(ADD_COMPONENT COMPONENT_NAME)
     endif()
     
     # Add source download/update project
-    LIST(APPEND _OCM_REQUIRED_SOURCES ${COMPONENT_NAME}_SRC)
+    LIST(APPEND _OCM_REQUIRED_SOURCES ${COMPONENT_NAME})
     # Collect still truly missing external projects so that the download target can be added
     # to the ALL target for first runs
     if (NOT EXISTS ${COMPONENT_SOURCE}/CMakeLists.txt)

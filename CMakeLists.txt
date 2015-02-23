@@ -100,14 +100,22 @@ include(Dependencies)
 include(Iron)
 
 # Finally, create the download target that depends on all other downloads
-SET(_ADDTOALL )
-if (_OCM_NEED_INITIAL_SOURCE_DOWNLOAD)
-    SET(_ADDTOALL ALL)
-endif()
+#SET(_ADDTOALL )
+#if (_OCM_NEED_INITIAL_SOURCE_DOWNLOAD)
+#    SET(_ADDTOALL ALL)
+#endif()
+SET(_OCM_REQUIRED_SOURCES_LIST )
+foreach(_COMP _OCM_REQUIRED_SOURCES)
+    LIST(APPEND _OCM_REQUIRED_SOURCES_LIST ${_COMP}_SRC)
+    if (_OCM_NEED_INITIAL_SOURCE_DOWNLOAD)
+        add_dependencies(${_COMP} update)
+    endif()
+endforeach()
 add_custom_target(update
-    ${_ADDTOALL} 
-    DEPENDS ${_OCM_REQUIRED_SOURCES}
+    #${_ADDTOALL} 
+    DEPENDS ${_OCM_REQUIRED_SOURCES_LIST}
 )
+
 # I already foresee that we will have to have "download" and "update" targets for the less insighted user.
 # So lets just give it to them. Does the same as external project has initial download and update steps.
 #add_custom_target(download 
