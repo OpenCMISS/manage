@@ -104,11 +104,6 @@ MACRO(ADD_COMPONENT COMPONENT_NAME)
     
     # Add source download/update project
     LIST(APPEND _OCM_REQUIRED_SOURCES ${COMPONENT_NAME})
-    # Collect still truly missing external projects so that the download target can be added
-    # to the ALL target for first runs
-    if (NOT EXISTS ${COMPONENT_SOURCE}/CMakeLists.txt)
-        SET(_OCM_NEED_INITIAL_SOURCE_DOWNLOAD YES)
-    endif()
     ExternalProject_Add(${COMPONENT_NAME}_SRC
         EXCLUDE_FROM_ALL 1
         TMP_DIR ${OPENCMISS_ROOT}/src/download/tmp
@@ -119,6 +114,7 @@ MACRO(ADD_COMPONENT COMPONENT_NAME)
         CONFIGURE_COMMAND ""
         BUILD_COMMAND ""
         INSTALL_COMMAND ""
+        STEP_TARGETS download update
     )
     
 	ExternalProject_Add(${COMPONENT_NAME}
@@ -127,7 +123,14 @@ MACRO(ADD_COMPONENT COMPONENT_NAME)
 		TMP_DIR ${COMPONENT_BUILD_DIR}/ep_tmp
 		STAMP_DIR ${COMPONENT_BUILD_DIR}/ep_stamps
 		
-		# Need empty download command, otherwise creation of external project fails with "no download info"
+		#--Download step--------------
+		# Ideal solution - include in the external project that also builds.
+		# Still a mess with mixed download/build stamp files and even though the UPDATE_DISCONNECTED command
+		# skips the update command the configure etc dependency chain is yet executed each time :-(
+        #${DOWNLOAD_CMDS}
+        #UPDATE_DISCONNECTED 1 # Dont update without being asked. New feature of CMake 3.2.0-rc1
+		
+        # Need empty download command, otherwise creation of external project fails with "no download info"
 		DOWNLOAD_COMMAND ""
 		
 		#--Configure step-------------
@@ -142,6 +145,21 @@ MACRO(ADD_COMPONENT COMPONENT_NAME)
 		# currently set as extra arg (above), somehow does not work
 		#INSTALL_DIR ${CMAKE_INSTALL_PREFIX} 
 		INSTALL_COMMAND ${INSTALL_COMMAND}
+	)
+	
+	# Add extra step that makes sure the source files at least exist at the first run.
+	# Triggers build of ${COMPONENT_NAME}_SRC if not found.
+	# Adding the DEPENDS line also takes care to re-build the component whenever the main cmakelists.txt changes.
+	#
+	# This could be added as DOWNLOAD_COMMAND inside the ExternalProject_Add above, however, this feels cleaner
+	# and can be commented out easier
+	ExternalProject_Add_Step(${COMPONENT_NAME} check_sources
+	        COMMAND ${CMAKE_COMMAND}
+                -DTARGET=${COMPONENT_NAME}_SRC-download
+                -DFOLDER=${COMPONENT_SOURCE}
+                -DBINDIR=${CMAKE_CURRENT_BINARY_DIR}
+                -P ${OPENCMISS_SETUP_DIR}/CMakeScripts/CheckSourceExists.cmake
+            DEPENDERS configure
 	)
 	
 	# Be a tidy kiwi
@@ -169,7 +187,7 @@ macro(GET_BUILD_COMMANDS BUILD_CMD_VAR INSTALL_CMD_VAR DIR PARALLEL)
     SET( BUILD_CMD ${CMAKE_COMMAND} --build ${DIR})
     SET( INSTALL_CMD ${CMAKE_COMMAND} --build ${DIR} --target install)
     
-    if(${PARALLEL} STREQUAL TRUE OR ${PARALLEL})
+    if(${PARALLEL})
         include(ProcessorCount)
         ProcessorCount(NUM_PROCESSORS)
         if (NUM_PROCESSORS EQUAL 0)

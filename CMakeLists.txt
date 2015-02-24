@@ -36,7 +36,7 @@ include(ToolchainSetup)
 
 ########################################################################
 # Start actual setup
-CMAKE_MINIMUM_REQUIRED(VERSION 3.0 FATAL_ERROR)
+CMAKE_MINIMUM_REQUIRED(VERSION 3.2.0-rc1 FATAL_ERROR)
 project(OpenCMISS-Setup VERSION 1.0 LANGUAGES C CXX Fortran)
 if (NOT WIN32 AND CMAKE_BUILD_TYPE STREQUAL "")
     SET(CMAKE_BUILD_TYPE RELEASE)
@@ -100,24 +100,17 @@ include(Dependencies)
 include(Iron)
 
 # Finally, create the download target that depends on all other downloads
-#SET(_ADDTOALL )
-#if (_OCM_NEED_INITIAL_SOURCE_DOWNLOAD)
-#    SET(_ADDTOALL ALL)
-#endif()
-SET(_OCM_REQUIRED_SOURCES_LIST )
+SET(_OCM_SOURCE_UPDATE_TARGETS )
+SET(_OCM_SOURCE_DOWNLOAD_TARGETS )
 foreach(_COMP ${_OCM_REQUIRED_SOURCES})
-    LIST(APPEND _OCM_REQUIRED_SOURCES_LIST ${_COMP}_SRC)
-    if (_OCM_NEED_INITIAL_SOURCE_DOWNLOAD)
-        add_dependencies(${_COMP} update)
-    endif()
+    LIST(APPEND _OCM_SOURCE_UPDATE_TARGETS ${_COMP}_SRC-update)
+    LIST(APPEND _OCM_SOURCE_DOWNLOAD_TARGETS ${_COMP}_SRC-download)
 endforeach()
 add_custom_target(update
-    #${_ADDTOALL} 
-    DEPENDS ${_OCM_REQUIRED_SOURCES_LIST}
+    DEPENDS ${_OCM_SOURCE_UPDATE_TARGETS}
 )
-
 # I already foresee that we will have to have "download" and "update" targets for the less insighted user.
 # So lets just give it to them. Does the same as external project has initial download and update steps.
-#add_custom_target(download 
-#    DEPENDS ${OCM_REQUIRED_SOURCES}
-#)
+add_custom_target(download 
+    DEPENDS ${_OCM_SOURCE_DOWNLOAD_TARGETS}
+)

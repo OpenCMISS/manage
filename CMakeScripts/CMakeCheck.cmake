@@ -1,12 +1,12 @@
-SET(CMAKE_MIN_VERSION_MAJ 3.1)
-SET(CMAKE_MIN_VERSION ${CMAKE_MIN_VERSION_MAJ}.0)
+SET(CMAKE_MIN_VERSION_MAJ 3.2)
+SET(CMAKE_MIN_VERSION ${CMAKE_MIN_VERSION_MAJ}.0-rc1)
 message(STATUS "Checking CMake..")
 if (CMAKE_VERSION VERSION_LESS ${CMAKE_MIN_VERSION})
     if (WIN32)
         message(FATAL_ERROR "Your CMake version is ${CMAKE_VERSION}.\nAt least version ${CMAKE_MIN_VERSION} is required for OpenCMISS.\nPlease download & install from http://www.cmake.org/download/")
     else()
-        # Fixes the library detection, somehow those variables are empty by default
-        # other platforms need to be catered for as we go.
+        # Fixes the library detection, as no project has been initialized yet and thus
+        # the find_library wont work correctly. this will probably bite someone sometime :-|
         if (UNIX)
             SET(CMAKE_FIND_LIBRARY_SUFFIXES ${CMAKE_FIND_LIBRARY_SUFFIXES} .a .so)
             SET(CMAKE_FIND_LIBRARY_PREFIXES ${CMAKE_FIND_LIBRARY_PREFIXES} lib)
