@@ -163,52 +163,9 @@ set(_MPI_XL_Fortran_COMPILER_NAMES         mpixlf95   mpixlf95_r mpxlf95 mpxlf95
                                            mpixlf77   mpixlf77_r mpxlf77 mpxlf77_r
                                            mpixlf     mpixlf_r   mpxlf   mpxlf_r)
                                            
-set(_MPI_PREFIX_PATH )
-
-# For 64bit environments, look in bin64 folders first!
-SET(_BIN_SUFFIX bin)
-SET(PROGRAM_FILES_PATH "Program\ Files (x86)")
-if (CMAKE_SYSTEM_PROCESSOR MATCHES "64")
-    LIST(INSERT _BIN_SUFFIX 0 bin64)
-    SET(PROGRAM_FILES_PATH "Program\ Files")
-endif()
-
-# Check if a mpi mnemonic is given
-# Standard local paths will be added below later
-if(DEFINED MPI)
-    message(STATUS "FindMPI: Trying to find ${MPI}-MPI implementation")
-    if (MPI STREQUAL mpich)
-        #LIST(APPEND _MPI_PREFIX_PATH /usr/lib/mpich /usr/lib64/mpich /usr/local/lib/mpich /usr/local/lib64/mpich)
-        LIST(APPEND _MPI_PREFIX_PATH mpich)
-        if(WIN32)
-            LIST(APPEND _MPI_PREFIX_PATH "C:/${PROGRAM_FILES_PATH}/MPICH" "C:/${PROGRAM_FILES_PATH}/mpich")
-        endif()
-    elseif(MPI STREQUAL mpich2)
-        #LIST(APPEND _MPI_PREFIX_PATH /usr/lib/mpich2 /usr/lib64/mpich2 /usr/local/lib/mpich2 /usr/local/lib64/mpich2)
-        LIST(APPEND _MPI_PREFIX_PATH mpich2)
-        if(WIN32)
-            LIST(APPEND _MPI_PREFIX_PATH "C:/${PROGRAM_FILES_PATH}/MPICH2" "C:/${PROGRAM_FILES_PATH}/mpich2")
-        endif()
-    elseif(MPI STREQUAL intel)
-        LIST(APPEND _MPI_PREFIX_PATH /opt/intel/impi_latest)
-    elseif(MPI STREQUAL openmpi)
-        #LIST(APPEND _MPI_PREFIX_PATH /usr/lib64/compat-openmpi /usr/lib/compat-openmpi
-        #    /usr/lib64/openmpi /usr/lib/openmpi
-        #    /usr/local/openmpi /usr/local/lib/openmpi)
-        LIST(APPEND _MPI_PREFIX_PATH compat-openmpi openmpi)
-    elseif(MPI STREQUAL mvapich2)
-        if(NOT DEFINED MPI_HOME)
-            message(WARNING "mvapich2 requested but not MPI_HOME is set")
-        endif()
-    elseif(MPI STREQUAL poe)
-        LIST(APPEND _MPI_PREFIX_PATH /usr/lpp/ppe.poe)
-    elseif(MPI STREQUAL cray)
-        LIST(APPEND _MPI_PREFIX_PATH /opt/cray/mpt/4.1.1/xt/seastar/mpich2-gnu)
-    else()
-        message(STATUS "MPI '${MPI}' not recognized")
-    endif()
-endif()
-
+############################################################
+# Get possible compiler names
+############################################################
 # append vendor-specific compilers to the list if we either don't know the compiler id,
 # or if we know it matches the regular compiler.
 foreach (lang C CXX Fortran)
@@ -224,7 +181,7 @@ endforeach()
 set(_MPI_EXEC_NAMES mpiexec mpirun lamexec srun)
 
 # For systems with "alternatives" management: prepend the mnemonic name to the executable names
-# (they match, by coincidence/common sense, but hey, they match at least for mpich2/openmpi).
+# (they match, by coincidence/same idea, but hey, they match at least for mpich2/openmpi).
 if(MPI)
     foreach (lang C CXX Fortran)
         foreach(compname ${_MPI_${lang}_COMPILER_NAMES})
@@ -238,40 +195,108 @@ if(MPI)
             LIST(INSERT _MPI_EXEC_NAMES 0 ${exename}.${MPI})
         endforeach()
     #message(STATUS "FindMPI: MPI_EXEC_NAMES=${_MPI_EXEC_NAMES}")
-endif()
-
-# Grab the path to MPI from the registry if we're on windows.
-if(WIN32 AND NOT MPI_HOME)
-  list(APPEND _MPI_PREFIX_PATH "[HKEY_LOCAL_MACHINE\\SOFTWARE\\MPICH\\SMPD;binary]/..")
-  list(APPEND _MPI_PREFIX_PATH "[HKEY_LOCAL_MACHINE\\SOFTWARE\\MPICH2;Path]")
-  list(APPEND _MPI_PREFIX_PATH "$ENV{ProgramW6432}/MPICH2/")
-endif()
-
-# Build a list of prefixes to search for MPI.
-SET(_MPI_PREFIX_PATH_COPY ${_MPI_PREFIX_PATH})
-foreach(SystemPrefixDir 
-    ${CMAKE_SYSTEM_PREFIX_PATH}
-    # Add some more paths
-    /usr/lib /usr/lib64
-    /usr/local/lib /usr/local/lib64)
-  foreach(MpiPackageDir ${_MPI_PREFIX_PATH_COPY})
-    #message(STATUS "FindMPI: Trying path ${SystemPrefixDir}/${MpiPackageDir}")
-    if(EXISTS ${SystemPrefixDir}/${MpiPackageDir})
-      #message(STATUS "FindMPI: Path added")
-      list(APPEND _MPI_PREFIX_PATH "${SystemPrefixDir}/${MpiPackageDir}")
-    endif()
-  endforeach()
-endforeach()
-unset(_MPI_PREFIX_PATH_COPY)
-
-if (MPI_HOME)
-    #list(INSERT _MPI_PREFIX_PATH 0 ${MPI_HOME})
+endif()                                           
+       
+############################################################
+# Compile the search path for MPI
+############################################################
+# Case 1: MPI_HOME is set. Look there and ONLY there.
+if (DEFINED MPI_HOME)
+    message(STATUS "FindMPI: Using MPI_HOME=${MPI_HOME}")
     SET(_MPI_PREFIX_PATH ${MPI_HOME})
-endif()
-if (_MPI_PREFIX_PATH)
-    message(STATUS "FindMPI: MPI_PREFIX_PATH=${_MPI_PREFIX_PATH}")
+    SET(PATHOPT NO_DEFAULT_PATH)
+else()
+    # Allow all paths
+    SET(PATHOPT )
+
+    # For 64bit environments, look in bin64 folders first!
+    SET(_BIN_SUFFIX bin)
+    SET(PROGRAM_FILES_PATH "Program\ Files (x86)")
+    if (CMAKE_SYSTEM_PROCESSOR MATCHES "64")
+        LIST(INSERT _BIN_SUFFIX 0 bin64)
+        SET(PROGRAM_FILES_PATH "Program\ Files")
+    endif()
+    
+    # Check if a mpi mnemonic is given
+    # Standard local paths will be added below later
+    if(DEFINED MPI)
+        message(STATUS "FindMPI: Trying to find ${MPI}-MPI implementation")
+        if (MPI STREQUAL mpich)
+            #LIST(APPEND _MPI_PREFIX_PATH /usr/lib/mpich /usr/lib64/mpich /usr/local/lib/mpich /usr/local/lib64/mpich)
+            LIST(APPEND _MPI_PREFIX_PATH mpich)
+            if(WIN32)
+                LIST(APPEND _MPI_PREFIX_PATH "C:/${PROGRAM_FILES_PATH}/MPICH" "C:/${PROGRAM_FILES_PATH}/mpich")
+            endif()
+        elseif(MPI STREQUAL mpich2)
+            #LIST(APPEND _MPI_PREFIX_PATH /usr/lib/mpich2 /usr/lib64/mpich2 /usr/local/lib/mpich2 /usr/local/lib64/mpich2)
+            LIST(APPEND _MPI_PREFIX_PATH mpich2)
+            if(WIN32)
+                LIST(APPEND _MPI_PREFIX_PATH "C:/${PROGRAM_FILES_PATH}/MPICH2" "C:/${PROGRAM_FILES_PATH}/mpich2")
+            endif()
+        elseif(MPI STREQUAL intel)
+            LIST(APPEND _MPI_PREFIX_PATH /opt/intel/impi_latest)
+        elseif(MPI STREQUAL openmpi)
+            #LIST(APPEND _MPI_PREFIX_PATH /usr/lib64/compat-openmpi /usr/lib/compat-openmpi
+            #    /usr/lib64/openmpi /usr/lib/openmpi
+            #    /usr/local/openmpi /usr/local/lib/openmpi)
+            LIST(APPEND _MPI_PREFIX_PATH compat-openmpi openmpi)
+        elseif(MPI STREQUAL mvapich2)
+            LIST(APPEND _MPI_PREFIX_PATH mvapich2 mvapich)
+        elseif(MPI STREQUAL poe)
+            LIST(APPEND _MPI_PREFIX_PATH /usr/lpp/ppe.poe)
+        elseif(MPI STREQUAL cray)
+            LIST(APPEND _MPI_PREFIX_PATH /opt/cray/mpt/4.1.1/xt/seastar/mpich2-gnu)
+        else()
+            message(FATAL_ERROR "Unknown MPI value '${MPI}'. Your options:
+1. Use one of 'mpich','mpich2','openmpi','intel' or 'mvapich2'
+2. Do not define the MPI variable and let CMake find the system default")
+        endif()
+    endif()
+    
+    # Grab the path to MPI from the registry if we're on windows.
+    if(WIN32 AND NOT MPI_HOME)
+      list(APPEND _MPI_PREFIX_PATH "[HKEY_LOCAL_MACHINE\\SOFTWARE\\MPICH\\SMPD;binary]/..")
+      list(APPEND _MPI_PREFIX_PATH "[HKEY_LOCAL_MACHINE\\SOFTWARE\\MPICH2;Path]")
+      list(APPEND _MPI_PREFIX_PATH "$ENV{ProgramW6432}/MPICH2/")
+    endif()
+    
+    # Build a list of prefixes to search for MPI.
+    SET(_MPI_PREFIX_PATH_COPY ${_MPI_PREFIX_PATH})
+    foreach(SystemPrefixDir 
+        ${CMAKE_SYSTEM_PREFIX_PATH}
+        # Add some more paths
+        /usr/lib /usr/lib64
+        /usr/local/lib /usr/local/lib64)
+      foreach(MpiPackageDir ${_MPI_PREFIX_PATH_COPY})
+        #message(STATUS "FindMPI: Trying path ${SystemPrefixDir}/${MpiPackageDir}")
+        if(EXISTS ${SystemPrefixDir}/${MpiPackageDir})
+          #message(STATUS "FindMPI: Path added")
+          list(APPEND _MPI_PREFIX_PATH "${SystemPrefixDir}/${MpiPackageDir}")
+        endif()
+      endforeach()
+    endforeach()
+    unset(_MPI_PREFIX_PATH_COPY)
+    
+    message(STATUS "FindMPI: Search locations: ${_MPI_PREFIX_PATH}")
+
+endif() # DEFINED MPI_HOME
+
+# Check if a different MPI type is specified this time and delete any previous findings if so.
+if (DEFINED _MPI_LASTFIND AND DEFINED MPI AND (NOT MPI STREQUAL _MPI_LASTFIND)) 
+    message(STATUS "@@@@@@@ UNSETTING LAST MPI FINDING OF ${_MPI_LASTFIND} (new: ${MPI})")
+    UNSET(_MPI_LASTFIND CACHE)
+    UNSET(MPIEXEC CACHE)
+    foreach (lang C CXX Fortran)
+        UNSET(MPI_${lang}_INCLUDE_PATH CACHE)
+        UNSET(MPI_${lang}_LIBRARIES CACHE)
+        UNSET(MPI_${lang}_COMPILER CACHE)
+        SET(MPI_${lang}_FOUND FALSE) 
+    endforeach()
 endif()
 
+############################################################
+# Interrogation part - function definition
+############################################################
 #
 # interrogate_mpi_compiler(lang try_libs)
 #
@@ -297,7 +322,7 @@ function (interrogate_mpi_compiler lang try_libs)
   # compiler, MPI_${lang}_COMPILER won't be equal to MPI_${lang}_NO_INTERROGATE, and we'll
   # inspect that compiler anew.  This allows users to set new compilers w/o rm'ing cache.
   string(COMPARE NOTEQUAL "${MPI_${lang}_NO_INTERROGATE}" "${MPI_${lang}_COMPILER}" interrogate)
-  #message("Interrogate MPI_${lang}_COMPILER: ${MPI_${lang}_COMPILER}")
+  
   # If MPI is set already in the cache, don't bother with interrogating the compiler.
   if (interrogate AND ((NOT MPI_${lang}_INCLUDE_PATH) OR (NOT MPI_${lang}_LIBRARIES)))
     if (MPI_${lang}_COMPILER)
@@ -501,11 +526,12 @@ function (interrogate_mpi_compiler lang try_libs)
       endif()
 
     elseif(try_libs)
-      message("FindMPI: Falling back to classic library search as no MPI_${lang}_COMPILER is set")
+      #message("FindMPI: Falling back to classic library search as no MPI_${lang}_COMPILER is set")
       # If we didn't have an MPI compiler script to interrogate, attempt to find everything
       # with plain old find functions.  This is nasty because MPI implementations have LOTS of
       # different library names, so this section isn't going to be very generic.  We need to
       # make sure it works for MS MPI, though, since there are no compiler wrappers for that.
+      set(MPI_HEADER_PATH "MPI_HEADER_PATH-NOTFOUND" CACHE FILEPATH "Cleared" FORCE)
       find_path(MPI_HEADER_PATH mpi.h
         HINTS ${_MPI_BASE_DIR} ${_MPI_PREFIX_PATH}
         PATH_SUFFIXES include Inc)
@@ -741,13 +767,12 @@ function(is_file_executable file result_var)
   endif()
 endfunction()
 
-# End definitions, commence real work here.
+############################################################
+# Interrogation part - commence real work here.
+############################################################
 
-SET(PATHOPT )
-if (MPI_HOME)
-    SET(PATHOPT NO_DEFAULT_PATH)
-endif()
 # Most mpi distros have some form of mpiexec which gives us something we can reliably look for.
+message(STATUS "MPI executable: names=${_MPI_EXEC_NAMES},hints=${_MPI_PREFIX_PATH},PATH_SUFFIXES=${_BIN_SUFFIX},PATHOPT=${PATHOPT}")
 find_program(MPIEXEC
   NAMES ${_MPI_EXEC_NAMES}
   HINTS ${_MPI_PREFIX_PATH} 
@@ -755,7 +780,7 @@ find_program(MPIEXEC
   ${PATHOPT}
   DOC "Executable for running MPI programs.")
 if (MPIEXEC)
-    message("MPI executable: ${MPIEXEC}")
+    message(STATUS "MPI executable: ${MPIEXEC}")
 endif()
 
 # call get_filename_component twice to remove mpiexec and the directory it exists in (typically bin).
@@ -768,7 +793,6 @@ set(MPIEXEC_PREFLAGS     ""    CACHE STRING "These flags will be directly before
 set(MPIEXEC_POSTFLAGS    ""    CACHE STRING "These flags will come after all flags given to MPIEXEC.")
 set(MPIEXEC_MAX_NUMPROCS "2"   CACHE STRING "Maximum number of processors available to run MPI applications.")
 mark_as_advanced(MPIEXEC MPIEXEC_NUMPROC_FLAG MPIEXEC_PREFLAGS MPIEXEC_POSTFLAGS MPIEXEC_MAX_NUMPROCS)
-
 
 #=============================================================================
 # Backward compatibility input hacks.  Propagate the FindMPI hints to C and
@@ -809,12 +833,12 @@ foreach (lang C CXX Fortran)
     set(try_libs TRUE)
     # If the user supplies a compiler *name* instead of an absolute path, assume that we need to find THAT compiler.
     if (MPI_${lang}_COMPILER)
-      message(STATUS "Using given MPI_${lang}_COMPILER '${MPI_${lang}_COMPILER}'")
+      #message(STATUS "Using given MPI_${lang}_COMPILER '${MPI_${lang}_COMPILER}'")
       # If the user specifies a compiler, we don't want to try to search libraries either.
       set(try_libs FALSE)  
       is_file_executable(${MPI_${lang}_COMPILER} MPI_COMPILER_IS_EXECUTABLE)
       if (NOT MPI_COMPILER_IS_EXECUTABLE)
-        message("User-defined MPI_${lang}_COMPILER is NOT an executable, looking for matching executable")
+        #message("User-defined MPI_${lang}_COMPILER is NOT an executable, looking for matching executable")
         # Get rid of our default list of names and just search for the name the user wants.
         set(_MPI_${lang}_COMPILER_NAMES ${MPI_${lang}_COMPILER})
         set(MPI_${lang}_COMPILER "MPI_${lang}_COMPILER-NOTFOUND" CACHE FILEPATH "Cleared" FORCE)
@@ -830,7 +854,6 @@ foreach (lang C CXX Fortran)
       HINTS  ${_MPI_PREFIX_PATH} ${MPI_HOME} $ENV{MPI_HOME}
       PATH_SUFFIXES ${_BIN_SUFFIX}
       ${PATHOPT})
-    #message(STATUS "Using MPI_${lang}_COMPILER '${MPI_${lang}_COMPILER}'")
     interrogate_mpi_compiler(${lang} ${try_libs})
     mark_as_advanced(MPI_${lang}_COMPILER)
 
@@ -846,35 +869,39 @@ foreach (lang C CXX Fortran)
     set(MPI_${lang}_FIND_VERSION ${MPI_FIND_VERSION})
     set(MPI_${lang}_FIND_VERSION_EXACT ${MPI_FIND_VERSION_EXACT})
     
-    if (MPI_${lang}_FOUND)
-        message(STATUS "MPI ${lang} Libs: ${MPI_${lang}_LIBRARIES}")
-        message(STATUS "MPI ${lang} Path: ${MPI_${lang}_INCLUDE_PATH}")
-    endif()
-    
     # Check if the found version matches with the desired one
     # (Applies only if MPI variable is set!)
     if(MPI AND MPI_${lang}_FOUND)
-        SET(MNEMONICS mpich mpich2 openmpi intel)
+        SET(MNEMONICS mpich mpich2 openmpi intel mvapich2)
         # Patterns to match the include path
-        SET(PATTERNS ".*mpich([/|-].*|$)" ".*mpich(2)?([/|-].*|$)" ".*openmpi([/|-].*|$)" ".*(intel|impi)[/|-].*")
-        foreach(IDX RANGE 3)
+        SET(PATTERNS ".*mpich([/|-].*|$)" ".*mpich(2)?([/|-].*|$)" ".*openmpi([/|-].*|$)" ".*(intel|impi)[/|-].*" ".*mvapich(2)?([/|-].*|$)")
+        foreach(IDX RANGE 4)
             LIST(GET MNEMONICS ${IDX} MNEMONIC)
             LIST(GET PATTERNS ${IDX} PATTERN)
             # Case insensitive match not possible with cmake regex :-(
             STRING(TOLOWER "${MPI_${lang}_INCLUDE_PATH}" INC_PATH)
             if (MPI STREQUAL ${MNEMONIC} AND NOT INC_PATH MATCHES ${PATTERN})
-                message(STATUS "An MPI_${lang} compiler '${MPI_${lang}_COMPILER}' was found but the MPI_${lang}_INCLUDE_PATH")
-                message(STATUS "'${INC_PATH}' does not match the requested MPI implementation '${MNEMONIC}'.")
-                message(STATUS "Check your include paths (searched in that order with suffixes '${_BIN_SUFFIX}'):")
-                message(STATUS "PATH1 (CMAKE_PREFIX_PATH): ${CMAKE_PREFIX_PATH}")
-                message(STATUS "PATH2 (MPI_HOME + OWN GUESS/HINTS): ${_MPI_PREFIX_PATH} ${MPI_HOME} $ENV{MPI_HOME}")
-                message(STATUS "PATH3 (ENVIRONMENT PATH): $ENV{PATH}")
-                message(STATUS "PATH4 (CMAKE_SYSTEM_PREFIX_PATH): ${CMAKE_SYSTEM_PREFIX_PATH}")
-                message(FATAL_ERROR "Wrong MPI implementation found.\nCheck your MPI_HOME [or provide an absolute path to MPI_${lang}_COMPILER in] OpenCMISSLocalConfig.")
-                UNSET(MPI_${lang}_INCLUDE_PATH CACHE)
-                UNSET(MPI_${lang}_LIBRARIES CACHE)
+            message(STATUS "The found MPI_${lang} compiler '${MPI_${lang}_COMPILER}' does not match the requested MPI implementation '${MNEMONIC}'.")
+#            message(STATUS "Check your include paths (suffixes '${_BIN_SUFFIX}' each):
+#1. CMAKE_PREFIX_PATH ${CMAKE_PREFIX_PATH}
+#2. Build system guess ${_MPI_PREFIX_PATH} $ENV{MPI_HOME}
+#3. CMAKE_SYSTEM_PREFIX_PATH ${CMAKE_SYSTEM_PREFIX_PATH}
+#Alternatively, specify MPI_HOME or set a full path to MPI_${lang}_COMPILER")
+                SET(MPI_${lang}_INCLUDE_PATH "MPI_${lang}_INCLUDE_PATH-NOTFOUND" CACHE PATH "Cleared" FORCE)
+                SET(MPI_${lang}_LIBRARIES "MPI_${lang}_LIBRARIES-NOTFOUND" CACHE STRING "Cleared" FORCE)
+                SET(MPI_${lang}_COMPILER "MPI_${lang}_COMPILER-NOTFOUND" CACHE FILEPATH "Cleared" FORCE)
+                unset(MPIEXEC CACHE)
+                SET(MPI_${lang}_FOUND FALSE) 
             endif()
         endforeach()
+    endif()
+    
+    if (MPI_${lang}_FOUND)
+        if (MPI_${lang}_COMPILER)
+            message(STATUS "MPI ${lang} Compiler: ${MPI_${lang}_COMPILER}")
+        endif()
+        message(STATUS "MPI ${lang} Libs: ${MPI_${lang}_LIBRARIES}")
+        message(STATUS "MPI ${lang} Path: ${MPI_${lang}_INCLUDE_PATH}")
     endif()
 
     if (regular_compiler_worked)
@@ -885,6 +912,10 @@ foreach (lang C CXX Fortran)
   endif()
 endforeach()
 
+# Store the currently successful findings of MPI in the local cache
+if (MPI AND (MPI_C_FOUND OR MPI_CXX_FOUND OR MPI_Fortran_FOUND))
+    SET(_MPI_LASTFIND ${MPI} CACHE INTERNAL "Contains the MPI value of the latest successful find.")
+endif()
 
 #=============================================================================
 # More backward compatibility stuff

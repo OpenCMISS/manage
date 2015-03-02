@@ -49,8 +49,14 @@ include(ExternalProject)
 # Utilities (Wrappers, MPI-pre-check, ...)
 include(Utilities)
 
+# Multithreading
 if(OCM_USE_MT)
     find_package(OpenMP REQUIRED)
+endif()
+
+# MPI
+if(OCM_USE_MPI)
+    include(MPIChecks)
 endif()
 
 ########################################################################
@@ -87,10 +93,11 @@ SET(OPENCMISS_COMPONENTS_INSTALL_PREFIX ${OPENCMISS_ROOT}/install/${ARCHITECTURE
 include(CollectComponentDefinitions)
 #message(STATUS "OpenCMISS components common definitions:\n${COMPONENT_COMMON_DEFS}")
 
-include(OCMSetupBuildMacros)
 SET(_OCM_REQUIRED_SOURCES )
 SET(_OCM_NEED_INITIAL_SOURCE_DOWNLOAD NO)
 
+
+include(OCMSetupBuildMacros)
 ########################################################################
 # Dependencies
 include(Dependencies)

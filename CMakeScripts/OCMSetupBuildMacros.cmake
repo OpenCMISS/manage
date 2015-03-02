@@ -24,27 +24,29 @@ MACRO(ADD_COMPONENT COMPONENT_NAME)
     
     # check if MPI compilers should be forwarded/set
     # so that the local FindMPI uses that
-    foreach(DEP ${OPENCMISS_COMPONENTS_WITHMPI})
-        if(${DEP} STREQUAL ${COMPONENT_NAME})
-            if (MPI)
-                LIST(APPEND COMPONENT_DEFS
-                    -DMPI=${MPI}
-                )
-            endif()
-            if (MPI_HOME)
-                LIST(APPEND COMPONENT_DEFS
-                    -DMPI_HOME=${MPI_HOME}
-                )
-            endif()
-            foreach(lang C CXX Fortran)
-                if(MPI_${lang}_COMPILER)
+    if (OCM_USE_MPI)
+        foreach(DEP ${OPENCMISS_COMPONENTS_WITHMPI})
+            if(${DEP} STREQUAL ${COMPONENT_NAME})
+                if (MPI)
                     LIST(APPEND COMPONENT_DEFS
-                        -DMPI_${lang}_COMPILER=${MPI_${lang}_COMPILER}
+                        -DMPI=${MPI}
                     )
                 endif()
-            endforeach()
-        endif()
-    endforeach()
+                if (MPI_HOME)
+                    LIST(APPEND COMPONENT_DEFS
+                        -DMPI_HOME=${MPI_HOME}
+                    )
+                endif()
+                foreach(lang C CXX Fortran)
+                    if(MPI_${lang}_COMPILER)
+                        LIST(APPEND COMPONENT_DEFS
+                            -DMPI_${lang}_COMPILER=${MPI_${lang}_COMPILER}
+                        )
+                    endif()
+                endforeach()
+            endif()
+        endforeach()
+    endif()
     
 	# Forward any other variables
     foreach(extra_def ${ARGN})
@@ -52,7 +54,7 @@ MACRO(ADD_COMPONENT COMPONENT_NAME)
         #message(STATUS "${COMPONENT_NAME}: Using extra definition -D${extra_def}")
     endforeach()
     
-    #message(STATUS "OpenCMISS component ${COMPONENT_NAME} extra args:\n${COMPONENT_DEFS}")
+    message(STATUS "OpenCMISS component ${COMPONENT_NAME} extra args:\n${COMPONENT_DEFS}")
 
 	GET_BUILD_COMMANDS(BUILD_COMMAND INSTALL_COMMAND ${COMPONENT_BUILD_DIR} TRUE)
 
@@ -217,22 +219,4 @@ macro(GET_BUILD_COMMANDS BUILD_CMD_VAR INSTALL_CMD_VAR DIR PARALLEL)
 
 	SET(${BUILD_CMD_VAR} ${BUILD_CMD})
 	SET(${INSTALL_CMD_VAR} ${INSTALL_CMD})
-endmacro()
-
-# Adds extra steps to the external projects for submodule updates and checkout.
-macro(ADD_SUBMODULE_CHECKOUT_STEPS PROJECT REPO_ROOT MODULE_PATH BRANCH) 
-    ExternalProject_Add_Step(${PROJECT} gitinit
-	        COMMAND ${GIT_COMMAND} submodule update ${MODULE_PATH} #-i --recursive not needed anymore as src/XXX is final depth
-	        COMMENT "Initializing git submodule ${MODULE_PATH}.."
-	        DEPENDERS configure
-	        WORKING_DIRECTORY ${REPO_ROOT})
-	if (BRANCH)
-     	ExternalProject_Add_Step(${PROJECT} gitcheckout
-     	        COMMAND ${GIT_COMMAND} checkout ${BRANCH}
-    	        COMMENT "Checking out branch ${BRANCH} of ${MODULE_PATH}.."
-     	        DEPENDEES gitinit
-    	        DEPENDERS configure
-     	        WORKING_DIRECTORY ${REPO_ROOT}/${MODULE_PATH}
-    	)
-	endif()
 endmacro()

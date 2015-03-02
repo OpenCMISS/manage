@@ -67,7 +67,6 @@
 
 # To enable local lookup of single components, set
 # OCM_SYSTEM_<COMPONENT_NAME> to YES
-# All those who default to system lookup first are initialized here with NO value
 ${OCM_USE_SYSTEM_FLAGS}
 
 # To disable the use of selected components, uncomment the appropriate lines

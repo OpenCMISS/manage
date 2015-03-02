@@ -1,7 +1,11 @@
-# This file takes care of own MPI builds according to the selected MPI implementation (Variable "MPI")
+########################################################################
+# This script takes care of building own MPI implementations.
+# See the Config/MPIChecks script for a scenario overview.
+# 
+# But we will always have the MPI mnemonic set for this script.
+
 # This is supported yet only on Unix systems
 if (UNIX)
-
     # Set the forward dependencies of MPI only if we build it ourselves
     SET(MPI_FWD_DEPS ${OPENCMISS_COMPONENTS_WITHMPI})
     # The choice is ... 
@@ -79,5 +83,5 @@ if (UNIX)
     	ADD_DOWNSTREAM_DEPS(MPI)
 	endif()
 else()
-    message(FATAL_ERROR "OpenMPI installation support not implemented for this platform.")
+    message(FATAL_ERROR "MPI (${MPI}) installation support not yet implemented for this platform.")
 endif()
