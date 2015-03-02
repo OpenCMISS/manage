@@ -96,7 +96,6 @@ include(CollectComponentDefinitions)
 SET(_OCM_REQUIRED_SOURCES )
 SET(_OCM_NEED_INITIAL_SOURCE_DOWNLOAD NO)
 
-
 include(OCMSetupBuildMacros)
 ########################################################################
 # Dependencies
@@ -121,3 +120,4 @@ add_custom_target(update
 add_custom_target(download 
     DEPENDS ${_OCM_SOURCE_DOWNLOAD_TARGETS}
 )
+message(STATUS "Also cleaning up: ${ADDITIONAL_MAKE_CLEAN_FILES}")

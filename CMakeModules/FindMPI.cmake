@@ -277,14 +277,28 @@ else()
     endforeach()
     unset(_MPI_PREFIX_PATH_COPY)
     
-    message(STATUS "FindMPI: Search locations: ${_MPI_PREFIX_PATH}")
+    if (_MPI_PREFIX_PATH)
+        message(STATUS "FindMPI: Search locations=${_MPI_PREFIX_PATH}")
+    endif()
 
 endif() # DEFINED MPI_HOME
 
 # Check if a different MPI type is specified this time and delete any previous findings if so.
-if (DEFINED _MPI_LASTFIND AND DEFINED MPI AND (NOT MPI STREQUAL _MPI_LASTFIND)) 
-    message(STATUS "@@@@@@@ UNSETTING LAST MPI FINDING OF ${_MPI_LASTFIND} (new: ${MPI})")
+set(_CLEANUP FALSE)
+if ((DEFINED _MPI_LASTFIND AND DEFINED MPI AND (NOT MPI STREQUAL _MPI_LASTFIND))
+    # Crossover case for change from MPI to MPI_HOME
+    OR (DEFINED _MPI_LASTFIND AND DEFINED MPI_HOME AND NOT DEFINED _MPI_LASTHOME)) 
     UNSET(_MPI_LASTFIND CACHE)
+    set(_CLEANUP TRUE)
+endif()
+if ((DEFINED _MPI_LASTHOME AND DEFINED MPI_HOME AND (NOT MPI_HOME STREQUAL _MPI_LASTHOME))
+    # Crossover case for change from MPI_HOME to MPI
+    OR (DEFINED _MPI_LASTHOME AND DEFINED MPI AND NOT DEFINED _MPI_LASTFIND)) 
+    UNSET(_MPI_LASTHOME CACHE)
+    set(_CLEANUP TRUE)
+endif()
+# Reset any found quantities if cleanup is required
+if (_CLEANUP)
     UNSET(MPIEXEC CACHE)
     foreach (lang C CXX Fortran)
         UNSET(MPI_${lang}_INCLUDE_PATH CACHE)
@@ -293,6 +307,7 @@ if (DEFINED _MPI_LASTFIND AND DEFINED MPI AND (NOT MPI STREQUAL _MPI_LASTFIND))
         SET(MPI_${lang}_FOUND FALSE) 
     endforeach()
 endif()
+unset(_CLEANUP)
 
 ############################################################
 # Interrogation part - function definition
@@ -587,7 +602,7 @@ function (interrogate_mpi_compiler lang try_libs)
       # Added by Daniel Wirtz - support to find MPICH2 fortran libraries on windows
       if (${lang} STREQUAL Fortran)
         set(MPI_LIB "MPI_LIB-NOTFOUND" CACHE FILEPATH "Cleared" FORCE)
-        message(STATUS "Looking for fmpich2g in ${_MPI_BASE_DIR} ${_MPI_PREFIX_PATH}")
+        #message(STATUS "Looking for fmpich2g in ${_MPI_BASE_DIR} ${_MPI_PREFIX_PATH}")
         if (CMAKE_${lang}_COMPILER_ID STREQUAL GNU)
             # This version exports lower case & underscore_ names
             SET(FORTRAN_LIBNAMES fmpich2g fmpichg)
@@ -772,7 +787,7 @@ endfunction()
 ############################################################
 
 # Most mpi distros have some form of mpiexec which gives us something we can reliably look for.
-message(STATUS "MPI executable: names=${_MPI_EXEC_NAMES},hints=${_MPI_PREFIX_PATH},PATH_SUFFIXES=${_BIN_SUFFIX},PATHOPT=${PATHOPT}")
+#message(STATUS "MPI executable: names=${_MPI_EXEC_NAMES},hints=${_MPI_PREFIX_PATH},PATH_SUFFIXES=${_BIN_SUFFIX},PATHOPT=${PATHOPT}")
 find_program(MPIEXEC
   NAMES ${_MPI_EXEC_NAMES}
   HINTS ${_MPI_PREFIX_PATH} 
@@ -833,7 +848,7 @@ foreach (lang C CXX Fortran)
     set(try_libs TRUE)
     # If the user supplies a compiler *name* instead of an absolute path, assume that we need to find THAT compiler.
     if (MPI_${lang}_COMPILER)
-      #message(STATUS "Using given MPI_${lang}_COMPILER '${MPI_${lang}_COMPILER}'")
+      message(STATUS "Using given MPI_${lang}_COMPILER '${MPI_${lang}_COMPILER}'")
       # If the user specifies a compiler, we don't want to try to search libraries either.
       set(try_libs FALSE)  
       is_file_executable(${MPI_${lang}_COMPILER} MPI_COMPILER_IS_EXECUTABLE)
@@ -913,8 +928,17 @@ foreach (lang C CXX Fortran)
 endforeach()
 
 # Store the currently successful findings of MPI in the local cache
-if (MPI AND (MPI_C_FOUND OR MPI_CXX_FOUND OR MPI_Fortran_FOUND))
-    SET(_MPI_LASTFIND ${MPI} CACHE INTERNAL "Contains the MPI value of the latest successful find.")
+if (MPI_C_FOUND OR MPI_CXX_FOUND OR MPI_Fortran_FOUND)
+    if (MPI)
+        SET(_MPI_LASTFIND ${MPI} CACHE INTERNAL "Contains the MPI value of the latest successful find.")
+    else()
+        unset(_MPI_LASTFIND CACHE)
+    endif()
+    if (MPI_HOME)
+        SET(_MPI_LASTHOME ${MPI_HOME} CACHE INTERNAL "Contains the MPI_HOME value of the latest successful find.")
+    else()
+        unset(_MPI_LASTHOME CACHE)
+    endif()
 endif()
 
 #=============================================================================
