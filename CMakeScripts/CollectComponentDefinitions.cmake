@@ -2,10 +2,6 @@
 # Collect common arguments for components/subprojects
 SET(COMPONENT_COMMON_DEFS )
 
-# As the CMAKE_ARGS are a list themselves, we need to treat the ; in the (possible) list of module_paths
-# specially. Therefore CMAKE has a special command $<SEMICOLON>
-STRING(REPLACE ";" "$<SEMICOLON>" CMAKE_MODULE_PATH_ESC "${CMAKE_MODULE_PATH}")
-
 # Misc definitions
 # The COMMON_PACKAGE_CONFIG_DIR contains the cmake-generated target config files consumed by find_package(... CONFIG).
 # Those are "usually" placed under the lib/ folders of the installation tree, however, the OpenCMISS build system
@@ -13,12 +9,19 @@ STRING(REPLACE ";" "$<SEMICOLON>" CMAKE_MODULE_PATH_ESC "${CMAKE_MODULE_PATH}")
 # for each build type, they can be collected in a common subfolder. As the build type subfolder-element is the last in line,
 # we simply use the parent folder of the component's CMAKE_INSTALL_PREFIX to place the cmake package config files.
 SET(COMMON_PACKAGE_CONFIG_DIR cmake) #../cmake
+list(APPEND CMAKE_PREFIX_PATH ${OPENCMISS_COMPONENTS_INSTALL_PREFIX}/${COMMON_PACKAGE_CONFIG_DIR})
+
+# As the CMAKE_ARGS are a list themselves, we need to treat the ; in the (possible) list of module_paths
+# specially. Therefore CMAKE has a special command $<SEMICOLON>
+STRING(REPLACE ";" "$<SEMICOLON>" CMAKE_MODULE_PATH_ESC "${CMAKE_MODULE_PATH}")
+STRING(REPLACE ";" "$<SEMICOLON>" CMAKE_PREFIX_PATH_ESC "${CMAKE_PREFIX_PATH}")
+
 LIST(APPEND COMPONENT_COMMON_DEFS
     -DCMAKE_INSTALL_PREFIX=${OPENCMISS_COMPONENTS_INSTALL_PREFIX}
     -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
     -DBUILD_PRECISION=${BUILD_PRECISION}
     -DBUILD_TESTS=${BUILD_TESTS}
-    -DCMAKE_PREFIX_PATH=${OPENCMISS_COMPONENTS_INSTALL_PREFIX}/${COMMON_PACKAGE_CONFIG_DIR}
+    -DCMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH_ESC}
     -DCMAKE_MODULE_PATH=${CMAKE_MODULE_PATH_ESC}
     -DBUILD_SHARED_LIBS=${BUILD_SHARED_LIBS}
     -DFORTRAN_MANGLING=${FORTRAN_MANGLING}
@@ -47,6 +50,12 @@ foreach(lang C CXX Fortran)
         )
     endif()
 endforeach()
+
+# MPI local installation - always pass this to have FindMPI use that if nothing else is specified
+if (DEFINED ADDITIONAL_MPI_PATHS)
+    LIST(APPEND COMPONENT_COMMON_DEFS
+        -DADDITIONAL_MPI_PATHS=${ADDITIONAL_MPI_PATHS})
+endif()
 
 # Pass on local lookup flags (consumed by find_package calls)
 foreach(COMP ${OPENCMISS_COMPONENTS})

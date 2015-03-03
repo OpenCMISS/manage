@@ -44,6 +44,8 @@ if (NOT WIN32 AND CMAKE_BUILD_TYPE STREQUAL "")
 endif()
 
 include(ExternalProject)
+include(OCMSetupArchitecture)
+include(OCMSetupBuildMacros)
 
 ########################################################################
 # Utilities (Wrappers, MPI-pre-check, ...)
@@ -56,7 +58,7 @@ endif()
 
 # MPI
 if(OCM_USE_MPI)
-    include(MPIChecks)
+    include(MPIConfig)
 endif()
 
 ########################################################################
@@ -67,7 +69,6 @@ endif()
 
 ########################################################################
 # General paths & preps
-include(OCMSetupArchitecture)
 get_architecture_path(ARCHITECTURE_PATH)
 # this is the <kickoff> part / main build tree configuration part 
 # DISABLED - kickoff
@@ -96,7 +97,7 @@ include(CollectComponentDefinitions)
 SET(_OCM_REQUIRED_SOURCES )
 SET(_OCM_NEED_INITIAL_SOURCE_DOWNLOAD NO)
 
-include(OCMSetupBuildMacros)
+
 ########################################################################
 # Dependencies
 include(Dependencies)
@@ -120,3 +121,19 @@ add_custom_target(update
 add_custom_target(download 
     DEPENDS ${_OCM_SOURCE_DOWNLOAD_TARGETS}
 )
+if (UNIX)
+    add_custom_target(reset
+        COMMAND mv OpenCMISSLocalConfig.cmake ../tmp.reset
+        COMMAND rm -rf *
+        COMMAND mv ../tmp.reset OpenCMISSLocalConfig.cmake
+        COMMENT "Blowing away main build config files"
+    )
+    add_custom_target(reset_all
+        COMMAND rm -rf build/ install/
+        COMMAND mv OpenCMISSLocalConfig.cmake ../tmp.reset
+        COMMAND rm -rf *
+        COMMAND mv ../tmp.reset OpenCMISSLocalConfig.cmake
+        COMMENT "Blowing away main build config files and build/ and install/ folders"
+        WORKING_DIRECTORY ${OPENCMISS_ROOT}
+    )
+endif()
