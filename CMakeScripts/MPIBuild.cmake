@@ -31,18 +31,22 @@ if (UNIX)
     endif()
     
     message(STATUS "Using shipped MPI (${MPI}-${_MPI_VERSION})")
-    SET(_MPI_INSTALL_DIR ${OPENCMISS_COMPONENTS_INSTALL_PREFIX}/${MPI})
+    
+    # For MPI we use a slightly different architecture path - we dont need to re-build MPI for static/shared builds nor do we need the actual
+    # MPI mnemonic in the path. Instead, we use "mpi" as common top folder to collect all local MPI builds.
+    get_architecture_path(ARCHITECTURE_PATH_MPI SHORT)
+    get_build_type_extra(BUILDTYPEEXTRA)
+    set(_MPI_INSTALL_DIR ${OPENCMISS_ROOT}/install/${ARCHITECTURE_PATH_MPI}/mpi/${MPI}/${BUILDTYPEEXTRA})
         
     # Check if already installed locally
+    #SET(MPI_HOME ${_MPI_INSTALL_DIR} CACHE PATH "MPI home directory" FORCE)
     SET(MPI_HOME ${_MPI_INSTALL_DIR})
     find_package(MPI QUIET)
         
     if (NOT MPI_FOUND)
-        get_build_type_extra(BUILDTYPEEXTRA)
         SET(_MPI_SOURCE_DIR ${OPENCMISS_ROOT}/src/dependencies/${MPI})
-        SET(_MPI_BINARY_DIR ${OPENCMISS_COMPONENTS_BINARY_DIR}/dependencies/${MPI}/${BUILDTYPEEXTRA})                
+        SET(_MPI_BINARY_DIR ${OPENCMISS_ROOT}/build/${ARCHITECTURE_PATH_MPI}/mpi/${MPI}/${BUILDTYPEEXTRA})
         SET(_MPI_BRANCH v${_MPI_VERSION})
-        #GET_BUILD_COMMANDS(BUILD_COMMAND INSTALL_COMMAND ${OPENMPI_BINARY_DIR} TRUE)
         
         message(STATUS "Configuring build of MPI (${MPI}-${_MPI_VERSION}) in ${_MPI_BINARY_DIR}...")
         

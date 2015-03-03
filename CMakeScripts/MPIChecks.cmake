@@ -112,7 +112,7 @@ elseif(DEFINED MPI_HOME)
 else()
     # We already have a mnemonic and allow system lookup.
     if(OCM_SYSTEM_MPI)
-        message(STATUS "---------------- Starting system MPI lookup (MPI=${MPI})")
+        message(STATUS "Starting system MPI lookup (MPI=${MPI})")
         #@b. OCM_SYSTEM_MPI = YES - Set PATHs to educated guess and look for an MPI implementation
         # This bit of logic is covered inside the FindMPI module where MPI is set
         find_package(MPI QUIET)

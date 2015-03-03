@@ -29,7 +29,7 @@ MACRO(GET_COMPILER_NAME VARNAME)
 ENDMACRO()
 
 # This function assembles the architecture path
-# We have [ARCH][COMPILER][MPI][MT][STATIC|SHARED]
+# We have [ARCH][COMPILER][MT][MPI][STATIC|SHARED]
 function(get_architecture_path VARNAME)
     SET(ARCHPATH )
     
@@ -47,34 +47,32 @@ function(get_architecture_path VARNAME)
         GET_COMPILER_NAME(COMPILER)
         SET(ARCHPATH ${ARCHPATH}/${COMPILER})
         
-        # MPI version information
-        if (OCM_USE_MPI)
-            SET(MPI_PART ${MPI})
-        else()
-            SET(MPI_PART "sequential")
-        endif()
-        SET(ARCHPATH ${ARCHPATH}/${MPI_PART})
-        
         # Multithreading
         if (OCM_USE_MT)
             SET(ARCHPATH ${ARCHPATH}/mt)
         endif()
         
-        # Library type (static/shared)
-        if (BUILD_SHARED_LIBS)
-            SET(ARCHPATH ${ARCHPATH}/shared)    
-        else()
-            SET(ARCHPATH ${ARCHPATH}/static)
+        # Short version is without MPI and static/shared path elements
+        if (${ARGC} EQUAL 1 OR NOT "${ARGV1}" STREQUAL SHORT)
+            # MPI version information
+            if (OCM_USE_MPI)
+                SET(MPI_PART ${MPI})
+            else()
+                SET(MPI_PART "sequential")
+            endif()
+            SET(ARCHPATH ${ARCHPATH}/${MPI_PART})
+            
+            # Library type (static/shared)
+            if (BUILD_SHARED_LIBS)
+                SET(ARCHPATH ${ARCHPATH}/shared)    
+            else()
+                SET(ARCHPATH ${ARCHPATH}/static)
+            endif()
         endif()
         
     else()
         SET(ARCHPATH .)
     endif()
-    
-    #if (ARGC EQUAL 2 AND ARGV1 STREQUAL FULL)
-    #    get_build_type_extra(BUILDTYPEEXTRA)
-    #    SET(ARCHPATH ${ARCHPATH}/${BUILDTYPEEXTRA})
-    #endif()
     
     # Append to desired variable
     SET(${VARNAME} ${ARCHPATH} PARENT_SCOPE)

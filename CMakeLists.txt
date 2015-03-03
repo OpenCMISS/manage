@@ -120,4 +120,3 @@ add_custom_target(update
 add_custom_target(download 
     DEPENDS ${_OCM_SOURCE_DOWNLOAD_TARGETS}
 )
-message(STATUS "Also cleaning up: ${ADDITIONAL_MAKE_CLEAN_FILES}")

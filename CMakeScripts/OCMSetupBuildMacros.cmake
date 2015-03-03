@@ -27,6 +27,12 @@ MACRO(ADD_COMPONENT COMPONENT_NAME)
     if (OCM_USE_MPI)
         foreach(DEP ${OPENCMISS_COMPONENTS_WITHMPI})
             if(${DEP} STREQUAL ${COMPONENT_NAME})
+                #message(STATUS "passing on MPI variables to ${COMPONENT_NAME}:
+                #MPI=${MPI}
+                #MPI_HOME=${MPI_HOME}
+                #MPI_C_COMPILER=${MPI_C_COMPILER}
+                #MPI_CXX_COMPILER=${MPI_CXX_COMPILER}
+                #MPI_Fortran_COMPILER=${MPI_Fortran_COMPILER}")
                 if (MPI)
                     LIST(APPEND COMPONENT_DEFS
                         -DMPI=${MPI}
@@ -37,13 +43,13 @@ MACRO(ADD_COMPONENT COMPONENT_NAME)
                         -DMPI_HOME=${MPI_HOME}
                     )
                 endif()
-                foreach(lang C CXX Fortran)
-                    if(MPI_${lang}_COMPILER)
-                        LIST(APPEND COMPONENT_DEFS
-                            -DMPI_${lang}_COMPILER=${MPI_${lang}_COMPILER}
-                        )
-                    endif()
-                endforeach()
+                #foreach(lang C CXX Fortran)
+                #    if(MPI_${lang}_COMPILER)
+                #        LIST(APPEND COMPONENT_DEFS
+                #            -DMPI_${lang}_COMPILER=${MPI_${lang}_COMPILER}
+                #        )
+                #    endif()
+                #endforeach()
             endif()
         endforeach()
     endif()
