@@ -148,9 +148,10 @@ MACRO(ADD_COMPONENT COMPONENT_NAME)
 		#INSTALL_DIR ${CMAKE_INSTALL_PREFIX} 
 		INSTALL_COMMAND ${INSTALL_COMMAND}
 	)
-	#message(STATUS "CMAKE_CURRENT_BINARY_DIR=${CMAKE_CURRENT_BINARY_DIR}")
-    #set_property(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR} PROPERTY ADDITIONAL_MAKE_CLEAN_FILES ${COMPONENT_BUILD_DIR}/CMakeCache.txt)
-    #set_property(DIRECTORY ${COMPONENT_BUILD_DIR} PROPERTY ADDITIONAL_MAKE_CLEAN_FILES CMakeCache.txt)
+	# See OpenCMISSDeveloper.cmake
+	if (OCM_CLEAN_REBUILDS_COMPONENTS)
+        set_directory_properties(PROPERTIES ADDITIONAL_MAKE_CLEAN_FILES ${COMPONENT_BUILD_DIR}/CMakeCache.txt)
+    endif()
 	
 	# Add extra step that makes sure the source files at least exist at the first run.
 	# Triggers build of ${COMPONENT_NAME}_SRC if not found.
