@@ -55,7 +55,7 @@ function(get_architecture_path VARNAME)
         # Short version is without MPI and static/shared path elements
         if (${ARGC} EQUAL 1 OR NOT "${ARGV1}" STREQUAL SHORT)
             # MPI version information
-            if (OCM_USE_MPI)
+            if (NOT MPI STREQUAL none)
                 SET(MPI_PART ${MPI})
             else()
                 SET(MPI_PART "sequential")
