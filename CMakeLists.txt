@@ -30,21 +30,22 @@ CMAKE_MINIMUM_REQUIRED(VERSION 2.6 FATAL_ERROR)
 # It will NOT be used (unless we let cmake use its defaults), but starting a project is
 # initializing a lot more CMake variables that ensure proper functionality of all cmake commands
 # (e.g. find_library does not "work" if issued before a project command, as the CMAKE_FIND_LIBRARY_SUFFIXES are still empty)
-project(opencmiss-generate-build C)
+project(OpenCMISS-Generate-Build C)
 
-# Set the setup directory
-SET(OPENCMISS_SETUP_DIR ${CMAKE_CURRENT_SOURCE_DIR})
-# The default opencmiss root is the parent directory of /setup
-if (NOT OPENCMISS_ROOT)
-    SET(OPENCMISS_ROOT ${OPENCMISS_SETUP_DIR}/..)
+# Set the manage directory
+SET(OPENCMISS_MANAGE_DIR ${CMAKE_CURRENT_SOURCE_DIR})
+# The default opencmiss root is the parent directory of "manage"
+SET(OPENCMISS_ROOT "${OPENCMISS_MANAGE_DIR}/.." CACHE PATH "Root directory for OpenCMISS.")
+if (ROOT)
+    SET(OPENCMISS_ROOT "${ROOT}" CACHE PATH "Root directory for OpenCMISS." FORCE)
 endif()
 get_filename_component(OPENCMISS_ROOT ${OPENCMISS_ROOT} ABSOLUTE)
 message(STATUS "OpenCMISS root will be ${OPENCMISS_ROOT}")
 
 # Set up include path required at this stage
-LIST(APPEND CMAKE_MODULE_PATH 
-    ${OPENCMISS_SETUP_DIR}/CMakeScripts
-    ${OPENCMISS_SETUP_DIR}/Config)
+LIST(APPEND CMAKE_MODULE_PATH
+    ${OPENCMISS_MANAGE_DIR}/CMakeScripts
+    ${OPENCMISS_MANAGE_DIR}/Config)
 
 # This ensures that CMake is new enough before anything else is done
 include(CMakeCheck)
@@ -65,7 +66,7 @@ include(MPIPreflight)
 
 # This is the main build file location for each compiler/mpi combination.
 SET(BUILD_IDENT compiler.${TC_PART}-mpi.${MPI}) # dont care, take anything to combine stuff
-SET(MAIN_BINARY_DIR ${CMAKE_CURRENT_BINARY_DIR}/${BUILD_IDENT}) # ${OPENCMISS_SETUP_DIR}
+SET(MAIN_BINARY_DIR ${CMAKE_CURRENT_BINARY_DIR}/${BUILD_IDENT}) # ${OPENCMISS_MANAGE_DIR}
 file(MAKE_DIRECTORY ${MAIN_BINARY_DIR})
 
 # # Create a local config file at target folder if not exists
@@ -80,7 +81,7 @@ if (MPI_HOME)
     SET(MPI_HOME_DEF "SET(MPI_HOME ${MPI_HOME})")
 endif()
 configure_file(
-    ${OPENCMISS_SETUP_DIR}/CMakeScripts/CMakeLists.main.template.cmake # from
+    ${OPENCMISS_MANAGE_DIR}/CMakeScripts/CMakeLists.main.template.cmake # from
     ${MAIN_BINARY_DIR}/CMakeLists.txt # to
     @ONLY # only @-tags
 )
@@ -88,15 +89,15 @@ configure_file(
 # Actual main project here
 include(ExternalProject)
 ExternalProject_Add(opencmiss_build_${BUILD_IDENT}
-	PREFIX ${MAIN_BINARY_DIR}
-	TMP_DIR ${MAIN_BINARY_DIR}/ep_tmp
-	STAMP_DIR ${MAIN_BINARY_DIR}/ep_stamps
-	DOWNLOAD_COMMAND ""
-	CMAKE_COMMAND ${MY_CMAKE_COMMAND} # Set in Config/CMakeCheck.cmake, might be own build
-	SOURCE_DIR ${MAIN_BINARY_DIR}
-	BUILD_IN_SOURCE 1 # replaces the build command
-	#CMAKE_ARGS ${BUILD_ARGS} 
-	INSTALL_COMMAND "" # no install on main build level
+    PREFIX ${MAIN_BINARY_DIR}
+    TMP_DIR ${MAIN_BINARY_DIR}/ep_tmp
+    STAMP_DIR ${MAIN_BINARY_DIR}/ep_stamps
+    DOWNLOAD_COMMAND ""
+    CMAKE_COMMAND ${MY_CMAKE_COMMAND} # Set in Config/CMakeCheck.cmake, might be own build
+    SOURCE_DIR ${MAIN_BINARY_DIR}
+    BUILD_IN_SOURCE 1 # replaces the build command
+    #CMAKE_ARGS ${BUILD_ARGS}
+    INSTALL_COMMAND "" # no install on main build level
 )
 
 # Convenience/Maintenance targets
