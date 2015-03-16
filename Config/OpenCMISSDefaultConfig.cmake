@@ -26,7 +26,7 @@ option(OCM_POSITION_INDEPENDENT_CODE "Always generate position independent code 
 # ==============================
 # Compilers
 # ==============================
-# Flag for DEBUG configuration builds only! 
+# Flag for DEBUG configuration builds only!
 SET(OCM_WARN_ALL YES)
 SET(OCM_CHECK_ALL YES)
 
@@ -44,7 +44,7 @@ option(OCM_USE_MT "Use multithreading in OpenCMISS (where applicable)" NO)
 FOREACH(OCM_DEP ${OPENCMISS_COMPONENTS})
     # Use everything by default
     option(OCM_USE_${OCM_DEP} "Use OpenCMISS component ${OCM_DEP}" YES)
-    # Look for some components on the system first before building 
+    # Look for some components on the system first before building
     LIST(FIND OPENCMISS_COMPONENTS_SYSTEM_BY_DEFAULT ${OCM_DEP} _COMP_POS)
     SET(_VALUE NO)
     if (_COMP_POS GREATER -1)
@@ -74,6 +74,9 @@ SET(SUNDIALS_VERSION 2.5)
 SET(SUPERLU_VERSION 4.3)
 SET(SUPERLU_DIST_VERSION 3.3)
 SET(ZLIB_VERSION 1.2.3)
+SET(BZIP2_VERSION 1.0.5)
+SET(FIELDML_VERSION 0.5.0)
+SET(LIBXML2_VERSION 2.7.6)
 # MPI
 SET(OPENMPI_VERSION 1.8.4)
 SET(MPICH_VERSION 3.1.3)

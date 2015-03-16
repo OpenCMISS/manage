@@ -21,7 +21,10 @@ SET(SUPERLU_FWD_DEPS PETSC IRON)
 SET(SUITESPARSE_FWD_DEPS PETSC IRON)
 SET(SUPERLU_DIST_FWD_DEPS PETSC IRON)
 SET(PETSC_FWD_DEPS SLEPC IRON)
-SET(ZLIB_FWD_DEPS SCOTCH PTSCOTCH IRON)
+SET(ZLIB_FWD_DEPS SCOTCH PTSCOTCH LIBXML2 FIELDML IRON)
+SET(BZIP2_FWD_DEPS )
+SET(LIBXML2_FWD_DEPS FIELDML)
+SET(FIELDML_FWD_DEPS IRON)
 
 # ================================
 # Postprocessing
@@ -33,7 +36,7 @@ SET(ZLIB_FWD_DEPS SCOTCH PTSCOTCH IRON)
     #        if(OCM_USE_${FWD_DEP} AND NOT OCM_USE_${OCM_DEP})
     #            message(STATUS "Package ${FWD_DEP} requires ${OCM_DEP}, setting OCM_USE_${OCM_DEP}=ON")
     #            set(OCM_USE_${OCM_DEP} ON)
-    #        endif() 
+    #        endif()
     #    endforeach()
     #endif()
 #ENDFOREACH()
@@ -47,7 +50,7 @@ set(SUBGROUP_PATH dependencies)
 set(GITHUB_ORGANIZATION OpenCMISS-Dependencies)
 
 # Note: The following order for all packages has to be in their interdependency order,
-# i.e. mumps may need scotch so scotch has to be processed first on order to be added to the 
+# i.e. mumps may need scotch so scotch has to be processed first on order to be added to the
 # external project dependencies list of any following package
 
 # LAPACK (includes BLAS)
@@ -55,9 +58,9 @@ if (OCM_USE_BLAS OR OCM_USE_LAPACK)
     if(OCM_SYSTEM_BLAS)
         find_package(BLAS ${BLAS_VERSION} QUIET)
     endif()
-    if(OCM_SYSTEM_LAPACK) 
+    if(OCM_SYSTEM_LAPACK)
         find_package(LAPACK ${LAPACK_VERSION} QUIET)
-    endif()    
+    endif()
     if(NOT (LAPACK_FOUND AND BLAS_FOUND))
         ADD_COMPONENT(LAPACK)
     endif()
@@ -67,9 +70,39 @@ endif()
 if(OCM_USE_ZLIB)
     if(OCM_SYSTEM_ZLIB)
         FIND_PACKAGE(ZLIB QUIET)
-    endif()        
+    endif()
     if(NOT ZLIB_FOUND)
         ADD_COMPONENT(ZLIB)
+    endif()
+endif()
+
+# bzip2
+if(OCM_USE_BZIP2)
+    if(OCM_SYSTEM_BZIP2)
+        FIND_PACKAGE(BZIP2 QUIET)
+    endif()
+    if(NOT BZIP2_FOUND)
+        ADD_COMPONENT(BZIP2)
+    endif()
+endif()
+
+# libxml2
+if(OCM_USE_LIBXML2)
+    if(OCM_SYSTEM_LIBXML2)
+        FIND_PACKAGE(LIBXML2 QUIET)
+    endif()
+    if(NOT LIBXML2_FOUND)
+        ADD_COMPONENT(LIBXML2)
+    endif()
+endif()
+
+# fieldml
+if(OCM_USE_FIELDML)
+    if(OCM_SYSTEM_FIELDML)
+        FIND_PACKAGE(FIELDML QUIET)
+    endif()
+    if(NOT FIELDML_FOUND)
+        ADD_COMPONENT(FIELDML)
     endif()
 endif()
 
@@ -88,7 +121,7 @@ elseif(OCM_USE_SCOTCH)
         FIND_PACKAGE(SCOTCH ${SCOTCH_VERSION} QUIET)
     endif()
     if(NOT SCOTCH_FOUND)
-        ADD_COMPONENT(SCOTCH 
+        ADD_COMPONENT(SCOTCH
             BUILD_PTSCOTCH=NO USE_ZLIB=${SCOTCH_WITH_ZLIB}
             USE_THREADS=${SCOTCH_USE_THREADS})
     endif()
@@ -98,7 +131,7 @@ endif()
 if(OCM_USE_PLAPACK)
     if(OCM_SYSTEM_PLAPACK)
         FIND_PACKAGE(PLAPACK QUIET)
-    endif()        
+    endif()
     if(NOT PLAPACK_FOUND)
         ADD_COMPONENT(PLAPACK
             BLAS_VERSION=${BLAS_VERSION}
@@ -134,7 +167,7 @@ if (OCM_USE_MUMPS)
         FIND_PACKAGE(MUMPS ${MUMPS_VERSION} QUIET)
     endif()
     if(NOT MUMPS_FOUND)
-        ADD_COMPONENT(MUMPS 
+        ADD_COMPONENT(MUMPS
             USE_SCOTCH=${MUMPS_WITH_SCOTCH}
             USE_PTSCOTCH=${MUMPS_WITH_PTSCOTCH}
             PTSCOTCH_VERSION=${PTSCOTCH_VERSION}
@@ -174,7 +207,7 @@ endif()
 if (OCM_USE_SUPERLU)
     if(OCM_SYSTEM_SUPERLU)
         FIND_PACKAGE(SUPERLU ${SUPERLU_VERSION} QUIET)
-    endif()        
+    endif()
     if(NOT SUPERLU_FOUND)
         ADD_COMPONENT(SUPERLU
             BLAS_VERSION=${BLAS_VERSION}
@@ -186,7 +219,7 @@ endif()
 if (OCM_USE_SUPERLU_DIST)
     if(OCM_SYSTEM_SUPERLU_DIST)
         FIND_PACKAGE(SUPERLU_DIST ${SUPERLU_DIST_VERSION} QUIET)
-    endif()        
+    endif()
     if(NOT SUPERLU_DIST_FOUND)
         ADD_COMPONENT(SUPERLU_DIST
             BLAS_VERSION=${BLAS_VERSION}
@@ -285,11 +318,11 @@ if (OCM_USE_CELLML)
     set(GITHUB_ORGANIZATION OpenCMISS)
     ADD_COMPONENT(CELLML)
 endif()
-# Set back to 
+# Set back to
 set(GITHUB_ORGANIZATION OpenCMISS-Dependencies)
 
 # Notes:
-# lapack: not sure if LAPACKE is build/required 
+# lapack: not sure if LAPACKE is build/required
 # plapack: have only MACHINE_TYPE=500 and MANUFACTURE=50 (linux)
 # plapack: some tests are not compiling
 # parmetis/metis: test programs not available (but for gklib, and they are also rudimental), linking executables instead to have a 50% "its working" test
@@ -297,7 +330,7 @@ set(GITHUB_ORGANIZATION OpenCMISS-Dependencies)
 # mumps - only have double precision arithmetics
 # mumps - no PORD is compiled (will have parmetis/scotch available)
 # mumps - hardcoded Add_ compiler flag for c/fortran interfacing.. dunno if that is the best idea
-# metis: have fixed IDXTYPEWIDTH 32 
+# metis: have fixed IDXTYPEWIDTH 32
 # cholmod: could go with CUDA BLAS version (indicated by makefile)
 # umfpack: building only "int" version right now (Suitesparse_long impl for AMD,CAMD etc but not umfpack)
 

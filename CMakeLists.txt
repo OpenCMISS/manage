@@ -9,13 +9,13 @@ get_filename_component(OPENCMISS_ROOT ${OPENCMISS_ROOT} ABSOLUTE)
 message(STATUS "Having OpenCMISS root at ${OPENCMISS_ROOT}")
 
 # Set up include path
-LIST(APPEND CMAKE_MODULE_PATH 
+LIST(APPEND CMAKE_MODULE_PATH
     ${OPENCMISS_SETUP_DIR}
     ${OPENCMISS_SETUP_DIR}/CMakeFindModuleWrappers
     ${OPENCMISS_SETUP_DIR}/CMakeModules
     ${OPENCMISS_SETUP_DIR}/CMakeScripts
     ${OPENCMISS_SETUP_DIR}/Config)
-  
+
 # This ensures that CMake is new enough before anything else is done
 include(CMakeCheck)
 
@@ -37,7 +37,7 @@ include(ToolchainSetup)
 ########################################################################
 # Start actual setup
 CMAKE_MINIMUM_REQUIRED(VERSION 3.2.0-rc1 FATAL_ERROR)
-project(OpenCMISS-Setup VERSION 1.0 LANGUAGES C CXX Fortran)
+project(OpenCMISS-Manage VERSION 1.0 LANGUAGES C CXX Fortran)
 if ((NOT WIN32 OR MINGW) AND CMAKE_BUILD_TYPE STREQUAL "")
     SET(CMAKE_BUILD_TYPE RELEASE)
     message(STATUS "No CMAKE_BUILD_TYPE has been defined. Using RELEASE.")
@@ -70,7 +70,7 @@ endif()
 ########################################################################
 # General paths & preps
 get_architecture_path(ARCHITECTURE_PATH)
-# this is the <kickoff> part / main build tree configuration part 
+# this is the <kickoff> part / main build tree configuration part
 # DISABLED - kickoff
 #get_filename_component(BUILDNAME ${CMAKE_CURRENT_BINARY_DIR} NAME)
 
@@ -118,7 +118,7 @@ add_custom_target(update
 )
 # I already foresee that we will have to have "download" and "update" targets for the less insighted user.
 # So lets just give it to them. Does the same as external project has initial download and update steps.
-add_custom_target(download 
+add_custom_target(download
     DEPENDS ${_OCM_SOURCE_DOWNLOAD_TARGETS}
 )
 if (UNIX)

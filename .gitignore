@@ -4,3 +4,4 @@ CMakeFindModuleWrappers/
 OpenCMISSDeveloper.cmake
 test/
 unix/
+CMakeLists.txt.user
