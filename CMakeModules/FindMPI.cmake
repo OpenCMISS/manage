@@ -218,9 +218,6 @@ if (DEFINED MPI_HOME)
 else()
     # Allow all paths, and add an extra path if set
     SET(PATHOPT )
-    if (DEFINED ADDITIONAL_MPI_PATHS)
-        list(APPEND PATHOPT PATHS ${ADDITIONAL_MPI_PATHS})
-    endif()
 
     # Check if a mpi mnemonic is given
     # Standard local paths will be added below later
@@ -251,6 +248,8 @@ else()
             LIST(APPEND _MPI_PREFIX_PATH /usr/lpp/ppe.poe)
         elseif(MPI STREQUAL cray)
             LIST(APPEND _MPI_PREFIX_PATH /opt/cray/mpt/4.1.1/xt/seastar/mpich2-gnu)
+        elseif(MPI STREQUAL unknown)
+            message(WARNING "MPI implementation unknown. Compilation process has not been tested/verified yet")
         else()
             messagev(FATAL_ERROR "Unknown MPI value '${MPI}'. Your options:
 1. Use one of 'mpich','mpich2','openmpi','intel' or 'mvapich2'
@@ -289,30 +288,30 @@ else()
 endif() # DEFINED MPI_HOME
 
 # Check if a different MPI type is specified this time and delete any previous findings if so.
-set(_CLEANUP FALSE)
-if ((DEFINED _MPI_LASTFIND AND DEFINED MPI AND (NOT MPI STREQUAL _MPI_LASTFIND))
-    # Crossover case for change from MPI to MPI_HOME
-    OR (DEFINED _MPI_LASTFIND AND DEFINED MPI_HOME AND NOT DEFINED _MPI_LASTHOME)) 
-    UNSET(_MPI_LASTFIND CACHE)
-    set(_CLEANUP TRUE)
-endif()
-if ((DEFINED _MPI_LASTHOME AND DEFINED MPI_HOME AND (NOT MPI_HOME STREQUAL _MPI_LASTHOME))
-    # Crossover case for change from MPI_HOME to MPI
-    OR (DEFINED _MPI_LASTHOME AND DEFINED MPI AND (NOT DEFINED _MPI_LASTFIND OR NOT DEFINED MPI_HOME))) 
-    UNSET(_MPI_LASTHOME CACHE)
-    set(_CLEANUP TRUE)
-endif()
-# Reset any found quantities if cleanup is required
-if (_CLEANUP)
-    UNSET(MPIEXEC CACHE)
-    foreach (lang C CXX Fortran)
-        UNSET(MPI_${lang}_INCLUDE_PATH CACHE)
-        UNSET(MPI_${lang}_LIBRARIES CACHE)
-        UNSET(MPI_${lang}_COMPILER CACHE)
-        SET(MPI_${lang}_FOUND FALSE) 
-    endforeach()
-endif()
-unset(_CLEANUP)
+#set(_CLEANUP FALSE)
+#if ((DEFINED _MPI_LASTFIND AND DEFINED MPI AND (NOT MPI STREQUAL _MPI_LASTFIND))
+#    # Crossover case for change from MPI to MPI_HOME
+#    OR (DEFINED _MPI_LASTFIND AND DEFINED MPI_HOME AND NOT DEFINED _MPI_LASTHOME)) 
+#    UNSET(_MPI_LASTFIND CACHE)
+#    set(_CLEANUP TRUE)
+#endif()
+#if ((DEFINED _MPI_LASTHOME AND DEFINED MPI_HOME AND (NOT MPI_HOME STREQUAL _MPI_LASTHOME))
+#    # Crossover case for change from MPI_HOME to MPI
+#    OR (DEFINED _MPI_LASTHOME AND DEFINED MPI AND (NOT DEFINED _MPI_LASTFIND OR NOT DEFINED MPI_HOME))) 
+#    UNSET(_MPI_LASTHOME CACHE)
+#    set(_CLEANUP TRUE)
+#endif()
+## Reset any found quantities if cleanup is required
+#if (_CLEANUP)
+#    UNSET(MPIEXEC CACHE)
+#    foreach (lang C CXX Fortran)
+#        UNSET(MPI_${lang}_INCLUDE_PATH CACHE)
+#        UNSET(MPI_${lang}_LIBRARIES CACHE)
+#        UNSET(MPI_${lang}_COMPILER CACHE)
+#        SET(MPI_${lang}_FOUND FALSE) 
+#    endforeach()
+#endif()
+#unset(_CLEANUP)
 
 ############################################################
 # Interrogation part - function definition
@@ -944,18 +943,18 @@ foreach (lang C CXX Fortran)
 endforeach()
 
 # Store the currently successful findings of MPI in the local cache
-if (MPI_C_FOUND OR MPI_CXX_FOUND OR MPI_Fortran_FOUND)
-    if (MPI)
-        SET(_MPI_LASTFIND ${MPI} CACHE INTERNAL "Contains the MPI value of the latest successful find.")
-    else()
-        unset(_MPI_LASTFIND CACHE)
-    endif()
-    if (MPI_HOME)
-        SET(_MPI_LASTHOME ${MPI_HOME} CACHE INTERNAL "Contains the MPI_HOME value of the latest successful find.")
-    else()
-        unset(_MPI_LASTHOME CACHE)
-    endif()
-endif()
+#if (MPI_C_FOUND OR MPI_CXX_FOUND OR MPI_Fortran_FOUND)
+#    if (MPI)
+#        SET(_MPI_LASTFIND ${MPI} CACHE INTERNAL "Contains the MPI value of the latest successful find.")
+#    else()
+#        unset(_MPI_LASTFIND CACHE)
+#    endif()
+#    if (MPI_HOME)
+#        SET(_MPI_LASTHOME ${MPI_HOME} CACHE INTERNAL "Contains the MPI_HOME value of the latest successful find.")
+#    else()
+#        unset(_MPI_LASTHOME CACHE)
+#    endif()
+#endif()
 
 #=============================================================================
 # More backward compatibility stuff
