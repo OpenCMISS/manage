@@ -6,7 +6,7 @@
 # choice, it's hard-coded rather than being modifiable (externally).
 SET(OPENCMISS_ROOT @OPENCMISS_ROOT@)
 SET(OPENCMISS_CONFIG_DIR @OPENCMISS_CONFIG_DIR@)
-SET(OPENCMISS_SETUP_DIR @OPENCMISS_SETUP_DIR@)
+SET(OPENCMISS_MANAGE_DIR @OPENCMISS_MANAGE_DIR@)
 @TOOLCHAIN_DEF@
 SET(MPI @MPI@)
 SET(OCM_SYSTEM_MPI @ALLOW_SYSTEM_MPI@)
@@ -14,12 +14,12 @@ SET(OCM_SYSTEM_MPI @ALLOW_SYSTEM_MPI@)
 ########################################################################
 
 # Set up include path
-LIST(APPEND CMAKE_MODULE_PATH 
-    ${OPENCMISS_SETUP_DIR}
-    ${OPENCMISS_SETUP_DIR}/CMakeFindModuleWrappers
-    ${OPENCMISS_SETUP_DIR}/CMakeModules
-    ${OPENCMISS_SETUP_DIR}/CMakeScripts
-    ${OPENCMISS_SETUP_DIR}/Config)
+LIST(APPEND CMAKE_MODULE_PATH
+    ${OPENCMISS_MANAGE_DIR}
+    ${OPENCMISS_MANAGE_DIR}/CMakeFindModuleWrappers
+    ${OPENCMISS_MANAGE_DIR}/CMakeModules
+    ${OPENCMISS_MANAGE_DIR}/CMakeScripts
+    ${OPENCMISS_MANAGE_DIR}/Config)
 
 # This includes the configuration, both default and local
 include(OpenCMISSConfig)
@@ -50,14 +50,14 @@ if(OCM_USE_MT)
 endif()
 
 ########################################################################
-# MPI 
+# MPI
 
 # Unless we said to not have MPI or MPI_HOME is given, see that it's available.
 if(NOT (DEFINED MPI_HOME OR MPI STREQUAL none))
     include(MPIConfig)
 endif()
-# Note: 
-# If MPI_HOME is set, we'll just pass it on to the external projects where the 
+# Note:
+# If MPI_HOME is set, we'll just pass it on to the external projects where the
 # FindMPI.cmake module is going to look exclusively there.
 # The availability of an MPI implementation at MPI_HOME was made sure
 # in the MPIPreflight.cmake script upon generation time of this script.
@@ -83,7 +83,7 @@ include(CollectComponentDefinitions)
 
 #message(STATUS "OpenCMISS components common definitions:\n${COMPONENT_COMMON_DEFS}")
 
-# Those list variables will be filled by the build macros 
+# Those list variables will be filled by the build macros
 SET(_OCM_REQUIRED_SOURCES )
 SET(_OCM_NEED_INITIAL_SOURCE_DOWNLOAD NO)
 
@@ -99,7 +99,7 @@ include(Iron)
 ########################################################################
 # Misc targets for convenience
 # update: Updates the whole source tree
-# reset: 
+# reset:
 
 # Create a download target that depends on all other downloads
 SET(_OCM_SOURCE_UPDATE_TARGETS )
@@ -113,7 +113,7 @@ add_custom_target(update
 )
 # I already foresee that we will have to have "download" and "update" targets for the less insighted user.
 # So lets just give it to them. Does the same as external project has initial download and update steps.
-#add_custom_target(download 
+#add_custom_target(download
 #    DEPENDS ${_OCM_SOURCE_DOWNLOAD_TARGETS}
 #)
 # Note: Added a <COMP>-SRC project that takes care to have the sources ready
