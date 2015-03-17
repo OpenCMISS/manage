@@ -20,7 +20,7 @@ macro(CREATE_OPENCMISS_LOCALCONFIG PATH)
             endif()
             SET(OCM_USE_SYSTEM_FLAGS "${OCM_USE_SYSTEM_FLAGS}#SET(OCM_SYSTEM_${OCM_COMP} ${_VALUE})${_NL}")
         endforeach()
-        configure_file(${OPENCMISS_SETUP_DIR}/Config/OpenCMISSLocalConfig.template.cmake
+        configure_file(${OPENCMISS_MANAGE_DIR}/Config/OpenCMISSLocalConfig.template.cmake
             ${PATH}/OpenCMISSLocalConfig.cmake)
         unset(_NL)
         unset(OCM_USE_SYSTEM_FLAGS)

@@ -165,7 +165,7 @@ MACRO(ADD_COMPONENT COMPONENT_NAME)
                 -DTARGET=${COMPONENT_NAME}_SRC-download
                 -DFOLDER=${COMPONENT_SOURCE}
                 -DBINDIR=${CMAKE_CURRENT_BINARY_DIR}
-                -P ${OPENCMISS_SETUP_DIR}/CMakeScripts/CheckSourceExists.cmake
+                -P ${OPENCMISS_MANAGE_DIR}/CMakeScripts/CheckSourceExists.cmake
             DEPENDERS configure
 	)
 	

@@ -1,5 +1,5 @@
 # Generate the wrappers (if not existing)
-SET(WRAPPER_DIR ${OPENCMISS_SETUP_DIR}/CMakeFindModuleWrappers)
+SET(WRAPPER_DIR ${OPENCMISS_MANAGE_DIR}/CMakeFindModuleWrappers)
 foreach(PACKAGE_NAME ${PACKAGES_WITH_TARGETS})
     SET(FILE ${WRAPPER_DIR}/Find${PACKAGE_NAME}.cmake)
     #if(NOT EXISTS ${FILE})
