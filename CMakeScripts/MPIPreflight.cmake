@@ -21,7 +21,7 @@ foreach (lang C CXX Fortran)
     UNSET(MPI_${lang}_INCLUDE_PATH CACHE)
     UNSET(MPI_${lang}_LIBRARIES CACHE)
     UNSET(MPI_${lang}_COMPILER CACHE)
-    SET(MPI_${lang}_FOUND FALSE) 
+    SET(MPI_${lang}_FOUND FALSE)
 endforeach()
 
 # The default implementation to use in all last-resort/unimplemented cases
@@ -35,7 +35,7 @@ if(NOT DEFINED MPI)
         if (NOT MPI_FOUND)
             message(FATAL_ERROR "No MPI found at MPI_HOME=${MPI_HOME}")
         endif()
-    # No MPI or MPI_HOME - let cmake look and find MPI.    
+    # No MPI or MPI_HOME - let cmake look and find MPI.
     elseif(SYSTEM_MPI)
         find_package(MPI QUIET)
     endif()
@@ -74,11 +74,11 @@ if(NOT DEFINED MPI)
         if (UNIX)
             if (NOT DEFINED LINUX_DISTRIBUTION)
                 SET(LINUX_DISTRIBUTION FALSE CACHE STRING "Distribution information")
-                find_program(LSB lsb_release 
+                find_program(LSB lsb_release
                     DOC "Distribution information tool")
                 if (LSB)
                     execute_process(COMMAND ${LSB} -i
-                        RESULT_VARIABLE RETFLAG 
+                        RESULT_VARIABLE RETFLAG
                         OUTPUT_VARIABLE DISTINFO
                         ERROR_VARIABLE ERRDISTINFO
                         OUTPUT_STRIP_TRAILING_WHITESPACE
@@ -86,9 +86,9 @@ if(NOT DEFINED MPI)
                     if (NOT RETFLAG)
                         STRING(SUBSTRING ${DISTINFO} 16 -1 LINUX_DISTRIBUTION)
                     endif()
-                endif() 
+                endif()
             endif()
-            if (LINUX_DISTRIBUTION STREQUAL "Ubuntu" OR LINUX_DISTRIBUTION STREQUAL "Scientific")
+            if (LINUX_DISTRIBUTION STREQUAL "Ubuntu" OR LINUX_DISTRIBUTION STREQUAL "Scientific" OR LINUX_DISTRIBUTION STREQUAL "Arch")
                 SET(SUGGESTED_MPI openmpi)
             elseif(LINUX_DISTRIBUTION STREQUAL "Fedora" OR LINUX_DISTRIBUTION STREQUAL "RedHat")
                 SET(SUGGESTED_MPI mpich)
