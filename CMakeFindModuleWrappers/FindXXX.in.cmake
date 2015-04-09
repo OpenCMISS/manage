@@ -135,7 +135,7 @@ macro(MODULE_TO_TARGETS LIBS INCS)
     endif()
 endmacro()
 
-#message(STATUS "OpenCMISS Find@PACKAGE_NAME@ wrapper called. (CMAKE_PREFIX_PATH: ${CMAKE_PREFIX_PATH})")
+#message(STATUS "OpenCMISS Find@PACKAGE_CASENAME@ wrapper called. (CMAKE_PREFIX_PATH: ${CMAKE_PREFIX_PATH})")
 
 # Default: Not found
 SET(@PACKAGE_NAME@_FOUND NO)
@@ -143,14 +143,14 @@ SET(@PACKAGE_NAME@_FOUND NO)
 # The default way is to look for components in the current PREFIX_PATH, e.g. own build components.
 # If a LOCAL flag is set for a package, the MODULE and CONFIG modes are tried outside the PREFIX PATH first.
 if (NOT OCM_SYSTEM_@PACKAGE_NAME@)
-     find_package(@PACKAGE_NAME@ ${@PACKAGE_NAME@_FIND_VERSION} CONFIG
+     find_package(@PACKAGE_CASENAME@ ${@PACKAGE_CASENAME@_FIND_VERSION} CONFIG
         PATHS ${CMAKE_PREFIX_PATH}
         QUIET
         NO_DEFAULT_PATH)
 else()
     # If local lookup is enabled, try to look for packages in old-fashioned module mode and then config modes 
     
-    message(STATUS "System search of component @PACKAGE_NAME@ enabled")
+    message(STATUS "System search of component @PACKAGE_CASENAME@ enabled")
     # Remove all paths resolving to this one here so that recursive calls wont search here again
     SET(_MODPATHCOPY ${CMAKE_MODULE_PATH})
     SET(_READDME )
@@ -164,26 +164,26 @@ else()
     endforeach()
     
     # Make "native" call to find_package in MODULE mode first
-    message(STATUS "Trying to find @PACKAGE_NAME@ ${@PACKAGE_NAME@_FIND_VERSION} in MODULE mode")
+    message(STATUS "Trying to find @PACKAGE_CASENAME@ ${@PACKAGE_CASENAME@_FIND_VERSION} in MODULE mode")
     #message(STATUS "(CMAKE_MODULE_PATH: ${CMAKE_MODULE_PATH})")
     
     # Temporarily disable the required flag (if set from outside)
-    SET(_PKG_REQ_OLD ${@PACKAGE_NAME@_FIND_REQUIRED})
-    UNSET(@PACKAGE_NAME@_FIND_REQUIRED)
+    SET(_PKG_REQ_OLD ${@PACKAGE_CASENAME@_FIND_REQUIRED})
+    UNSET(@PACKAGE_CASENAME@_FIND_REQUIRED)
     
     # Remove CMAKE_INSTALL_PREFIX from CMAKE_SYSTEM_PREFIX_PATH - we dont want the module search to "accidentally"
     # discover the packages in our install directory, collect libraries and then re-turn them into targets (redundant round-trip)
     LIST(REMOVE_ITEM CMAKE_SYSTEM_PREFIX_PATH ${CMAKE_INSTALL_PREFIX})
     
     # Actual MODULE mode find call
-    find_package(@PACKAGE_NAME@ ${@PACKAGE_NAME@_FIND_VERSION} MODULE QUIET)
+    find_package(@PACKAGE_CASENAME@ ${@PACKAGE_CASENAME@_FIND_VERSION} MODULE QUIET)
     
     # Restore stuff
-    SET(@PACKAGE_NAME@_FIND_REQUIRED ${_PKG_REQ_OLD})
+    SET(@PACKAGE_CASENAME@_FIND_REQUIRED ${_PKG_REQ_OLD})
     LIST(APPEND CMAKE_SYSTEM_PREFIX_PATH ${CMAKE_INSTALL_PREFIX})
     
     if (@PACKAGE_NAME@_FOUND)
-        message(STATUS "Found package @PACKAGE_NAME@: ${@PACKAGE_NAME@_LIBRARIES}")
+        message(STATUS "Found package @PACKAGE_CASENAME@: ${@PACKAGE_NAME@_LIBRARIES}")
         SET(INCS )
         foreach(DIRSUFF _INCLUDE_DIRS _INCLUDES _INCLUDE_PATH _INCLUDE_DIR)
             #message(STATUS "Trying @PACKAGE_NAME@${DIRSUFF}..")
@@ -194,14 +194,14 @@ else()
         
         MODULE_TO_TARGETS("${@PACKAGE_NAME@_LIBRARIES}" "${INCS}")
     else()
-        message(STATUS "Trying to find @PACKAGE_NAME@ ${@PACKAGE_NAME@_FIND_VERSION} in CONFIG mode")
+        message(STATUS "Trying to find @PACKAGE_CASENAME@ ${@PACKAGE_CASENAME@_FIND_VERSION} in CONFIG mode")
         # First look outside the prefix path
         find_package(@PACKAGE_NAME@ ${@PACKAGE_NAME@_FIND_VERSION} CONFIG QUIET NO_CMAKE_PATH)
         
         # If not found, look also at the prefix path
         if (NOT @PACKAGE_NAME@_FOUND)
         
-            find_package(@PACKAGE_NAME@ ${@PACKAGE_NAME@_FIND_VERSION} CONFIG
+            find_package(@PACKAGE_CASENAME@ ${@PACKAGE_CASENAME@_FIND_VERSION} CONFIG
                 QUIET
                 PATHS ${CMAKE_PREFIX_PATH}
                 NO_CMAKE_ENVIRONMENT_PATH
@@ -221,6 +221,6 @@ else()
     
 endif()        
 
-if (@PACKAGE_NAME@_FIND_REQUIRED AND NOT @PACKAGE_NAME@_FOUND)
-    message(FATAL_ERROR "Could not find @PACKAGE_NAME@ with either MODULE or CONFIG mode.\nCMAKE_MODULE_PATH: ${CMAKE_MODULE_PATH}\nCMAKE_PREFIX_PATH: ${CMAKE_PREFIX_PATH}")
+if (@PACKAGE_CASENAME@_FIND_REQUIRED AND NOT @PACKAGE_NAME@_FOUND)
+    message(FATAL_ERROR "Could not find @PACKAGE_CASENAME@ with either MODULE or CONFIG mode.\nCMAKE_MODULE_PATH: ${CMAKE_MODULE_PATH}\nCMAKE_PREFIX_PATH: ${CMAKE_PREFIX_PATH}")
 endif()

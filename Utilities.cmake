@@ -1,7 +1,16 @@
+# Some shipped find-package modules have a different case-sensitive spelling - need to stay consistent with that
+SET(LIBXML2_CASENAME LibXml2)
+
 # Generate the wrappers (if not existing)
 SET(WRAPPER_DIR ${OPENCMISS_MANAGE_DIR}/CMakeFindModuleWrappers)
 foreach(PACKAGE_NAME ${PACKAGES_WITH_TARGETS})
-    SET(FILE ${WRAPPER_DIR}/Find${PACKAGE_NAME}.cmake)
+    # See above
+    if (${PACKAGE_NAME}_CASENAME)
+        SET(PACKAGE_CASENAME ${${PACKAGE_NAME}_CASENAME})
+    else()
+        SET(PACKAGE_CASENAME ${PACKAGE_NAME})
+    endif()
+    SET(FILE ${WRAPPER_DIR}/Find${PACKAGE_CASENAME}.cmake)
     #if(NOT EXISTS ${FILE})
         SET(PACKAGE_TARGETS ${${PACKAGE_NAME}_TARGETS})
         configure_file(${WRAPPER_DIR}/FindXXX.in.cmake ${FILE} @ONLY)

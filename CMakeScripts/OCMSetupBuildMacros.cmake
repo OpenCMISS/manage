@@ -194,7 +194,7 @@ macro(GET_BUILD_COMMANDS BUILD_CMD_VAR INSTALL_CMD_VAR DIR PARALLEL)
     SET( BUILD_CMD ${CMAKE_COMMAND} --build ${DIR})
     SET( INSTALL_CMD ${CMAKE_COMMAND} --build ${DIR} --target install)
     
-    if(${PARALLEL})
+    if(PARALLEL_BUILDS AND ${PARALLEL})
         include(ProcessorCount)
         ProcessorCount(NUM_PROCESSORS)
         if (NUM_PROCESSORS EQUAL 0)

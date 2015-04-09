@@ -19,6 +19,8 @@ SET(INT_TYPE int32)
 # Also build tests?
 SET(BUILD_TESTS ON)
 
+option(PARALLEL_BUILDS "Use multithreading (-jN etc) for builds" ON)
+
 # Type of libraries to build
 option(BUILD_SHARED_LIBS "Build shared libraries" NO)
 option(OCM_POSITION_INDEPENDENT_CODE "Always generate position independent code (-fPIC flag)" NO)
@@ -77,12 +79,15 @@ SET(ZLIB_VERSION 1.2.3)
 SET(BZIP2_VERSION 1.0.5)
 SET(FIELDML-API_VERSION 0.5.0)
 SET(LIBXML2_VERSION 2.7.6)
+SET(LLVM_VERSION 3.4)
+SET(GTEST_VERSION 1.7.0)
 # MPI
 SET(OPENMPI_VERSION 1.8.4)
 SET(MPICH_VERSION 3.1.3)
 SET(MVAPICH2_VERSION 2.1)
 # Cellml
 SET(CELLML_VERSION 1.0) # any will do, not used
+SET(CSIM_VERSION 1.0)
 # will be "master" finally
 SET(IRON_BRANCH iron)
 # Needs to be here until the repo's name is "iron", then it's compiled automatically (see Iron.cmake/BuildMacros)
@@ -116,3 +121,5 @@ SET(PASTIX_USE_METIS YES)
 SET(PASTIX_USE_PTSCOTCH YES)
 
 SET(IRON_WITH_CELLML YES)
+
+SET(LIBXML2_WITH_ZLIB YES)

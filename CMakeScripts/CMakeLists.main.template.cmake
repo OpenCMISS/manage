@@ -63,6 +63,7 @@ endif()
 # in the MPIPreflight.cmake script upon generation time of this script.
 
 # Checks for known issues as good as possible
+# TODO: move this to the generator script (suitably)!
 if (CMAKE_COMPILER_IS_GNUC AND MPI STREQUAL intel)
     message(FATAL_ERROR "Invalid compiler/MPI combination: Cannot build with GNU compiler and Intel MPI.")
 endif()
