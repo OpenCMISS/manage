@@ -107,6 +107,10 @@ ExternalProject_Add(opencmiss_build_${BUILD_IDENT}
 add_custom_target(update
     COMMAND ${CMAKE_COMMAND} --build ${MAIN_BINARY_DIR} --target update
 )
+# Forward examples target
+add_custom_target(examples
+    COMMAND ${CMAKE_COMMAND} --build ${MAIN_BINARY_DIR} --target examples
+)
 
 if (UNIX)
     add_custom_target(reset_current

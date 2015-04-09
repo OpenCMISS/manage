@@ -78,6 +78,16 @@ SET(OPENCMISS_COMPONENTS_BINARY_DIR ${OPENCMISS_ROOT}/build/${ARCHITECTURE_PATH}
 get_build_type_extra(BUILDTYPEEXTRA)
 # everything from the OpenCMISS main project goes into install/
 SET(OPENCMISS_COMPONENTS_INSTALL_PREFIX ${OPENCMISS_ROOT}/install/${ARCHITECTURE_PATH}/${BUILDTYPEEXTRA})
+# Misc definitions
+# The COMMON_PACKAGE_CONFIG_DIR contains the cmake-generated target config files consumed by find_package(... CONFIG).
+# Those are "usually" placed under the lib/ folders of the installation tree, however, the OpenCMISS build system
+# install trees also have the build type as subfolders. As the config-files generated natively create differently named files
+# for each build type, they can be collected in a common subfolder. As the build type subfolder-element is the last in line,
+# we simply use the parent folder of the component's CMAKE_INSTALL_PREFIX to place the cmake package config files.
+SET(COMMON_PACKAGE_CONFIG_DIR cmake) #../cmake
+
+# The path where find_package calls will find the cmake package config files
+set(OPENCMISS_PREFIX_PATH ${OPENCMISS_COMPONENTS_INSTALL_PREFIX}/${COMMON_PACKAGE_CONFIG_DIR})
 
 # Collect the common arguments for any package/component
 include(CollectComponentDefinitions)
@@ -96,6 +106,13 @@ include(Dependencies)
 
 # Iron
 include(Iron)
+
+# Examples
+include(Examples)
+
+########################################################################
+# Export the currently applied configuration for consumation by
+include(ExportBuildContext)
 
 ########################################################################
 # Misc targets for convenience
