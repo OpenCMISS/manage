@@ -24,6 +24,8 @@ SET(PACKAGES_WITH_TARGETS BLAS HYPRE LAPACK METIS
 
 # The opencmiss components that are looked for on the local system instead of building it
 SET(OPENCMISS_COMPONENTS_SYSTEM_BY_DEFAULT BLAS LAPACK LLVM LIBXML2 ZLIB)
+# Disabled components - added but not compiling
+SET(OPENCMISS_COMPONENTS_DISABLED_BY_DEFAULT CSIM LLVM)
 
 SET(BLAS_TARGETS blas)
 SET(CELLML_TARGETS cellml_model_definition cellml_api)

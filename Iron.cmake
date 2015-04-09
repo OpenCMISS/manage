@@ -1,7 +1,0 @@
-if (OCM_USE_IRON)
-    set(SUBGROUP_PATH .)
-    set(GITHUB_ORGANIZATION OpenCMISS)
-    
-    ADD_COMPONENT(IRON
-        WITH_CELLML=${IRON_WITH_CELLML})
-endif()

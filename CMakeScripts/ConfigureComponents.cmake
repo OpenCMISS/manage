@@ -1,61 +1,36 @@
-# Forward/downstream dependencies (for cmake build ordering and dependency checking)
-# Its organized this way as not all backward dependencies might be built by the cmake
-# system. here, the actual dependency list is filled "as we go" and actually build
-# packages locally, see ADD_DOWNSTREAM_DEPS in BuildMacros.cmake
-SET(HYPRE_FWD_DEPS PETSC IRON)
-SET(PLAPACK_FWD_DEPS IRON)
-SET(LAPACK_FWD_DEPS SCALAPACK SUITESPARSE MUMPS
-        SUPERLU SUPERLU_DIST PARMETIS HYPRE SUNDIALS PASTIX PLAPACK PETSC IRON)
-SET(LIBCELLML_FWD_DEPS CSIM CELLML IRON)
-SET(LLVM_FWD_DEPS CSIM)
-SET(CELLML_FWD_DEPS IRON)
-SET(CSIM_FWD_DEPS IRON)
-SET(GTEST_FWD_DEPS LLVM CSIM)
-SET(MUMPS_FWD_DEPS PETSC IRON)
-SET(PARMETIS_FWD_DEPS MUMPS SUITESPARSE SUPERLU_DIST PASTIX IRON)
-SET(PASTIX_FWD_DEPS PETSC IRON)
-SET(PTSCOTCH_FWD_DEPS PASTIX PETSC MUMPS IRON)
-SET(SCALAPACK_FWD_DEPS MUMPS PETSC IRON)
-SET(SCOTCH_FWD_DEPS PASTIX PETSC MUMPS IRON)
-SET(SLEPC_FWD_DEPS IRON)
-SET(SOWING_FWD_DEPS PETSC)
-SET(SUNDIALS_FWD_DEPS CSIM PETSC IRON)
-SET(SUPERLU_FWD_DEPS PETSC IRON)
-SET(SUITESPARSE_FWD_DEPS PETSC IRON)
-SET(SUPERLU_DIST_FWD_DEPS PETSC IRON)
-SET(PETSC_FWD_DEPS SLEPC IRON)
-SET(ZLIB_FWD_DEPS SCOTCH PTSCOTCH LIBXML2 FIELDML-API IRON CSIM LLVM)
-SET(BZIP2_FWD_DEPS )
-SET(LIBXML2_FWD_DEPS CSIM LLVM FIELDML-API)
-SET(FIELDML-API_FWD_DEPS IRON)
+# Main components config
+# This script sets up all the different components by either looking them up on the system or adding an external project
+# to build them ourselves.
+#
+# The main sections are Utils, Dependencies and Iron.
+#
+# The main macro is ADD_COMPONENT defined in OCMSetupBuildMacros.cmake.
+# Its behaviour is controlled (despite the direct argument) by
+# SUBGROUP_PATH: Determines a grouping folder to sort components into.
+# GITHUB_ORGANIZATION: For the default source locations, we use the OpenCMISS github organizations to group the components sources.
+#                      Those are used to both clone the git repo in development mode or generate the path to the zipped source file on github. 
 
-# ================================
-# Postprocessing
-# ================================
-#FOREACH(OCM_DEP ${OPENCMISS_COMPONENTS})
-    # Make a dependency check and enable other packages if required
-    #if (${OCM_DEP}_FWD_DEPS)
-    #    foreach(FWD_DEP ${${OCM_DEP}_FWD_DEPS})
-    #        if(OCM_USE_${FWD_DEP} AND NOT OCM_USE_${OCM_DEP})
-    #            message(STATUS "Package ${FWD_DEP} requires ${OCM_DEP}, setting OCM_USE_${OCM_DEP}=ON")
-    #            set(OCM_USE_${OCM_DEP} ON)
-    #        endif()
-    #    endforeach()
-    #endif()
-#ENDFOREACH()
+# ================================================================
+# Utils 
+#  -as long as we dont have more utilities i wont change everything to have that in the "Utilities.cmake" script
+#   we probably also dont need the release/debug versions here. we'll see what logic we need to extract from the build macros script
+# ================================================================ 
 
-# ================================
-# Package creation
-# ================================
-
-# Utils - as long as we dont have more utilities i wont change everything to have that in the "Utilities.cmake" script
-# we probably also dont need the release/debug versions here. we'll see what logic we need to extract from the build macros script
-# gTest 
+# gTest
 if (OCM_USE_GTEST AND BUILD_TESTS)
+    SET(GTEST_FWD_DEPS LLVM CSIM)
     set(SUBGROUP_PATH utilities)
     set(GITHUB_ORGANIZATION OpenCMISS-Utilities)
     ADD_COMPONENT(GTEST)
 endif()
+
+# ================================================================
+# Dependencies
+# ================================================================
+# Forward/downstream dependencies (for cmake build ordering and dependency checking)
+# Its organized this way as not all backward dependencies might be built by the cmake
+# system. here, the actual dependency list is filled "as we go" and actually build
+# packages locally, see ADD_DOWNSTREAM_DEPS in BuildMacros.cmake
 
 # Affects the ADD_COMPONENT macro
 set(SUBGROUP_PATH dependencies)
@@ -74,6 +49,8 @@ if (OCM_USE_BLAS OR OCM_USE_LAPACK)
         find_package(LAPACK ${LAPACK_VERSION} QUIET)
     endif()
     if(NOT (LAPACK_FOUND AND BLAS_FOUND))
+        SET(LAPACK_FWD_DEPS SCALAPACK SUITESPARSE MUMPS
+            SUPERLU SUPERLU_DIST PARMETIS HYPRE SUNDIALS PASTIX PLAPACK PETSC IRON)
         ADD_COMPONENT(LAPACK)
     endif()
 endif()
@@ -84,6 +61,7 @@ if(OCM_USE_ZLIB)
         FIND_PACKAGE(ZLIB QUIET)
     endif()
     if(NOT ZLIB_FOUND)
+        SET(ZLIB_FWD_DEPS SCOTCH PTSCOTCH LIBXML2 FIELDML-API IRON CSIM LLVM)
         ADD_COMPONENT(ZLIB)
     endif()
 endif()
@@ -94,6 +72,7 @@ if(OCM_USE_BZIP2)
         FIND_PACKAGE(BZIP2 QUIET)
     endif()
     if(NOT BZIP2_FOUND)
+        SET(BZIP2_FWD_DEPS )
         ADD_COMPONENT(BZIP2)
     endif()
 endif()
@@ -104,6 +83,7 @@ if(OCM_USE_LIBXML2)
         FIND_PACKAGE(LibXml2 QUIET)
     endif()
     if(NOT LIBXML2_FOUND)
+        SET(LIBXML2_FWD_DEPS CSIM LLVM FIELDML-API)
         ADD_COMPONENT(LIBXML2
             WITH_ZLIB=${LIBXML2_WITH_ZLIB})
     endif()
@@ -115,6 +95,7 @@ if(OCM_USE_FIELDML-API)
         FIND_PACKAGE(FIELDML-API QUIET)
     endif()
     if(NOT FIELDML-API_FOUND)
+        SET(FIELDML-API_FWD_DEPS IRON)
         ADD_COMPONENT(FIELDML-API)
     endif()
 endif()
@@ -125,6 +106,7 @@ if (OCM_USE_PTSCOTCH)
         FIND_PACKAGE(PTSCOTCH ${PTSCOTCH_VERSION} QUIET)
     endif()
     if(NOT PTSCOTCH_FOUND)
+        SET(SCOTCH_FWD_DEPS PASTIX PETSC MUMPS IRON)
         ADD_COMPONENT(SCOTCH
             BUILD_PTSCOTCH=YES USE_ZLIB=${SCOTCH_WITH_ZLIB}
             USE_THREADS=${SCOTCH_USE_THREADS})
@@ -134,6 +116,7 @@ elseif(OCM_USE_SCOTCH)
         FIND_PACKAGE(SCOTCH ${SCOTCH_VERSION} QUIET)
     endif()
     if(NOT SCOTCH_FOUND)
+        SET(PTSCOTCH_FWD_DEPS PASTIX PETSC MUMPS IRON)
         ADD_COMPONENT(SCOTCH
             BUILD_PTSCOTCH=NO USE_ZLIB=${SCOTCH_WITH_ZLIB}
             USE_THREADS=${SCOTCH_USE_THREADS})
@@ -146,6 +129,7 @@ if(OCM_USE_PLAPACK)
         FIND_PACKAGE(PLAPACK QUIET)
     endif()
     if(NOT PLAPACK_FOUND)
+        SET(PLAPACK_FWD_DEPS IRON)
         ADD_COMPONENT(PLAPACK
             BLAS_VERSION=${BLAS_VERSION}
             LAPACK_VERSION=${LAPACK_VERSION})
@@ -158,6 +142,7 @@ if(OCM_USE_SCALAPACK)
         FIND_PACKAGE(SCALAPACK ${SCALAPACK_VERSION} QUIET)
     endif()
     if(NOT SCALAPACK_FOUND)
+        SET(SCALAPACK_FWD_DEPS MUMPS PETSC IRON)
         ADD_COMPONENT(SCALAPACK
             BLAS_VERSION=${BLAS_VERSION}
             LAPACK_VERSION=${LAPACK_VERSION})
@@ -170,6 +155,7 @@ if(OCM_USE_PARMETIS)
         FIND_PACKAGE(PARMETIS ${PARMETIS_VERSION} QUIET)
     endif()
     if(NOT PARMETIS_FOUND)
+        SET(PARMETIS_FWD_DEPS MUMPS SUITESPARSE SUPERLU_DIST PASTIX IRON)
         ADD_COMPONENT(PARMETIS)
     endif()
 endif()
@@ -180,6 +166,7 @@ if (OCM_USE_MUMPS)
         FIND_PACKAGE(MUMPS ${MUMPS_VERSION} QUIET)
     endif()
     if(NOT MUMPS_FOUND)
+        SET(MUMPS_FWD_DEPS PETSC IRON)
         ADD_COMPONENT(MUMPS
             USE_SCOTCH=${MUMPS_WITH_SCOTCH}
             USE_PTSCOTCH=${MUMPS_WITH_PTSCOTCH}
@@ -197,6 +184,7 @@ if (OCM_USE_SUITESPARSE)
         FIND_PACKAGE(SUITESPARSE ${SUITESPARSE_VERSION} QUIET)
     endif()
     if(NOT SUITESPARSE_FOUND)
+        SET(SUITESPARSE_FWD_DEPS PETSC IRON)
         ADD_COMPONENT(SUITESPARSE
             BLAS_VERSION=${BLAS_VERSION}
             LAPACK_VERSION=${LAPACK_VERSION}
@@ -210,6 +198,7 @@ if (OCM_USE_HYPRE)
         FIND_PACKAGE(HYPRE ${HYPRE_VERSION} QUIET)
     endif()
     if(NOT HYPRE_FOUND)
+        SET(HYPRE_FWD_DEPS PETSC IRON)
         ADD_COMPONENT(HYPRE
             BLAS_VERSION=${BLAS_VERSION}
             LAPACK_VERSION=${LAPACK_VERSION})
@@ -222,6 +211,7 @@ if (OCM_USE_SUPERLU)
         FIND_PACKAGE(SUPERLU ${SUPERLU_VERSION} QUIET)
     endif()
     if(NOT SUPERLU_FOUND)
+        SET(SUPERLU_FWD_DEPS PETSC IRON)
         ADD_COMPONENT(SUPERLU
             BLAS_VERSION=${BLAS_VERSION}
             LAPACK_VERSION=${LAPACK_VERSION})
@@ -234,6 +224,7 @@ if (OCM_USE_SUPERLU_DIST)
         FIND_PACKAGE(SUPERLU_DIST ${SUPERLU_DIST_VERSION} QUIET)
     endif()
     if(NOT SUPERLU_DIST_FOUND)
+        SET(SUPERLU_DIST_FWD_DEPS PETSC IRON)
         ADD_COMPONENT(SUPERLU_DIST
             BLAS_VERSION=${BLAS_VERSION}
             USE_PARMETIS=${SUPERLU_DIST_WITH_PARMETIS}
@@ -250,6 +241,7 @@ if (OCM_USE_SUNDIALS)
         FIND_PACKAGE(SUNDIALS ${SUNDIALS_VERSION} QUIET)
     endif()
     if(NOT SUNDIALS_FOUND)
+        SET(SUNDIALS_FWD_DEPS CSIM PETSC IRON)
         ADD_COMPONENT(SUNDIALS
             USE_LAPACK=${SUNDIALS_WITH_LAPACK}
             BLAS_VERSION=${BLAS_VERSION}
@@ -263,6 +255,7 @@ if (OCM_USE_PASTIX)
         FIND_PACKAGE(PASTIX ${PASTIX_VERSION} QUIET)
     endif()
     if(NOT PASTIX_FOUND)
+        SET(PASTIX_FWD_DEPS PETSC IRON)
         ADD_COMPONENT(PASTIX
             USE_THREADS=${PASTIX_USE_THREADS}
             USE_METIS=${PASTIX_USE_METIS}
@@ -276,6 +269,7 @@ if (OCM_USE_SOWING)
         FIND_PACKAGE(SOWING ${SOWING_VERSION} QUIET)
     endif()
     if(NOT SOWING_FOUND)
+        SET(SOWING_FWD_DEPS PETSC)
         ADD_COMPONENT(SOWING)
     endif()
 endif()
@@ -286,6 +280,7 @@ if (OCM_USE_PETSC)
         FIND_PACKAGE(PETSC ${PETSC_VERSION} QUIET)
     endif()
     if(NOT PETSC_FOUND)
+        SET(PETSC_FWD_DEPS SLEPC IRON)
         ADD_COMPONENT(PETSC
             HYPRE_VERSION=${HYPRE_VERSION}
             MUMPS_VERSION=${MUMPS_VERSION}
@@ -306,6 +301,7 @@ if (OCM_USE_SLEPC)
         FIND_PACKAGE(SLEPC ${SLEPC_VERSION} QUIET)
     endif()
     if(NOT SLEPC_FOUND)
+        SET(SLEPC_FWD_DEPS IRON)
         ADD_COMPONENT(SLEPC
             HYPRE_VERSION=${HYPRE_VERSION}
             MUMPS_VERSION=${MUMPS_VERSION}
@@ -323,22 +319,37 @@ endif()
 
 # CellML
 if (OCM_USE_LIBCELLML)
+    SET(LIBCELLML_FWD_DEPS CSIM CELLML IRON)
     ADD_COMPONENT(LIBCELLML)
 endif()
 
 if (OCM_USE_CELLML)
     # For now cellml is in OpenCMISS organization on GitHub
     set(GITHUB_ORGANIZATION OpenCMISS)
+    SET(CELLML_FWD_DEPS IRON)
     ADD_COMPONENT(CELLML)
     # Set back
     set(GITHUB_ORGANIZATION OpenCMISS-Dependencies)
 endif()
 
 if (OCM_USE_LLVM)
+    SET(LLVM_FWD_DEPS CSIM)
     ADD_COMPONENT(LLVM)
 endif()
 if (OCM_USE_CSIM)
+    SET(CSIM_FWD_DEPS IRON)
     ADD_COMPONENT(CSIM)
+endif()
+
+# ================================================================
+# Iron
+# ================================================================
+if (OCM_USE_IRON)
+    set(SUBGROUP_PATH .)
+    set(GITHUB_ORGANIZATION OpenCMISS)
+    
+    ADD_COMPONENT(IRON
+        WITH_CELLML=${IRON_WITH_CELLML})
 endif()
 
 # Notes:

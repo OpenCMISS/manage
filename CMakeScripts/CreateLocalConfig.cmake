@@ -10,8 +10,14 @@ macro(CREATE_OPENCMISS_LOCALCONFIG PATH)
             SET(_NL "\n")
         endif()
         foreach(OCM_COMP ${OPENCMISS_COMPONENTS})
-            # All components are set to be used by default. So prepare the option to disable here.
-            SET(OCM_USE_FLAGS "${OCM_USE_FLAGS}#SET(OCM_USE_${OCM_COMP} NO)${_NL}")
+            LIST(FIND OPENCMISS_COMPONENTS_DISABLED_BY_DEFAULT ${OCM_COMP} _COMP_POS)
+            set(_HASH "#")
+            if (_COMP_POS GREATER -1)
+                set(_HASH "")
+            endif()
+            # Prepare the option to disable here.
+            SET(OCM_USE_FLAGS "${OCM_USE_FLAGS}${_HASH}SET(OCM_USE_${OCM_COMP} NO)${_NL}")
+            
             # Some components are looked for on the system by default. add option for opposite action here
             LIST(FIND OPENCMISS_COMPONENTS_SYSTEM_BY_DEFAULT ${OCM_COMP} _COMP_POS)
             SET(_VALUE YES)

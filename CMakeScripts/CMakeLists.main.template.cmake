@@ -101,14 +101,11 @@ SET(_OCM_NEED_INITIAL_SOURCE_DOWNLOAD NO)
 ########################################################################
 # Actual external project configurations
 
-# Dependencies
-include(Dependencies)
-
-# Iron
-include(Iron)
+# Dependencies, Iron, ...
+include(ConfigureComponents)
 
 # Examples
-include(Examples)
+include(AddExamplesProject)
 
 ########################################################################
 # Export the currently applied configuration for consumation by

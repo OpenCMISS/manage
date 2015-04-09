@@ -149,6 +149,7 @@ MACRO(ADD_COMPONENT COMPONENT_NAME)
 		#INSTALL_DIR ${CMAKE_INSTALL_PREFIX} 
 		INSTALL_COMMAND ${INSTALL_COMMAND}
 	)
+		
 	# See OpenCMISSDeveloper.cmake
 	if (OCM_CLEAN_REBUILDS_COMPONENTS)
         set_directory_properties(PROPERTIES ADDITIONAL_MAKE_CLEAN_FILES ${COMPONENT_BUILD_DIR}/CMakeCache.txt)
@@ -167,6 +168,11 @@ MACRO(ADD_COMPONENT COMPONENT_NAME)
                 -DBINDIR=${CMAKE_CURRENT_BINARY_DIR}
                 -P ${OPENCMISS_MANAGE_DIR}/CMakeScripts/CheckSourceExists.cmake
             DEPENDERS configure
+	)
+	# Add convenience direct-access clean target for component
+	add_custom_target(${COMPONENT_NAME}-clean
+	    COMMAND ${CMAKE_COMMAND} -E remove -f ${COMPONENT_BUILD_DIR}/ep_stamps/*-build
+	    COMMAND ${CMAKE_COMMAND} --build ${COMPONENT_BUILD_DIR} --target clean
 	)
 	
 	# Be a tidy kiwi
