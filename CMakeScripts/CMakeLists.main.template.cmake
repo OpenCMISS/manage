@@ -5,11 +5,10 @@
 # for this specific compiler/mpi choice and sub-external projects rely on this
 # choice, it's hard-coded rather than being modifiable (externally).
 SET(OPENCMISS_ROOT @OPENCMISS_ROOT@)
-SET(OPENCMISS_CONFIG_DIR @OPENCMISS_CONFIG_DIR@)
 SET(OPENCMISS_MANAGE_DIR @OPENCMISS_MANAGE_DIR@)
 @TOOLCHAIN_DEF@
 SET(MPI @MPI@)
-SET(OCM_SYSTEM_MPI @ALLOW_SYSTEM_MPI@)
+SET(OCM_SYSTEM_MPI @SYSTEM_MPI@)
 @MPI_HOME_DEF@
 ########################################################################
 

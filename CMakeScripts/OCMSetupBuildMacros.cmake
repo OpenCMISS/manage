@@ -148,6 +148,7 @@ MACRO(ADD_COMPONENT COMPONENT_NAME)
 		# currently set as extra arg (above), somehow does not work
 		#INSTALL_DIR ${CMAKE_INSTALL_PREFIX} 
 		INSTALL_COMMAND ${INSTALL_COMMAND}
+		STEP_TARGETS build install
 	)
 		
 	# See OpenCMISSDeveloper.cmake
@@ -171,7 +172,7 @@ MACRO(ADD_COMPONENT COMPONENT_NAME)
 	)
 	# Add convenience direct-access clean target for component
 	add_custom_target(${COMPONENT_NAME}-clean
-	    COMMAND ${CMAKE_COMMAND} -E remove -f ${COMPONENT_BUILD_DIR}/ep_stamps/*-build
+	    COMMAND ${CMAKE_COMMAND} -E remove -f ${COMPONENT_BUILD_DIR}/ep_stamps/*-configure 
 	    COMMAND ${CMAKE_COMMAND} --build ${COMPONENT_BUILD_DIR} --target clean
 	)
 	

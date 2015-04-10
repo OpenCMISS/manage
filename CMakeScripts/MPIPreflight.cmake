@@ -6,7 +6,7 @@
 #
 # 1. Nothing specified - Call FindMPI and let it come up with whatever is found on the default path
 #  a. SYSTEM_MPI = NO AND/OR No MPI found - Prescribe a reasonable system default choice and go with that
-#  b. SYSTEM_MPI = YES AND MPI found - Infer the MPI implementation from the PATH and use that
+#  b. SYSTEM_MPI = YES AND MPI found - Use the MPI implementation found on PATH/environment 
 # 2. MPI_HOME specified - Look exclusively at that location for binaries/libraries
 #  a. MPI FOUND - ok, detect type and forward that
 #  b. MPI NOT FOUND - Error and abort
