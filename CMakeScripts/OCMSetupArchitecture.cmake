@@ -47,6 +47,8 @@ function(get_architecture_path VARNAME)
         GET_COMPILER_NAME(COMPILER)
         SET(ARCHPATH ${ARCHPATH}/${COMPILER})
         
+        # Profiling
+        
         # Multithreading
         if (OCM_USE_MT)
             SET(ARCHPATH ${ARCHPATH}/mt)

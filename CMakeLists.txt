@@ -11,9 +11,39 @@
 # The easiest thing to do is nothing: CMake will detect
 # the system's default setup and try to use that.
 #
-# To select the toolchain, define the TOOLCHAIN variable
-# (either via CMakeGUI or -D command line as one of the
-# following: gnu intel ibm
+# ==============================
+# Toolchain setup - details
+# ==============================
+# Usually you dont need to tell CMake which compilers to use.
+# If you change compilers here, YOU SHOULD KNOW WHY!!!
+# If by some chance you have to, first try to specify your
+# desired toolchain via either CMakeGUI or -D command line
+# as one of the following: 
+# - gnu        # gcc,g++ and gfortran compilers
+# - intel      # icc, icpc, ifort compilers
+# - ibm        # xlc, xlC, xlf95 compilers
+# Note that this variable will be used case-insensitive.
+#
+# If this does not cover you needs, you can specify each compiler using the CMAKE_<lang>_COMPILER variables,
+# where <lang> can be each of "C","CXX" or "Fortran".
+# For example, to have CMake use the GNU C compiler, set the binary name via e.g. 
+# -DCMAKE_C_COMPILER gcc
+# If that can not be found on CMake's PATH, you should specify an absolute path to the binary like
+# -DCMAKE_C_COMPILER /usr/local/mygcc/bin/gcc
+#
+# If you still fail to have CMake successfully configure OpenCMISS with non-default compilers, please contact the OpenCMISS Team.
+#
+# ==============================
+# MPI
+# ==============================
+# MPI is a crucial part of OpenCMISS and defaults to be used.
+# You should not have to specify a specific MPI implementation, however, here
+# are the options:
+#
+# Global switch for enabling/disabling MPI.
+option(OCM_USE_MPI "Use MPI within OpenCMISS [No-MPI case not yet implemented!]" YES)
+# Whether to allow a system search for MPI implementations 
+option(OCM_SYSTEM_MPI "Allow to use a system MPI if found" NO)
 #
 # To select an MPI implementation, you can use the MPI
 # variable the same way by choosing from: mpich mpich2
@@ -23,9 +53,21 @@
 # which is intended for future use but not implemented
 # yet.
 #
+# - ALTERNATIVELY -
+# You can also specify a custom MPI root directory to have CMake look there EXCLUSIVELY.
+#SET(MPI_HOME ~/software/openmpi-1.8.3_install)
+
+# - ALTERNATIVELY -
+# Further, you can specify an explicit name of the compiler executable (full path or just the binary name)
+# This can be used independently of (but possibly with) the MPI_HOME setting.
+#SET(MPI_C_COMPILER mpicc)
+#SET(MPI_CXX_COMPILER mpic++)
+#SET(MPI_Fortran_COMPILER mpif77)
+
+
 ########################################################
 
-CMAKE_MINIMUM_REQUIRED(VERSION 2.6 FATAL_ERROR)
+CMAKE_MINIMUM_REQUIRED(VERSION 2.8.4 FATAL_ERROR)
 # We start a fake project here that will use any encountered C compiler here.
 # It will NOT be used (unless we let cmake use its defaults), but starting a project is
 # initializing a lot more CMake variables that ensure proper functionality of all cmake commands
@@ -61,7 +103,7 @@ endif()
 # See if we have to suggest/detect MPI if not specified explicitly
 # Note:
 # This will make sure to have MPI set (also possible: "none" or "unknown")
-option(ALLOW_SYSTEM_MPI "Prefer local system MPI implementations over own builds" YES)
+option(SYSTEM_MPI "Prefer local system MPI implementations over own builds" YES)
 include(MPIPreflight)
 
 # This is the main build file location for each compiler/mpi combination.

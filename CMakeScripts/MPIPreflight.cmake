@@ -5,8 +5,8 @@
 # handle it.
 #
 # 1. Nothing specified - Call FindMPI and let it come up with whatever is found on the default path
-#  a. SYSTEM_MPI = NO AND/OR No MPI found - Prescribe a reasonable system default choice and go with that
-#  b. SYSTEM_MPI = YES AND MPI found - Use the MPI implementation found on PATH/environment 
+#  a. OCM_SYSTEM_MPI = NO AND/OR No MPI found - Prescribe a reasonable system default choice and go with that
+#  b. OCM_SYSTEM_MPI = YES AND MPI found - Use the MPI implementation found on PATH/environment 
 # 2. MPI_HOME specified - Look exclusively at that location for binaries/libraries
 #  a. MPI FOUND - ok, detect type and forward that
 #  b. MPI NOT FOUND - Error and abort
@@ -36,8 +36,9 @@ if(NOT DEFINED MPI)
             message(FATAL_ERROR "No MPI found at MPI_HOME=${MPI_HOME}")
         endif()
     # No MPI or MPI_HOME - let cmake look and find MPI.
-    elseif(SYSTEM_MPI)
-        find_package(MPI QUIET)
+    elseif(OCM_SYSTEM_MPI)
+        message(STATUS "Looking for system MPI...")
+        find_package(MPI )#QUIET
     endif()
 
     # If we have found MPI by now, it's either system MPI or the one specified at MPI_HOME.
@@ -52,7 +53,7 @@ if(NOT DEFINED MPI)
             LIST(GET PATTERNS ${IDX} PATTERN)
             STRING(TOLOWER "${MPI_C_INCLUDE_PATH}" C_INC_PATH)
             STRING(TOLOWER "${MPI_CXX_INCLUDE_PATH}" CXX_INC_PATH)
-            #message(STATUS "Architecture: checking '${MPI_C_INCLUDE_PATH} MATCHES ${PATTERN} OR ${MPI_CXX_INCLUDE_PATH} MATCHES ${PATTERN}'")
+            message(STATUS "Architecture: checking '${MPI_C_INCLUDE_PATH} MATCHES ${PATTERN} OR ${MPI_CXX_INCLUDE_PATH} MATCHES ${PATTERN}'")
             if (C_INC_PATH MATCHES ${PATTERN} OR CXX_INC_PATH MATCHES ${PATTERN})
                 SET(DETECTED_MPI ${MNEMONIC})
                 break()
@@ -67,7 +68,7 @@ if(NOT DEFINED MPI)
             endif()
             message(WARNING "MPI compiler '${MPI_C_COMPILER}' with include path '${MPI_C_INCLUDE_PATH}' not recognized.")
         endif()
-        set(MPI ${DETECTED_MPI} CACHE "Detected MPI implementation" FORCE)
+        set(MPI ${DETECTED_MPI} CACHE STRING "Detected MPI implementation" FORCE)
         unset(DETECTED_MPI)
     else()
         # No MPI found - Prescribe a reasonable system default choice and go with that
