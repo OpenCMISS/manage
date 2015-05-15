@@ -42,8 +42,15 @@
 #
 # Global switch for enabling/disabling MPI.
 option(OCM_USE_MPI "Use MPI within OpenCMISS [No-MPI case not yet implemented!]" YES)
-# Whether to allow a system search for MPI implementations 
-option(OCM_SYSTEM_MPI "Allow to use a system MPI if found" NO)
+# Whether to allow a system search for MPI implementations
+# On Windows, we always will have a look for system mpi installations 
+if (WIN32)
+    set(SYSMPI_DEF YES)
+else()
+    set(SYSMPI_DEF NO)
+endif()
+option(OCM_SYSTEM_MPI "Allow to use a system MPI if found" ${SYSMPI_DEF})
+unset(SYSMPI_DEF)
 #
 # To select an MPI implementation, you can use the MPI
 # variable the same way by choosing from: mpich mpich2
