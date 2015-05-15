@@ -90,6 +90,7 @@ LIST(APPEND CMAKE_MODULE_PATH
     ${OPENCMISS_MANAGE_DIR}/Config)
 
 # This ensures that CMake is new enough before anything else is done
+option(BUILD_CMAKE "Build the latest CMake with OpenSSL support enabled." OFF)
 include(CMakeCheck)
 
 # See if we have a specified toolchain
