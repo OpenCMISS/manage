@@ -2,10 +2,10 @@
 # Construct installation path
 # For MPI we use a slightly different architecture path - we dont need to re-build MPI for static/shared builds nor do we need the actual
 # MPI mnemonic in the path. Instead, we use "mpi" as common top folder to collect all local MPI builds.
-get_architecture_path(ARCHITECTURE_PATH_MPI SHORT)
+get_architecture_path(SHORT_ARCH_PATH SHORT)
 get_build_type_extra(BUILDTYPEEXTRA)
 # This is where our own build of MPI will reside if compilation is needed
-set(OWN_MPI_INSTALL_DIR ${OPENCMISS_ROOT}/install/${ARCHITECTURE_PATH_MPI}/mpi/${MPI}/${BUILDTYPEEXTRA})
+set(OWN_MPI_INSTALL_DIR ${OPENCMISS_ROOT}/install/${SHORT_ARCH_PATH}/mpi/${MPI}/${BUILDTYPEEXTRA})
     
 if (NOT DEFINED MPI_HOME)
     # If no system MPI is allowed, search ONLY at MPI_HOME, which is our own bake
@@ -57,7 +57,7 @@ if (NOT MPI_FOUND)
         
         set(MPI_HOME ${OWN_MPI_INSTALL_DIR})   
         SET(_MPI_SOURCE_DIR ${OPENCMISS_ROOT}/src/dependencies/${MPI})
-        SET(_MPI_BINARY_DIR ${OPENCMISS_ROOT}/build/${ARCHITECTURE_PATH_MPI}/mpi/${MPI}/${BUILDTYPEEXTRA})
+        SET(_MPI_BINARY_DIR ${OPENCMISS_ROOT}/build/${SHORT_ARCH_PATH}/mpi/${MPI}/${BUILDTYPEEXTRA})
         SET(_MPI_BRANCH v${_MPI_VERSION})
         
         message(STATUS "Configuring build of MPI (${MPI}-${_MPI_VERSION}) in ${_MPI_BINARY_DIR}...")
@@ -84,7 +84,7 @@ if (NOT MPI_FOUND)
     		BINARY_DIR ${_MPI_BINARY_DIR}
     		
     		#--Build step-----------------
-    		BUILD_COMMAND make -j12 #${BUILD_COMMAND}
+    		BUILD_COMMAND make -j #${BUILD_COMMAND}
     		
     		#--Install step---------------
     		# currently set as extra arg (above), somehow does not work
@@ -94,6 +94,7 @@ if (NOT MPI_FOUND)
     		#LOG_CONFIGURE 1
     		#LOG_BUILD 1
     		#LOG_INSTALL 1
+    		STEP_TARGETS install
     	)
     ADD_DOWNSTREAM_DEPS(MPI)
     else()

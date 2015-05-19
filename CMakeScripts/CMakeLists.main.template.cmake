@@ -69,42 +69,34 @@ endif()
 
 ########################################################################
 # General paths & preps
-get_architecture_path(ARCHITECTURE_PATH)
-# Build tree location for components
+get_architecture_path(ARCHITECTURE_PATH ARCHITECTURE_PATH_MPI)
+# Build tree location for components (with/without mpi)
 SET(OPENCMISS_COMPONENTS_BINARY_DIR ${OPENCMISS_ROOT}/build/${ARCHITECTURE_PATH})
+SET(OPENCMISS_COMPONENTS_BINARY_DIR_MPI ${OPENCMISS_ROOT}/build/${ARCHITECTURE_PATH_MPI})
 # Install dir
 # Extra path segment for single configuration case - will give release/debug/...
 get_build_type_extra(BUILDTYPEEXTRA)
 # everything from the OpenCMISS main project goes into install/
 SET(OPENCMISS_COMPONENTS_INSTALL_PREFIX ${OPENCMISS_ROOT}/install/${ARCHITECTURE_PATH}/${BUILDTYPEEXTRA})
+SET(OPENCMISS_COMPONENTS_INSTALL_PREFIX_MPI ${OPENCMISS_ROOT}/install/${ARCHITECTURE_PATH_MPI}/${BUILDTYPEEXTRA})
 # Misc definitions
 # The COMMON_PACKAGE_CONFIG_DIR contains the cmake-generated target config files consumed by find_package(... CONFIG).
 # Those are "usually" placed under the lib/ folders of the installation tree, however, the OpenCMISS build system
 # install trees also have the build type as subfolders. As the config-files generated natively create differently named files
 # for each build type, they can be collected in a common subfolder. As the build type subfolder-element is the last in line,
 # we simply use the parent folder of the component's CMAKE_INSTALL_PREFIX to place the cmake package config files.
+######################
+# ATTENTION: this is (yet) pretty useless, as cmake seems to remove configurations for e.g. debug builds when placing config files for e.g. release
+# builds in the same folder. One folder containing config files for multiple configurations seems to be possible exclusively on multi-configuration
+# platforms, i.e. xcode or visual studio. GRRRRRR
+###################### 
 SET(COMMON_PACKAGE_CONFIG_DIR cmake) #../cmake ${OPENCMISS_ROOT}/install/${ARCHITECTURE_PATH}/
 
-# build/x86/gnu/mpi/mpich/release
-# build/x86/gnu/mpi/mpich/debug
-# build/x86/gnu/mpich/static/release
-# build/x86/gnu/no_mpi/static/release
-# install/x86/gnu/mpi/mpich/release
-# install/x86/gnu/mpi/mpich/debug
-# install/x86/gnu/mpi/mpich/profile
-# install/x86/gnu/mpi/openmpi
-
-# install/x86/gnu/mpich/static/hypre/release/lib
-# install/x86/gnu/mpich/static/hypre/debug/lib
-# install/x86/gnu/mpich/static/hypre/profile/lib
-# install/x86/gnu/mpich/shared/hypre/debug/lib
-# install/x86/gnu/openmpi/static/hypre/release/lib
-# install/x86/gnu/no_mpi/static/zlib/release/lib
-# install/x86/gnu/no_mpi/static/cmake
-# install/x86/gnu/mpich/shared/cmake
-
-# The path where find_package calls will find the cmake package config files
-set(OPENCMISS_PREFIX_PATH ${OPENCMISS_COMPONENTS_INSTALL_PREFIX}/${COMMON_PACKAGE_CONFIG_DIR})
+# The path where find_package calls will find the cmake package config files for any opencmiss component
+set(OPENCMISS_PREFIX_PATH
+    ${OPENCMISS_COMPONENTS_INSTALL_PREFIX}/${COMMON_PACKAGE_CONFIG_DIR} 
+    ${OPENCMISS_COMPONENTS_INSTALL_PREFIX_MPI}/${COMMON_PACKAGE_CONFIG_DIR}
+)
 
 # Collect the common arguments for any package/component
 include(CollectComponentDefinitions)

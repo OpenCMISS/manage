@@ -81,6 +81,8 @@ CMAKE_MINIMUM_REQUIRED(VERSION 2.8.4 FATAL_ERROR)
 # (e.g. find_library does not "work" if issued before a project command, as the CMAKE_FIND_LIBRARY_SUFFIXES are still empty)
 project(OpenCMISS-Generate-Build C)
 
+message(STATUS "CMAKE_HOST_SYSTEM_VERSION=${CMAKE_HOST_SYSTEM_VERSION}, CMAKE_HOST_SYSTEM_NAME = ${CMAKE_HOST_SYSTEM_NAME}, CMAKE_SYSTEM_NAME=${CMAKE_SYSTEM_NAME}")
+
 # Set the manage directory
 SET(OPENCMISS_MANAGE_DIR ${CMAKE_CURRENT_SOURCE_DIR})
 # The default opencmiss root is the parent directory of "manage"

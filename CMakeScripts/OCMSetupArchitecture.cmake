@@ -29,10 +29,20 @@ MACRO(GET_COMPILER_NAME VARNAME)
 ENDMACRO()
 
 # This function assembles the architecture path
-# We have [ARCH][COMPILER][MT][MPI][STATIC|SHARED]
-function(get_architecture_path VARNAME)
+# We have [ARCH][COMPILER][MT][MPI|no_mpi][STATIC|SHARED]
+#
+# This function returns two architecture paths, the first for mpi-unaware applications (VARNAME)
+# and the second for applications that link against an mpi implementation (VARNAME_MPI)
+#
+# # If the second argument is "SHORT" (literally), only the variable VARNAME will be set to a path with no mpi and static/shared parts
+function(get_architecture_path VARNAME VARNAME_MPI)
     SET(ARCHPATH )
-    
+    # If the second argument is "SHORT" (literally) we only return a path with no mpi part 
+    if (VARNAME_MPI STREQUAL SHORT)
+        set(IS_SHORT YES)
+    else()
+        set(IS_SHORT NO)
+    endif()
     if(OCM_USE_ARCHITECTURE_PATH)
         # Architecture/System
         STRING(TOLOWER ${CMAKE_SYSTEM_NAME} CMAKE_SYSTEM_NAME_LOWER)
@@ -55,12 +65,12 @@ function(get_architecture_path VARNAME)
         endif()
         
         # Short version is without MPI and static/shared path elements
-        if (${ARGC} EQUAL 1 OR NOT "${ARGV1}" STREQUAL SHORT)
+        if (NOT IS_SHORT)
             # MPI version information
             if (NOT MPI STREQUAL none)
                 SET(MPI_PART ${MPI})
             else()
-                SET(MPI_PART "sequential")
+                SET(MPI_PART "no_mpi")
             endif()
             SET(ARCHPATH ${ARCHPATH}/${MPI_PART})
             
@@ -77,7 +87,14 @@ function(get_architecture_path VARNAME)
     endif()
     
     # Append to desired variable
-    SET(${VARNAME} ${ARCHPATH} PARENT_SCOPE)
+    if (IS_SHORT)
+        SET(${VARNAME} ${ARCHPATH} PARENT_SCOPE)
+    else()
+        SET(${VARNAME_MPI} ${ARCHPATH} PARENT_SCOPE)
+        # The full architecture path without mpi is the same but with "no_mpi" at the same level
+        string(REPLACE "/${MPI_PART}" "/no_mpi" ARCHPATH_NOMPI ${ARCHPATH})
+        SET(${VARNAME} ${ARCHPATH_NOMPI} PARENT_SCOPE)
+    endif()
 endfunction()
 
 function(get_build_type_extra VARNAME)
