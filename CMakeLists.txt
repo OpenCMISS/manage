@@ -74,7 +74,7 @@ unset(SYSMPI_DEF)
 
 ########################################################
 
-CMAKE_MINIMUM_REQUIRED(VERSION 2.8.4 FATAL_ERROR)
+CMAKE_MINIMUM_REQUIRED(VERSION 2.6.0 FATAL_ERROR)
 # We start a fake project here that will use any encountered C compiler here.
 # It will NOT be used (unless we let cmake use its defaults), but starting a project is
 # initializing a lot more CMake variables that ensure proper functionality of all cmake commands
