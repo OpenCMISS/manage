@@ -40,18 +40,6 @@
 # You should not have to specify a specific MPI implementation, however, here
 # are the options:
 #
-# Global switch for enabling/disabling MPI.
-option(OCM_USE_MPI "Use MPI within OpenCMISS [No-MPI case not yet implemented!]" YES)
-# Whether to allow a system search for MPI implementations
-# On Windows, we always will have a look for system mpi installations 
-if (WIN32)
-    set(SYSMPI_DEF YES)
-else()
-    set(SYSMPI_DEF NO)
-endif()
-option(OCM_SYSTEM_MPI "Allow to use a system MPI if found" ${SYSMPI_DEF})
-unset(SYSMPI_DEF)
-#
 # To select an MPI implementation, you can use the MPI
 # variable the same way by choosing from: mpich mpich2
 # openmpi mvapich2 intel none
@@ -71,18 +59,9 @@ unset(SYSMPI_DEF)
 #SET(MPI_CXX_COMPILER mpic++)
 #SET(MPI_Fortran_COMPILER mpif77)
 
-
 ########################################################
-
+# If your cmake is older than 2.6 - goodbye. 
 CMAKE_MINIMUM_REQUIRED(VERSION 2.6.0 FATAL_ERROR)
-# We start a fake project here that will use any encountered C compiler here.
-# It will NOT be used (unless we let cmake use its defaults), but starting a project is
-# initializing a lot more CMake variables that ensure proper functionality of all cmake commands
-# (e.g. find_library does not "work" if issued before a project command, as the CMAKE_FIND_LIBRARY_SUFFIXES are still empty)
-project(OpenCMISS-Generate-Build C)
-
-message(STATUS "CMAKE_HOST_SYSTEM_VERSION=${CMAKE_HOST_SYSTEM_VERSION}, CMAKE_HOST_SYSTEM_NAME = ${CMAKE_HOST_SYSTEM_NAME}, CMAKE_SYSTEM_NAME=${CMAKE_SYSTEM_NAME}")
-
 # Set the manage directory
 SET(OPENCMISS_MANAGE_DIR ${CMAKE_CURRENT_SOURCE_DIR})
 # The default opencmiss root is the parent directory of "manage"
@@ -99,8 +78,22 @@ LIST(APPEND CMAKE_MODULE_PATH
     ${OPENCMISS_MANAGE_DIR}/Config)
 
 # This ensures that CMake is new enough before anything else is done
-option(BUILD_CMAKE "Build the latest CMake with OpenSSL support enabled." OFF)
+# If its too old, the script will stop with an appropriate error message.
+# The option is to either come up with a sufficiently new version yourself,
+# or to build cmake using the (then generated) "cmake" target.
 include(CMakeCheck)
+if (NOT CMAKE_COMPATIBLE)
+    return()
+endif()
+
+# We start a fake project here that will use any encountered C compiler here.
+# It will NOT be used (unless we let cmake use its defaults), but starting a project is
+# initializing a lot more CMake variables that ensure proper functionality of all cmake commands
+# (e.g. find_library does not "work" if issued before a project command, as the CMAKE_FIND_LIBRARY_SUFFIXES are still empty)
+#
+# The variable CMAKE_MIN_VERSION is set inside the CMakeCheck script
+CMAKE_MINIMUM_REQUIRED(VERSION ${CMAKE_MIN_VERSION} FATAL_ERROR)
+project(OpenCMISS-Generate-Build C)
 
 # See if we have a specified toolchain
 if (DEFINED TOOLCHAIN)
@@ -113,7 +106,18 @@ endif()
 # See if we have to suggest/detect MPI if not specified explicitly
 # Note:
 # This will make sure to have MPI set (also possible: "none" or "unknown")
-option(SYSTEM_MPI "Prefer local system MPI implementations over own builds" YES)
+# Global switch for enabling/disabling MPI.
+option(OCM_USE_MPI "Use MPI within OpenCMISS [No-MPI case not yet implemented!]" YES)
+ 
+ # Whether to allow a system search for MPI implementations
+if (WIN32)
+    # On Windows, we will always have a look for system mpi installations
+    set(SYSMPI_DEF YES)
+else()
+    set(SYSMPI_DEF NO)
+endif()
+option(OCM_SYSTEM_MPI "Allow to use a system MPI if found" ${SYSMPI_DEF})
+unset(SYSMPI_DEF)
 include(MPIPreflight)
 
 # This is the main build file location for each compiler/mpi combination.
