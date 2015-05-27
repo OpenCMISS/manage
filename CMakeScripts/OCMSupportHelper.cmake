@@ -1,0 +1,10 @@
+# Reacts to "-DUMP=YES"
+if (UMP)
+    message(STATUS "Entering CMake help mode!")
+    message(STATUS "------- Current CMake variables -------")
+    get_cmake_property(_variableNames VARIABLES)
+    foreach (_variableName ${_variableNames})
+        message(STATUS "${_variableName}=${${_variableName}}")
+    endforeach()
+    message(STATUS "------- Done -------")
+endif(UMP)

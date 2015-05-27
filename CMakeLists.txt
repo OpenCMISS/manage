@@ -3,7 +3,7 @@
 ########################################################
 # This script realises the top-level setup/generation
 # phase. All it does is making sure you have the minimum
-# cmake version available (if not, it's build for you!)
+# cmake version available (if not, you can have us build for you)
 # and generates the actual main build project for any
 # choice of compiler/toolchain and MPI combination
 # you'd like.
@@ -68,9 +68,8 @@ SET(OPENCMISS_MANAGE_DIR ${CMAKE_CURRENT_SOURCE_DIR})
 SET(OPENCMISS_ROOT "${OPENCMISS_MANAGE_DIR}/.." CACHE PATH "Root directory for OpenCMISS.")
 if (ROOT)
     SET(OPENCMISS_ROOT "${ROOT}" CACHE PATH "Root directory for OpenCMISS." FORCE)
-endif()
+endif(ROOT)
 get_filename_component(OPENCMISS_ROOT ${OPENCMISS_ROOT} ABSOLUTE)
-message(STATUS "OpenCMISS root will be ${OPENCMISS_ROOT}")
 
 # Set up include path required at this stage
 LIST(APPEND CMAKE_MODULE_PATH
@@ -84,7 +83,8 @@ LIST(APPEND CMAKE_MODULE_PATH
 include(CMakeCheck)
 if (NOT CMAKE_COMPATIBLE)
     return()
-endif()
+endif(NOT CMAKE_COMPATIBLE)
+############################## END OF FULLY BACKWARDS-COMPATIBLE PART ###############################
 
 # We start a fake project here that will use any encountered C compiler here.
 # It will NOT be used (unless we let cmake use its defaults), but starting a project is
@@ -185,3 +185,28 @@ if (UNIX)
         WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
     )
 endif()
+
+# This script dumps all available variables if invoked with "-DUMP=YES" :-)
+include(OCMSupportHelper)
+
+# Print a neat summary
+message(STATUS "@@@@@@@@@@@@@@@@@@@ SETUP SUMMARY @@@@@@@@@@@@@@@@@@@")
+message(STATUS "*")
+message(STATUS "* OPENCMISS_ROOT: ${OPENCMISS_ROOT}")
+message(STATUS "* OPENCMISS_MANAGE_DIR: ${OPENCMISS_MANAGE_DIR}")
+message(STATUS "* Current local configuration: ${MAIN_BINARY_DIR}")
+message(STATUS "* MPI: ${MPI}")
+if (MPI_HOME)
+    message(STATUS "* MPI HOME: ${MPI_HOME}")
+endif()
+if (TOOLCHAIN)
+    message(STATUS "* TOOLCHAIN: ${TOOLCHAIN})")
+endif()
+message(STATUS "*")
+message(STATUS "@@@@@@@@@@@@@@@@@@@ NEXT STEPS @@@@@@@@@@@@@@@@@@@@@@")
+message(STATUS "*")
+message(STATUS "* Change ${MAIN_BINARY_DIR}/OpenCMISSLocalConfig.cmake according to your setup/needs")
+message(STATUS "* Run your native build command (${CMAKE_MAKE_PROGRAM}) to start the build process")
+message(STATUS "* Refer to the build documentation for customization instructions")
+message(STATUS "*")
+message(STATUS "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@")
