@@ -103,12 +103,6 @@ else()
     set(TC_PART default) # "default" name
 endif()
 
-# See if we have to suggest/detect MPI if not specified explicitly
-# Note:
-# This will make sure to have MPI set (also possible: "none" or "unknown")
-# Global switch for enabling/disabling MPI.
-option(OCM_USE_MPI "Use MPI within OpenCMISS [No-MPI case not yet implemented!]" YES)
- 
  # Whether to allow a system search for MPI implementations
 if (WIN32)
     # On Windows, we will always have a look for system mpi installations

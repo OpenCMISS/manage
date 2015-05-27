@@ -11,7 +11,7 @@ MACRO(ADD_COMPONENT COMPONENT_NAME)
     
     # Check which build dir is required - depending on whether this component can be built against mpi
     list(FIND OPENCMISS_COMPONENTS_WITHMPI ${COMPONENT_NAME} COMP_WITH_MPI)
-    if (OCM_USE_MPI AND COMP_WITH_MPI GREATER -1)
+    if (COMP_WITH_MPI GREATER -1)
         SET(COMPONENT_BUILD_DIR ${OPENCMISS_COMPONENTS_BINARY_DIR_MPI}/${SUBGROUP_PATH}/${FOLDER_NAME}/${BUILDTYPEEXTRA})
         LIST(APPEND COMPONENT_DEFS -DCMAKE_INSTALL_PREFIX=${OPENCMISS_COMPONENTS_INSTALL_PREFIX_MPI})
     else()
@@ -32,30 +32,28 @@ MACRO(ADD_COMPONENT COMPONENT_NAME)
     
     # check if MPI compilers should be forwarded/set
     # so that the local FindMPI uses that
-    if (OCM_USE_MPI)
-        foreach(DEP ${OPENCMISS_COMPONENTS_WITHMPI})
-            if(${DEP} STREQUAL ${COMPONENT_NAME})
-                # Pass on settings and take care to undefine them if no longer used at this level
-                if (MPI)
-                    LIST(APPEND COMPONENT_DEFS -DMPI=${MPI})
-                else()
-                    LIST(APPEND COMPONENT_DEFS -UMPI)
-                endif()
-                if (MPI_HOME)
-                    LIST(APPEND COMPONENT_DEFS -DMPI_HOME=${MPI_HOME})
-                else()
-                    LIST(APPEND COMPONENT_DEFS -UMPI_HOME)
-                endif()
-                #foreach(lang C CXX Fortran)
-                #    if(MPI_${lang}_COMPILER)
-                #        LIST(APPEND COMPONENT_DEFS
-                #            -DMPI_${lang}_COMPILER=${MPI_${lang}_COMPILER}
-                #        )
-                #    endif()
-                #endforeach()
+    foreach(DEP ${OPENCMISS_COMPONENTS_WITHMPI})
+        if(${DEP} STREQUAL ${COMPONENT_NAME})
+            # Pass on settings and take care to undefine them if no longer used at this level
+            if (MPI)
+                LIST(APPEND COMPONENT_DEFS -DMPI=${MPI})
+            else()
+                LIST(APPEND COMPONENT_DEFS -UMPI)
             endif()
-        endforeach()
-    endif()
+            if (MPI_HOME)
+                LIST(APPEND COMPONENT_DEFS -DMPI_HOME=${MPI_HOME})
+            else()
+                LIST(APPEND COMPONENT_DEFS -UMPI_HOME)
+            endif()
+            #foreach(lang C CXX Fortran)
+            #    if(MPI_${lang}_COMPILER)
+            #        LIST(APPEND COMPONENT_DEFS
+            #            -DMPI_${lang}_COMPILER=${MPI_${lang}_COMPILER}
+            #        )
+            #    endif()
+            #endforeach()
+        endif()
+    endforeach()
     
 	# Forward any other variables
     foreach(extra_def ${ARGN})
