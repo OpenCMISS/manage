@@ -151,13 +151,14 @@ else()
     # If local lookup is enabled, try to look for packages in old-fashioned module mode and then config modes 
     
     message(STATUS "System search of component @PACKAGE_CASENAME@ enabled")
+    
     # Remove all paths resolving to this one here so that recursive calls wont search here again
     SET(_MODPATHCOPY ${CMAKE_MODULE_PATH})
     SET(_READDME )
     foreach(_ENTRY ${_MODPATHCOPY})
-        #message(STATUS "Test: ${_ENTRY} MATCHES .*/CMakeFindModuleWrappers(/)?$")
-        if(_ENTRY MATCHES ".*/CMakeFindModuleWrappers(/)?$")
-            #message(STATUS "Test positive")
+        get_filename_component(_ENTRY_ABSOLUTE ${_ENTRY} ABSOLUTE)
+        get_filename_component(_PARENT_DIRECTORY ${CMAKE_CURRENT_LIST_FILE} DIRECTORY)
+        if (_ENTRY_ABSOLUTE STREQUAL _PARENT_DIRECTORY)
             LIST(REMOVE_ITEM CMAKE_MODULE_PATH ${_ENTRY})
             LIST(APPEND _READDME ${_ENTRY})
         endif()
@@ -189,6 +190,7 @@ else()
             #message(STATUS "Trying @PACKAGE_NAME@${DIRSUFF}..")
             if (DEFINED @PACKAGE_NAME@${DIRSUFF})
                 LIST(APPEND INCS ${@PACKAGE_NAME@${DIRSUFF}})
+                #set(@PACKAGE_NAME@_DIR ${@PACKAGE_NAME@${DIRSUFF}})
             endif()
         endforeach()
         
