@@ -114,6 +114,7 @@ MACRO(ADD_COMPONENT COMPONENT_NAME)
     # Add source download/update project
     LIST(APPEND _OCM_REQUIRED_SOURCES ${COMPONENT_NAME})
     ExternalProject_Add(${COMPONENT_NAME}_SRC
+        PREFIX ${OPENCMISS_ROOT}/src/download/
         EXCLUDE_FROM_ALL 1
         TMP_DIR ${OPENCMISS_ROOT}/src/download/tmp
         STAMP_DIR ${OPENCMISS_ROOT}/src/download/stamps

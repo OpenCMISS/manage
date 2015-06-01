@@ -61,7 +61,7 @@ if(OCM_USE_ZLIB)
         FIND_PACKAGE(ZLIB QUIET)
     endif()
     if(NOT ZLIB_FOUND)
-        SET(ZLIB_FWD_DEPS SCOTCH PTSCOTCH LIBXML2 FIELDML-API IRON CSIM LLVM)
+        SET(ZLIB_FWD_DEPS SCOTCH PTSCOTCH MUMPS LIBXML2 FIELDML-API IRON CSIM LLVM)
         ADD_COMPONENT(ZLIB)
     endif()
 endif()
@@ -172,6 +172,8 @@ if (OCM_USE_MUMPS)
             USE_PTSCOTCH=${MUMPS_WITH_PTSCOTCH}
             PTSCOTCH_VERSION=${PTSCOTCH_VERSION}
             SCOTCH_VERSION=${SCOTCH_VERSION}
+            SCOTCH_WITH_ZLIB=${SCOTCH_WITH_ZLIB} #Dirty hack, see mumps dependency main CMakeLists.txt
+            ZLIB_VERSION=${ZLIB_VERSION} # Belongs to dirty hack
             USE_PARMETIS=${MUMPS_WITH_PARMETIS}
             PARMETIS_VERSION=${PARMETIS_VERSION}
         )
@@ -259,7 +261,10 @@ if (OCM_USE_PASTIX)
         ADD_COMPONENT(PASTIX
             USE_THREADS=${PASTIX_USE_THREADS}
             USE_METIS=${PASTIX_USE_METIS}
-            USE_PTSCOTCH=${PASTIX_USE_PTSCOTCH})
+            USE_PTSCOTCH=${PASTIX_USE_PTSCOTCH}
+            SCOTCH_WITH_ZLIB=${SCOTCH_WITH_ZLIB} #Dirty hack, see mumps dependency main CMakeLists.txt
+            ZLIB_VERSION=${ZLIB_VERSION} # Belongs to dirty hack
+        )
     endif()
 endif()
 

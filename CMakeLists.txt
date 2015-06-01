@@ -19,7 +19,7 @@
 # If by some chance you have to, first try to specify your
 # desired toolchain via either CMakeGUI or -D command line
 # as one of the following: 
-# - gnu        # gcc,g++ and gfortran compilers
+# - gnu,mingw        # gcc,g++ and gfortran compilers
 # - intel      # icc, icpc, ifort compilers
 # - ibm        # xlc, xlC, xlf95 compilers
 # Note that this variable will be used case-insensitive.
@@ -100,7 +100,12 @@ if (DEFINED TOOLCHAIN)
     string(TOLOWER ${TOOLCHAIN} TOOLCHAIN)
     SET(TC_PART ${TOOLCHAIN})
 else()
-    set(TC_PART default) # "default" name
+    # if unspecified but we're on MINGW, use that instead of "default"
+    if (MINGW)
+        set(TC_PART mingw) 
+    else()
+        set(TC_PART default) # "default" name
+    endif()
 endif()
 
  # Whether to allow a system search for MPI implementations
@@ -194,7 +199,7 @@ if (MPI_HOME)
     message(STATUS "* MPI HOME: ${MPI_HOME}")
 endif()
 if (TOOLCHAIN)
-    message(STATUS "* TOOLCHAIN: ${TOOLCHAIN})")
+    message(STATUS "* TOOLCHAIN: ${TOOLCHAIN}")
 endif()
 message(STATUS "*")
 message(STATUS "@@@@@@@@@@@@@@@@@@@ NEXT STEPS @@@@@@@@@@@@@@@@@@@@@@")
