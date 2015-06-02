@@ -296,7 +296,10 @@ if (OCM_USE_PETSC)
             SUITESPARSE_VERSION=${SUITESPARSE_VERSION}
             SUNDIALS_VERSION=${SUNDIALS_VERSION}
             SUPERLU_VERSION=${SUPERLU_VERSION}
-            SUPERLU_DIST_VERSION=${SUPERLU_DIST_VERSION})
+            SUPERLU_DIST_VERSION=${SUPERLU_DIST_VERSION}
+            SCOTCH_WITH_ZLIB=${SCOTCH_WITH_ZLIB} #Dirty hack, see petsc dependency main CMakeLists.txt
+            ZLIB_VERSION=${ZLIB_VERSION} # Belongs to dirty hack
+        )
     endif()
 endif()
 
