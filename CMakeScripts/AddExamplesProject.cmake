@@ -46,14 +46,27 @@ else()
     )
 endif()
 message(STATUS "Configuring build of OpenCMISS-Examples ('examples' target) at ${OPENCMISS_EXAMPLES_BUILD_DIR}")
-ExternalProject_Add(examples
-    #DEPENDS IRON
+ExternalProject_Add(examples-download
+    PREFIX ${OPENCMISS_EXAMPLES_SRC_DIR}
+    TMP_DIR ${OPENCMISS_EXAMPLES_SRC_DIR}/ep_tmp
+    STAMP_DIR ${OPENCMISS_EXAMPLES_SRC_DIR}/ep_stamps
+    EXCLUDE_FROM_ALL 1
     ${DOWNLOAD_CMDS}
+    CONFIGURE_COMMAND ""
+    BUILD_COMMAND ""
+    INSTALL_COMMAND ""
+)
+ExternalProject_Add(examples-build
     PREFIX ${OPENCMISS_EXAMPLES_BUILD_DIR}
+    TMP_DIR ${OPENCMISS_EXAMPLES_BUILD_DIR}/ep_tmp
+    STAMP_DIR ${OPENCMISS_EXAMPLES_BUILD_DIR}/ep_stamps
     SOURCE_DIR ${OPENCMISS_EXAMPLES_SRC_DIR}
     BINARY_DIR ${OPENCMISS_EXAMPLES_BUILD_DIR}
     CMAKE_ARGS 
         -DOPENCMISS_INSTALL_DIR=${OPENCMISS_COMPONENTS_INSTALL_PREFIX_MPI}
+)
+add_custom_target(examples
+    DEPENDS examples-download examples-build
 )
 # We dont want to build the examples project by default - you got to trigger it.
 set_target_properties(examples PROPERTIES EXCLUDE_FROM_ALL TRUE)
