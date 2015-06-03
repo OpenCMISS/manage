@@ -60,6 +60,7 @@ ExternalProject_Add(examples-build
     PREFIX ${OPENCMISS_EXAMPLES_BUILD_DIR}
     TMP_DIR ${OPENCMISS_EXAMPLES_BUILD_DIR}/ep_tmp
     STAMP_DIR ${OPENCMISS_EXAMPLES_BUILD_DIR}/ep_stamps
+    EXCLUDE_FROM_ALL 1
     SOURCE_DIR ${OPENCMISS_EXAMPLES_SRC_DIR}
     BINARY_DIR ${OPENCMISS_EXAMPLES_BUILD_DIR}
     CMAKE_ARGS 
@@ -67,6 +68,7 @@ ExternalProject_Add(examples-build
 )
 add_custom_target(examples
     DEPENDS examples-download examples-build
+    EXCLUDE_FROM_ALL 1
 )
 # We dont want to build the examples project by default - you got to trigger it.
 set_target_properties(examples PROPERTIES EXCLUDE_FROM_ALL TRUE)

@@ -67,10 +67,12 @@ function(get_architecture_path VARNAME VARNAME_MPI)
         # Short version is without MPI and static/shared path elements
         if (NOT IS_SHORT)
             # MPI version information
-            if (NOT MPI STREQUAL none)
-                SET(MPI_PART ${MPI})
-            else()
+            if (MPI STREQUAL none)
                 SET(MPI_PART "no_mpi")
+            else()
+                # Add the build type of MPI to the architecture path - we obtain different libraries
+                # for different mpi build types
+                SET(MPI_PART ${MPI}_${MPI_BUILD_TYPE})
             endif()
             SET(ARCHPATH ${ARCHPATH}/${MPI_PART})
             

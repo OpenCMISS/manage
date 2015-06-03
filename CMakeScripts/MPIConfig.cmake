@@ -2,10 +2,11 @@
 # Construct installation path
 # For MPI we use a slightly different architecture path - we dont need to re-build MPI for static/shared builds nor do we need the actual
 # MPI mnemonic in the path. Instead, we use "mpi" as common top folder to collect all local MPI builds.
+# Only the debug/release versions of MPI are located in different folders (for own builds only - the behaviour using system mpi
+# in debug mode is unspecified) 
 get_architecture_path(SHORT_ARCH_PATH SHORT)
-get_build_type_extra(BUILDTYPEEXTRA)
 # This is where our own build of MPI will reside if compilation is needed
-set(OWN_MPI_INSTALL_DIR ${OPENCMISS_ROOT}/install/${SHORT_ARCH_PATH}/mpi/${MPI}/${BUILDTYPEEXTRA})
+set(OWN_MPI_INSTALL_DIR ${OPENCMISS_ROOT}/install/${SHORT_ARCH_PATH}/mpi/${MPI}/${MPI_BUILD_TYPE})
     
 if (NOT DEFINED MPI_HOME)
     # If no system MPI is allowed, search ONLY at MPI_HOME, which is our own bake
@@ -37,16 +38,16 @@ if (NOT MPI_FOUND)
             SET(_MPI_EXTRA_PARAMS )
         elseif (MPI STREQUAL mpich)
             SET(_MPI_VERSION ${MPICH_VERSION})
-            if (CMAKE_BUILD_TYPE STREQUAL RELEASE)
+            if (MPI_BUILD_TYPE STREQUAL release)
                 SET(_MPI_EXTRA_PARAMS "--enable-fast=O3,ndebug --disable-error-checking --without-timing --without-mpit-pvars")
-            elseif(CMAKE_BUILD_TYPE STREQUAL DEBUG)
+            elseif(MPI_BUILD_TYPE STREQUAL debug)
                 SET(_MPI_EXTRA_PARAMS "--disable-fast")
             endif()
         elseif (MPI STREQUAL mvapich2)
             SET(_MPI_VERSION ${MVAPICH2_VERSION})
-            if (CMAKE_BUILD_TYPE STREQUAL RELEASE)
+            if (MPI_BUILD_TYPE STREQUAL release)
                 SET(_MPI_EXTRA_PARAMS "--enable-fast=O3,ndebug --disable-error-checking --without-timing --without-mpit-pvars")
-            elseif(CMAKE_BUILD_TYPE STREQUAL DEBUG)
+            elseif(MPI_BUILD_TYPE STREQUAL debug)
                 SET(_MPI_EXTRA_PARAMS "--disable-fast")
             endif()
         else()
@@ -55,12 +56,27 @@ if (NOT MPI_FOUND)
         
         message(STATUS "Using shipped MPI (${MPI}-${_MPI_VERSION})")
         
-        set(MPI_HOME ${OWN_MPI_INSTALL_DIR})   
+        set(MPI_HOME ${OWN_MPI_INSTALL_DIR})
         SET(_MPI_SOURCE_DIR ${OPENCMISS_ROOT}/src/dependencies/${MPI})
-        SET(_MPI_BINARY_DIR ${OPENCMISS_ROOT}/build/${SHORT_ARCH_PATH}/mpi/${MPI}/${BUILDTYPEEXTRA})
+        SET(_MPI_BINARY_DIR ${OPENCMISS_ROOT}/build/${SHORT_ARCH_PATH}/mpi/${MPI}/${MPI_BUILD_TYPE})
         SET(_MPI_BRANCH v${_MPI_VERSION})
         
-        message(STATUS "Configuring build of MPI (${MPI}-${_MPI_VERSION}) in ${_MPI_BINARY_DIR}...")
+        message(STATUS "Configuring build of MPI (${MPI}-${_MPI_VERSION})")
+        message(STATUS "Location: ${_MPI_BINARY_DIR}")
+        message(STATUS "Build params: ${_MPI_EXTRA_PARAMS}")
+        
+        # Dont download again if the target source folder already contains files 
+        file(GLOB _MPI_FILES ${_MPI_SOURCE_DIR})
+        list(LENGTH ${_MPI_FILES} _NUM_MPI_FILES)
+        set(DOWNLOAD_COMMANDS )
+        if(RES_LEN EQUAL 0)
+            set(DOWNLOAD_COMMANDS 
+                DOWNLOAD_DIR ${_MPI_SOURCE_DIR}/src-download
+                URL https://github.com/OpenCMISS-Dependencies/${MPI}/archive/${_MPI_BRANCH}.zip
+                #http://www.open-mpi.org/software/ompi/v1.8/downloads/openmpi-1.8.4.tar.gz
+                #URL_HASH SHA1=22002fc226f55e188e21be0fdc3602f8d024e7ba
+            )
+        endif()
         
         ExternalProject_Add(MPI
     		PREFIX ${_MPI_BINARY_DIR}
@@ -68,10 +84,7 @@ if (NOT MPI_FOUND)
     		STAMP_DIR ${_MPI_BINARY_DIR}/ep_stamp
     		
     		#--Download step--------------
-    		DOWNLOAD_DIR ${_MPI_SOURCE_DIR}/src-download
-            URL https://github.com/OpenCMISS-Dependencies/${MPI}/archive/${_MPI_BRANCH}.zip
-            #http://www.open-mpi.org/software/ompi/v1.8/downloads/openmpi-1.8.4.tar.gz
-            #URL_HASH SHA1=22002fc226f55e188e21be0fdc3602f8d024e7ba
+    		${DOWNLOAD_COMMANDS}
              
     		#--Configure step-------------
     		SOURCE_DIR ${_MPI_SOURCE_DIR}
@@ -96,7 +109,7 @@ if (NOT MPI_FOUND)
     		#LOG_INSTALL 1
     		STEP_TARGETS install
     	)
-    ADD_DOWNSTREAM_DEPS(MPI)
+        ADD_DOWNSTREAM_DEPS(MPI)
     else()
         message(FATAL_ERROR "MPI (${MPI}) installation support not yet implemented for this platform.")
     endif()

@@ -41,12 +41,15 @@
 # are the options:
 #
 # To select an MPI implementation, you can use the MPI
-# variable the same way by choosing from: mpich mpich2
-# openmpi mvapich2 intel none
+# variable the same way by choosing from:
+# mpich mpich2 openmpi mvapich2 intel none
 #
 # The selection "none" will build OpenCMISS without MPI,
 # which is intended for future use but not implemented
 # yet.
+#
+# To have MPI build in debug mode, set DEBUG_MPI=YES (Default: NO)
+# This is only guaranteed to work for own MPI builds yet.
 #
 # - ALTERNATIVELY -
 # You can also specify a custom MPI root directory to have CMake look there EXCLUSIVELY.
@@ -111,17 +114,24 @@ endif()
  # Whether to allow a system search for MPI implementations
 if (WIN32)
     # On Windows, we will always have a look for system mpi installations
-    set(SYSMPI_DEF YES)
+    set(_SYSMPI_DEF YES)
 else()
-    set(SYSMPI_DEF NO)
+    set(_SYSMPI_DEF NO)
 endif()
-option(OCM_SYSTEM_MPI "Allow to use a system MPI if found" ${SYSMPI_DEF})
-unset(SYSMPI_DEF)
+option(SYSTEM_MPI "Allow to use a system MPI if found" ${_SYSMPI_DEF})
+option(DEBUG_MPI "Use DEBUG version of MPI (works only for own builds thus far)" NO)
+if (DEBUG_MPI)
+    set(MPI_BUILD_TYPE debug)
+else()
+    set(MPI_BUILD_TYPE release)
+endif()
+unset(_SYSMPI_DEF)
 include(MPIPreflight)
 
 # This is the main build file location for each compiler/mpi combination.
-SET(BUILD_IDENT compiler.${TC_PART}-mpi.${MPI}) # dont care, take anything to combine stuff
-SET(MAIN_BINARY_DIR ${CMAKE_CURRENT_BINARY_DIR}/${BUILD_IDENT}) # ${OPENCMISS_MANAGE_DIR}
+# We need to have different base folders for MPI in release/debug modes.
+SET(BUILD_IDENT compiler.${TC_PART}-mpi.${MPI}.${MPI_BUILD_TYPE}) # dont care, take anything to combine stuff
+SET(MAIN_BINARY_DIR ${CMAKE_CURRENT_BINARY_DIR}/${BUILD_IDENT})
 file(MAKE_DIRECTORY ${MAIN_BINARY_DIR})
 
 # # Create a local config file at target folder if not exists

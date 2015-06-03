@@ -44,8 +44,14 @@ option(OCM_USE_MT "Use multithreading in OpenCMISS (where applicable)" NO)
 # ==============================
 # This is changeable in the OpenCMISSLocalConfig file
 FOREACH(OCM_DEP ${OPENCMISS_COMPONENTS})
-    # Use everything by default
-    option(OCM_USE_${OCM_DEP} "Use OpenCMISS component ${OCM_DEP}" YES)
+    LIST(FIND OPENCMISS_COMPONENTS_DISABLED_BY_DEFAULT ${OCM_DEP} _COMP_POS)
+    set(_VALUE YES)
+    if (_COMP_POS GREATER -1)
+        set(_VALUE NO)
+    endif()
+    # Use everything but the components in OPENCMISS_COMPONENTS_DISABLED_BY_DEFAULT
+    option(OCM_USE_${OCM_DEP} "Use OpenCMISS component ${OCM_DEP}" ${_VALUE})
+    
     # Look for some components on the system first before building
     LIST(FIND OPENCMISS_COMPONENTS_SYSTEM_BY_DEFAULT ${OCM_DEP} _COMP_POS)
     SET(_VALUE NO)

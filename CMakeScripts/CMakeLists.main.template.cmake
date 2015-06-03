@@ -6,10 +6,6 @@
 # choice, it's hard-coded rather than being modifiable (externally).
 SET(OPENCMISS_ROOT @OPENCMISS_ROOT@)
 SET(OPENCMISS_MANAGE_DIR @OPENCMISS_MANAGE_DIR@)
-@TOOLCHAIN_DEF@
-SET(MPI @MPI@)
-SET(OCM_SYSTEM_MPI @SYSTEM_MPI@)
-@MPI_HOME_DEF@
 ########################################################################
 
 # Set up include path
@@ -22,6 +18,20 @@ LIST(APPEND CMAKE_MODULE_PATH
 
 # This includes the configuration, both default and local
 include(OpenCMISSConfig)
+
+########################################################################
+# These values will be put in place at generation phase.
+# They could've also been passed over as command line definitions, however,
+# this would allow to mess with them later. As this is the top level CMakeLists.txt
+# for this specific compiler/mpi choice and sub-external projects rely on this
+# choice, it's hard-coded rather than being modifiable (externally).
+@TOOLCHAIN_DEF@
+SET(MPI @MPI@)
+SET(OCM_SYSTEM_MPI @SYSTEM_MPI@)
+SET(OCM_DEBUG_MPI @DEBUG_MPI@)
+SET(MPI_BUILD_TYPE @MPI_BUILD_TYPE@)
+@MPI_HOME_DEF@
+########################################################################
 
 # Between reading the config and starting the setup project.. this is the time for compiler stuff!
 include(ToolchainSetup)

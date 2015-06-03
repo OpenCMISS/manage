@@ -5,8 +5,8 @@
 # handle it.
 #
 # 1. Nothing specified - Call FindMPI and let it come up with whatever is found on the default path
-#  a. OCM_SYSTEM_MPI = NO AND/OR No MPI found - Prescribe a reasonable system default choice and go with that
-#  b. OCM_SYSTEM_MPI = YES AND MPI found - Use the MPI implementation found on PATH/environment 
+#  a. SYSTEM_MPI = NO AND/OR No MPI found - Prescribe a reasonable system default choice and go with that
+#  b. SYSTEM_MPI = YES AND MPI found - Use the MPI implementation found on PATH/environment 
 # 2. MPI_HOME specified - Look exclusively at that location for binaries/libraries
 #  a. MPI FOUND - ok, detect type and forward that
 #  b. MPI NOT FOUND - Error and abort
@@ -36,7 +36,7 @@ if(NOT DEFINED MPI)
             message(FATAL_ERROR "No MPI found at MPI_HOME=${MPI_HOME}")
         endif()
     # No MPI or MPI_HOME - let cmake look and find MPI.
-    elseif(OCM_SYSTEM_MPI)
+    elseif(SYSTEM_MPI)
         message(STATUS "Looking for system MPI...")
         find_package(MPI )#QUIET
     endif()
