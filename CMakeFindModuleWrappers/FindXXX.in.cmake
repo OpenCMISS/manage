@@ -16,31 +16,35 @@ function(append_link_library TARGET LIB)
 endfunction()
 
 function(my_add_library TARGET LIB)
-    add_library(${TARGET} UNKNOWN IMPORTED)
-    set_property(TARGET ${TARGET} APPEND PROPERTY
-        IMPORTED_CONFIGURATIONS ${CURRENT_BUILD_TYPE})
-    # Treat apple frameworks separate
-    # See http://stackoverflow.com/questions/12547624/cant-link-macos-frameworks-with-cmake
-    if(APPLE AND ${LIB} MATCHES ".framework$")
-        STRING(REGEX REPLACE ".*/([A-Za-z0-9.]+).framework$" "\\1" FW_NAME ${LIB})
-        #message(STATUS "Matched '${FW_NAME}' to ${LIB}")
-        SET(LIB "${LIB}/${FW_NAME}")
-    endif()
-    set_target_properties(${TARGET} PROPERTIES 
-            IMPORTED_LOCATION_${CURRENT_BUILD_TYPE} ${LIB})
-    # Simply add the m and rt libraries if suitable
-    if(UNIX)
-        append_link_library(${TARGET} m)
-        if(NOT APPLE)
-            append_link_library(${TARGET} rt)
+    if (NOT TARGET ${TARGET})
+        add_library(${TARGET} UNKNOWN IMPORTED)
+        set_property(TARGET ${TARGET} APPEND PROPERTY
+            IMPORTED_CONFIGURATIONS ${CURRENT_BUILD_TYPE})
+        # Treat apple frameworks separate
+        # See http://stackoverflow.com/questions/12547624/cant-link-macos-frameworks-with-cmake
+        if(APPLE AND ${LIB} MATCHES ".framework$")
+            STRING(REGEX REPLACE ".*/([A-Za-z0-9.]+).framework$" "\\1" FW_NAME ${LIB})
+            #message(STATUS "Matched '${FW_NAME}' to ${LIB}")
+            SET(LIB "${LIB}/${FW_NAME}")
         endif()
-    endif()
-    if (INCS)
         set_target_properties(${TARGET} PROPERTIES 
-            INTERFACE_INCLUDE_DIRECTORIES "${INCS}")
+                IMPORTED_LOCATION_${CURRENT_BUILD_TYPE} ${LIB})
+        # Simply add the m and rt libraries if suitable
+        if(UNIX)
+            append_link_library(${TARGET} m)
+            if(NOT APPLE)
+                append_link_library(${TARGET} rt)
+            endif()
+        endif()
+        if (INCS)
+            set_target_properties(${TARGET} PROPERTIES 
+                INTERFACE_INCLUDE_DIRECTORIES "${INCS}")
+        endif()
+        #include(~/hpc/ocms/utilities/FunctionDefinitions.cmake)
+        #echo_target(${ALL_TARGETS})
+    else()
+        message(STATUS "Find@PACKAGE_NAME@: Already have target '${TARGET}', skipping.")
     endif()
-    #include(~/hpc/ocms/utilities/FunctionDefinitions.cmake)
-    #echo_target(${ALL_TARGETS})
 endfunction()
 
 macro(MODULE_TO_TARGETS LIBS INCS)
