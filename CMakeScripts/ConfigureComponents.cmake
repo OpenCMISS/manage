@@ -172,8 +172,6 @@ if (OCM_USE_MUMPS)
             USE_PTSCOTCH=${MUMPS_WITH_PTSCOTCH}
             PTSCOTCH_VERSION=${PTSCOTCH_VERSION}
             SCOTCH_VERSION=${SCOTCH_VERSION}
-            SCOTCH_WITH_ZLIB=${SCOTCH_WITH_ZLIB} #Dirty hack, see mumps dependency main CMakeLists.txt
-            ZLIB_VERSION=${ZLIB_VERSION} # Belongs to dirty hack
             USE_PARMETIS=${MUMPS_WITH_PARMETIS}
             PARMETIS_VERSION=${PARMETIS_VERSION}
         )
@@ -262,8 +260,6 @@ if (OCM_USE_PASTIX)
             USE_THREADS=${PASTIX_USE_THREADS}
             USE_METIS=${PASTIX_USE_METIS}
             USE_PTSCOTCH=${PASTIX_USE_PTSCOTCH}
-            SCOTCH_WITH_ZLIB=${SCOTCH_WITH_ZLIB} #Dirty hack, see mumps dependency main CMakeLists.txt
-            ZLIB_VERSION=${ZLIB_VERSION} # Belongs to dirty hack
         )
     endif()
 endif()
@@ -297,8 +293,6 @@ if (OCM_USE_PETSC)
             SUNDIALS_VERSION=${SUNDIALS_VERSION}
             SUPERLU_VERSION=${SUPERLU_VERSION}
             SUPERLU_DIST_VERSION=${SUPERLU_DIST_VERSION}
-            SCOTCH_WITH_ZLIB=${SCOTCH_WITH_ZLIB} #Dirty hack, see petsc dependency main CMakeLists.txt
-            ZLIB_VERSION=${ZLIB_VERSION} # Belongs to dirty hack
         )
     endif()
 endif()
@@ -355,7 +349,6 @@ endif()
 if (OCM_USE_IRON)
     set(SUBGROUP_PATH .)
     set(GITHUB_ORGANIZATION OpenCMISS)
-    
     ADD_COMPONENT(IRON
         WITH_CELLML=${IRON_WITH_CELLML}
         WITH_FIELDML=${IRON_WITH_FIELDML} 
