@@ -2,6 +2,7 @@
 #SET(INT_TYPE int32)
 #SET(BUILD_TESTS ON)
 #SET(BUILD_SHARED_LIBS YES)
+#set(CMAKE_BUILD_TYPE DEBUG)
 
 # ==============================
 # Misc

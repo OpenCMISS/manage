@@ -136,7 +136,6 @@ file(MAKE_DIRECTORY ${MAIN_BINARY_DIR})
 
 # # Create a local config file at target folder if not exists
 include(CreateLocalConfig)
-CREATE_OPENCMISS_LOCALCONFIG(${MAIN_BINARY_DIR})
 
 # Configure the main build CMakeLists.txt
 if (TOOLCHAIN)
@@ -145,8 +144,11 @@ endif()
 if (MPI_HOME)
     SET(MPI_HOME_DEF "SET(MPI_HOME ${MPI_HOME})")
 endif()
+if (CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
+    set(CMAKE_INSTALL_PREFIX ${OPENCMISS_ROOT}/install CACHE STRING "OpenCMISS installation root" FORCE)
+endif()
 configure_file(
-    ${OPENCMISS_MANAGE_DIR}/CMakeScripts/CMakeLists.main.template.cmake # from
+    ${OPENCMISS_MANAGE_DIR}/Templates/CMakeLists.main.template.cmake # from
     ${MAIN_BINARY_DIR}/CMakeLists.txt # to
     @ONLY # only @-tags
 )

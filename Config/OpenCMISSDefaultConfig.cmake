@@ -1,8 +1,6 @@
 # ==============================
 # Build configuration
 # ==============================
-SET(OCM_USE_IRON YES)
-SET(OCM_USE_ZINC NO)
 
 # Precision to build (if applicable)
 # Valid choices are s,d,c,z and any combinations.
@@ -10,14 +8,14 @@ SET(OCM_USE_ZINC NO)
 # d: Double precision
 # c: Complex / float precision
 # z: Complex / double precision
-SET(BUILD_PRECISION sd)
+set(BUILD_PRECISION sd CACHE STRING "Build precisions for OpenCMISS components. Choose any of [sdcz]")
 
 # The integer types that can be used (if applicable)
 # Used only by PASTIX yet
-SET(INT_TYPE int32)
+set(INT_TYPE int32 CACHE STRING "OpenCMISS integer type (only used by PASTIX yet)")
 
 # Also build tests?
-SET(BUILD_TESTS ON)
+option(BUILD_TESTS "Build OpenCMISS(-components) tests" ON)
 
 option(PARALLEL_BUILDS "Use multithreading (-jN etc) for builds" ON)
 
@@ -119,6 +117,7 @@ SET(SUNDIALS_WITH_LAPACK YES)
 
 SET(SCOTCH_USE_THREADS YES)
 SET(SCOTCH_WITH_ZLIB YES)
+SET(SCOTCH_WITH_BZIP2 YES)
 
 SET(SUPERLU_DIST_WITH_PARMETIS YES)
 

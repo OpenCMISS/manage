@@ -66,10 +66,9 @@ if (NOT MPI_FOUND)
         message(STATUS "Build params: ${_MPI_EXTRA_PARAMS}")
         
         # Dont download again if the target source folder already contains files 
-        file(GLOB _MPI_FILES ${_MPI_SOURCE_DIR})
-        list(LENGTH ${_MPI_FILES} _NUM_MPI_FILES)
-        set(DOWNLOAD_COMMANDS )
-        if(RES_LEN EQUAL 0)
+        file(GLOB _MPI_FILES ${_MPI_SOURCE_DIR}/)
+        set(DOWNLOAD_COMMANDS DOWNLOAD_COMMAND "")
+        if("" STREQUAL "${_MPI_FILES}")
             set(DOWNLOAD_COMMANDS 
                 DOWNLOAD_DIR ${_MPI_SOURCE_DIR}/src-download
                 URL https://github.com/OpenCMISS-Dependencies/${MPI}/archive/${_MPI_BRANCH}.zip

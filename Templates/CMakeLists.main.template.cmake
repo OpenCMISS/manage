@@ -6,13 +6,12 @@
 # choice, it's hard-coded rather than being modifiable (externally).
 SET(OPENCMISS_ROOT @OPENCMISS_ROOT@)
 SET(OPENCMISS_MANAGE_DIR @OPENCMISS_MANAGE_DIR@)
+set(OPENCMISS_INSTALL_ROOT @CMAKE_INSTALL_PREFIX@)
 ########################################################################
 
 # Set up include path
 LIST(APPEND CMAKE_MODULE_PATH
     ${OPENCMISS_MANAGE_DIR}
-    ${OPENCMISS_MANAGE_DIR}/CMakeFindModuleWrappers
-    ${OPENCMISS_MANAGE_DIR}/CMakeModules
     ${OPENCMISS_MANAGE_DIR}/CMakeScripts
     ${OPENCMISS_MANAGE_DIR}/Config)
 
@@ -50,8 +49,9 @@ include(OCMSetupArchitecture)
 include(OCMSetupBuildMacros)
 
 ########################################################################
-# Utilities (Wrappers, Fortran interface ...)
-include(Utilities)
+# Utilities
+include(InstallFindModuleWrappers)
+include(DetectFortranMangling)
 
 # Multithreading
 if(OCM_USE_MT)
@@ -87,8 +87,8 @@ SET(OPENCMISS_COMPONENTS_BINARY_DIR_MPI ${OPENCMISS_ROOT}/build/${ARCHITECTURE_P
 # Extra path segment for single configuration case - will give release/debug/...
 get_build_type_extra(BUILDTYPEEXTRA)
 # everything from the OpenCMISS main project goes into install/
-SET(OPENCMISS_COMPONENTS_INSTALL_PREFIX ${OPENCMISS_ROOT}/install/${ARCHITECTURE_PATH}/${BUILDTYPEEXTRA})
-SET(OPENCMISS_COMPONENTS_INSTALL_PREFIX_MPI ${OPENCMISS_ROOT}/install/${ARCHITECTURE_PATH_MPI}/${BUILDTYPEEXTRA})
+SET(OPENCMISS_COMPONENTS_INSTALL_PREFIX ${OPENCMISS_INSTALL_ROOT}/${ARCHITECTURE_PATH}/${BUILDTYPEEXTRA})
+SET(OPENCMISS_COMPONENTS_INSTALL_PREFIX_MPI ${OPENCMISS_INSTALL_ROOT}/${ARCHITECTURE_PATH_MPI}/${BUILDTYPEEXTRA})
 # Misc definitions
 # The COMMON_PACKAGE_CONFIG_DIR contains the cmake-generated target config files consumed by find_package(... CONFIG).
 # Those are "usually" placed under the lib/ folders of the installation tree, however, the OpenCMISS build system

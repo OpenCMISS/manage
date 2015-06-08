@@ -38,11 +38,10 @@ else()
     endif()
     ################@TEMP@#################
     SET(DOWNLOAD_CMDS
-        DOWNLOAD_DIR ${OPENCMISS_EXAMPLES_SRC_DIR}/src-download
+        DOWNLOAD_DIR ${OPENCMISS_ROOT}/src/download
         #URL https://github.com/${GITHUB_ORGANIZATION}/${FOLDER_NAME}/archive/${${COMPONENT_NAME}_BRANCH}.zip
-        ################@TEMP@#################
+        DOWNLOAD_NO_PROGRESS 1
         URL ${EXAMPLES_REPO}/archive/${EXAMPLES_BRANCH}.zip
-        ################@TEMP@#################
     )
 endif()
 message(STATUS "Configuring build of OpenCMISS-Examples ('examples' target) at ${OPENCMISS_EXAMPLES_BUILD_DIR}")
@@ -52,6 +51,7 @@ ExternalProject_Add(examples-download
     STAMP_DIR ${OPENCMISS_EXAMPLES_SRC_DIR}/ep_stamps
     EXCLUDE_FROM_ALL 1
     ${DOWNLOAD_CMDS}
+    SOURCE_DIR ${OPENCMISS_EXAMPLES_SRC_DIR}
     CONFIGURE_COMMAND ""
     BUILD_COMMAND ""
     INSTALL_COMMAND ""
@@ -70,5 +70,5 @@ add_custom_target(examples
     DEPENDS examples-download examples-build
     EXCLUDE_FROM_ALL 1
 )
-# We dont want to build the examples project by default - you got to trigger it.
-set_target_properties(examples PROPERTIES EXCLUDE_FROM_ALL TRUE)
+# We dont want to build the examples by default - you got to trigger it.
+#set_target_properties(examples-build examples-download PROPERTIES EXCLUDE_FROM_ALL TRUE)
