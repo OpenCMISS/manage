@@ -2,7 +2,7 @@
 SET(OCM_USE_ARCHITECTURE_PATH YES)
 
 # Set this to YES to build with the -p profiling flags.
-SET(OCM_WITH_PROFILING NO)
+set(OCM_WITH_PROFILING NO)
 
 # If you set a github username, cmake will automatically try and locate all the components as repositories under that github account.
 #SET(GITHUB_USERNAME )

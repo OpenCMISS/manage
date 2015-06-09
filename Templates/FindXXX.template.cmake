@@ -46,7 +46,7 @@ else()
     
     # Make "native" call to find_package in MODULE mode first
     message(STATUS "Trying to find @PACKAGE_CASENAME@ ${@PACKAGE_CASENAME@_FIND_VERSION} in MODULE mode")
-    message(STATUS "(CMAKE_MODULE_PATH: ${CMAKE_MODULE_PATH})")
+    #message(STATUS "CMAKE_MODULE_PATH: ${CMAKE_MODULE_PATH}\nCMAKE_SYSTEM_PREFIX_PATH=${CMAKE_SYSTEM_PREFIX_PATH}\nPATH=$ENV{PATH}\nLD_LIBRARY_PATH=$ENV{LD_LIBRARY_PATH}")
     
     # Temporarily disable the required flag (if set from outside)
     SET(_PKG_REQ_OLD ${@PACKAGE_CASENAME@_FIND_REQUIRED})
@@ -57,6 +57,7 @@ else()
     LIST(REMOVE_ITEM CMAKE_SYSTEM_PREFIX_PATH ${CMAKE_INSTALL_PREFIX})
     
     # Actual MODULE mode find call
+    #message(STATUS "find_package(@PACKAGE_CASENAME@ ${@PACKAGE_CASENAME@_FIND_VERSION} MODULE QUIET)")
     find_package(@PACKAGE_CASENAME@ ${@PACKAGE_CASENAME@_FIND_VERSION} MODULE QUIET)
     
     # Restore stuff
@@ -114,11 +115,13 @@ else()
     else()
         #message(STATUS "Trying to find @PACKAGE_CASENAME@ ${@PACKAGE_CASENAME@_FIND_VERSION} in CONFIG mode")
         # First look outside the prefix path
+        #message(STATUS "find_package(@PACKAGE_CASENAME@ ${@PACKAGE_NAME@_FIND_VERSION} CONFIG QUIET NO_CMAKE_PATH)")
         find_package(@PACKAGE_CASENAME@ ${@PACKAGE_NAME@_FIND_VERSION} CONFIG QUIET NO_CMAKE_PATH)
         
         # If not found, look also at the prefix path
         if (NOT @PACKAGE_CASENAME@_FOUND)
             message(STATUS "No system @PACKAGE_CASENAME@ found/available")
+            #message(STATUS "find_package(@PACKAGE_CASENAME@ ${@PACKAGE_CASENAME@_FIND_VERSION} CONFIG QUIET PATHS ${CMAKE_PREFIX_PATH})")
             find_package(@PACKAGE_CASENAME@ ${@PACKAGE_CASENAME@_FIND_VERSION} CONFIG
                 QUIET
                 PATHS ${CMAKE_PREFIX_PATH}

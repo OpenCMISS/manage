@@ -95,7 +95,7 @@ SET(CSIM_VERSION 1.0)
 # will be "master" finally
 SET(IRON_BRANCH iron)
 # Needs to be here until the repo's name is "iron", then it's compiled automatically (see Iron.cmake/BuildMacros)
-SET(IRON_REPO https://github.com/OpenCMISS/cm)
+SET(IRON_REPO https://github.com/rondiplomatico/iron)
 
 # ==========================================================================================
 # Single module configuration

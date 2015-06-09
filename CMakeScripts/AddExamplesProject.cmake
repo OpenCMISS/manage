@@ -34,7 +34,7 @@ else()
     # Temporary fix to also adhere to "custom" repository locations when in user mode.
     # Should be removed in final version.
     if (NOT EXAMPLES_REPO)
-        SET(EXAMPLES_REPO https://github.com/OpenCMISS/examples)
+        SET(EXAMPLES_REPO https://github.com/rondiplomatico/examples)
     endif()
     ################@TEMP@#################
     SET(DOWNLOAD_CMDS
