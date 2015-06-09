@@ -27,7 +27,9 @@ foreach(OCM_COMP ${OPENCMISS_COMPONENTS})
 endforeach()
 
 # OpenCMISS find modules - wrapper
-set(OPENCMISS_MODULE_PATH ${OPENCMISS_FINDMODULE_WRAPPER_DIR})
+set(OPENCMISS_MODULE_PATH
+    ${OPENCMISS_FINDMODULE_WRAPPER_DIR}
+    ${OPENCMISS_INSTALL_ROOT}/cmake/OpenCMISSExtraFindModules)
 list(APPEND EXPORT_VARS OPENCMISS_MODULE_PATH)
 
 set(CFILE ${OPENCMISS_COMPONENTS_INSTALL_PREFIX_MPI}/OpenCMISSBuildContext.cmake)
@@ -48,8 +50,8 @@ unset(CFILE)
 
 # Second part - copy the FindModule files so that the installation folder is self-contained
 #message(STATUS "Exporting OpenCMISS wrapper module files to ${OPENCMISS_MODULE_PATH}")
-#file(COPY ${OPENCMISS_MANAGE_DIR}/CMakeModules/FindOpenCMISS.cmake
-#    DESTINATION ${OPENCMISS_COMPONENTS_INSTALL_PREFIX}/cmake/modules)
+file(COPY ${OPENCMISS_MANAGE_DIR}/CMakeModules/
+    DESTINATION ${OPENCMISS_INSTALL_ROOT}/cmake/OpenCMISSExtraFindModules)
 #file(COPY ${OPENCMISS_MANAGE_DIR}/CMakeFindModuleWrappers/ 
 #    DESTINATION ${OPENCMISS_COMPONENTS_INSTALL_PREFIX}/cmake/modules
 #    PATTERN FindXXX.cmake EXCLUDE)
