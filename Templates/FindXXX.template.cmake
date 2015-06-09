@@ -23,6 +23,7 @@ SET(@PACKAGE_CASENAME@_FOUND NO)
 # The default way is to look for components in the current PREFIX_PATH, e.g. own build components.
 # If a LOCAL flag is set for a package, the MODULE and CONFIG modes are tried outside the PREFIX PATH first.
 if (NOT OCM_SYSTEM_@PACKAGE_NAME@)
+     set(OCM_SYSTEM_@PACKAGE_NAME@ NO) # set it to NO so that we have a value if none is set at all (debug output)
      find_package(@PACKAGE_CASENAME@ ${@PACKAGE_CASENAME@_FIND_VERSION} CONFIG
         PATHS ${CMAKE_PREFIX_PATH}
         QUIET
@@ -142,5 +143,12 @@ else()
 endif()
 
 if (@PACKAGE_CASENAME@_FIND_REQUIRED AND NOT @PACKAGE_CASENAME@_FOUND)
-    message(FATAL_ERROR "Could not find @PACKAGE_CASENAME@ with either MODULE or CONFIG mode.\nCMAKE_MODULE_PATH: ${CMAKE_MODULE_PATH}\nCMAKE_PREFIX_PATH: ${CMAKE_PREFIX_PATH}")
+    message(FATAL_ERROR "OpenCMISS FindModuleWrapper error!\n"
+        "Could not find @PACKAGE_CASENAME@ ${@PACKAGE_CASENAME@_FIND_VERSION} with either MODULE or CONFIG mode.\n"
+        "CMAKE_MODULE_PATH: ${CMAKE_MODULE_PATH}\n"
+        "CMAKE_PREFIX_PATH: ${CMAKE_PREFIX_PATH}\n"
+        "Allow system @PACKAGE_NAME@: ${OCM_SYSTEM_@PACKAGE_NAME@}\n"
+        "Please check your OpenCMISSLocalConfig file and ensure to set USE_@PACKAGE_NAME@=YES\n"
+        "Alternatively, refer to CMake(Output|Error).log in ${PROJECT_BINARY_DIR}/CMakeFiles\n"
+    )
 endif()
