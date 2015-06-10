@@ -179,6 +179,7 @@ foreach (lang C CXX Fortran)
     unset(_MPI_${id}_${lang}_COMPILER_NAMES)    # clean up the namespace here
   endforeach()
 endforeach()
+messagev("FindMPI: Looking for _MPI_C_COMPILER_NAMES=${_MPI_C_COMPILER_NAMES}, _MPI_CXX_COMPILER_NAMES=${_MPI_CXX_COMPILER_NAMES}, _MPI_Fortran_COMPILER_NAMES=${_MPI_Fortran_COMPILER_NAMES}")
 
 # Names to try for MPI exec
 set(_MPI_EXEC_NAMES mpiexec mpirun lamexec srun)
@@ -257,7 +258,7 @@ else()
             message(WARNING "MPI implementation unknown. Compilation process has not been tested/verified yet")
         else()
             messagev(FATAL_ERROR "Unknown MPI value '${MPI}'. Your options:
-1. Use one of 'mpich','mpich2','openmpi','intel' or 'mvapich2'
+1. Use one of 'mpich','mpich2','openmpi','intel','mvapich2' or 'msmpi'
 2. Do not define the MPI variable and let CMake find the system default")
         endif()
     endif()
@@ -404,7 +405,7 @@ function (interrogate_mpi_compiler lang try_libs)
         endif()
       endif()
 
-      # MPICH just uses "-show". Try it.
+      # MPICH or Intel just uses "-show". Try it.
       if (NOT MPI_COMPILER_RETURN EQUAL 0)
         _mpi_check_compiler("${MPI_${lang}_COMPILER}" "-show" MPI_COMPILE_CMDLINE MPI_COMPILER_RETURN)
       endif()

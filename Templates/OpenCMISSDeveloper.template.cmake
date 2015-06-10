@@ -4,6 +4,9 @@ SET(OCM_USE_ARCHITECTURE_PATH YES)
 # Set this to YES to build with the -p profiling flags.
 set(OCM_WITH_PROFILING NO)
 
+# Override the default setting when being an OpenCMISS-Developer - you of all should build and run tests!
+set(BUILD_TESTS ON)
+
 # If you set a github username, cmake will automatically try and locate all the components as repositories under that github account.
 #SET(GITHUB_USERNAME )
 
