@@ -38,7 +38,7 @@ if(NOT DEFINED MPI)
     # No MPI or MPI_HOME - let cmake look and find MPI.
     elseif(SYSTEM_MPI)
         message(STATUS "Looking for system MPI...")
-        find_package(MPI )#QUIET
+        find_package(MPI)
     endif()
 
     # If we have found MPI by now, it's either system MPI or the one specified at MPI_HOME.

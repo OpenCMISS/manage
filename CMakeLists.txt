@@ -111,14 +111,12 @@ else()
     endif()
 endif()
 
- # Whether to allow a system search for MPI implementations
-if (WIN32)
-    # On Windows, we will always have a look for system mpi installations
-    set(_SYSMPI_DEF YES)
-else()
-    set(_SYSMPI_DEF NO)
+# MPI
+if (DEFINED MPI)
+    string(TOLOWER ${MPI} MPI)
 endif()
-option(SYSTEM_MPI "Allow to use a system MPI if found" ${_SYSMPI_DEF})
+# Whether to allow a system search for MPI implementations
+option(SYSTEM_MPI "Allow to use a system MPI if found" YES)
 option(DEBUG_MPI "Use DEBUG version of MPI (works only for own builds thus far)" NO)
 if (DEBUG_MPI)
     set(MPI_BUILD_TYPE debug)

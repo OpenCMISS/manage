@@ -37,7 +37,7 @@ include(ToolchainSetup)
 
 ########################################################################
 # Ready to start the "build project"
-CMAKE_MINIMUM_REQUIRED(VERSION 3.2.0-rc1 FATAL_ERROR)
+CMAKE_MINIMUM_REQUIRED(VERSION @CMAKE_MIN_VERSION@ FATAL_ERROR)
 project(OpenCMISS-Build VERSION 1.0 LANGUAGES C CXX Fortran)
 if ((NOT WIN32 OR MINGW) AND CMAKE_BUILD_TYPE STREQUAL "")
     SET(CMAKE_BUILD_TYPE RELEASE)

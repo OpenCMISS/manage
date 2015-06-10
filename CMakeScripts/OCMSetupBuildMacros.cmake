@@ -22,38 +22,41 @@ MACRO(ADD_COMPONENT COMPONENT_NAME)
     message(STATUS "Configuring build of ${COMPONENT_NAME} in ${COMPONENT_BUILD_DIR}...")
     
     # OpenMP multithreading
-    foreach(DEP ${OPENCMISS_COMPONENTS_WITH_OPENMP})
-        if(${DEP} STREQUAL ${COMPONENT_NAME})
-            LIST(APPEND COMPONENT_DEFS
-                -DWITH_OPENMP=${OCM_USE_MT}
-            )
-        endif()
-    endforeach()
+    if(${COMPONENT_NAME} IN_LIST OPENCMISS_COMPONENTS_WITH_OPENMP)
+        LIST(APPEND COMPONENT_DEFS
+            -DWITH_OPENMP=${OCM_USE_MT}
+        )
+    endif()
     
     # check if MPI compilers should be forwarded/set
     # so that the local FindMPI uses that
-    foreach(DEP ${OPENCMISS_COMPONENTS_WITHMPI})
-        if(${DEP} STREQUAL ${COMPONENT_NAME})
-            # Pass on settings and take care to undefine them if no longer used at this level
-            if (MPI)
-                LIST(APPEND COMPONENT_DEFS -DMPI=${MPI})
-            else()
-                LIST(APPEND COMPONENT_DEFS -UMPI)
-            endif()
-            if (MPI_HOME)
-                LIST(APPEND COMPONENT_DEFS -DMPI_HOME=${MPI_HOME})
-            else()
-                LIST(APPEND COMPONENT_DEFS -UMPI_HOME)
-            endif()
-            #foreach(lang C CXX Fortran)
-            #    if(MPI_${lang}_COMPILER)
-            #        LIST(APPEND COMPONENT_DEFS
-            #            -DMPI_${lang}_COMPILER=${MPI_${lang}_COMPILER}
-            #        )
-            #    endif()
-            #endforeach()
+    if(${COMPONENT_NAME} IN_LIST OPENCMISS_COMPONENTS_WITHMPI)
+        # Pass on settings and take care to undefine them if no longer used at this level
+        if (MPI)
+            LIST(APPEND COMPONENT_DEFS -DMPI=${MPI})
+        else()
+            LIST(APPEND COMPONENT_DEFS -UMPI)
         endif()
-    endforeach()
+        if (MPI_HOME)
+            LIST(APPEND COMPONENT_DEFS -DMPI_HOME=${MPI_HOME})
+        else()
+            LIST(APPEND COMPONENT_DEFS -UMPI_HOME)
+        endif()
+        # Override Compilers with MPI compilers
+        # for all components that may use MPI
+        foreach(lang C CXX Fortran)
+            if(MPI_${lang}_COMPILER)
+                LIST(APPEND COMPONENT_DEFS
+                    # Directly specify the compiler wrapper as compiler!
+                    # That is a perfect workaround for the "finding MPI after compilers have been initialized" problem
+                    # that occurs when building a component directly. 
+                    -DCMAKE_${lang}_COMPILER=${MPI_${lang}_COMPILER}
+                    # Also specify the MPI_ versions so that FindMPI is faster
+                    -DMPI_${lang}_COMPILER=${MPI_${lang}_COMPILER}
+                )
+            endif()
+        endforeach()
+    endif()
     
 	# Forward any other variables
     foreach(extra_def ${ARGN})
