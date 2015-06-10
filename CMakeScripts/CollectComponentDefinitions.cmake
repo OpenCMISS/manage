@@ -71,3 +71,9 @@ endif()
 if (CMAKE_VERBOSE_MAKEFILE)
     list(APPEND COMPONENT_COMMON_DEFS -DCMAKE_VERBOSE_MAKEFILE=YES)
 endif()
+
+# BLAS vendor
+# If set, propagate it to any component so that the correct libraries are used.
+if (BLA_VENDOR)
+    list(APPEND COMPONENT_COMMON_DEFS -DBLA_VENDOR=${BLA_VENDOR})
+endif()
