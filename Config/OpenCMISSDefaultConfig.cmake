@@ -22,6 +22,9 @@ option(PARALLEL_BUILDS "Use multithreading (-jN etc) for builds" ON)
 # Type of libraries to build
 option(BUILD_SHARED_LIBS "Build shared libraries" NO)
 option(OCM_POSITION_INDEPENDENT_CODE "Always generate position independent code (-fPIC flag)" NO)
+# Debug postfix
+set(CMAKE_DEBUG_POSTFIX d CACHE STRING "Debug postfix for library names of DEBUG-builds")
+
 
 # ==============================
 # Compilers
@@ -85,6 +88,7 @@ SET(FIELDML-API_VERSION 0.5.0)
 SET(LIBXML2_VERSION 2.7.6)
 SET(LLVM_VERSION 3.4)
 SET(GTEST_VERSION 1.7.0)
+set(HDF5_VERSION 1.8.11)
 # MPI
 SET(OPENMPI_VERSION 1.8.4)
 SET(MPICH_VERSION 3.1.3)
@@ -124,6 +128,11 @@ SET(SUPERLU_DIST_WITH_PARMETIS YES)
 SET(PASTIX_USE_THREADS YES)
 SET(PASTIX_USE_METIS YES)
 SET(PASTIX_USE_PTSCOTCH YES)
+
+set(FIELDML-API_WITH_HDF5 NO)
+set(FIELDML-API_WITH_JAVA_BINDINGS NO)
+set(FIELDML-API_WITH_FORTRAN_BINDINGS YES)
+set(HDF5_WITH_MPI NO)
 
 SET(IRON_WITH_CELLML YES)
 SET(IRON_WITH_FIELDML NO)

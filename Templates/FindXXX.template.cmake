@@ -72,12 +72,14 @@ else()
         if (NOT TARGET @PACKAGE_TARGET@)
             set(LIBS ${@PACKAGE_NAME@_LIBRARIES})
             message(STATUS "Found package @PACKAGE_CASENAME@: ${LIBS}")
+            
             SET(INCS )
             foreach(DIRSUFF _INCLUDE_DIRS _INCLUDES _INCLUDE_PATH _INCLUDE_DIR)
                 if (DEFINED @PACKAGE_NAME@${DIRSUFF})
                     LIST(APPEND INCS ${@PACKAGE_NAME@${DIRSUFF}})
                 endif()
             endforeach()
+            message(STATUS "@PACKAGE_CASENAME@ include directories: ${INCS}")
             
             #message(STATUS "Converting found module to imported targets for package @PACKAGE_NAME@")
                 #":\nLibraries: ${LIBS}\nIncludes: ${INCS}")
@@ -104,6 +106,7 @@ else()
                     IMPORTED_CONFIGURATIONS ${CURRENT_BUILD_TYPE}
                     INTERFACE_INCLUDE_DIRECTORIES "${INCS}"
             )
+            
             list(REMOVE_AT LIBS 0)
             # Add non-matched libraries as link libraries so nothing gets forgotten
             foreach(LIB ${LIBS})

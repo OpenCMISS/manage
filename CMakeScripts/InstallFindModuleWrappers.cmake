@@ -6,6 +6,7 @@ SET(PACKAGES_WITH_TARGETS BLAS HYPRE LAPACK METIS
     
 # Some shipped find-package modules have a different case-sensitive spelling - need to stay consistent with that
 SET(LIBXML2_CASENAME LibXml2)
+SET(LIBXML2_TARGETNAME xml2)
 SET(BZIP2_CASENAME BZip2)
     
 # Generate the wrappers (if not existing)
@@ -19,7 +20,12 @@ foreach(PACKAGE_NAME ${PACKAGES_WITH_TARGETS})
     endif()
     SET(FILE ${OPENCMISS_FINDMODULE_WRAPPER_DIR}/Find${PACKAGE_CASENAME}.cmake)
     #if(NOT EXISTS ${FILE})
-        string(TOLOWER ${PACKAGE_NAME} PACKAGE_TARGET)
+        # Some packages have different target names than their package name
+        if (${PACKAGE_NAME}_TARGETNAME)
+            set(PACKAGE_TARGET ${${PACKAGE_NAME}_TARGETNAME})
+        else()
+            string(TOLOWER ${PACKAGE_NAME} PACKAGE_TARGET)    
+        endif()
         configure_file(${OPENCMISS_MANAGE_DIR}/Templates/FindXXX.template.cmake ${FILE} @ONLY)
     #endif()
 endforeach()
