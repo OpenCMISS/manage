@@ -31,4 +31,16 @@ if (NOT EXISTS ${MAIN_BINARY_DIR}/OpenCMISSLocalConfig.cmake)
     unset(_NL)
     unset(OCM_USE_SYSTEM_FLAGS)
     unset(OCM_USE_FLAGS)
+    
+    # Extra development part - allows to set localconfig variables directly
+    if (DEFINED DIRECT_VARS)
+        file(APPEND ${MAIN_BINARY_DIR}/OpenCMISSLocalConfig.cmake
+            "# Directly forwarded variables:\r\n"
+        )
+        foreach(VARNAME ${DIRECT_VARS})
+            file(APPEND ${MAIN_BINARY_DIR}/OpenCMISSLocalConfig.cmake
+                "set(${VARNAME} ${${VARNAME}})\r\n"
+            )
+        endforeach()
+    endif()
 endif()
