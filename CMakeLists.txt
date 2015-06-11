@@ -77,6 +77,7 @@ get_filename_component(OPENCMISS_ROOT ${OPENCMISS_ROOT} ABSOLUTE)
 # Set up include path required at this stage
 LIST(APPEND CMAKE_MODULE_PATH
     ${OPENCMISS_MANAGE_DIR}/CMakeScripts
+    ${OPENCMISS_MANAGE_DIR}/CMakeModules
     ${OPENCMISS_MANAGE_DIR}/Config)
 
 # This ensures that CMake is new enough before anything else is done

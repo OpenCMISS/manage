@@ -21,10 +21,11 @@ option(PARALLEL_BUILDS "Use multithreading (-jN etc) for builds" ON)
 
 # Type of libraries to build
 option(BUILD_SHARED_LIBS "Build shared libraries" NO)
+
 option(OCM_POSITION_INDEPENDENT_CODE "Always generate position independent code (-fPIC flag)" NO)
+
 # Debug postfix
 set(CMAKE_DEBUG_POSTFIX d CACHE STRING "Debug postfix for library names of DEBUG-builds")
-
 
 # ==============================
 # Compilers
@@ -41,7 +42,6 @@ option(OCM_USE_MT "Use multithreading in OpenCMISS (where applicable)" NO)
 
 # ==============================
 # Defaults for all dependencies
-# (including MPI!)
 # ==============================
 # This is changeable in the OpenCMISSLocalConfig file
 FOREACH(OCM_DEP ${OPENCMISS_COMPONENTS})

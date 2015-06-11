@@ -5,6 +5,9 @@
 # the module will only look there for compilers and use them.
 # The option 1) from below is still valid.
 #
+# I also switched the compiler search names, as the last match for a name seems to be used;
+# this is contra-intuitive to that regard that e.g. mpif77 is rather used than mpif90 if both are found.
+#
 # FindMPI
 # -------
 #
@@ -137,15 +140,15 @@ endmacro()
 set(_MPI_C_COMPILER_NAMES                  mpicc    mpcc      mpicc_r mpcc_r)
 set(_MPI_CXX_COMPILER_NAMES                mpicxx   mpiCC     mpcxx   mpCC    mpic++   mpc++
                                            mpicxx_r mpiCC_r   mpcxx_r mpCC_r  mpic++_r mpc++_r)
-set(_MPI_Fortran_COMPILER_NAMES            mpif95   mpif95_r  mpf95   mpf95_r
+set(_MPI_Fortran_COMPILER_NAMES            mpif77   mpif77_r  mpf77   mpf77_r
                                            mpif90   mpif90_r  mpf90   mpf90_r
-                                           mpif77   mpif77_r  mpf77   mpf77_r)
+                                           mpif95   mpif95_r  mpf95   mpf95_r)
 
 # GNU compiler names
 set(_MPI_GNU_C_COMPILER_NAMES              mpigcc mpgcc mpigcc_r mpgcc_r)
 set(_MPI_GNU_CXX_COMPILER_NAMES            mpig++ mpg++ mpig++_r mpg++_r)
-set(_MPI_GNU_Fortran_COMPILER_NAMES        mpigfortran mpgfortran mpigfortran_r mpgfortran_r
-                                           mpig77 mpig77_r mpg77 mpg77_r)
+set(_MPI_GNU_Fortran_COMPILER_NAMES        mpig77 mpig77_r mpg77 mpg77_r
+                                           mpigfortran mpgfortran mpigfortran_r mpgfortran_r)
 
 # Intel MPI compiler names
 set(_MPI_Intel_C_COMPILER_NAMES            mpiicc)
@@ -904,7 +907,7 @@ foreach (lang C CXX Fortran)
         if (NOT STORYTOLD AND MPI_${lang}_INCLUDE_PATH)
             list(GET MPI_${lang}_INCLUDE_PATH 0 _TMP_PATH)
             get_filename_component(_TMP_MPIDIR ${_TMP_PATH} DIRECTORY)
-            message(STATUS "MPI: Located ${MPI} at ${_TMP_MPIDIR}")
+            message(STATUS "FindMPI: Located ${MPI} at ${_TMP_MPIDIR}")
             unset(_TMP_MPIDIR)
             unset(_TMP_PATH)
             set(STORYTOLD YES)
