@@ -1,8 +1,6 @@
 # ==============================
 # Build configuration
 # ==============================
-SET(OCM_USE_IRON YES)
-SET(OCM_USE_ZINC NO)
 
 # Precision to build (if applicable)
 # Valid choices are s,d,c,z and any combinations.
@@ -10,20 +8,24 @@ SET(OCM_USE_ZINC NO)
 # d: Double precision
 # c: Complex / float precision
 # z: Complex / double precision
-SET(BUILD_PRECISION sd)
+set(BUILD_PRECISION sd CACHE STRING "Build precisions for OpenCMISS components. Choose any of [sdcz]")
 
 # The integer types that can be used (if applicable)
 # Used only by PASTIX yet
-SET(INT_TYPE int32)
+set(INT_TYPE int32 CACHE STRING "OpenCMISS integer type (only used by PASTIX yet)")
 
 # Also build tests?
-SET(BUILD_TESTS ON)
+option(BUILD_TESTS "Build OpenCMISS(-components) tests" OFF)
 
 option(PARALLEL_BUILDS "Use multithreading (-jN etc) for builds" ON)
 
 # Type of libraries to build
 option(BUILD_SHARED_LIBS "Build shared libraries" NO)
+
 option(OCM_POSITION_INDEPENDENT_CODE "Always generate position independent code (-fPIC flag)" NO)
+
+# Debug postfix
+set(CMAKE_DEBUG_POSTFIX d CACHE STRING "Debug postfix for library names of DEBUG-builds")
 
 # ==============================
 # Compilers
@@ -40,12 +42,17 @@ option(OCM_USE_MT "Use multithreading in OpenCMISS (where applicable)" NO)
 
 # ==============================
 # Defaults for all dependencies
-# (including MPI!)
 # ==============================
 # This is changeable in the OpenCMISSLocalConfig file
 FOREACH(OCM_DEP ${OPENCMISS_COMPONENTS})
-    # Use everything by default
-    option(OCM_USE_${OCM_DEP} "Use OpenCMISS component ${OCM_DEP}" YES)
+    LIST(FIND OPENCMISS_COMPONENTS_DISABLED_BY_DEFAULT ${OCM_DEP} _COMP_POS)
+    set(_VALUE YES)
+    if (_COMP_POS GREATER -1)
+        set(_VALUE NO)
+    endif()
+    # Use everything but the components in OPENCMISS_COMPONENTS_DISABLED_BY_DEFAULT
+    option(OCM_USE_${OCM_DEP} "Use OpenCMISS component ${OCM_DEP}" ${_VALUE})
+    
     # Look for some components on the system first before building
     LIST(FIND OPENCMISS_COMPONENTS_SYSTEM_BY_DEFAULT ${OCM_DEP} _COMP_POS)
     SET(_VALUE NO)
@@ -81,6 +88,7 @@ SET(FIELDML-API_VERSION 0.5.0)
 SET(LIBXML2_VERSION 2.7.6)
 SET(LLVM_VERSION 3.4)
 SET(GTEST_VERSION 1.7.0)
+set(HDF5_VERSION 1.8.11)
 # MPI
 SET(OPENMPI_VERSION 1.8.4)
 SET(MPICH_VERSION 3.1.3)
@@ -91,7 +99,7 @@ SET(CSIM_VERSION 1.0)
 # will be "master" finally
 SET(IRON_BRANCH iron)
 # Needs to be here until the repo's name is "iron", then it's compiled automatically (see Iron.cmake/BuildMacros)
-SET(IRON_REPO https://github.com/OpenCMISS/cm)
+SET(IRON_REPO https://github.com/rondiplomatico/iron)
 
 # ==========================================================================================
 # Single module configuration
@@ -113,6 +121,7 @@ SET(SUNDIALS_WITH_LAPACK YES)
 
 SET(SCOTCH_USE_THREADS YES)
 SET(SCOTCH_WITH_ZLIB YES)
+SET(SCOTCH_WITH_BZIP2 YES)
 
 SET(SUPERLU_DIST_WITH_PARMETIS YES)
 
@@ -120,6 +129,17 @@ SET(PASTIX_USE_THREADS YES)
 SET(PASTIX_USE_METIS YES)
 SET(PASTIX_USE_PTSCOTCH YES)
 
+set(FIELDML-API_WITH_HDF5 NO)
+set(FIELDML-API_WITH_JAVA_BINDINGS NO)
+set(FIELDML-API_WITH_FORTRAN_BINDINGS YES)
+set(HDF5_WITH_MPI NO)
+
 SET(IRON_WITH_CELLML YES)
+SET(IRON_WITH_FIELDML NO)
+SET(IRON_WITH_HYPRE YES)
+SET(IRON_WITH_SUNDIALS YES)
+SET(IRON_WITH_MUMPS YES)
+SET(IRON_WITH_SCALAPACK YES)
+SET(IRON_WITH_PETSC YES)
 
 SET(LIBXML2_WITH_ZLIB YES)

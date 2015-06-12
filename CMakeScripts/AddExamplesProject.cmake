@@ -1,6 +1,6 @@
 set(OPENCMISS_EXAMPLES_SRC_DIR ${OPENCMISS_ROOT}/examples)
-set(OPENCMISS_EXAMPLES_BUILD_DIR ${OPENCMISS_COMPONENTS_BINARY_DIR}/examples)
-set(OPENCMISS_EXAMPLES_INSTALL_PREFIX ${OPENCMISS_COMPONENTS_INSTALL_PREFIX}/examples)
+set(OPENCMISS_EXAMPLES_BUILD_DIR ${OPENCMISS_ROOT}/build/examples/${ARCHITECTURE_PATH_MPI})
+set(OPENCMISS_EXAMPLES_INSTALL_PREFIX ${OPENCMISS_ROOT}/install/examples/${ARCHITECTURE_PATH_MPI})
 set(EXAMPLES_BRANCH cmake)
 
 # git repo or zip!
@@ -34,26 +34,41 @@ else()
     # Temporary fix to also adhere to "custom" repository locations when in user mode.
     # Should be removed in final version.
     if (NOT EXAMPLES_REPO)
-        SET(EXAMPLES_REPO https://github.com/OpenCMISS/examples)
+        SET(EXAMPLES_REPO https://github.com/rondiplomatico/examples)
     endif()
     ################@TEMP@#################
     SET(DOWNLOAD_CMDS
-        DOWNLOAD_DIR ${OPENCMISS_EXAMPLES_SRC_DIR}/src-download
+        DOWNLOAD_DIR ${OPENCMISS_ROOT}/src/download
         #URL https://github.com/${GITHUB_ORGANIZATION}/${FOLDER_NAME}/archive/${${COMPONENT_NAME}_BRANCH}.zip
-        ################@TEMP@#################
+        DOWNLOAD_NO_PROGRESS 1
         URL ${EXAMPLES_REPO}/archive/${EXAMPLES_BRANCH}.zip
-        ################@TEMP@#################
     )
 endif()
 message(STATUS "Configuring build of OpenCMISS-Examples ('examples' target) at ${OPENCMISS_EXAMPLES_BUILD_DIR}")
-ExternalProject_Add(examples
-    #DEPENDS IRON
+ExternalProject_Add(examples-download
+    PREFIX ${OPENCMISS_EXAMPLES_SRC_DIR}
+    TMP_DIR ${OPENCMISS_EXAMPLES_SRC_DIR}/ep_tmp
+    STAMP_DIR ${OPENCMISS_EXAMPLES_SRC_DIR}/ep_stamps
+    EXCLUDE_FROM_ALL 1
     ${DOWNLOAD_CMDS}
+    SOURCE_DIR ${OPENCMISS_EXAMPLES_SRC_DIR}
+    CONFIGURE_COMMAND ""
+    BUILD_COMMAND ""
+    INSTALL_COMMAND ""
+)
+ExternalProject_Add(examples-build
     PREFIX ${OPENCMISS_EXAMPLES_BUILD_DIR}
+    TMP_DIR ${OPENCMISS_EXAMPLES_BUILD_DIR}/ep_tmp
+    STAMP_DIR ${OPENCMISS_EXAMPLES_BUILD_DIR}/ep_stamps
+    EXCLUDE_FROM_ALL 1
     SOURCE_DIR ${OPENCMISS_EXAMPLES_SRC_DIR}
     BINARY_DIR ${OPENCMISS_EXAMPLES_BUILD_DIR}
     CMAKE_ARGS 
-        -DOPENCMISS_INSTALL_DIR=${OPENCMISS_COMPONENTS_INSTALL_PREFIX}
+        -DOPENCMISS_INSTALL_DIR=${OPENCMISS_COMPONENTS_INSTALL_PREFIX_MPI}
 )
-# We dont want to build the examples project by default - you got to trigger it.
-set_target_properties(examples PROPERTIES EXCLUDE_FROM_ALL TRUE)
+add_custom_target(examples
+    DEPENDS examples-download examples-build
+    EXCLUDE_FROM_ALL 1
+)
+# We dont want to build the examples by default - you got to trigger it.
+#set_target_properties(examples-build examples-download PROPERTIES EXCLUDE_FROM_ALL TRUE)

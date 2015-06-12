@@ -37,17 +37,19 @@ if(NOT DEFINED MPI)
         endif()
     # No MPI or MPI_HOME - let cmake look and find MPI.
     elseif(SYSTEM_MPI)
-        find_package(MPI QUIET)
+        message(STATUS "Looking for system MPI...")
+        find_package(MPI)
     endif()
 
     # If we have found MPI by now, it's either system MPI or the one specified at MPI_HOME.
     # Either way, we need to infer the MPI implementation from that.
     if (MPI_FOUND)
         # If we find MPI, we need to infer the MPI implementation for use in e.g. architecture paths
-        SET(MNEMONICS mpich mpich2 openmpi intel mvapich2)
+        SET(MNEMONICS mpich mpich2 openmpi intel mvapich2 msmpi)
         # Patterns to match the include path
-        SET(PATTERNS ".*mpich([/|-].*|$)" ".*mpich(2)?([/|-].*|$)" ".*openmpi([/|-].*|$)" ".*(intel|impi)[/|-].*" ".*mvapich(2)?([/|-].*|$)")
-        foreach(IDX RANGE 4)
+        SET(PATTERNS ".*mpich([/|-].*|$)" ".*mpich(2)?([/|-].*|$)" ".*openmpi([/|-].*|$)"
+         ".*(intel|impi)[/|-].*" ".*mvapich(2)?([/|-].*|$)" ".*microsoft(.*|$)")
+        foreach(IDX RANGE 5)
             LIST(GET MNEMONICS ${IDX} MNEMONIC)
             LIST(GET PATTERNS ${IDX} PATTERN)
             STRING(TOLOWER "${MPI_C_INCLUDE_PATH}" C_INC_PATH)

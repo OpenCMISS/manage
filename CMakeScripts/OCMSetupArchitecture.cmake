@@ -10,15 +10,8 @@ MACRO(GET_COMPILER_NAME VARNAME)
 		SET(${VARNAME} "watcom" )
 	ELSEIF( MSVC OR MSVC_IDE OR MSVC60 OR MSVC70 OR MSVC71 OR MSVC80 OR CMAKE_COMPILER_2005 OR MSVC90 )
 		SET(${VARNAME} "msvc" )
-	ELSEIF( CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX)
-	    execute_process(COMMAND ${CMAKE_C_COMPILER} -dumpversion
-	        RESULT_VARIABLE RES
-	        OUTPUT_VARIABLE VERSION
-	        OUTPUT_STRIP_TRAILING_WHITESPACE)
-	    if (NOT RES EQUAL 0)
-	        SET(VERSION "0.0")
-	    endif()
-	    SET(${VARNAME} gnu-${VERSION})
+	ELSEIF( CMAKE_COMPILER_IS_GNUCC)
+	    SET(${VARNAME} gnu-${CMAKE_C_COMPILER_VERSION})
 	ELSEIF(${CMAKE_C_COMPILER} MATCHES icc 
 	    OR ${CMAKE_CXX_COMPILER} MATCHES icpc
 	    OR ${CMAKE_Fortran_COMPILER} MATCHES ifort)
@@ -29,10 +22,20 @@ MACRO(GET_COMPILER_NAME VARNAME)
 ENDMACRO()
 
 # This function assembles the architecture path
-# We have [ARCH][COMPILER][MT][MPI][STATIC|SHARED]
-function(get_architecture_path VARNAME)
+# We have [ARCH][COMPILER][MT][MPI|no_mpi][STATIC|SHARED]
+#
+# This function returns two architecture paths, the first for mpi-unaware applications (VARNAME)
+# and the second for applications that link against an mpi implementation (VARNAME_MPI)
+#
+# # If the second argument is "SHORT" (literally), only the variable VARNAME will be set to a path with no mpi and static/shared parts
+function(get_architecture_path VARNAME VARNAME_MPI)
     SET(ARCHPATH )
-    
+    # If the second argument is "SHORT" (literally) we only return a path with no mpi part 
+    if (VARNAME_MPI STREQUAL SHORT)
+        set(IS_SHORT YES)
+    else()
+        set(IS_SHORT NO)
+    endif()
     if(OCM_USE_ARCHITECTURE_PATH)
         # Architecture/System
         STRING(TOLOWER ${CMAKE_SYSTEM_NAME} CMAKE_SYSTEM_NAME_LOWER)
@@ -47,18 +50,22 @@ function(get_architecture_path VARNAME)
         GET_COMPILER_NAME(COMPILER)
         SET(ARCHPATH ${ARCHPATH}/${COMPILER})
         
+        # Profiling
+        
         # Multithreading
         if (OCM_USE_MT)
             SET(ARCHPATH ${ARCHPATH}/mt)
         endif()
         
         # Short version is without MPI and static/shared path elements
-        if (${ARGC} EQUAL 1 OR NOT "${ARGV1}" STREQUAL SHORT)
+        if (NOT IS_SHORT)
             # MPI version information
-            if (NOT MPI STREQUAL none)
-                SET(MPI_PART ${MPI})
+            if (MPI STREQUAL none)
+                SET(MPI_PART "no_mpi")
             else()
-                SET(MPI_PART "sequential")
+                # Add the build type of MPI to the architecture path - we obtain different libraries
+                # for different mpi build types
+                SET(MPI_PART ${MPI}_${MPI_BUILD_TYPE})
             endif()
             SET(ARCHPATH ${ARCHPATH}/${MPI_PART})
             
@@ -75,7 +82,14 @@ function(get_architecture_path VARNAME)
     endif()
     
     # Append to desired variable
-    SET(${VARNAME} ${ARCHPATH} PARENT_SCOPE)
+    if (IS_SHORT)
+        SET(${VARNAME} ${ARCHPATH} PARENT_SCOPE)
+    else()
+        SET(${VARNAME_MPI} ${ARCHPATH} PARENT_SCOPE)
+        # The full architecture path without mpi is the same but with "no_mpi" at the same level
+        string(REPLACE "/${MPI_PART}" "/no_mpi" ARCHPATH_NOMPI ${ARCHPATH})
+        SET(${VARNAME} ${ARCHPATH_NOMPI} PARENT_SCOPE)
+    endif()
 endfunction()
 
 function(get_build_type_extra VARNAME)

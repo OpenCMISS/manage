@@ -4,47 +4,56 @@ MACRO(ADD_COMPONENT COMPONENT_NAME)
     
     # set source directory
     SET(COMPONENT_SOURCE ${OPENCMISS_ROOT}/src/${SUBGROUP_PATH}/${FOLDER_NAME})
+    SET(COMPONENT_DEFS ${COMPONENT_COMMON_DEFS})
     
     # Complete build dir with debug/release AFTER everything else (consistent with windows)
     get_build_type_extra(BUILDTYPEEXTRA)
-    SET(COMPONENT_BUILD_DIR ${OPENCMISS_COMPONENTS_BINARY_DIR}/${SUBGROUP_PATH}/${FOLDER_NAME}/${BUILDTYPEEXTRA})
+    
+    # Check which build dir is required - depending on whether this component can be built against mpi
+    list(FIND OPENCMISS_COMPONENTS_WITHMPI ${COMPONENT_NAME} COMP_WITH_MPI)
+    if (COMP_WITH_MPI GREATER -1)
+        SET(COMPONENT_BUILD_DIR ${OPENCMISS_COMPONENTS_BINARY_DIR_MPI}/${SUBGROUP_PATH}/${FOLDER_NAME}/${BUILDTYPEEXTRA})
+        LIST(APPEND COMPONENT_DEFS -DCMAKE_INSTALL_PREFIX=${OPENCMISS_COMPONENTS_INSTALL_PREFIX_MPI})
+    else()
+        SET(COMPONENT_BUILD_DIR ${OPENCMISS_COMPONENTS_BINARY_DIR}/${SUBGROUP_PATH}/${FOLDER_NAME}/${BUILDTYPEEXTRA})
+        LIST(APPEND COMPONENT_DEFS -DCMAKE_INSTALL_PREFIX=${OPENCMISS_COMPONENTS_INSTALL_PREFIX})
+    endif()
     
     message(STATUS "Configuring build of ${COMPONENT_NAME} in ${COMPONENT_BUILD_DIR}...")
     
-    SET(COMPONENT_DEFS ${COMPONENT_COMMON_DEFS})
-    
     # OpenMP multithreading
-    foreach(DEP ${OPENCMISS_COMPONENTS_WITH_OPENMP})
-        if(${DEP} STREQUAL ${COMPONENT_NAME})
-            LIST(APPEND COMPONENT_DEFS
-                -DWITH_OPENMP=${OCM_USE_MT}
-            )
-        endif()
-    endforeach()
+    if(${COMPONENT_NAME} IN_LIST OPENCMISS_COMPONENTS_WITH_OPENMP)
+        LIST(APPEND COMPONENT_DEFS
+            -DWITH_OPENMP=${OCM_USE_MT}
+        )
+    endif()
     
     # check if MPI compilers should be forwarded/set
     # so that the local FindMPI uses that
-    if (OCM_USE_MPI)
-        foreach(DEP ${OPENCMISS_COMPONENTS_WITHMPI})
-            if(${DEP} STREQUAL ${COMPONENT_NAME})
-                # Pass on settings and take care to undefine them if no longer used at this level
-                if (MPI)
-                    LIST(APPEND COMPONENT_DEFS -DMPI=${MPI})
-                else()
-                    LIST(APPEND COMPONENT_DEFS -UMPI)
-                endif()
-                if (MPI_HOME)
-                    LIST(APPEND COMPONENT_DEFS -DMPI_HOME=${MPI_HOME})
-                else()
-                    LIST(APPEND COMPONENT_DEFS -UMPI_HOME)
-                endif()
-                #foreach(lang C CXX Fortran)
-                #    if(MPI_${lang}_COMPILER)
-                #        LIST(APPEND COMPONENT_DEFS
-                #            -DMPI_${lang}_COMPILER=${MPI_${lang}_COMPILER}
-                #        )
-                #    endif()
-                #endforeach()
+    if(${COMPONENT_NAME} IN_LIST OPENCMISS_COMPONENTS_WITHMPI)
+        # Pass on settings and take care to undefine them if no longer used at this level
+        if (MPI)
+            LIST(APPEND COMPONENT_DEFS -DMPI=${MPI})
+        else()
+            LIST(APPEND COMPONENT_DEFS -UMPI)
+        endif()
+        if (MPI_HOME)
+            LIST(APPEND COMPONENT_DEFS -DMPI_HOME=${MPI_HOME})
+        else()
+            LIST(APPEND COMPONENT_DEFS -UMPI_HOME)
+        endif()
+        # Override Compilers with MPI compilers
+        # for all components that may use MPI
+        foreach(lang C CXX Fortran)
+            if(MPI_${lang}_COMPILER)
+                LIST(APPEND COMPONENT_DEFS
+                    # Directly specify the compiler wrapper as compiler!
+                    # That is a perfect workaround for the "finding MPI after compilers have been initialized" problem
+                    # that occurs when building a component directly. 
+                    -DCMAKE_${lang}_COMPILER=${MPI_${lang}_COMPILER}
+                    # Also specify the MPI_ versions so that FindMPI is faster
+                    -DMPI_${lang}_COMPILER=${MPI_${lang}_COMPILER}
+                )
             endif()
         endforeach()
     endif()
@@ -108,6 +117,7 @@ MACRO(ADD_COMPONENT COMPONENT_NAME)
     # Add source download/update project
     LIST(APPEND _OCM_REQUIRED_SOURCES ${COMPONENT_NAME})
     ExternalProject_Add(${COMPONENT_NAME}_SRC
+        PREFIX ${OPENCMISS_ROOT}/src/download/
         EXCLUDE_FROM_ALL 1
         TMP_DIR ${OPENCMISS_ROOT}/src/download/tmp
         STAMP_DIR ${OPENCMISS_ROOT}/src/download/stamps
