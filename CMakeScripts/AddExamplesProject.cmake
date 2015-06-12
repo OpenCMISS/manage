@@ -57,6 +57,7 @@ ExternalProject_Add(examples-download
     INSTALL_COMMAND ""
 )
 ExternalProject_Add(examples-build
+    DEPENDS examples-download
     PREFIX ${OPENCMISS_EXAMPLES_BUILD_DIR}
     TMP_DIR ${OPENCMISS_EXAMPLES_BUILD_DIR}/ep_tmp
     STAMP_DIR ${OPENCMISS_EXAMPLES_BUILD_DIR}/ep_stamps
