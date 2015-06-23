@@ -162,8 +162,6 @@ ExternalProject_Add(opencmiss_build_${BUILD_IDENT}
     CMAKE_COMMAND ${MY_CMAKE_COMMAND} # Set in Config/CMakeCheck.cmake, might be own build
     SOURCE_DIR ${MAIN_BINARY_DIR}
     BUILD_IN_SOURCE 1 # replaces the build command
-    #CMAKE_ARGS ${BUILD_ARGS}
-    INSTALL_COMMAND "" # no install on main build level
 )
 
 # Convenience/Maintenance targets

@@ -127,8 +127,18 @@ include(ConfigureComponents)
 include(AddExamplesProject)
 
 ########################################################################
-# Export the currently applied configuration for consumation by
+# Installation stuff
+
+# Build context
 include(ExportBuildContext)
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/OpenCMISSBuildContext.cmake
+    ${OPENCMISS_MANAGE_DIR}/CMakeModules/FindOpenCMISS.cmake 
+    DESTINATION ${OPENCMISS_COMPONENTS_INSTALL_PREFIX_MPI})
+
+# Copy the FindModule files so that the installation folder is self-contained
+install(DIRECTORY ${OPENCMISS_MANAGE_DIR}/CMakeModules/
+    DESTINATION ${OPENCMISS_INSTALL_ROOT}/cmake/OpenCMISSExtraFindModules
+    PATTERN FindOpenCMISS.cmake EXCLUDE)
 
 ########################################################################
 # Misc targets for convenience
