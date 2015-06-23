@@ -49,7 +49,10 @@ foreach(OCM_COMP ${OPENCMISS_COMPONENTS})
         SET(OCM_SYSTEM_${OCM_COMP} YES)
     endif()
     if (NOT OCM_COMP STREQUAL MPI) # Dont show that for MPI - have different implementations
-        message(STATUS "OpenCMISS component ${OCM_COMP}: Enabled ${OCM_USE_${OCM_COMP}}, System search ${OCM_SYSTEM_${OCM_COMP}}, Version '${${OCM_COMP}_VERSION}'")
+	string(SUBSTRING "${OCM_COMP}              " 0 12 OCM_COMP_FIXED_SIZE)
+	string(SUBSTRING "${OCM_USE_${OCM_COMP}}   " 0  3 OCM_USE_FIXED_SIZE)
+	string(SUBSTRING "${OCM_SYSTEM_${OCM_COMP}}    " 0  3 OCM_SYSTEM_FIXED_SIZE)
+        message(STATUS "OpenCMISS component ${OCM_COMP_FIXED_SIZE}: Enabled ${OCM_USE_FIXED_SIZE}, System search ${OCM_SYSTEM_FIXED_SIZE}, Version '${${OCM_COMP}_VERSION}'")
     endif()
     
     # All developer enabled?

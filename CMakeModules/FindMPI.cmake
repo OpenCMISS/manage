@@ -888,17 +888,25 @@ foreach (lang C CXX Fortran)
             STRING(TOLOWER "${MPI_${lang}_INCLUDE_PATH}" INC_PATH)
             messagev("Checking '${MPI} STREQUAL ${MNEMONIC} AND NOT ${INC_PATH} MATCHES ${PATTERN}'")
             if (MPI STREQUAL ${MNEMONIC} AND NOT INC_PATH MATCHES ${PATTERN})
-            messagev("The found MPI_${lang} compiler '${MPI_${lang}_COMPILER}' does not match the requested MPI implementation '${MNEMONIC}'.")
-#            messagev("Check your include paths (suffixes '${_BIN_SUFFIX}' each):
+              messagev("The found MPI_${lang} compiler '${MPI_${lang}_COMPILER}' does not match the requested MPI implementation '${MNEMONIC}'.")
+#             messagev("Check your include paths (suffixes '${_BIN_SUFFIX}' each):
 #1. CMAKE_PREFIX_PATH ${CMAKE_PREFIX_PATH}
 #2. Build system guess ${_MPI_PREFIX_PATH} $ENV{MPI_HOME}
 #3. CMAKE_SYSTEM_PREFIX_PATH ${CMAKE_SYSTEM_PREFIX_PATH}
 #Alternatively, specify MPI_HOME or set a full path to MPI_${lang}_COMPILER")
+              execute_process(
+                COMMAND ${MPI_${lang}_COMPILER} -showme:libdirs
+                OUTPUT_VARIABLE  MPI_LIBDIRS OUTPUT_STRIP_TRAILING_WHITESPACE
+                ERROR_VARIABLE   MPI_LIBDIRS ERROR_STRIP_TRAILING_WHITESPACE)
+              # Check to see if the lib dir matches the pattern if the header file is located in
+              # a system install path directly.
+              if (NOT MPI_LIBDIRS MATCHES ${PATTERN})
                 SET(MPI_${lang}_INCLUDE_PATH "MPI_${lang}_INCLUDE_PATH-NOTFOUND" CACHE PATH "Cleared" FORCE)
                 SET(MPI_${lang}_LIBRARIES "MPI_${lang}_LIBRARIES-NOTFOUND" CACHE STRING "Cleared" FORCE)
                 SET(MPI_${lang}_COMPILER "MPI_${lang}_COMPILER-NOTFOUND" CACHE FILEPATH "Cleared" FORCE)
                 unset(MPIEXEC CACHE)
                 SET(MPI_${lang}_FOUND FALSE) 
+              endif()
             endif()
         endforeach()
     endif()
@@ -907,7 +915,7 @@ foreach (lang C CXX Fortran)
         if (NOT STORYTOLD AND MPI_${lang}_INCLUDE_PATH)
             list(GET MPI_${lang}_INCLUDE_PATH 0 _TMP_PATH)
             get_filename_component(_TMP_MPIDIR ${_TMP_PATH} DIRECTORY)
-            message(STATUS "FindMPI: Located ${MPI} at ${_TMP_MPIDIR}")
+            messagev(STATUS "FindMPI: Located ${MPI} at ${_TMP_MPIDIR}")
             unset(_TMP_MPIDIR)
             unset(_TMP_PATH)
             set(STORYTOLD YES)

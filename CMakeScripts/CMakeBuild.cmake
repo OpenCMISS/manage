@@ -1,7 +1,10 @@
 # This script is intended to be used within the OpenCMISS build environment, called from CMakeCheck.cmake.
 # Arguments passed to this script are:
+# CMAKE_MODULE_PATH
 # OPENCMISS_ROOT
-# DCMAKE_MIN_VERSION_MAJ
+# DCMAKE_MIN_MAJOR_VERSION_MAJ
+# DCMAKE_MIN_MINOR_VERSION_MAJ
+# DCMAKE_MIN_PATCH_VERSION_MAJ
 # DCMAKE_MIN_VERSION
 
 message(STATUS "Building CMake version ${CMAKE_MIN_VERSION} ..")
@@ -112,10 +115,16 @@ if (NOT EXISTS ${MY_CMAKE_EXECUTABLE})
     endif()
     
     # reset the paths for latest cmake version
+    SET(CMAKE_SRC_DIR ${OPENCMISS_ROOT}/src/utilities)
     SET(CMAKE_INSTALL_DIR ${OPENCMISS_ROOT}/install/utilities/cmake)
     SET(CMAKE_TARBALL cmake-${CMAKE_MIN_VERSION}.tar.gz)
-    BUILD_CMAKE(${CMAKE_MIN_VERSION} ${CMAKE_MIN_VERSION_MAJ} YES)
+    BUILD_CMAKE(${CMAKE_MIN_VERSION} ${CMAKE_MIN_MAJOR_VERSION}.${CMAKE_MIN_MINOR_VERSION} YES)
     SET(MY_CMAKE_COMMAND ${CMAKE_INSTALL_DIR}/bin/cmake${CMAKE_EXECUTABLE_SUFFIX})
+    message("@@@@@@@@@@@@@@@@@@@@@@@@@@ ATTENTION @@@@@@@@@@@@@@@@@@@@@@@@@@\n"
+            " Successfully built CMake version ${CMAKE_MIN_VERSION}.\n"
+            " Install directory: ${CMAKE_INSTALL_DIR}/bin/\n"
+            " You may now start building OpenCMISS by re-invoking the CMake configuration step using the new CMake binary.\n"
+            "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@")
     
     # remove intermediate cmake version if it was built
     #file(REMOVE ${CMAKE_INTERMEDIATE_VERSION_INSTALL_DIR})

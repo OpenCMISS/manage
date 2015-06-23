@@ -74,6 +74,7 @@ else()
                     -DCMAKE_MIN_PATCH_VERSION=${CMAKE_MIN_PATCH_VERSION}
                     -DCMAKE_MIN_VERSION=${CMAKE_MIN_VERSION}
                     -DOPENCMISS_ROOT=${OPENCMISS_ROOT}
+                    -DCMAKE_MODULE_PATH=${CMAKE_MODULE_PATH}
                     -P ${OPENCMISS_MANAGE_DIR}/CMakeScripts/CMakeBuild.cmake  
             )
             set(CMAKE_COMPATIBLE NO)
