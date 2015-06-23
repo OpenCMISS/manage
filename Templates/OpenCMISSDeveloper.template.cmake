@@ -16,4 +16,8 @@ set(BUILD_TESTS ON)
 
 # If you issue "make clean" from the manage build folder, normally the external projects (i.e. dependencies) wont completely re-build.
 # Set this to true to have the build system remove the CMakeCache.txt of each dependency, which triggers a complete re-build. 
-SET(OCM_CLEAN_REBUILDS_COMPONENTS NO)
+set(OCM_CLEAN_REBUILDS_COMPONENTS NO)
+
+# The default for developers is to directly print the build output to the standard output/terminal.
+# This way developers directly see any errors instead of having to open log files.
+set(OCM_CREATE_LOGS NO)

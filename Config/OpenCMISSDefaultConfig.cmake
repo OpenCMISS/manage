@@ -24,6 +24,10 @@ option(BUILD_SHARED_LIBS "Build shared libraries" NO)
 
 option(OCM_POSITION_INDEPENDENT_CODE "Always generate position independent code (-fPIC flag)" NO)
 
+# Have the build system wrap the builds of component into log files.
+# Selecting NO will directly print the build process to the standard output.
+set(OCM_CREATE_LOGS YES)
+
 # Debug postfix
 set(CMAKE_DEBUG_POSTFIX d CACHE STRING "Debug postfix for library names of DEBUG-builds")
 

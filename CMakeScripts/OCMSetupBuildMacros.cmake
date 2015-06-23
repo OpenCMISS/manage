@@ -114,6 +114,13 @@ MACRO(ADD_COMPONENT COMPONENT_NAME)
         )
     endif()
     
+    # Log settings
+    if (OCM_CREATE_LOGS)
+        set(_LOGFLAG 1)
+    else()
+        set(_LOGFLAG 0)
+    endif()
+    
     # Add source download/update project
     LIST(APPEND _OCM_REQUIRED_SOURCES ${COMPONENT_NAME})
     ExternalProject_Add(${COMPONENT_NAME}_SRC
@@ -128,11 +135,13 @@ MACRO(ADD_COMPONENT COMPONENT_NAME)
         BUILD_COMMAND ""
         INSTALL_COMMAND ""
         STEP_TARGETS download update
+        LOG_DOWNLOAD ${_LOGFLAG}
     )
     
 	ExternalProject_Add(${COMPONENT_NAME}
 		DEPENDS ${${COMPONENT_NAME}_DEPS}
 		PREFIX ${COMPONENT_BUILD_DIR}
+		LIST_SEPARATOR ${OCM_LIST_SEPARATOR}
 		TMP_DIR ${COMPONENT_BUILD_DIR}/ep_tmp
 		STAMP_DIR ${COMPONENT_BUILD_DIR}/ep_stamps
 		
@@ -159,6 +168,10 @@ MACRO(ADD_COMPONENT COMPONENT_NAME)
 		#INSTALL_DIR ${CMAKE_INSTALL_PREFIX} 
 		INSTALL_COMMAND ${INSTALL_COMMAND}
 		STEP_TARGETS build install
+		# Logging
+		LOG_CONFIGURE ${_LOGFLAG}
+		LOG_BUILD ${_LOGFLAG}
+		LOG_INSTALL ${_LOGFLAG}
 	)
 		
 	# See OpenCMISSDeveloper.cmake
