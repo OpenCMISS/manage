@@ -18,7 +18,8 @@ find_file(OPENCMISS_BUILD_CONTEXT OpenCMISSBuildContext.cmake
         ${OPENCMISS_INSTALL_DIR}/release 
         ${CMAKE_CURRENT_SOURCE_DIR}/../install/release
         ${CMAKE_CURRENT_SOURCE_DIR}/../install/debug
-        ${_HERE}
+        ${_HERE} 
+    ENV OPENCMISS_INSTALL_DIR
 )
 set(OPENCMISS_FOUND NO)
 if (OPENCMISS_BUILD_CONTEXT)
@@ -61,7 +62,7 @@ if (OPENCMISS_BUILD_CONTEXT)
         
         # For shared libs, use the correct install RPATH to enable binaries to find the shared libs.
         # See http://www.cmake.org/Wiki/CMake_RPATH_handling
-        if (BUILD_SHARED_LIBS)
+        if (OPENCMISS_BUILD_SHARED_LIBS)
             set(CMAKE_INSTALL_RPATH ${OPENCMISS_INSTALL_DIR}/lib)
             set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
         endif()

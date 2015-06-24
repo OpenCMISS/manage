@@ -126,6 +126,7 @@ include(AddExamplesProject)
 
 # Build context
 set(OPENCMISS_CMAKE_MIN_VERSION @OPENCMISS_CMAKE_MIN_VERSION@)
+set(OPENCMISS_BUILD_SHARED_LIBS BUILD_SHARED_LIBS)
 include(ExportBuildContext)
 install(FILES ${CMAKE_CURRENT_BINARY_DIR}/OpenCMISSBuildContext.cmake
     ${OPENCMISS_MANAGE_DIR}/CMakeModules/FindOpenCMISS.cmake 

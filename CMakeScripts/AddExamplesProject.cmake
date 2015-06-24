@@ -47,29 +47,12 @@ else()
     )
 endif()
 message(STATUS "Configuring build of OpenCMISS-Examples ('examples' target) at ${OPENCMISS_EXAMPLES_BUILD_DIR}")
-ExternalProject_Add(examples-download
-    PREFIX ${OPENCMISS_EXAMPLES_SRC_DIR}
-    TMP_DIR ${OPENCMISS_EXAMPLES_SRC_DIR}/ep_tmp
-    STAMP_DIR ${OPENCMISS_EXAMPLES_SRC_DIR}/ep_stamps
-    EXCLUDE_FROM_ALL 1
-    ${DOWNLOAD_CMDS}
-    SOURCE_DIR ${OPENCMISS_EXAMPLES_SRC_DIR}
-    CONFIGURE_COMMAND ""
-    BUILD_COMMAND ""
-    INSTALL_COMMAND ""
-)
-ExternalProject_Add(examples-build
-    DEPENDS examples-download
+ExternalProject_Add(examples
     PREFIX ${OPENCMISS_EXAMPLES_BUILD_DIR}
-    TMP_DIR ${OPENCMISS_EXAMPLES_BUILD_DIR}/ep_tmp
-    STAMP_DIR ${OPENCMISS_EXAMPLES_BUILD_DIR}/ep_stamps
     EXCLUDE_FROM_ALL 1
     SOURCE_DIR ${OPENCMISS_EXAMPLES_SRC_DIR}
     BINARY_DIR ${OPENCMISS_EXAMPLES_BUILD_DIR}
+    ${DOWNLOAD_CMDS}
     CMAKE_ARGS 
         -DOPENCMISS_INSTALL_DIR=${OPENCMISS_COMPONENTS_INSTALL_PREFIX_MPI}
-)
-add_custom_target(examples
-    DEPENDS examples-download examples-build
-    EXCLUDE_FROM_ALL 1
 )
