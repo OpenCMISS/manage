@@ -96,7 +96,7 @@ endif(NOT CMAKE_COMPATIBLE)
 # (e.g. find_library does not "work" if issued before a project command, as the CMAKE_FIND_LIBRARY_SUFFIXES are still empty)
 #
 # The variable CMAKE_MIN_VERSION is set inside the CMakeCheck script
-CMAKE_MINIMUM_REQUIRED(VERSION ${CMAKE_MIN_VERSION} FATAL_ERROR)
+CMAKE_MINIMUM_REQUIRED(VERSION ${OPENCMISS_CMAKE_MIN_VERSION} FATAL_ERROR)
 project(OpenCMISS-Generate-Build C)
 
 # See if we have a specified toolchain

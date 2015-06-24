@@ -5,9 +5,9 @@
 # DCMAKE_MIN_MAJOR_VERSION_MAJ
 # DCMAKE_MIN_MINOR_VERSION_MAJ
 # DCMAKE_MIN_PATCH_VERSION_MAJ
-# DCMAKE_MIN_VERSION
+# DOPENCMISS_CMAKE_MIN_VERSION
 
-message(STATUS "Building CMake version ${CMAKE_MIN_VERSION} ..")
+message(STATUS "Building CMake version ${OPENCMISS_CMAKE_MIN_VERSION} ..")
 # Use the cmake binary with which this script was invoked as default 
 SET(MY_CMAKE_COMMAND ${CMAKE_COMMAND})
 
@@ -69,7 +69,7 @@ SET(MY_CMAKE_EXECUTABLE ${CMAKE_INSTALL_DIR}/bin/cmake${CMAKE_EXECUTABLE_SUFFIX}
 if (NOT EXISTS ${MY_CMAKE_EXECUTABLE})
 
     # Otherwise .. need compilation!
-    message(WARNING "Your CMake version is ${CMAKE_VERSION}, but at least version ${CMAKE_MIN_VERSION} is required for OpenCMISS. Building now..")
+    message(WARNING "Your CMake version is ${CMAKE_VERSION}, but at least version ${OPENCMISS_CMAKE_MIN_VERSION} is required for OpenCMISS. Building now..")
     
     SET(CMAKE_SRC_DIR ${OPENCMISS_ROOT}/src/utilities)
     SET(CMAKE_INTERMEDIATE_VERSION_MAJ 2.8)
@@ -78,7 +78,7 @@ if (NOT EXISTS ${MY_CMAKE_EXECUTABLE})
     # compile intermediate version of cmake if present is too old
     if (CMAKE_VERSION VERSION_LESS ${CMAKE_INTERMEDIATE_VERSION})
         message(WARNING "Your CMake version is too old: ${CMAKE_VERSION}!\n"
-                        "A newer version is required to build version ${CMAKE_MIN_VERSION}. Building now..")
+                        "A newer version is required to build version ${OPENCMISS_CMAKE_MIN_VERSION}. Building now..")
         # set up the paths for an intermediate version of cmake
         SET(CMAKE_TARBALL cmake-${CMAKE_INTERMEDIATE_VERSION}.tar.gz)
         SET(CMAKE_INTERMEDIATE_VERSION_INSTALL_DIR ${OPENCMISS_ROOT}/install/utilities/cmake-${CMAKE_INTERMEDIATE_VERSION})
@@ -117,11 +117,11 @@ if (NOT EXISTS ${MY_CMAKE_EXECUTABLE})
     # reset the paths for latest cmake version
     SET(CMAKE_SRC_DIR ${OPENCMISS_ROOT}/src/utilities)
     SET(CMAKE_INSTALL_DIR ${OPENCMISS_ROOT}/install/utilities/cmake)
-    SET(CMAKE_TARBALL cmake-${CMAKE_MIN_VERSION}.tar.gz)
-    BUILD_CMAKE(${CMAKE_MIN_VERSION} ${CMAKE_MIN_MAJOR_VERSION}.${CMAKE_MIN_MINOR_VERSION} YES)
+    SET(CMAKE_TARBALL cmake-${OPENCMISS_CMAKE_MIN_VERSION}.tar.gz)
+    BUILD_CMAKE(${OPENCMISS_CMAKE_MIN_VERSION} ${CMAKE_MIN_MAJOR_VERSION}.${CMAKE_MIN_MINOR_VERSION} YES)
     SET(MY_CMAKE_COMMAND ${CMAKE_INSTALL_DIR}/bin/cmake${CMAKE_EXECUTABLE_SUFFIX})
     message("@@@@@@@@@@@@@@@@@@@@@@@@@@ ATTENTION @@@@@@@@@@@@@@@@@@@@@@@@@@\n"
-            " Successfully built CMake version ${CMAKE_MIN_VERSION}.\n"
+            " Successfully built CMake version ${OPENCMISS_CMAKE_MIN_VERSION}.\n"
             " Install directory: ${CMAKE_INSTALL_DIR}/bin/\n"
             " You may now start building OpenCMISS by re-invoking the CMake configuration step using the new CMake binary.\n"
             "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@")
@@ -131,7 +131,7 @@ if (NOT EXISTS ${MY_CMAKE_EXECUTABLE})
     
 elseif(EXISTS ${MY_CMAKE_EXECUTABLE})
     # TODO print message pointing to new binary.
-    message(STATUS "Using own build of CMake ${CMAKE_MIN_VERSION} at ${CMAKE_INSTALL_DIR}")
+    message(STATUS "Using own build of CMake ${OPENCMISS_CMAKE_MIN_VERSION} at ${CMAKE_INSTALL_DIR}")
     #SET(MY_CMAKE_COMMAND ${MY_CMAKE_EXECUTABLE})
 endif()
         

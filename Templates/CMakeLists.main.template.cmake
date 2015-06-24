@@ -4,8 +4,8 @@
 # this would allow to mess with them later. As this is the top level CMakeLists.txt
 # for this specific compiler/mpi choice and sub-external projects rely on this
 # choice, it's hard-coded rather than being modifiable (externally).
-SET(OPENCMISS_ROOT @OPENCMISS_ROOT@)
-SET(OPENCMISS_MANAGE_DIR @OPENCMISS_MANAGE_DIR@)
+set(OPENCMISS_ROOT @OPENCMISS_ROOT@)
+set(OPENCMISS_MANAGE_DIR @OPENCMISS_MANAGE_DIR@)
 set(OPENCMISS_INSTALL_ROOT @CMAKE_INSTALL_PREFIX@)
 ########################################################################
 
@@ -19,11 +19,6 @@ LIST(APPEND CMAKE_MODULE_PATH
 include(OpenCMISSConfig)
 
 ########################################################################
-# These values will be put in place at generation phase.
-# They could've also been passed over as command line definitions, however,
-# this would allow to mess with them later. As this is the top level CMakeLists.txt
-# for this specific compiler/mpi choice and sub-external projects rely on this
-# choice, it's hard-coded rather than being modifiable (externally).
 @TOOLCHAIN_DEF@
 SET(MPI @MPI@)
 SET(OCM_SYSTEM_MPI @SYSTEM_MPI@)
@@ -37,7 +32,7 @@ include(ToolchainSetup)
 
 ########################################################################
 # Ready to start the "build project"
-CMAKE_MINIMUM_REQUIRED(VERSION @CMAKE_MIN_VERSION@ FATAL_ERROR)
+CMAKE_MINIMUM_REQUIRED(VERSION @OPENCMISS_CMAKE_MIN_VERSION@ FATAL_ERROR)
 project(OpenCMISS-Build VERSION 1.0 LANGUAGES C CXX Fortran)
 if ((NOT WIN32 OR MINGW) AND CMAKE_BUILD_TYPE STREQUAL "")
     SET(CMAKE_BUILD_TYPE RELEASE)
@@ -130,6 +125,7 @@ include(AddExamplesProject)
 # Installation stuff
 
 # Build context
+set(OPENCMISS_CMAKE_MIN_VERSION @OPENCMISS_CMAKE_MIN_VERSION@)
 include(ExportBuildContext)
 install(FILES ${CMAKE_CURRENT_BINARY_DIR}/OpenCMISSBuildContext.cmake
     ${OPENCMISS_MANAGE_DIR}/CMakeModules/FindOpenCMISS.cmake 

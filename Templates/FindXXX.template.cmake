@@ -55,7 +55,10 @@ else()
     
     # Remove CMAKE_INSTALL_PREFIX from CMAKE_SYSTEM_PREFIX_PATH - we dont want the module search to "accidentally"
     # discover the packages in our install directory, collect libraries and then re-turn them into targets (redundant round-trip)
-    LIST(REMOVE_ITEM CMAKE_SYSTEM_PREFIX_PATH ${CMAKE_INSTALL_PREFIX})
+    if (CMAKE_INSTALL_PREFIX)
+        list(REMOVE_ITEM CMAKE_SYSTEM_PREFIX_PATH ${CMAKE_INSTALL_PREFIX})
+        set(_readd YES)
+    endif()
     
     # Actual MODULE mode find call
     #message(STATUS "find_package(@PACKAGE_CASENAME@ ${@PACKAGE_CASENAME@_FIND_VERSION} MODULE QUIET)")
@@ -63,7 +66,10 @@ else()
     
     # Restore stuff
     SET(@PACKAGE_CASENAME@_FIND_REQUIRED ${_PKG_REQ_OLD})
-    LIST(APPEND CMAKE_SYSTEM_PREFIX_PATH ${CMAKE_INSTALL_PREFIX})
+    if (_readd)
+        list(APPEND CMAKE_SYSTEM_PREFIX_PATH ${CMAKE_INSTALL_PREFIX})
+    endif()
+    unset(_readd)
     
     if (@PACKAGE_NAME@_FOUND)
         # Also set the casename variant as this is checked upon at the end ("newer" version; config mode returns

@@ -1,6 +1,8 @@
 set(OPENCMISS_EXAMPLES_SRC_DIR ${OPENCMISS_ROOT}/examples)
 set(OPENCMISS_EXAMPLES_BUILD_DIR ${OPENCMISS_ROOT}/build/examples/${ARCHITECTURE_PATH_MPI})
-set(OPENCMISS_EXAMPLES_INSTALL_PREFIX ${OPENCMISS_ROOT}/install/examples/${ARCHITECTURE_PATH_MPI})
+#set(OPENCMISS_EXAMPLES_INSTALL_PREFIX ${OPENCMISS_ROOT}/install/examples/${ARCHITECTURE_PATH_MPI})
+# This is the examples location until we've got a working version for everyone.
+SET(EXAMPLES_REPO https://github.com/rondiplomatico/examples)
 set(EXAMPLES_BRANCH cmake)
 
 # git repo or zip!
@@ -71,5 +73,3 @@ add_custom_target(examples
     DEPENDS examples-download examples-build
     EXCLUDE_FROM_ALL 1
 )
-# We dont want to build the examples by default - you got to trigger it.
-#set_target_properties(examples-build examples-download PROPERTIES EXCLUDE_FROM_ALL TRUE)

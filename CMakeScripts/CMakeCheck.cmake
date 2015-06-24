@@ -2,7 +2,7 @@
 SET(CMAKE_MIN_MAJOR_VERSION 3)
 SET(CMAKE_MIN_MINOR_VERSION 3)
 SET(CMAKE_MIN_PATCH_VERSION 0-rc1)
-SET(CMAKE_MIN_VERSION ${CMAKE_MIN_MAJOR_VERSION}.${CMAKE_MIN_MINOR_VERSION}.${CMAKE_MIN_PATCH_VERSION})
+SET(OPENCMISS_CMAKE_MIN_VERSION ${CMAKE_MIN_MAJOR_VERSION}.${CMAKE_MIN_MINOR_VERSION}.${CMAKE_MIN_PATCH_VERSION})
 
 message(STATUS "Checking CMake version..")
 # Assume we're good until found otherwise
@@ -44,7 +44,7 @@ if (WIN32)
     if (NOT CMAKE_UPTODATE)
         message("@@@@@@@@@@@@@@@@@@@@@@@@@@ ATTENTION @@@@@@@@@@@@@@@@@@@@@@@@@@\n"
                 " Your CMake version is ${CMAKE_VERSION}.\n"
-                " At least version ${CMAKE_MIN_VERSION} is required for OpenCMISS.\n"
+                " At least version ${OPENCMISS_CMAKE_MIN_VERSION} is required for OpenCMISS.\n"
                 " Please download & install from http://www.cmake.org/download/\n"
                 "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@")
         set(CMAKE_COMPATIBLE NO)
@@ -60,9 +60,9 @@ else()
     # check for cmake version, ssl support and if OpenSSL is installed
     if (NOT CMAKE_UPTODATE)
             message("@@@@@@@@@@@@@@@@@@@@@@@@@@ ATTENTION @@@@@@@@@@@@@@@@@@@@@@@@@@\n"
-                    " Your CMake version is ${CMAKE_VERSION}, but at least version ${CMAKE_MIN_VERSION} is required to build OpenCMISS.\n"
+                    " Your CMake version is ${CMAKE_VERSION}, but at least version ${OPENCMISS_CMAKE_MIN_VERSION} is required to build OpenCMISS.\n"
                     " You can either:\n"
-                    " - Have your administrator install or update CMake ${CMAKE_MIN_VERSION} (or newer) with SSL support.\n"
+                    " - Have your administrator install or update CMake ${OPENCMISS_CMAKE_MIN_VERSION} (or newer) with SSL support.\n"
                     " - Build the target 'cmake'. This attempts to automatically download & compile a new CMake version for you.\n"
                     " In any case, you need to re-invoke the CMake configuration step using the new CMake binary.\n"
                     "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@")
@@ -72,7 +72,7 @@ else()
                     -DCMAKE_MIN_MAJOR_VERSION=${CMAKE_MIN_MAJOR_VERSION}
                     -DCMAKE_MIN_MINOR_VERSION=${CMAKE_MIN_MINOR_VERSION}
                     -DCMAKE_MIN_PATCH_VERSION=${CMAKE_MIN_PATCH_VERSION}
-                    -DCMAKE_MIN_VERSION=${CMAKE_MIN_VERSION}
+                    -DOPENCMISS_CMAKE_MIN_VERSION=${OPENCMISS_CMAKE_MIN_VERSION}
                     -DOPENCMISS_ROOT=${OPENCMISS_ROOT}
                     -DCMAKE_MODULE_PATH=${CMAKE_MODULE_PATH}
                     -P ${OPENCMISS_MANAGE_DIR}/CMakeScripts/CMakeBuild.cmake  
