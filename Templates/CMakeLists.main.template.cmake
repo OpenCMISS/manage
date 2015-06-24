@@ -46,6 +46,12 @@ include(OCMSetupBuildMacros)
 ########################################################################
 # Utilities
 include(InstallFindModuleWrappers)
+# Add CMakeModules directory after wrapper module directory (set in above script)
+# This folder is also exported to the install tree upon "make install" and
+# then used within the FindOpenCMISS.cmake module script
+list(APPEND CMAKE_MODULE_PATH 
+    ${OPENCMISS_MANAGE_DIR}/CMakeModules
+)
 include(DetectFortranMangling)
 
 # Multithreading
@@ -135,7 +141,7 @@ install(FILES ${CMAKE_CURRENT_BINARY_DIR}/OpenCMISSBuildContext.cmake
 # Copy the FindModule files so that the installation folder is self-contained
 install(DIRECTORY ${OPENCMISS_MANAGE_DIR}/CMakeModules/
     DESTINATION ${OPENCMISS_INSTALL_ROOT}/cmake/OpenCMISSExtraFindModules
-    PATTERN FindOpenCMISS.cmake EXCLUDE)
+    PATTERN FindOpenCMISS.cmake EXCLUDE) 
 
 ########################################################################
 # Misc targets for convenience

@@ -30,7 +30,10 @@ foreach(OCM_COMP ${OPENCMISS_COMPONENTS})
     endif()
 endforeach()
 
-# OpenCMISS find modules - wrapper
+# OpenCMISS find modules - wrapper and extra find library scripts
+# The build tree uses the folder manage/CMakeModules directly, but the
+# installed OpenCMISS wont necessarily have the manage folder and needs to
+# be self-contained
 set(OPENCMISS_MODULE_PATH
     ${OPENCMISS_FINDMODULE_WRAPPER_DIR}
     ${OPENCMISS_INSTALL_ROOT}/cmake/OpenCMISSExtraFindModules)

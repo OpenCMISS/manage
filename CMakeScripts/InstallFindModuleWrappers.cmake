@@ -32,6 +32,5 @@ endforeach()
 
 # Add directory to module path
 list(APPEND CMAKE_MODULE_PATH 
-    ${OPENCMISS_FINDMODULE_WRAPPER_DIR} # Add wrapper directory before "native" module dir!!!
-    ${OPENCMISS_MANAGE_DIR}/CMakeModules
+    ${OPENCMISS_FINDMODULE_WRAPPER_DIR}
 )

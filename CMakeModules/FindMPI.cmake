@@ -140,14 +140,14 @@ endmacro()
 set(_MPI_C_COMPILER_NAMES                  mpicc    mpcc      mpicc_r mpcc_r)
 set(_MPI_CXX_COMPILER_NAMES                mpicxx   mpiCC     mpcxx   mpCC    mpic++   mpc++
                                            mpicxx_r mpiCC_r   mpcxx_r mpCC_r  mpic++_r mpc++_r)
-set(_MPI_Fortran_COMPILER_NAMES            mpif77   mpif77_r  mpf77   mpf77_r
+set(_MPI_Fortran_COMPILER_NAMES            #mpif77   mpif77_r  mpf77   mpf77_r
                                            mpif90   mpif90_r  mpf90   mpf90_r
                                            mpif95   mpif95_r  mpf95   mpf95_r)
 
 # GNU compiler names
 set(_MPI_GNU_C_COMPILER_NAMES              mpigcc mpgcc mpigcc_r mpgcc_r)
 set(_MPI_GNU_CXX_COMPILER_NAMES            mpig++ mpg++ mpig++_r mpg++_r)
-set(_MPI_GNU_Fortran_COMPILER_NAMES        mpig77 mpig77_r mpg77 mpg77_r
+set(_MPI_GNU_Fortran_COMPILER_NAMES        #mpig77 mpig77_r mpg77 mpg77_r
                                            mpigfortran mpgfortran mpigfortran_r mpgfortran_r)
 
 # Intel MPI compiler names
@@ -166,7 +166,7 @@ set(_MPI_XL_CXX_COMPILER_NAMES             mpixlcxx   mpixlC     mpixlc++   mpxl
                                            mpixlcxx_r mpixlC_r   mpixlc++_r mpxlcxx_r mpxlc++_r mpixlc++_r mpxlCC_r)
 set(_MPI_XL_Fortran_COMPILER_NAMES         mpixlf95   mpixlf95_r mpxlf95 mpxlf95_r
                                            mpixlf90   mpixlf90_r mpxlf90 mpxlf90_r
-                                           mpixlf77   mpixlf77_r mpxlf77 mpxlf77_r
+                                           #mpixlf77   mpixlf77_r mpxlf77 mpxlf77_r
                                            mpixlf     mpixlf_r   mpxlf   mpxlf_r)
                                            
 ############################################################
