@@ -6,8 +6,11 @@ SET(PACKAGES_WITH_TARGETS BLAS HYPRE LAPACK METIS
     
 # Some shipped find-package modules have a different case-sensitive spelling - need to stay consistent with that
 SET(LIBXML2_CASENAME LibXml2)
-SET(LIBXML2_TARGETNAME xml2)
 SET(BZIP2_CASENAME BZip2)
+# Some packages naturally have their exported target names differ from those of the package - this is convenience but
+# enables us to stay more consistent (e.g. we have "libbz2.a" on system installations instead of "libbzip2.a")
+SET(LIBXML2_TARGETNAME xml2)
+SET(BZIP2_TARGETNAME bz2)
     
 # Generate the wrappers (if not existing)
 SET(OPENCMISS_FINDMODULE_WRAPPER_DIR ${OPENCMISS_INSTALL_ROOT}/cmake/OpenCMISSFindModuleWrappers)

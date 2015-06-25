@@ -158,6 +158,12 @@ endforeach()
 add_custom_target(update
     DEPENDS ${_OCM_SOURCE_UPDATE_TARGETS}
 )
+
+# Need to enable testing in order for any add_test calls (see OCMSetupBuildMacros) to work
+if (BUILD_TESTS)
+    enable_testing()
+endif()
+
 # I already foresee that we will have to have "download" and "update" targets for the less insighted user.
 # So lets just give it to them. Does the same as external project has initial download and update steps.
 #add_custom_target(download

@@ -198,6 +198,14 @@ MACRO(ADD_COMPONENT COMPONENT_NAME)
 	    COMMAND ${CMAKE_COMMAND} -E remove -f ${COMPONENT_BUILD_DIR}/ep_stamps/*-configure 
 	    COMMAND ${CMAKE_COMMAND} --build ${COMPONENT_BUILD_DIR} --target clean
 	)
+	if (BUILD_TESTS)
+    	# Add convenience direct-access test target for component
+    	add_custom_target(${COMPONENT_NAME}-testdirect
+    	    COMMAND ${CMAKE_COMMAND} --build ${COMPONENT_BUILD_DIR} --target test
+    	)
+    	# Add a global test to run the external project's tests
+    	add_test(${COMPONENT_NAME}-test ${CMAKE_COMMAND} --build ${COMPONENT_BUILD_DIR} --target test)
+	endif()
 	
 	# Be a tidy kiwi
 	UNSET( BUILD_COMMAND )

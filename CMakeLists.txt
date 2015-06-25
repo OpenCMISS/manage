@@ -181,7 +181,7 @@ if (UNIX)
         COMMAND mv ${BUILD_IDENT}/OpenCMISSLocalConfig.cmake ../backup_localconfig.tmp
         COMMAND rm -rf ${BUILD_IDENT}/*
         COMMAND mv ../backup_localconfig.tmp ${BUILD_IDENT}/OpenCMISSLocalConfig.cmake
-        COMMENT "Blowing away main build config files"
+        COMMENT "Blowing away main build config files, preserving OpenCMISSLocalConfig at /${BUILD_IDENT}"
         WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
     )
     add_custom_target(reset_all
