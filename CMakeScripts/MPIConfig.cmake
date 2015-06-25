@@ -90,6 +90,14 @@ if (NOT MPI_FOUND)
             )
         endif()
         
+        include(ProcessorCount)
+        ProcessorCount(NUM_PROCESSORS)
+        if (NUM_PROCESSORS EQUAL 0)
+            SET(NUM_PROCESSORS 1)
+        #else()
+        #    MATH(EXPR NUM_PROCESSORS ${NUM_PROCESSORS}+4)
+        endif()
+        
         ExternalProject_Add(MPI
     		PREFIX ${_MPI_BINARY_DIR}
     		TMP_DIR ${_MPI_BINARY_DIR}/ep_tmp
@@ -109,7 +117,7 @@ if (NOT MPI_FOUND)
     		BINARY_DIR ${_MPI_BINARY_DIR}
     		
     		#--Build step-----------------
-    		BUILD_COMMAND make -j #${BUILD_COMMAND}
+    		BUILD_COMMAND make -j${NUM_PROCESSORS} #${BUILD_COMMAND}
     		
     		#--Install step---------------
     		# currently set as extra arg (above), somehow does not work
