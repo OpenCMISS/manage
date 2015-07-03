@@ -21,7 +21,7 @@ endfunction()
 SET(@PACKAGE_CASENAME@_FOUND NO)
     
 # The default way is to look for components in the current PREFIX_PATH, e.g. own build components.
-# If a LOCAL flag is set for a package, the MODULE and CONFIG modes are tried outside the PREFIX PATH first.
+# If the OCM_SYSTEM_@PACKAGE_NAME@ flag is set for a package, the MODULE and CONFIG modes are tried outside the PREFIX PATH first.
 if (NOT OCM_SYSTEM_@PACKAGE_NAME@)
      set(OCM_SYSTEM_@PACKAGE_NAME@ NO) # set it to NO so that we have a value if none is set at all (debug output)
      find_package(@PACKAGE_CASENAME@ ${@PACKAGE_CASENAME@_FIND_VERSION} CONFIG

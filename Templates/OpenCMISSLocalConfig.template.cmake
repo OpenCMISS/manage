@@ -4,6 +4,19 @@
 #SET(BUILD_SHARED_LIBS YES)
 #set(CMAKE_BUILD_TYPE DEBUG)
 
+# If you have a remote installation of opencmiss components 
+# (e.g. you are using OpenCMISS in a shared network environment
+# specify the installation directory here.
+# This will have the build environment search for opencmiss components there.
+#set(OPENCMISS_DEPENDENCIES_DIR )
+# e.g.
+#set(OPENCMISS_DEPENDENCIES_DIR ~/software/opencmiss/install/x86_64_linux/gnu-4.8.4/openmpi_release/static/release)
+
+# Alternatively, if you are using architecture paths, you can just specify the root "install" folder
+# of the dependencies, and the build system will automatically look for dependencies at the matching architecture subpaths. 
+#set(OPENCMISS_DEPENDENCIES_ROOT )
+#set(OPENCMISS_DEPENDENCIES_ROOT ~/software/opencmiss/install)
+
 # Define a BLAS library vendor here.
 # This is consumed by the FindBLAS package, see its documentation for all possible values.
 #set(BLA_VENDOR Intel10_64lp)

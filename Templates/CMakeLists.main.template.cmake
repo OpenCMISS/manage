@@ -109,6 +109,35 @@ set(OPENCMISS_PREFIX_PATH
     ${OPENCMISS_COMPONENTS_INSTALL_PREFIX_MPI}/${COMMON_PACKAGE_CONFIG_DIR}
 )
 
+###################### 
+# Prefix path assembly for remote installations of opencmiss dependencies
+function(get_remote_prefix_path DIR)
+    get_filename_component(DIR ${DIR} ABSOLUTE)
+    if (EXISTS ${DIR}/OpenCMISSBuildContext.cmake)
+        include(${DIR}/OpenCMISSBuildContext.cmake)
+        set(REMOTE_PREFIX_PATH ${OPENCMISS_PREFIX_PATH} PARENT_SCOPE)
+    endif()
+endfunction()
+# In case we are provided with a remote root directory, we are creating the same sub-path as we are locally using
+# to import the matching libraries
+if (OPENCMISS_DEPENDENCIES_ROOT)
+    set(OPENCMISS_DEPENDENCIES_DIR ${OPENCMISS_DEPENDENCIES_ROOT}/${ARCHITECTURE_PATH}/${BUILDTYPEEXTRA})
+endif()
+# If we have a OPENCMISS_DEPENDENCIES_DIR, it's either provided directly or constructed from OPENCMISS_DEPENDENCIES_ROOT
+if (OPENCMISS_DEPENDENCIES_DIR)
+    # Need to wrap this into a function as a separate scope is needed in order to avoid overriding
+    # local values by those set in the opencmiss build context file.
+    get_remote_prefix_path(${OPENCMISS_DEPENDENCIES_DIR})
+    if (REMOTE_PREFIX_PATH)
+        message(STATUS "Using remote OpenCMISS component installation at ${OPENCMISS_DEPENDENCIES_DIR}...")
+        list(APPEND CMAKE_PREFIX_PATH ${REMOTE_PREFIX_PATH})
+        unset(REMOTE_PREFIX_PATH) 
+    else()
+        message(FATAL_ERROR "No OpenCMISS build context file (OpenCMISSBuildContext.cmake) could be found at OPENCMISS_DEPENDENCIES_DIR=${OPENCMISS_DEPENDENCIES_DIR}")
+    endif()
+endif()
+
+###################### 
 # Collect the common arguments for any package/component
 include(CollectComponentDefinitions)
 
