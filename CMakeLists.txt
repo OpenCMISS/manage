@@ -152,12 +152,23 @@ configure_file(
     @ONLY # only @-tags
 )
 
+set(MAIN_BUILD_STAMPDIR ${MAIN_BINARY_DIR}/ep_stamps)
+set(MAIN_BUILD_NAME opencmiss_build_${BUILD_IDENT})
+# Remove the build file for the main project so that a "make" invocation
+# Always at least triggers the build command for the current configured build.
+# As that in turn re-invokes the configure stage if any changes happened, this
+# ensures no dummy user tries to call "make" but the project just says "done" because the
+# current external-project build stamp was still unchanged.
+add_custom_target(${MAIN_BUILD_NAME}_ensurebuild
+    COMMAND ${CMAKE_COMMAND} -E remove -f ${MAIN_BUILD_STAMPDIR}/${MAIN_BUILD_NAME}-build
+)
 # Actual main project here
 include(ExternalProject)
-ExternalProject_Add(opencmiss_build_${BUILD_IDENT}
+ExternalProject_Add(${MAIN_BUILD_NAME}
+    DEPENDS ${MAIN_BUILD_NAME}_ensurebuild
     PREFIX ${MAIN_BINARY_DIR}
     TMP_DIR ${MAIN_BINARY_DIR}/ep_tmp
-    STAMP_DIR ${MAIN_BINARY_DIR}/ep_stamps
+    STAMP_DIR ${MAIN_BUILD_STAMPDIR}
     DOWNLOAD_COMMAND ""
     CMAKE_COMMAND ${MY_CMAKE_COMMAND} # Set in Config/CMakeCheck.cmake, might be own build
     SOURCE_DIR ${MAIN_BINARY_DIR}
