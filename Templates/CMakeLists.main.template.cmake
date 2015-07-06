@@ -113,8 +113,8 @@ set(OPENCMISS_PREFIX_PATH
 # Prefix path assembly for remote installations of opencmiss dependencies
 function(get_remote_prefix_path DIR)
     get_filename_component(DIR ${DIR} ABSOLUTE)
-    if (EXISTS ${DIR}/OpenCMISSBuildContext.cmake)
-        include(${DIR}/OpenCMISSBuildContext.cmake)
+    if (EXISTS ${DIR}/OpenCMISSBuildInfo.cmake)
+        include(${DIR}/OpenCMISSBuildInfo.cmake)
         set(REMOTE_PREFIX_PATH ${OPENCMISS_PREFIX_PATH} PARENT_SCOPE)
     endif()
 endfunction()
@@ -133,7 +133,7 @@ if (OPENCMISS_DEPENDENCIES_DIR)
         list(APPEND CMAKE_PREFIX_PATH ${REMOTE_PREFIX_PATH})
         unset(REMOTE_PREFIX_PATH) 
     else()
-        message(FATAL_ERROR "No OpenCMISS build context file (OpenCMISSBuildContext.cmake) could be found at OPENCMISS_DEPENDENCIES_DIR=${OPENCMISS_DEPENDENCIES_DIR}")
+        message(FATAL_ERROR "No OpenCMISS build context file (OpenCMISSBuildInfo.cmake) could be found at OPENCMISS_DEPENDENCIES_DIR=${OPENCMISS_DEPENDENCIES_DIR}")
     endif()
 endif()
 
@@ -161,16 +161,18 @@ include(AddExamplesProject)
 
 # Build context
 set(OPENCMISS_CMAKE_MIN_VERSION @OPENCMISS_CMAKE_MIN_VERSION@)
-set(OPENCMISS_BUILD_SHARED_LIBS BUILD_SHARED_LIBS)
+set(OPENCMISS_BUILD_SHARED_LIBS ${BUILD_SHARED_LIBS})
 include(ExportBuildContext)
-install(FILES ${CMAKE_CURRENT_BINARY_DIR}/OpenCMISSBuildContext.cmake
-    ${OPENCMISS_MANAGE_DIR}/CMakeModules/FindOpenCMISS.cmake 
+install(FILES ${OPENCMISS_TOOLCHAIN_INFO}
+    ${OPENCMISS_BUILD_INFO}
+    ${OPENCMISS_MANAGE_DIR}/CMakeModules/FindOpenCMISSToolchain.cmake
+    ${OPENCMISS_MANAGE_DIR}/CMakeModules/FindOpenCMISS.cmake
     DESTINATION ${OPENCMISS_COMPONENTS_INSTALL_PREFIX_MPI})
 
 # Copy the FindModule files so that the installation folder is self-contained
 install(DIRECTORY ${OPENCMISS_MANAGE_DIR}/CMakeModules/
     DESTINATION ${OPENCMISS_INSTALL_ROOT}/cmake/OpenCMISSExtraFindModules
-    PATTERN FindOpenCMISS.cmake EXCLUDE) 
+    PATTERN "FindOpenCMISS*.cmake" EXCLUDE) 
 
 ########################################################################
 # Misc targets for convenience

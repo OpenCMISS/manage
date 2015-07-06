@@ -11,7 +11,7 @@
 # Find the build context (normally either in same location as this file or at OPENCMISS_INSTALL_DIR)
 string(TOLOWER "${CMAKE_BUILD_TYPE}" _BUILDTYPE)
 get_filename_component(_HERE ${CMAKE_CURRENT_LIST_FILE} PATH)
-find_file(OPENCMISS_BUILD_CONTEXT OpenCMISSBuildContext.cmake
+find_file(OPENCMISS_BUILD_CONTEXT OpenCMISSBuildInfo.cmake
     HINTS ${OPENCMISS_INSTALL_DIR}
         ${CMAKE_MODULE_PATH}
         ${OPENCMISS_INSTALL_DIR}/${_BUILDTYPE} 
@@ -29,59 +29,36 @@ if (OPENCMISS_BUILD_CONTEXT)
     
     message(STATUS "Using OpenCMISS-${OPENCMISS_BUILD_TYPE} installation at ${OPENCMISS_INSTALL_DIR}")
     
-    # MPI setup
-    set(HAVE_MPI_WRAPPER NO)
-    foreach(lang C CXX Fortran)
-        if (MPI_${lang}_COMPILER)
-            if (EXISTS ${MPI_${lang}_COMPILER})
-                set(CMAKE_${lang}_COMPILER ${MPI_${lang}_COMPILER})
-                set(HAVE_MPI_WRAPPER YES)
-            else()
-                message(FATAL_ERROR "The MPI compiler ${MPI_${lang}_COMPILER} could not be found.")
-            endif()
-        endif() 
-    endforeach()
-    if (NOT HAVE_MPI_WRAPPER)
-        find_package(MPI REQUIRED)
-        include_directories(${MPI_C_INCLUDE_PATH} ${MPI_CXX_INCLUDE_PATH} ${MPI_Fortran_INCLUDE_PATH})
+    # Make sure we have a sufficient cmake version
+    cmake_minimum_required(VERSION ${OPENCMISS_CMAKE_MIN_VERSION} FATAL_ERROR)
+    
+    # Append the OpenCMISS module path to the current path
+    list(APPEND CMAKE_MODULE_PATH ${OPENCMISS_MODULE_PATH})
+    
+    # Add the prefix path so the config files can be found
+    set(CMAKE_PREFIX_PATH ${OPENCMISS_PREFIX_PATH} ${CMAKE_PREFIX_PATH})
+    
+    #message(STATUS "CMAKE_MODULE_PATH=${CMAKE_MODULE_PATH}\nCMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}")
+    
+    # For shared libs, use the correct install RPATH to enable binaries to find the shared libs.
+    # See http://www.cmake.org/Wiki/CMake_RPATH_handling
+    if (OPENCMISS_BUILD_SHARED_LIBS)
+        set(CMAKE_INSTALL_RPATH ${OPENCMISS_INSTALL_DIR}/lib)
+        set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
     endif()
     
-    # TODO: Maybe set mpi compiler wrappers here if used
+    # Add the opencmiss library (INTERFACE type is new since 3.0)
+    add_library(opencmiss INTERFACE)
     
-    macro(OPENCMISS_IMPORT)
-        message(STATUS "--")
-        message(STATUS "Initializing OpenCMISS environment...")
-        
-        # Append the OpenCMISS module path to the current path
-        list(APPEND CMAKE_MODULE_PATH ${OPENCMISS_MODULE_PATH})
-        
-        # Add the prefix path so the config files can be found
-        set(CMAKE_PREFIX_PATH ${OPENCMISS_PREFIX_PATH} ${CMAKE_PREFIX_PATH})
-        
-        #message(STATUS "CMAKE_MODULE_PATH=${CMAKE_MODULE_PATH}\nCMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}")
-        
-        # For shared libs, use the correct install RPATH to enable binaries to find the shared libs.
-        # See http://www.cmake.org/Wiki/CMake_RPATH_handling
-        if (OPENCMISS_BUILD_SHARED_LIBS)
-            set(CMAKE_INSTALL_RPATH ${OPENCMISS_INSTALL_DIR}/lib)
-            set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
-        endif()
-        
-        # Add the opencmiss library (INTERFACE type is new since 3.0)
-        add_library(opencmiss INTERFACE)
-        
-        # Add top level libraries of OpenCMISS framework if configured
-        if (OCM_USE_IRON)
-            find_package(IRON ${IRON_VERSION} REQUIRED)
-            target_link_libraries(opencmiss INTERFACE iron)
-        endif()
-        if (OCM_USE_ZINC)
-            find_package(ZINC ${ZINC_VERSION} REQUIRED)
-            target_link_libraries(opencmiss INTERFACE zinc)
-        endif()
-        message(STATUS "Initializing OpenCMISS environment... success")
-        message(STATUS "--")
-    endmacro()
+    # Add top level libraries of OpenCMISS framework if configured
+    if (OCM_USE_IRON)
+        find_package(IRON ${IRON_VERSION} REQUIRED)
+        target_link_libraries(opencmiss INTERFACE iron)
+    endif()
+    if (OCM_USE_ZINC)
+        find_package(ZINC ${ZINC_VERSION} REQUIRED)
+        target_link_libraries(opencmiss INTERFACE zinc)
+    endif()
     
     #get_target_property(ocd opencmiss INTERFACE_COMPILE_DEFINITIONS)
     #get_target_property(oid opencmiss INTERFACE_INCLUDE_DIRECTORIES)
@@ -90,5 +67,5 @@ if (OPENCMISS_BUILD_CONTEXT)
     
     set(OPENCMISS_FOUND YES)
 else()
-    message(FATAL_ERROR "Could not find OpenCMISS. Missing OpenCMISSBuildContext.cmake (HINTS: ${OPENCMISS_INSTALL_DIR})")
+    message(FATAL_ERROR "Could not find OpenCMISS. Missing OpenCMISSBuildInfo.cmake (HINTS: ${OPENCMISS_INSTALL_DIR})")
 endif()

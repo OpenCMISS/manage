@@ -56,7 +56,7 @@ else()
     
     # Remove CMAKE_INSTALL_PREFIX from CMAKE_SYSTEM_PREFIX_PATH - we dont want the module search to "accidentally"
     # discover the packages in our install directory, collect libraries and then re-turn them into targets (redundant round-trip)
-    if (CMAKE_INSTALL_PREFIX)
+    if (CMAKE_INSTALL_PREFIX AND CMAKE_SYSTEM_PREFIX_PATH)
         list(REMOVE_ITEM CMAKE_SYSTEM_PREFIX_PATH ${CMAKE_INSTALL_PREFIX})
         set(_readd YES)
     endif()
