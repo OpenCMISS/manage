@@ -167,7 +167,6 @@ MACRO(ADD_COMPONENT COMPONENT_NAME)
 		# currently set as extra arg (above), somehow does not work
 		#INSTALL_DIR ${CMAKE_INSTALL_PREFIX} 
 		INSTALL_COMMAND ${INSTALL_COMMAND}
-		STEP_TARGETS build install
 		# Logging
 		LOG_CONFIGURE ${_LOGFLAG}
 		LOG_BUILD ${_LOGFLAG}
@@ -198,9 +197,14 @@ MACRO(ADD_COMPONENT COMPONENT_NAME)
 	    COMMAND ${CMAKE_COMMAND} -E remove -f ${COMPONENT_BUILD_DIR}/ep_stamps/*-configure 
 	    COMMAND ${CMAKE_COMMAND} --build ${COMPONENT_BUILD_DIR} --target clean
 	)
+	# Add convenience direct-access forced build target for component
+	add_custom_target(${COMPONENT_NAME}-build
+	    COMMAND ${CMAKE_COMMAND} -E remove -f ${COMPONENT_BUILD_DIR}/ep_stamps/*-build 
+	    COMMAND ${CMAKE_COMMAND} --build ${COMPONENT_BUILD_DIR} --target install
+	)
 	if (BUILD_TESTS)
     	# Add convenience direct-access test target for component
-    	add_custom_target(${COMPONENT_NAME}-testdirect
+    	add_custom_target(${COMPONENT_NAME}-test
     	    COMMAND ${CMAKE_COMMAND} --build ${COMPONENT_BUILD_DIR} --target test
     	)
     	# Add a global test to run the external project's tests

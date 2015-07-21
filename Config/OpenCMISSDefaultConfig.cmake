@@ -66,6 +66,9 @@ FOREACH(OCM_DEP ${OPENCMISS_COMPONENTS})
     option(OCM_SYSTEM_${OCM_DEP} "Enable local system search for ${OCM_DEP}" ${_VALUE})
 ENDFOREACH()
 
+# Main version
+SET(OPENCMISS_VERSION 1.0)
+
 # Component versions
 SET(BLAS_VERSION 3.5.0)
 SET(HYPRE_VERSION 2.10.0) # Alternatives: 2.9.0

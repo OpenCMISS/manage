@@ -1,5 +1,5 @@
-set(OPENCMISS_TOOLCHAIN_INFO ${CMAKE_CURRENT_BINARY_DIR}/OpenCMISSToolchainInfo.cmake)
-set(OPENCMISS_BUILD_INFO ${CMAKE_CURRENT_BINARY_DIR}/OpenCMISSBuildInfo.cmake)
+set(TOOLCHAIN_VARS ${CMAKE_CURRENT_BINARY_DIR}/export/toolchain_vars.cmake)
+set(OPENCMISS_CONTEXT ${CMAKE_CURRENT_BINARY_DIR}/export/context.cmake)
 
 function(do_export CFILE)
     message(STATUS "Exporting OpenCMISS info: ${CFILE}")
@@ -34,7 +34,7 @@ foreach(lang C CXX Fortran)
         MPI_${lang}_COMPILE_FLAGS
     ) 
 endforeach()
-do_export(${OPENCMISS_TOOLCHAIN_INFO})
+do_export(${TOOLCHAIN_VARS})
 
 # Build config second    
 set(EXPORT_VARS
@@ -63,13 +63,7 @@ foreach(OCM_COMP ${OPENCMISS_COMPONENTS})
 endforeach()
 
 # OpenCMISS find modules - wrapper and extra find library scripts
-# The build tree uses the folder manage/CMakeModules directly, but the
-# installed OpenCMISS wont necessarily have the manage folder and needs to
-# be self-contained
-set(OPENCMISS_MODULE_PATH
-    ${OPENCMISS_FINDMODULE_WRAPPER_DIR}
-    ${OPENCMISS_INSTALL_ROOT}/cmake/OpenCMISSExtraFindModules)
 list(APPEND EXPORT_VARS OPENCMISS_MODULE_PATH)
 
-do_export(${OPENCMISS_BUILD_INFO})
+do_export(${OPENCMISS_CONTEXT})
 unset(EXPORT_VARS)

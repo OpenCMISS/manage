@@ -33,7 +33,7 @@ include(ToolchainSetup)
 ########################################################################
 # Ready to start the "build project"
 CMAKE_MINIMUM_REQUIRED(VERSION @OPENCMISS_CMAKE_MIN_VERSION@ FATAL_ERROR)
-project(OpenCMISS-Build VERSION 1.0 LANGUAGES C CXX Fortran)
+project(OpenCMISS VERSION ${OPENCMISS_VERSION} LANGUAGES C CXX Fortran)
 if ((NOT WIN32 OR MINGW) AND CMAKE_BUILD_TYPE STREQUAL "")
     SET(CMAKE_BUILD_TYPE RELEASE)
     message(STATUS "No CMAKE_BUILD_TYPE has been defined. Using RELEASE.")
@@ -88,21 +88,21 @@ SET(OPENCMISS_COMPONENTS_BINARY_DIR_MPI ${OPENCMISS_ROOT}/build/${ARCHITECTURE_P
 # Extra path segment for single configuration case - will give release/debug/...
 get_build_type_extra(BUILDTYPEEXTRA)
 # everything from the OpenCMISS main project goes into install/
-SET(OPENCMISS_COMPONENTS_INSTALL_PREFIX ${OPENCMISS_INSTALL_ROOT}/${ARCHITECTURE_PATH}/${BUILDTYPEEXTRA})
+set(OCM_COM_INST_PREFIX_MPI_NOBT ${OPENCMISS_INSTALL_ROOT}/${ARCHITECTURE_PATH_MPI})
+SET(OPENCMISS_COMPONENTS_INSTALL_PREFIX ${OCM_COM_INST_PREFIX_MPI_NOBT}/${BUILDTYPEEXTRA})
 SET(OPENCMISS_COMPONENTS_INSTALL_PREFIX_MPI ${OPENCMISS_INSTALL_ROOT}/${ARCHITECTURE_PATH_MPI}/${BUILDTYPEEXTRA})
-# Misc definitions
+
+######################
 # The COMMON_PACKAGE_CONFIG_DIR contains the cmake-generated target config files consumed by find_package(... CONFIG).
 # Those are "usually" placed under the lib/ folders of the installation tree, however, the OpenCMISS build system
 # install trees also have the build type as subfolders. As the config-files generated natively create differently named files
 # for each build type, they can be collected in a common subfolder. As the build type subfolder-element is the last in line,
 # we simply use the parent folder of the component's CMAKE_INSTALL_PREFIX to place the cmake package config files.
-######################
-# ATTENTION: this is (yet) pretty useless, as cmake seems to remove configurations for e.g. debug builds when placing config files for e.g. release
-# builds in the same folder. One folder containing config files for multiple configurations seems to be possible exclusively on multi-configuration
-# platforms, i.e. xcode or visual studio. GRRRRRR
-###################### 
-SET(COMMON_PACKAGE_CONFIG_DIR cmake) #../cmake ${OPENCMISS_ROOT}/install/${ARCHITECTURE_PATH}/
-
+# ATTENTION: this is (still) not usable. While older cmake versions deleted other-typed config files, they are now kept at least.
+# However, having the config file OUTSIDE the install prefix path still does not work correctly, and the fact that
+# we need to be able to determine build types for examples/iron/dependencies separately requires separate folders, for now.
+SET(COMMON_PACKAGE_CONFIG_DIR cmake)
+#SET(COMMON_PACKAGE_CONFIG_DIR ../cmake)
 # The path where find_package calls will find the cmake package config files for any opencmiss component
 set(OPENCMISS_PREFIX_PATH
     ${OPENCMISS_COMPONENTS_INSTALL_PREFIX}/${COMMON_PACKAGE_CONFIG_DIR} 
@@ -113,8 +113,8 @@ set(OPENCMISS_PREFIX_PATH
 # Prefix path assembly for remote installations of opencmiss dependencies
 function(get_remote_prefix_path DIR)
     get_filename_component(DIR ${DIR} ABSOLUTE)
-    if (EXISTS ${DIR}/OpenCMISSBuildInfo.cmake)
-        include(${DIR}/OpenCMISSBuildInfo.cmake)
+    if (EXISTS ${DIR}/context.cmake)
+        include(${DIR}/context.cmake)
         set(REMOTE_PREFIX_PATH ${OPENCMISS_PREFIX_PATH} PARENT_SCOPE)
     endif()
 endfunction()
@@ -126,14 +126,18 @@ endif()
 # If we have a OPENCMISS_DEPENDENCIES_DIR, it's either provided directly or constructed from OPENCMISS_DEPENDENCIES_ROOT
 if (OPENCMISS_DEPENDENCIES_DIR)
     # Need to wrap this into a function as a separate scope is needed in order to avoid overriding
-    # local values by those set in the opencmiss build context file.
+    # local values by those set in the opencmiss context file.
     get_remote_prefix_path(${OPENCMISS_DEPENDENCIES_DIR})
     if (REMOTE_PREFIX_PATH)
         message(STATUS "Using remote OpenCMISS component installation at ${OPENCMISS_DEPENDENCIES_DIR}...")
         list(APPEND CMAKE_PREFIX_PATH ${REMOTE_PREFIX_PATH})
         unset(REMOTE_PREFIX_PATH) 
     else()
-        message(FATAL_ERROR "No OpenCMISS build context file (OpenCMISSBuildInfo.cmake) could be found at OPENCMISS_DEPENDENCIES_DIR=${OPENCMISS_DEPENDENCIES_DIR}")
+        if (OPENCMISS_DEPENDENCIES_ROOT)
+            message(FATAL_ERROR "No OpenCMISS build context file (context.cmake) could be found using OPENCMISS_DEPENDENCIES_ROOT=${OPENCMISS_DEPENDENCIES_ROOT} (inferred OPENCMISS_DEPENDENCIES_DIR=${OPENCMISS_DEPENDENCIES_DIR})")
+        else()
+            message(FATAL_ERROR "No OpenCMISS build context file (context.cmake) could be found at OPENCMISS_DEPENDENCIES_DIR=${OPENCMISS_DEPENDENCIES_DIR}")
+        endif()
     endif()
 endif()
 
@@ -158,21 +162,8 @@ include(AddExamplesProject)
 
 ########################################################################
 # Installation stuff
-
-# Build context
 set(OPENCMISS_CMAKE_MIN_VERSION @OPENCMISS_CMAKE_MIN_VERSION@)
-set(OPENCMISS_BUILD_SHARED_LIBS ${BUILD_SHARED_LIBS})
-include(ExportBuildContext)
-install(FILES ${OPENCMISS_TOOLCHAIN_INFO}
-    ${OPENCMISS_BUILD_INFO}
-    ${OPENCMISS_MANAGE_DIR}/CMakeModules/FindOpenCMISSToolchain.cmake
-    ${OPENCMISS_MANAGE_DIR}/CMakeModules/FindOpenCMISS.cmake
-    DESTINATION ${OPENCMISS_COMPONENTS_INSTALL_PREFIX_MPI})
-
-# Copy the FindModule files so that the installation folder is self-contained
-install(DIRECTORY ${OPENCMISS_MANAGE_DIR}/CMakeModules/
-    DESTINATION ${OPENCMISS_INSTALL_ROOT}/cmake/OpenCMISSExtraFindModules
-    PATTERN "FindOpenCMISS*.cmake" EXCLUDE) 
+include(Install)
 
 ########################################################################
 # Misc targets for convenience
