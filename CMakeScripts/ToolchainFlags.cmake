@@ -25,36 +25,35 @@ if (TOOLCHAIN)
     message(STATUS "Trying to use ${TOOLCHAIN} compilers..")
     STRING(TOLOWER "${TOOLCHAIN}" TOOLCHAIN)
     if (TOOLCHAIN STREQUAL "gnu" OR TOOLCHAIN STREQUAL "mingw")
-        SET(CMAKE_C_COMPILER gcc)
-        SET(CMAKE_CXX_COMPILER g++)
-        SET(CMAKE_Fortran_COMPILER gfortran)
-        
         # ABI Flag -m$(ABI)
         
         # Release
         ADDFLAGALL(FLAGS_RELEASE "-Ofast")
         
         # Debug
+        ADDFLAGALL(FLAGS_DEBUG "-O0")
         if (OCM_WARN_ALL)
-            ADDFLAGALL(FLAGS_DEBUG "-Wall -O0")
+            ADDFLAGALL(FLAGS_DEBUG "-Wall")
         endif()
         ADDFLAG(CMAKE_Fortran_FLAGS_DEBUG -fbacktrace)
         # Compiler minor >= 8
-        #ADDFLAG(CMAKE_Fortran_FLAGS_DEBUG "-Warray-temporaries -Wextra -Wsurprising -Wrealloc-lhs-all")
+        if (CMAKE_Fortran_COMPILER_VERSION VERSION_GREATER 4.7)
+            ADDFLAG(CMAKE_Fortran_FLAGS_DEBUG "-Warray-temporaries -Wextra -Wsurprising -Wrealloc-lhs-all")
+        endif()
         if (OCM_CHECK_ALL)
             # Compiler version 4.4
-            #ADDFLAG(CMAKE_Fortran_FLAGS_DEBUG "-fbounds-check")
+            if (CMAKE_Fortran_COMPILER_VERSION VERSION_EQUAL 4.4)
+                ADDFLAG(CMAKE_Fortran_FLAGS_DEBUG "-fbounds-check")
+            endif()
             # Compiler minor >= 8
-            #ADDFLAG(CMAKE_Fortran_FLAGS_DEBUG "-finit-real=snan")
+            if (CMAKE_Fortran_COMPILER_VERSION VERSION_GREATER 4.7)
+                ADDFLAG(CMAKE_Fortran_FLAGS_DEBUG "-finit-real=snan")
+            endif()
             # Newer versions
             ADDFLAG(CMAKE_Fortran_FLAGS_DEBUG "-fcheck=all")
         endif()
         
     elseif (TOOLCHAIN STREQUAL "intel")
-        SET(CMAKE_C_COMPILER icc)
-        SET(CMAKE_CXX_COMPILER icpc)
-        SET(CMAKE_Fortran_COMPILER ifort)
-        
         # ABI Flag -m$(ABI)
         
         # Release
@@ -76,19 +75,9 @@ if (TOOLCHAIN)
         
     elseif(TOOLCHAIN STREQUAL "ibm")
         if (OCM_USE_MT)
-            SET(CMAKE_C_COMPILER xlc_r)
-            SET(CMAKE_CXX_COMPILER xlC_r)
-            # F77=xlf77_r
-            SET(CMAKE_Fortran_COMPILER xlf95_r)
-            
             # FindOpenMP uses "-qsmp" for multithreading.. will need to see.
             ADDFLAGALL(FLAGS_RELEASE "-qomp")
             ADDFLAGALL(FLAGS_DEBUG "-qomp:noopt")
-        else()
-            SET(CMAKE_C_COMPILER xlc)
-            SET(CMAKE_CXX_COMPILER xlC)
-            # F77=xlf77
-            SET(CMAKE_Fortran_COMPILER xlf95)
         endif()
         # ABI Flag -q$(ABI)
         
@@ -107,7 +96,7 @@ if (TOOLCHAIN)
             ADDFLAGALL(FLAGS_DEBUG "-qcheck")
         endif()
     else()
-        message(WARNING "Unknown toolchain: ${TOOLCHAIN}. Proceeding with CMake defaults.")
+        message(WARNING "Unknown toolchain: ${TOOLCHAIN}. Proceeding with CMake default flags.")
     endif()
 endif()
 
@@ -116,6 +105,7 @@ if (OCM_WITH_PROFILING)
     ADDFLAGALL(FLAGS "-p")
 endif()
 
+# Some verbose output for summary
 foreach(lang C CXX Fortran)
     if (CMAKE_${lang}_FLAGS)
         message(STATUS "${lang} FLAGS=${CMAKE_${lang}_FLAGS}")

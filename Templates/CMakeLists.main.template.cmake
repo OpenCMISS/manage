@@ -27,13 +27,18 @@ SET(MPI_BUILD_TYPE @MPI_BUILD_TYPE@)
 @MPI_HOME_DEF@
 ########################################################################
 
-# Between reading the config and starting the setup project.. this is the time for compiler stuff!
-include(ToolchainSetup)
+# Need to set the compilers before any project call
+include(ToolchainCompilers)
 
 ########################################################################
 # Ready to start the "build project"
 CMAKE_MINIMUM_REQUIRED(VERSION @OPENCMISS_CMAKE_MIN_VERSION@ FATAL_ERROR)
 project(OpenCMISS VERSION ${OPENCMISS_VERSION} LANGUAGES C CXX Fortran)
+
+# Need to set the compiler flags after any project call - this ensures the cmake platform values
+# are used, too.
+include(ToolchainFlags)
+
 if ((NOT WIN32 OR MINGW) AND CMAKE_BUILD_TYPE STREQUAL "")
     SET(CMAKE_BUILD_TYPE RELEASE)
     message(STATUS "No CMAKE_BUILD_TYPE has been defined. Using RELEASE.")
