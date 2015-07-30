@@ -20,83 +20,76 @@ endmacro()
 #    SET(CMAKE_${lang}_FLAGS "-m${ABI} ${CMAKE_${lang}_FLAGS}")
 #endforeach()
 
-# In this file the (possibly) set compiler mnemonics are used to specify default compilers.
-if (TOOLCHAIN)
-    message(STATUS "Trying to use ${TOOLCHAIN} compilers..")
-    STRING(TOLOWER "${TOOLCHAIN}" TOOLCHAIN)
-    if (TOOLCHAIN STREQUAL "gnu" OR TOOLCHAIN STREQUAL "mingw")
-        # ABI Flag -m$(ABI)
-        
-        # Release
-        ADDFLAGALL(FLAGS_RELEASE "-Ofast")
-        
-        # Debug
-        ADDFLAGALL(FLAGS_DEBUG "-O0")
-        if (OCM_WARN_ALL)
-            ADDFLAGALL(FLAGS_DEBUG "-Wall")
+if (CMAKE_COMPILER_IS_GNUC OR CMAKE_C_COMPILER_ID STREQUAL "GNU" OR MINGW)
+    # ABI Flag -m$(ABI)
+    
+    # Release
+    ADDFLAGALL(FLAGS_RELEASE "-Ofast")
+    
+    # Debug
+    ADDFLAGALL(FLAGS_DEBUG "-O0")
+    if (OCM_WARN_ALL)
+        ADDFLAGALL(FLAGS_DEBUG "-Wall")
+    endif()
+    ADDFLAG(CMAKE_Fortran_FLAGS_DEBUG -fbacktrace)
+    # Compiler minor >= 8
+    if (CMAKE_Fortran_COMPILER_VERSION VERSION_GREATER 4.7)
+        ADDFLAG(CMAKE_Fortran_FLAGS_DEBUG "-Warray-temporaries -Wextra -Wsurprising -Wrealloc-lhs-all")
+    endif()
+    if (OCM_CHECK_ALL)
+        # Compiler version 4.4
+        if (CMAKE_Fortran_COMPILER_VERSION VERSION_EQUAL 4.4)
+            ADDFLAG(CMAKE_Fortran_FLAGS_DEBUG "-fbounds-check")
         endif()
-        ADDFLAG(CMAKE_Fortran_FLAGS_DEBUG -fbacktrace)
         # Compiler minor >= 8
         if (CMAKE_Fortran_COMPILER_VERSION VERSION_GREATER 4.7)
-            ADDFLAG(CMAKE_Fortran_FLAGS_DEBUG "-Warray-temporaries -Wextra -Wsurprising -Wrealloc-lhs-all")
+            ADDFLAG(CMAKE_Fortran_FLAGS_DEBUG "-finit-real=snan")
         endif()
-        if (OCM_CHECK_ALL)
-            # Compiler version 4.4
-            if (CMAKE_Fortran_COMPILER_VERSION VERSION_EQUAL 4.4)
-                ADDFLAG(CMAKE_Fortran_FLAGS_DEBUG "-fbounds-check")
-            endif()
-            # Compiler minor >= 8
-            if (CMAKE_Fortran_COMPILER_VERSION VERSION_GREATER 4.7)
-                ADDFLAG(CMAKE_Fortran_FLAGS_DEBUG "-finit-real=snan")
-            endif()
-            # Newer versions
-            ADDFLAG(CMAKE_Fortran_FLAGS_DEBUG "-fcheck=all")
-        endif()
-        
-    elseif (TOOLCHAIN STREQUAL "intel")
-        # ABI Flag -m$(ABI)
-        
-        # Release
-        #ADDFLAGALL(FLAGS_RELEASE "-fast") - commented out in original file
-        ADDFLAGALL(FLAGS_RELEASE "-O3")
-        
-        # Debug
-        ADDFLAGALL(FLAGS_DEBUG "-traceback")
-        if (OCM_WARN_ALL)
-            ADDFLAG(CMAKE_C_FLAGS_DEBUG "-Wall")
-            ADDFLAG(CMAKE_CXX_FLAGS_DEBUG "-Wall")
-            ADDFLAG(CMAKE_Fortran_FLAGS_DEBUG "-warn all")
-        endif()
-        if (OCM_CHECK_ALL)
-            ADDFLAG(CMAKE_C_FLAGS_DEBUG "-Wcheck -fp-trap=common -ftrapuv")
-            ADDFLAG(CMAKE_CXX_FLAGS_DEBUG "-Wcheck -fp-trap=common -ftrapuv")
-            ADDFLAG(CMAKE_Fortran_FLAGS_DEBUG "-check all -fpe-all=0 -ftrapuv")
-        endif()
-        
-    elseif(TOOLCHAIN STREQUAL "ibm")
-        if (OCM_USE_MT)
-            # FindOpenMP uses "-qsmp" for multithreading.. will need to see.
-            ADDFLAGALL(FLAGS_RELEASE "-qomp")
-            ADDFLAGALL(FLAGS_DEBUG "-qomp:noopt")
-        endif()
-        # ABI Flag -q$(ABI)
-        
-        # Instruction type - use auto here (pwr4-pwr7 available)
-        ADDFLAGALL(FLAGS "-qarch=auto -qtune=auto")
-        
-        # Release
-        ADDFLAGALL(FLAGS_RELEASE "-qstrict")
-        
-        # Debug
-        if (OCM_WARN_ALL)
-            # Assuming 64bit builds here. will need to see if that irritates the compiler for 32bit arch
-            ADDFLAGALL(FLAGS_DEBUG "-qflag=i:i -qwarn64")
-        endif()
-        if (OCM_CHECK_ALL)
-            ADDFLAGALL(FLAGS_DEBUG "-qcheck")
-        endif()
-    else()
-        message(WARNING "Unknown toolchain: ${TOOLCHAIN}. Proceeding with CMake default flags.")
+        # Newer versions
+        ADDFLAG(CMAKE_Fortran_FLAGS_DEBUG "-fcheck=all")
+    endif()
+    
+elseif (CMAKE_C_COMPILER_ID STREQUAL "Intel" OR CMAKE_CXX_COMPILER_ID STREQUAL "Intel")
+    # ABI Flag -m$(ABI)
+    
+    # Release
+    #ADDFLAGALL(FLAGS_RELEASE "-fast") - commented out in original file
+    ADDFLAGALL(FLAGS_RELEASE "-O3")
+    
+    # Debug
+    ADDFLAGALL(FLAGS_DEBUG "-traceback")
+    if (OCM_WARN_ALL)
+        ADDFLAG(CMAKE_C_FLAGS_DEBUG "-Wall")
+        ADDFLAG(CMAKE_CXX_FLAGS_DEBUG "-Wall")
+        ADDFLAG(CMAKE_Fortran_FLAGS_DEBUG "-warn all")
+    endif()
+    if (OCM_CHECK_ALL)
+        ADDFLAG(CMAKE_C_FLAGS_DEBUG "-Wcheck -fp-trap=common -ftrapuv")
+        ADDFLAG(CMAKE_CXX_FLAGS_DEBUG "-Wcheck -fp-trap=common -ftrapuv")
+        ADDFLAG(CMAKE_Fortran_FLAGS_DEBUG "-check all -fpe-all=0 -ftrapuv")
+    endif()
+    
+elseif(CMAKE_C_COMPILER_ID STREQUAL "XL" OR CMAKE_CXX_COMPILER_ID STREQUAL "XL") # IBM case
+    if (OCM_USE_MT)
+        # FindOpenMP uses "-qsmp" for multithreading.. will need to see.
+        ADDFLAGALL(FLAGS_RELEASE "-qomp")
+        ADDFLAGALL(FLAGS_DEBUG "-qomp:noopt")
+    endif()
+    # ABI Flag -q$(ABI)
+    
+    # Instruction type - use auto here (pwr4-pwr7 available)
+    ADDFLAGALL(FLAGS "-qarch=auto -qtune=auto")
+    
+    # Release
+    ADDFLAGALL(FLAGS_RELEASE "-qstrict")
+    
+    # Debug
+    if (OCM_WARN_ALL)
+        # Assuming 64bit builds here. will need to see if that irritates the compiler for 32bit arch
+        ADDFLAGALL(FLAGS_DEBUG "-qflag=i:i -qwarn64")
+    endif()
+    if (OCM_CHECK_ALL)
+        ADDFLAGALL(FLAGS_DEBUG "-qcheck")
     endif()
 endif()
 
