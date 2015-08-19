@@ -92,10 +92,13 @@ SET(OPENCMISS_COMPONENTS_BINARY_DIR_MPI ${OPENCMISS_ROOT}/build/${ARCHITECTURE_P
 # Install dir
 # Extra path segment for single configuration case - will give release/debug/...
 get_build_type_extra(BUILDTYPEEXTRA)
-# everything from the OpenCMISS main project goes into install/
-set(OCM_COM_INST_PREFIX_MPI_NOBT ${OPENCMISS_INSTALL_ROOT}/${ARCHITECTURE_PATH_MPI})
-SET(OPENCMISS_COMPONENTS_INSTALL_PREFIX ${OCM_COM_INST_PREFIX_MPI_NOBT}/${BUILDTYPEEXTRA})
-SET(OPENCMISS_COMPONENTS_INSTALL_PREFIX_MPI ${OPENCMISS_INSTALL_ROOT}/${ARCHITECTURE_PATH_MPI}/${BUILDTYPEEXTRA})
+########### everything from the OpenCMISS main project goes into install/
+# This is also used in Install.cmake to place the opencmiss config files.
+set(OPENCMISS_COMPONENTS_INSTALL_PREFIX_MPI_NO_BUILD_TYPE ${OPENCMISS_INSTALL_ROOT}/${ARCHITECTURE_PATH_MPI})
+# This is the install prefix for all components without mpi 
+SET(OPENCMISS_COMPONENTS_INSTALL_PREFIX ${OPENCMISS_INSTALL_ROOT}/${ARCHITECTURE_PATH}/${BUILDTYPEEXTRA})
+# This is the install path for mpi-aware components
+SET(OPENCMISS_COMPONENTS_INSTALL_PREFIX_MPI ${OPENCMISS_COMPONENTS_INSTALL_PREFIX_MPI_NO_BUILD_TYPE}/${BUILDTYPEEXTRA})
 
 ######################
 # The COMMON_PACKAGE_CONFIG_DIR contains the cmake-generated target config files consumed by find_package(... CONFIG).

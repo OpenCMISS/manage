@@ -41,7 +41,7 @@ install(
     FILES ${CMAKE_CURRENT_BINARY_DIR}/export/opencmiss-config.cmake
         ${CMAKE_CURRENT_BINARY_DIR}/export/opencmisstoolchain-config.cmake 
         ${CMAKE_CURRENT_BINARY_DIR}/export/opencmiss-config-version.cmake
-    DESTINATION ${OCM_COM_INST_PREFIX_MPI_NOBT}
+    DESTINATION ${OPENCMISS_COMPONENTS_INSTALL_PREFIX_MPI_NO_BUILD_TYPE}
 )
 
 # Copy the FindModule files so that the installation folder is self-contained
