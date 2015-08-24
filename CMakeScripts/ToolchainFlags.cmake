@@ -8,6 +8,9 @@ macro(ADDFLAGALL SUFFIX VALUE)
     endforeach()
 endmacro()
 
+include(CheckCCompilerFlag)
+include(CheckFortranCompilerFlag)
+
 # ABI detection - no crosscompiling implemented yet, so will use native
 #if (NOT ABI)
 #if( CMAKE_SIZEOF_VOID_P EQUAL 8 )
@@ -24,7 +27,12 @@ if (CMAKE_COMPILER_IS_GNUC OR CMAKE_C_COMPILER_ID STREQUAL "GNU" OR MINGW)
     # ABI Flag -m$(ABI)
     
     # Release
-    ADDFLAGALL(FLAGS_RELEASE "-Ofast")
+    CHECK_C_COMPILER_FLAG("-Ofast" HAVE_OFAST_SUPPORT)
+    if (HAVE_OFAST_SUPPORT)
+        ADDFLAGALL(FLAGS_RELEASE "-Ofast")
+    else()
+        ADDFLAGALL(FLAGS_RELEASE "-O3")
+    endif()
     
     # Debug
     ADDFLAGALL(FLAGS_DEBUG "-O0")

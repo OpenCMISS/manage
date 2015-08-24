@@ -33,6 +33,7 @@
 #    MPI_<lang>_INCLUDE_PATH    Include path(s) for MPI header
 #    MPI_<lang>_LINK_FLAGS      Linking flags for MPI programs
 #    MPI_<lang>_LIBRARIES       All libraries to link MPI programs against
+#    MPI_Fortran_MODULE_COMPATIBLE True if "USE MPI" works. Have to use "include mpif.h" else.
 #
 # Additionally, FindMPI sets the following variables for running MPI
 # programs from the command line:
@@ -926,6 +927,20 @@ foreach (lang C CXX Fortran)
         endif()
         messagev("MPI ${lang} Libs: ${MPI_${lang}_LIBRARIES}")
         messagev("MPI ${lang} Path: ${MPI_${lang}_INCLUDE_PATH}")
+        
+        # Check extra case for Fortran USE MPI module inclusion
+        if (lang STREQUAL Fortran)
+            include(CheckFortranSourceCompiles)
+            set(CMAKE_REQUIRED_FLAGS "${MPI_Fortran_COMPILE_FLAGS}")
+            set(CMAKE_REQUIRED_INCLUDES ${MPI_Fortran_INCLUDE_PATH})
+            set(CMAKE_REQUIRED_LIBRARIES ${MPI_Fortran_LIBRARIES})
+            # Stupid tabs \t! 
+            CHECK_Fortran_SOURCE_COMPILES("\tprogram test_mpi_module
+                \tuse mpi
+                \tend program test_mpi_module"
+                MPI_Fortran_MODULE_COMPATIBLE)
+        endif()
+        
     endif()
 
     if (regular_compiler_worked)
