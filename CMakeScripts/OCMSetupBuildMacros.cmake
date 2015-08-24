@@ -90,8 +90,9 @@ MACRO(ADD_COMPONENT COMPONENT_NAME)
             SET(DOWNLOAD_CMDS
                 GIT_REPOSITORY ${${COMPONENT_NAME}_REPO}
                 GIT_TAG ${${COMPONENT_NAME}_BRANCH}
-                UPDATE_COMMAND ${GIT_EXECUTABLE} pull
+                
             )
+            set(_UPDATE_COMMAND UPDATE_COMMAND ${GIT_EXECUTABLE} pull)
             #message(STATUS "DOWNLOAD_CMDS=${DOWNLOAD_CMDS}")
         else()
             message(FATAL_ERROR "Could not find GIT. GIT is required if OCM_GIT_CLONE_${COMPONENT_NAME} is set.")
@@ -132,6 +133,7 @@ MACRO(ADD_COMPONENT COMPONENT_NAME)
         #--Download step--------------
         ${DOWNLOAD_CMDS}
         SOURCE_DIR ${COMPONENT_SOURCE}
+        ${_UPDATE_COMMAND}
         CONFIGURE_COMMAND ""
         BUILD_COMMAND ""
         INSTALL_COMMAND ""

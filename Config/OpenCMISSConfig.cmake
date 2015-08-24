@@ -48,13 +48,6 @@ foreach(OCM_COMP ${OPENCMISS_COMPONENTS})
     if (OCM_SYSTEM_ALL)
         SET(OCM_SYSTEM_${OCM_COMP} YES)
     endif()
-    if (NOT OCM_COMP STREQUAL MPI) # Dont show that for MPI - have different implementations
-    	string(SUBSTRING "${OCM_COMP}              " 0 12 OCM_COMP_FIXED_SIZE)
-    	string(SUBSTRING "${OCM_USE_${OCM_COMP}}   " 0  3 OCM_USE_FIXED_SIZE)
-    	string(SUBSTRING "${OCM_SYSTEM_${OCM_COMP}}    " 0  3 OCM_SYSTEM_FIXED_SIZE)
-        message(STATUS "OpenCMISS component ${OCM_COMP_FIXED_SIZE}: Enabled ${OCM_USE_FIXED_SIZE}, System search ${OCM_SYSTEM_FIXED_SIZE}, Version '${${OCM_COMP}_VERSION}'")
-    endif()
-    
     # Force "devel" branches for each component of DEVEL_ALL is set
     if (OCM_DEVEL_ALL)
         SET(${OCM_COMP}_BRANCH devel)
@@ -62,6 +55,13 @@ foreach(OCM_COMP ${OPENCMISS_COMPONENTS})
     # All git clone enabled?
     if (OCM_GIT_CLONE_ALL)
         SET(OCM_GIT_CLONE_${OCM_COMP} YES)
+    endif()
+    if (NOT OCM_COMP STREQUAL MPI) # Dont show that for MPI - have different implementations
+    	string(SUBSTRING "${OCM_COMP}              " 0 12 OCM_COMP_FIXED_SIZE)
+    	string(SUBSTRING "${OCM_USE_${OCM_COMP}}   " 0  3 OCM_USE_FIXED_SIZE)
+    	string(SUBSTRING "${OCM_SYSTEM_${OCM_COMP}}    " 0  3 OCM_SYSTEM_FIXED_SIZE)
+    	# ${OCM_COMP}_BRANCH is as good as version (this is what is effectively checked out) and will also display "devel" correctly
+        message(STATUS "OpenCMISS component ${OCM_COMP_FIXED_SIZE}: Enabled ${OCM_USE_FIXED_SIZE}, System search ${OCM_SYSTEM_FIXED_SIZE}, Version '${${OCM_COMP}_BRANCH}'")
     endif()
 endforeach()
 if (OCM_DEVEL_ALL)
