@@ -11,12 +11,18 @@ set(BUILD_TESTS ON)
 #SET(GITHUB_USERNAME )
 
 # If enabled, ssl connections like git@github.com/username are used instead of https access.
-# Requires public key registration with github but wont require to enter the password every time. 
+# Requires public key registration with github but wont require to enter the password (for push) every time. 
 #SET(GITHUB_USE_SSL YES)
+
+# Override any local variable and clone the repository for each component locally
+#set(OCM_GIT_CLONE_ALL YES)
+
+# Override any local variable and have CMake download/checkout the "devel" branch of any components repository
+#set(OCM_DEVEL_ALL YES)
 
 # If you issue "make clean" from the manage build folder, normally the external projects (i.e. dependencies) wont completely re-build.
 # Set this to true to have the build system remove the CMakeCache.txt of each dependency, which triggers a complete re-build. 
-set(OCM_CLEAN_REBUILDS_COMPONENTS NO)
+set(OCM_CLEAN_REBUILDS_COMPONENTS YES)
 
 # The default for developers is to directly print the build output to the standard output/terminal.
 # This way developers directly see any errors instead of having to open log files.

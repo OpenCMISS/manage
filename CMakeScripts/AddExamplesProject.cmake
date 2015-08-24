@@ -6,7 +6,7 @@ SET(EXAMPLES_REPO https://github.com/rondiplomatico/examples)
 set(EXAMPLES_BRANCH cmake)
 
 # git repo or zip!
-if (OCM_DEVEL_EXAMPLES)
+if (OCM_GIT_CLONE_EXAMPLES)
     find_package(Git)
     if(GIT_FOUND)
         if (NOT EXAMPLES_REPO)

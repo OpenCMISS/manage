@@ -70,7 +70,7 @@ MACRO(ADD_COMPONENT COMPONENT_NAME)
 
     SET(DOWNLOAD_CMDS )
     # Developer mode
-    if (${OCM_DEVEL_${COMPONENT_NAME}})
+    if (${OCM_GIT_CLONE_${COMPONENT_NAME}})
         find_package(Git)
         if(GIT_FOUND)
             #message(STATUS "GITHUB_ORGANIZATION=${GITHUB_ORGANIZATION}, GITHUB_USERNAME=${GITHUB_USERNAME}")
@@ -90,13 +90,14 @@ MACRO(ADD_COMPONENT COMPONENT_NAME)
             SET(DOWNLOAD_CMDS
                 GIT_REPOSITORY ${${COMPONENT_NAME}_REPO}
                 GIT_TAG ${${COMPONENT_NAME}_BRANCH}
+                UPDATE_COMMAND ${GIT_EXECUTABLE} pull
             )
             #message(STATUS "DOWNLOAD_CMDS=${DOWNLOAD_CMDS}")
         else()
-            message(FATAL_ERROR "Could not find GIT. GIT is required for development mode of component ${COMPONENT_NAME}")
+            message(FATAL_ERROR "Could not find GIT. GIT is required if OCM_GIT_CLONE_${COMPONENT_NAME} is set.")
         endif()
     
-    # Default: Download the current version branch as zip of no development flag is set
+    # Default: Download the current version branch as zip of no git clone flag is set
     else()
         ################@TEMP@#################
         # Temporary fix to also adhere to "custom" repository locations when in user mode.
@@ -134,7 +135,7 @@ MACRO(ADD_COMPONENT COMPONENT_NAME)
         CONFIGURE_COMMAND ""
         BUILD_COMMAND ""
         INSTALL_COMMAND ""
-        STEP_TARGETS download update
+        STEP_TARGETS update
         LOG_DOWNLOAD ${_LOGFLAG}
     )
     
@@ -196,6 +197,13 @@ MACRO(ADD_COMPONENT COMPONENT_NAME)
 	add_custom_target(${COMPONENT_NAME}-clean
 	    COMMAND ${CMAKE_COMMAND} -E remove -f ${COMPONENT_BUILD_DIR}/ep_stamps/*-configure 
 	    COMMAND ${CMAKE_COMMAND} --build ${COMPONENT_BUILD_DIR} --target clean
+	)
+	# Add convenience direct-access update target for component
+	# (This just invokes the ${COMPONENT_NAME}_SRC-update target exposed in the source external project,
+	# essentially allowing to call ${COMPONENT_NAME}-update instead of ${COMPONENT_NAME}_SRC-update)
+	add_custom_target(${COMPONENT_NAME}-update
+	    #COMMAND ${CMAKE_COMMAND} -E remove -f ${COMPONENT_BUILD_DIR}/ep_stamps/*-configure 
+	    COMMAND ${CMAKE_COMMAND} --build ${COMPONENT_BUILD_DIR} --target ${COMPONENT_NAME}_SRC-update
 	)
 	# Add convenience direct-access forced build target for component
 	add_custom_target(${COMPONENT_NAME}-build
