@@ -135,7 +135,7 @@ MACRO(ADD_COMPONENT COMPONENT_NAME)
         CONFIGURE_COMMAND ""
         BUILD_COMMAND ""
         INSTALL_COMMAND ""
-        STEP_TARGETS update
+        STEP_TARGETS download update
         LOG_DOWNLOAD ${_LOGFLAG}
     )
     
