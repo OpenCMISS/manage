@@ -222,8 +222,9 @@ if (DEFINED MPI_HOME)
     SET(PATHOPT NO_DEFAULT_PATH)
 else()
     # Allow all paths, and add an extra path if set
-    SET(PATHOPT )
-
+    set(PATHOPT )
+    # Start with MPI_HOME from the environment, of given
+    set(_MPI_PREFIX_PATH $ENV{MPI_HOME})
     # Check if a mpi mnemonic is given
     # Standard local paths will be added below later
     if(DEFINED MPI)
@@ -786,7 +787,7 @@ endfunction()
 #messagev("MPI executable: names=${_MPI_EXEC_NAMES},hints=${_MPI_PREFIX_PATH},PATH_SUFFIXES=${_BIN_SUFFIX},PATHOPT=${PATHOPT}")
 find_program(MPIEXEC
   NAMES ${_MPI_EXEC_NAMES}
-  HINTS ${_MPI_PREFIX_PATH} $ENV{MPI_HOME}
+  HINTS ${_MPI_PREFIX_PATH}
   PATH_SUFFIXES ${_BIN_SUFFIX}
   ${PATHOPT}
   DOC "Executable for running MPI programs.")
@@ -855,8 +856,7 @@ foreach (lang C CXX Fortran)
     #messagev("Looking for MPI_${lang}_COMPILER with names ${_MPI_${lang}_COMPILER_NAMES} at ${_MPI_PREFIX_PATH} + environment PATH")
     find_program(MPI_${lang}_COMPILER
       NAMES  ${_MPI_${lang}_COMPILER_NAMES}
-      # Look for our locations first then on environment path
-      HINTS  ${_MPI_PREFIX_PATH} $ENV{MPI_HOME}
+      HINTS  ${_MPI_PREFIX_PATH}
       PATH_SUFFIXES ${_BIN_SUFFIX}
       ${PATHOPT})
     interrogate_mpi_compiler(${lang} ${try_libs})
@@ -892,7 +892,7 @@ foreach (lang C CXX Fortran)
               messagev("The found MPI_${lang} compiler '${MPI_${lang}_COMPILER}' does not match the requested MPI implementation '${MNEMONIC}'.")
 #             messagev("Check your include paths (suffixes '${_BIN_SUFFIX}' each):
 #1. CMAKE_PREFIX_PATH ${CMAKE_PREFIX_PATH}
-#2. Build system guess ${_MPI_PREFIX_PATH} $ENV{MPI_HOME}
+#2. Build system guess ${_MPI_PREFIX_PATH}
 #3. CMAKE_SYSTEM_PREFIX_PATH ${CMAKE_SYSTEM_PREFIX_PATH}
 #Alternatively, specify MPI_HOME or set a full path to MPI_${lang}_COMPILER")
               execute_process(
