@@ -1,3 +1,5 @@
 if (NOT EXISTS ${FOLDER}/CMakeLists.txt)
-    execute_process(COMMAND ${CMAKE_COMMAND} --build ${BINDIR} --target ${TARGET})
+    file(GLOB STAMPS ${STAMP_DIR}/${COMPONENT}_SRC*)
+    file(REMOVE ${STAMPS})
+    execute_process(COMMAND ${CMAKE_COMMAND} --build ${BINDIR} --target ${COMPONENT}_SRC-download)
 endif()

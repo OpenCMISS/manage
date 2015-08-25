@@ -124,6 +124,9 @@ MACRO(ADD_COMPONENT COMPONENT_NAME)
     endif()
     
     # Add source download/update project
+    #
+    # This is separate from the actual build project for the component, as we want to use the same
+    # source for different builds/architecture paths (shared/static, different MPI)
     LIST(APPEND _OCM_REQUIRED_SOURCES ${COMPONENT_NAME})
     ExternalProject_Add(${COMPONENT_NAME}_SRC
         PREFIX ${OPENCMISS_ROOT}/src/download/
@@ -141,8 +144,20 @@ MACRO(ADD_COMPONENT COMPONENT_NAME)
         LOG_DOWNLOAD ${_LOGFLAG}
     )
     
+    # Add extra target that makes sure the source files are being present
+	# Triggers build of ${COMPONENT_NAME}_SRC if no CMakeLists.txt is found in the target source directory.
+	add_custom_target(CHECK_${COMPONENT_NAME}_SOURCES 
+	        COMMAND ${CMAKE_COMMAND}
+                -DCOMPONENT=${COMPONENT_NAME}
+                -DFOLDER=${COMPONENT_SOURCE}
+                -DBINDIR=${CMAKE_CURRENT_BINARY_DIR}
+                -DSTAMP_DIR=${OPENCMISS_ROOT}/src/download/stamps
+                -P ${OPENCMISS_MANAGE_DIR}/CMakeScripts/CheckSourceExists.cmake
+            COMMENT "Checking ${COMPONENT_NAME} sources are present"
+    )  
+    
 	ExternalProject_Add(${COMPONENT_NAME}
-		DEPENDS ${${COMPONENT_NAME}_DEPS}
+		DEPENDS ${${COMPONENT_NAME}_DEPS} CHECK_${COMPONENT_NAME}_SOURCES
 		PREFIX ${COMPONENT_BUILD_DIR}
 		LIST_SEPARATOR ${OCM_LIST_SEPARATOR}
 		TMP_DIR ${COMPONENT_BUILD_DIR}/ep_tmp
@@ -181,24 +196,11 @@ MACRO(ADD_COMPONENT COMPONENT_NAME)
         set_directory_properties(PROPERTIES ADDITIONAL_MAKE_CLEAN_FILES ${COMPONENT_BUILD_DIR}/CMakeCache.txt)
     endif()
 	
-	# Add extra step that makes sure the source files at least exist at the first run.
-	# Triggers build of ${COMPONENT_NAME}_SRC if not found.
-	# Adding the DEPENDS line also takes care to re-build the component whenever the main cmakelists.txt changes.
-	#
-	# This could be added as DOWNLOAD_COMMAND inside the ExternalProject_Add above, however, this feels cleaner
-	# and can be commented out easier
-	ExternalProject_Add_Step(${COMPONENT_NAME} check_sources
-	        COMMAND ${CMAKE_COMMAND}
-                -DTARGET=${COMPONENT_NAME}_SRC-download
-                -DFOLDER=${COMPONENT_SOURCE}
-                -DBINDIR=${CMAKE_CURRENT_BINARY_DIR}
-                -P ${OPENCMISS_MANAGE_DIR}/CMakeScripts/CheckSourceExists.cmake
-            DEPENDERS configure
-	)
 	# Add convenience direct-access clean target for component
 	add_custom_target(${COMPONENT_NAME}-clean
 	    COMMAND ${CMAKE_COMMAND} -E remove -f ${COMPONENT_BUILD_DIR}/ep_stamps/*-configure 
 	    COMMAND ${CMAKE_COMMAND} --build ${COMPONENT_BUILD_DIR} --target clean
+	    COMMAND ${CMAKE_COMMAND} -E remove -f ${COMPONENT_BUILD_DIR}/CMakeCache.txt
 	)
 	# Add convenience direct-access update target for component
 	# (This just invokes the ${COMPONENT_NAME}_SRC-update target exposed in the source external project,
