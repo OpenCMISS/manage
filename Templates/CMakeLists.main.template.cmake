@@ -117,47 +117,19 @@ set(OPENCMISS_PREFIX_PATH
     ${OPENCMISS_COMPONENTS_INSTALL_PREFIX_MPI}/${COMMON_PACKAGE_CONFIG_DIR}
 )
 
-###################### 
-# Prefix path assembly for remote installations of opencmiss dependencies
-function(get_remote_prefix_path DIR)
-    get_filename_component(DIR ${DIR} ABSOLUTE)
-    if (EXISTS ${DIR}/context.cmake)
-        include(${DIR}/context.cmake)
-        set(REMOTE_PREFIX_PATH ${OPENCMISS_PREFIX_PATH} PARENT_SCOPE)
-    endif()
-endfunction()
-# In case we are provided with a remote root directory, we are creating the same sub-path as we are locally using
-# to import the matching libraries
-if (OPENCMISS_DEPENDENCIES_ROOT)
-    set(OPENCMISS_DEPENDENCIES_DIR ${OPENCMISS_DEPENDENCIES_ROOT}/${ARCHITECTURE_PATH}/${BUILDTYPEEXTRA})
-endif()
-# If we have a OPENCMISS_DEPENDENCIES_DIR, it's either provided directly or constructed from OPENCMISS_DEPENDENCIES_ROOT
-if (OPENCMISS_DEPENDENCIES_DIR)
-    # Need to wrap this into a function as a separate scope is needed in order to avoid overriding
-    # local values by those set in the opencmiss context file.
-    get_remote_prefix_path(${OPENCMISS_DEPENDENCIES_DIR})
-    if (REMOTE_PREFIX_PATH)
-        message(STATUS "Using remote OpenCMISS component installation at ${OPENCMISS_DEPENDENCIES_DIR}...")
-        list(APPEND CMAKE_PREFIX_PATH ${REMOTE_PREFIX_PATH})
-        unset(REMOTE_PREFIX_PATH) 
-    else()
-        if (OPENCMISS_DEPENDENCIES_ROOT)
-            message(FATAL_ERROR "No OpenCMISS build context file (context.cmake) could be found using OPENCMISS_DEPENDENCIES_ROOT=${OPENCMISS_DEPENDENCIES_ROOT} (inferred OPENCMISS_DEPENDENCIES_DIR=${OPENCMISS_DEPENDENCIES_DIR})")
-        else()
-            message(FATAL_ERROR "No OpenCMISS build context file (context.cmake) could be found at OPENCMISS_DEPENDENCIES_DIR=${OPENCMISS_DEPENDENCIES_DIR}")
-        endif()
-    endif()
-endif()
+######################
+# Checks if conditions for a remote installation of opencmiss are given and augments the prefix path
+# by a matching remote one
+# If the according remote directory does not exist or any package is not build there, it will be built
+# locally.
+include(OCCheckRemoteInstallation)
 
 ###################### 
 # Collect the common arguments for any package/component
 include(OCCollectComponentDefinitions)
 
-#message(STATUS "OpenCMISS components common definitions:\n${COMPONENT_COMMON_DEFS}")
-
 # Those list variables will be filled by the build macros
 SET(_OCM_SELECTED_COMPONENTS )
-SET(_OCM_NEED_INITIAL_SOURCE_DOWNLOAD NO)
 
 ########################################################################
 # Actual external project configurations

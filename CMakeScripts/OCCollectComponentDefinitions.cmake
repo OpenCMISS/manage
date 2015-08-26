@@ -80,3 +80,5 @@ endif()
 if (BLA_VENDOR)
     list(APPEND COMPONENT_COMMON_DEFS -DBLA_VENDOR=${BLA_VENDOR})
 endif()
+
+#message(STATUS "OpenCMISS components common definitions:\n${COMPONENT_COMMON_DEFS}")
