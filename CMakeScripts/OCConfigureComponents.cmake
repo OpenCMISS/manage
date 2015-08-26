@@ -4,7 +4,7 @@
 #
 # The main sections are Utils, Dependencies and Iron.
 #
-# The main macro is addAndConfigureLocalComponent defined in OCMSetupBuildMacros.cmake.
+# The main macro is addAndConfigureLocalComponent defined in OCComponentSetupMacros.cmake.
 # Its behaviour is controlled (despite the direct argument) by
 # SUBGROUP_PATH: Determines a grouping folder to sort components into.
 # GITHUB_ORGANIZATION: For the default source locations, we use the OpenCMISS github organizations to group the components sources.

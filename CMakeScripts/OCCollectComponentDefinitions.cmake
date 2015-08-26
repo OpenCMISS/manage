@@ -4,7 +4,7 @@ SET(COMPONENT_COMMON_DEFS )
 
 # As the CMAKE_ARGS are a list themselves, we need to treat the ; in the (possible) list of module_paths
 # specially. Therefore CMAKE has a special command LIST_SEPARATOR within the ExternalProject macros
-# See also OCMSetupBuildMacros.cmake:144
+# See also OCComponentSetupMacros.cmake:144
 set(OCM_LIST_SEPARATOR "-<ocm_list_sep>-") # just use anything unlikely to be passed as an actual variable string
 STRING(REPLACE ";" ${OCM_LIST_SEPARATOR} CMAKE_MODULE_PATH_ESC "${CMAKE_MODULE_PATH}")
 STRING(REPLACE ";" ${OCM_LIST_SEPARATOR} OPENCMISS_PREFIX_PATH_ESC "${OPENCMISS_PREFIX_PATH}")

@@ -11,7 +11,7 @@ set(OPENCMISS_MODULE_PATH
     ${OPENCMISS_INSTALL_ROOT}/cmake/OpenCMISSExtraFindModules)
 
 # ExportVariables defines OPENCMISS_VARS
-include(ExportVariables)
+include(OCInstallExportVariables)
 install(
     FILES ${OPENCMISS_CONTEXT}
     DESTINATION ${OPENCMISS_COMPONENTS_INSTALL_PREFIX_MPI}

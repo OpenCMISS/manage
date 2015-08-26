@@ -191,7 +191,7 @@ function(createExternalProjects COMPONENT_NAME SOURCE_DIR BINARY_DIR DEFS)
                 -DFOLDER=${SOURCE_DIR}
                 -DBINDIR=${CMAKE_CURRENT_BINARY_DIR}
                 -DSTAMP_DIR=${OPENCMISS_ROOT}/src/download/stamps
-                -P ${OPENCMISS_MANAGE_DIR}/CMakeScripts/CheckSourceExists.cmake
+                -P ${OPENCMISS_MANAGE_DIR}/CMakeScripts/ScriptCheckSourceExists.cmake
             COMMENT "Checking ${COMPONENT_NAME} sources are present"
     )  
     

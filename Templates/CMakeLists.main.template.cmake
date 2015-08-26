@@ -28,7 +28,7 @@ SET(MPI_BUILD_TYPE @MPI_BUILD_TYPE@)
 ########################################################################
 
 # Need to set the compilers before any project call
-include(ToolchainCompilers)
+include(OCToolchainCompilers)
 
 ########################################################################
 # Ready to start the "build project"
@@ -37,7 +37,7 @@ project(OpenCMISS VERSION ${OPENCMISS_VERSION} LANGUAGES C CXX Fortran)
 
 # Need to set the compiler flags after any project call - this ensures the cmake platform values
 # are used, too.
-include(ToolchainFlags)
+include(OCToolchainFlags)
 
 if ((NOT WIN32 OR MINGW) AND CMAKE_BUILD_TYPE STREQUAL "")
     SET(CMAKE_BUILD_TYPE RELEASE)
@@ -45,19 +45,19 @@ if ((NOT WIN32 OR MINGW) AND CMAKE_BUILD_TYPE STREQUAL "")
 endif()
 
 include(ExternalProject)
-include(OCMSetupArchitecture)
-include(OCMSetupBuildMacros)
+include(OCArchitecturePath)
+include(OCComponentSetupMacros)
 
 ########################################################################
 # Utilities
-include(InstallFindModuleWrappers)
+include(OCInstallFindModuleWrappers)
 # Add CMakeModules directory after wrapper module directory (set in above script)
 # This folder is also exported to the install tree upon "make install" and
 # then used within the FindOpenCMISS.cmake module script
 list(APPEND CMAKE_MODULE_PATH 
     ${OPENCMISS_MANAGE_DIR}/CMakeModules
 )
-include(DetectFortranMangling)
+include(OCDetectFortranMangling)
 
 # Multithreading
 if(OCM_USE_MT)
@@ -69,7 +69,7 @@ endif()
 
 # Unless we said to not have MPI or MPI_HOME is given, see that it's available.
 if(NOT (DEFINED MPI_HOME OR MPI STREQUAL none))
-    include(MPIConfig)
+    include(OCMPIConfig)
 endif()
 # Note:
 # If MPI_HOME is set, we'll just pass it on to the external projects where the
@@ -151,7 +151,7 @@ endif()
 
 ###################### 
 # Collect the common arguments for any package/component
-include(CollectComponentDefinitions)
+include(OCCollectComponentDefinitions)
 
 #message(STATUS "OpenCMISS components common definitions:\n${COMPONENT_COMMON_DEFS}")
 
@@ -163,15 +163,15 @@ SET(_OCM_NEED_INITIAL_SOURCE_DOWNLOAD NO)
 # Actual external project configurations
 
 # Dependencies, Iron, ...
-include(ConfigureComponents)
+include(OCConfigureComponents)
 
 # Examples
-include(AddExamplesProject)
+include(OCAddExamplesProject)
 
 ########################################################################
 # Installation stuff
 set(OPENCMISS_CMAKE_MIN_VERSION @OPENCMISS_CMAKE_MIN_VERSION@)
-include(Install)
+include(OCInstall)
 
 ########################################################################
 # Misc targets for convenience
@@ -189,7 +189,7 @@ add_custom_target(update
     DEPENDS ${_OCM_SOURCE_UPDATE_TARGETS}
 )
 
-# Need to enable testing in order for any add_test calls (see OCMSetupBuildMacros) to work
+# Need to enable testing in order for any add_test calls (see OCComponentSetupMacros) to work
 if (BUILD_TESTS)
     enable_testing()
 endif()

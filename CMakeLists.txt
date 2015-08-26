@@ -84,7 +84,7 @@ LIST(APPEND CMAKE_MODULE_PATH
 # If its too old, the script will stop with an appropriate error message.
 # The option is to either come up with a sufficiently new version yourself,
 # or to build cmake using the (then generated) "cmake" target.
-include(CMakeCheck)
+include(OCCMakeCheck)
 if (NOT CMAKE_COMPATIBLE)
     return()
 endif(NOT CMAKE_COMPATIBLE)
@@ -125,7 +125,7 @@ else()
     set(MPI_BUILD_TYPE release)
 endif()
 unset(_SYSMPI_DEF)
-include(MPIPreflight)
+include(OCMPIPreflight)
 
 # This is the main build file location for each compiler/mpi combination.
 # We need to have different base folders for MPI in release/debug modes.
@@ -134,7 +134,7 @@ SET(MAIN_BINARY_DIR ${CMAKE_CURRENT_BINARY_DIR}/${BUILD_IDENT})
 file(MAKE_DIRECTORY ${MAIN_BINARY_DIR})
 
 # # Create a local config file at target folder if not exists
-include(CreateLocalConfig)
+include(OCCreateLocalConfig)
 
 # Configure the main build CMakeLists.txt
 if (TOOLCHAIN)

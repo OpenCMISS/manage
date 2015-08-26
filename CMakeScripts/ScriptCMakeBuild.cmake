@@ -37,7 +37,7 @@ MACRO(BUILD_CMAKE VERSION_TO_BUILD VERSION_TO_BUILD_MAJ BUILD_WITH_OPENSSL)
     file(MAKE_DIRECTORY ${CMAKEBUILD_BINARY_DIR})
     
     # Get build commands
-    include(OCMSetupBuildMacros)
+    include(OCComponentSetupMacros)
     GET_BUILD_COMMANDS(BUILD_COMMAND INSTALL_COMMAND ${CMAKEBUILD_BINARY_DIR} YES)
     
     # Run cmake
