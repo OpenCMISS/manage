@@ -85,13 +85,13 @@ endif()
 
 ########################################################################
 # General paths & preps
-get_architecture_path(ARCHITECTURE_PATH ARCHITECTURE_PATH_MPI)
+getArchitecturePath(ARCHITECTURE_PATH ARCHITECTURE_PATH_MPI)
 # Build tree location for components (with/without mpi)
 SET(OPENCMISS_COMPONENTS_BINARY_DIR ${OPENCMISS_ROOT}/build/${ARCHITECTURE_PATH})
 SET(OPENCMISS_COMPONENTS_BINARY_DIR_MPI ${OPENCMISS_ROOT}/build/${ARCHITECTURE_PATH_MPI})
 # Install dir
 # Extra path segment for single configuration case - will give release/debug/...
-get_build_type_extra(BUILDTYPEEXTRA)
+getBuildTypePathElem(BUILDTYPEEXTRA)
 ########### everything from the OpenCMISS main project goes into install/
 # This is also used in Install.cmake to place the opencmiss config files.
 set(OPENCMISS_COMPONENTS_INSTALL_PREFIX_MPI_NO_BUILD_TYPE ${OPENCMISS_INSTALL_ROOT}/${ARCHITECTURE_PATH_MPI})
@@ -156,7 +156,7 @@ include(CollectComponentDefinitions)
 #message(STATUS "OpenCMISS components common definitions:\n${COMPONENT_COMMON_DEFS}")
 
 # Those list variables will be filled by the build macros
-SET(_OCM_REQUIRED_SOURCES )
+SET(_OCM_SELECTED_COMPONENTS )
 SET(_OCM_NEED_INITIAL_SOURCE_DOWNLOAD NO)
 
 ########################################################################
@@ -181,7 +181,7 @@ include(Install)
 # Create a download target that depends on all other downloads
 SET(_OCM_SOURCE_UPDATE_TARGETS )
 #SET(_OCM_SOURCE_DOWNLOAD_TARGETS )
-foreach(_COMP ${_OCM_REQUIRED_SOURCES})
+foreach(_COMP ${_OCM_SELECTED_COMPONENTS})
     LIST(APPEND _OCM_SOURCE_UPDATE_TARGETS ${_COMP}_SRC-update)
     #LIST(APPEND _OCM_SOURCE_DOWNLOAD_TARGETS ${_COMP}_SRC-download)
 endforeach()

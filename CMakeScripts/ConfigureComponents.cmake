@@ -4,7 +4,7 @@
 #
 # The main sections are Utils, Dependencies and Iron.
 #
-# The main macro is ADD_COMPONENT defined in OCMSetupBuildMacros.cmake.
+# The main macro is addAndConfigureLocalComponent defined in OCMSetupBuildMacros.cmake.
 # Its behaviour is controlled (despite the direct argument) by
 # SUBGROUP_PATH: Determines a grouping folder to sort components into.
 # GITHUB_ORGANIZATION: For the default source locations, we use the OpenCMISS github organizations to group the components sources.
@@ -21,7 +21,7 @@ if (OCM_USE_GTEST AND BUILD_TESTS)
     SET(GTEST_FWD_DEPS LLVM CSIM)
     set(SUBGROUP_PATH utilities)
     set(GITHUB_ORGANIZATION OpenCMISS-Utilities)
-    ADD_COMPONENT(GTEST)
+    addAndConfigureLocalComponent(GTEST)
 endif()
 
 # ================================================================
@@ -32,7 +32,7 @@ endif()
 # system. here, the actual dependency list is filled "as we go" and actually build
 # packages locally, see ADD_DOWNSTREAM_DEPS in BuildMacros.cmake
 
-# Affects the ADD_COMPONENT macro
+# Affects the addAndConfigureLocalComponent macro
 set(SUBGROUP_PATH dependencies)
 set(GITHUB_ORGANIZATION OpenCMISS-Dependencies)
 
@@ -47,7 +47,7 @@ if (OCM_USE_BLAS OR OCM_USE_LAPACK)
     if(NOT (LAPACK_FOUND AND BLAS_FOUND))
         SET(LAPACK_FWD_DEPS SCALAPACK SUITESPARSE MUMPS
             SUPERLU SUPERLU_DIST PARMETIS HYPRE SUNDIALS PASTIX PLAPACK PETSC IRON)
-        ADD_COMPONENT(LAPACK)
+        addAndConfigureLocalComponent(LAPACK)
     endif()
 endif()
 
@@ -59,7 +59,7 @@ if(OCM_USE_ZLIB)
             SCOTCH PTSCOTCH 
             MUMPS LIBXML2 FIELDML-API
             IRON CSIM LLVM CELLML)
-        ADD_COMPONENT(ZLIB)
+        addAndConfigureLocalComponent(ZLIB)
     endif()
 endif()
 
@@ -68,7 +68,7 @@ if(OCM_USE_BZIP2)
     find_package(BZIP2 ${BZIP2_VERSION} QUIET)
     if(NOT BZIP2_FOUND)
         SET(BZIP2_FWD_DEPS SCOTCH PTSCOTCH)
-        ADD_COMPONENT(BZIP2)
+        addAndConfigureLocalComponent(BZIP2)
     endif()
 endif()
 
@@ -77,7 +77,7 @@ if(OCM_USE_LIBXML2)
     find_package(LibXml2 ${LIBXML2_VERSION} QUIET)
     if(NOT LIBXML2_FOUND)
         SET(LIBXML2_FWD_DEPS CSIM LLVM FIELDML-API CELLML)
-        ADD_COMPONENT(LIBXML2
+        addAndConfigureLocalComponent(LIBXML2
             WITH_ZLIB=${LIBXML2_WITH_ZLIB}
             ZLIB_VERSION=${ZLIB_VERSION}
         )
@@ -89,7 +89,7 @@ if(OCM_USE_FIELDML-API)
     find_package(FIELDML-API ${FIELDML-API_VERSION} QUIET)
     if(NOT FIELDML-API_FOUND)
         SET(FIELDML-API_FWD_DEPS IRON)
-        ADD_COMPONENT(FIELDML-API
+        addAndConfigureLocalComponent(FIELDML-API
             LIBXML2_VERSION=${LIBXML2_VERSION}
             USE_HDF5=${FIELDML-API_WITH_HDF5}
             HDF5_VERSION=${HDF5_VERSION}
@@ -105,7 +105,7 @@ if (OCM_USE_PTSCOTCH)
     find_package(PTSCOTCH ${PTSCOTCH_VERSION} QUIET)
     if(NOT PTSCOTCH_FOUND)
         SET(SCOTCH_FWD_DEPS PASTIX PETSC MUMPS IRON)
-        ADD_COMPONENT(SCOTCH
+        addAndConfigureLocalComponent(SCOTCH
             BUILD_PTSCOTCH=YES
             USE_ZLIB=${SCOTCH_WITH_ZLIB}
             ZLIB_VERSION=${ZLIB_VERSION}
@@ -117,7 +117,7 @@ elseif(OCM_USE_SCOTCH)
     find_package(SCOTCH ${SCOTCH_VERSION} QUIET)
     if(NOT SCOTCH_FOUND)
         SET(PTSCOTCH_FWD_DEPS PASTIX PETSC MUMPS IRON)
-        ADD_COMPONENT(SCOTCH
+        addAndConfigureLocalComponent(SCOTCH
             BUILD_PTSCOTCH=NO
             USE_ZLIB=${SCOTCH_WITH_ZLIB}
             ZLIB_VERSION=${ZLIB_VERSION}
@@ -132,7 +132,7 @@ if(OCM_USE_PLAPACK)
     find_package(PLAPACK ${PLAPACK_VERSION} QUIET)
     if(NOT PLAPACK_FOUND)
         SET(PLAPACK_FWD_DEPS IRON)
-        ADD_COMPONENT(PLAPACK
+        addAndConfigureLocalComponent(PLAPACK
             BLAS_VERSION=${BLAS_VERSION}
             LAPACK_VERSION=${LAPACK_VERSION})
     endif()
@@ -143,7 +143,7 @@ if(OCM_USE_SCALAPACK)
     find_package(SCALAPACK ${SCALAPACK_VERSION} QUIET)
     if(NOT SCALAPACK_FOUND)
         SET(SCALAPACK_FWD_DEPS MUMPS PETSC IRON)
-        ADD_COMPONENT(SCALAPACK
+        addAndConfigureLocalComponent(SCALAPACK
             BLAS_VERSION=${BLAS_VERSION}
             LAPACK_VERSION=${LAPACK_VERSION})
     endif()
@@ -154,7 +154,7 @@ if(OCM_USE_PARMETIS)
     find_package(PARMETIS ${PARMETIS_VERSION} QUIET)
     if(NOT PARMETIS_FOUND)
         SET(PARMETIS_FWD_DEPS MUMPS SUITESPARSE SUPERLU_DIST PASTIX IRON)
-        ADD_COMPONENT(PARMETIS)
+        addAndConfigureLocalComponent(PARMETIS)
     endif()
 endif()
 
@@ -163,7 +163,7 @@ if (OCM_USE_MUMPS)
     find_package(MUMPS ${MUMPS_VERSION} QUIET)
     if(NOT MUMPS_FOUND)
         SET(MUMPS_FWD_DEPS PETSC IRON)
-        ADD_COMPONENT(MUMPS
+        addAndConfigureLocalComponent(MUMPS
             USE_SCOTCH=${MUMPS_WITH_SCOTCH}
             USE_PTSCOTCH=${MUMPS_WITH_PTSCOTCH}
             USE_PARMETIS=${MUMPS_WITH_PARMETIS}
@@ -184,7 +184,7 @@ if (OCM_USE_SUITESPARSE)
     find_package(SUITESPARSE ${SUITESPARSE_VERSION} QUIET)
     if(NOT SUITESPARSE_FOUND)
         SET(SUITESPARSE_FWD_DEPS PETSC IRON)
-        ADD_COMPONENT(SUITESPARSE
+        addAndConfigureLocalComponent(SUITESPARSE
             BLAS_VERSION=${BLAS_VERSION}
             LAPACK_VERSION=${LAPACK_VERSION}
             METIS_VERSION=${METIS_VERSION})
@@ -196,7 +196,7 @@ if (OCM_USE_SUPERLU)
     find_package(SUPERLU ${SUPERLU_VERSION} QUIET)
     if(NOT SUPERLU_FOUND)
         SET(SUPERLU_FWD_DEPS PETSC IRON HYPRE)
-        ADD_COMPONENT(SUPERLU
+        addAndConfigureLocalComponent(SUPERLU
             BLAS_VERSION=${BLAS_VERSION}
             LAPACK_VERSION=${LAPACK_VERSION})
     endif()
@@ -207,7 +207,7 @@ if (OCM_USE_HYPRE)
     find_package(HYPRE ${HYPRE_VERSION} QUIET)
     if(NOT HYPRE_FOUND)
         SET(HYPRE_FWD_DEPS PETSC IRON)
-        ADD_COMPONENT(HYPRE
+        addAndConfigureLocalComponent(HYPRE
             BLAS_VERSION=${BLAS_VERSION}
             LAPACK_VERSION=${LAPACK_VERSION})
     endif()
@@ -218,7 +218,7 @@ if (OCM_USE_SUPERLU_DIST)
     find_package(SUPERLU_DIST ${SUPERLU_DIST_VERSION} QUIET)
     if(NOT SUPERLU_DIST_FOUND)
         SET(SUPERLU_DIST_FWD_DEPS PETSC IRON)
-        ADD_COMPONENT(SUPERLU_DIST
+        addAndConfigureLocalComponent(SUPERLU_DIST
             BLAS_VERSION=${BLAS_VERSION}
             USE_PARMETIS=${SUPERLU_DIST_WITH_PARMETIS}
             PARMETIS_VERSION=${PARMETIS_VERSION}
@@ -233,7 +233,7 @@ if (OCM_USE_SUNDIALS)
     find_package(SUNDIALS ${SUNDIALS_VERSION} QUIET)
     if(NOT SUNDIALS_FOUND)
         SET(SUNDIALS_FWD_DEPS CSIM PETSC IRON)
-        ADD_COMPONENT(SUNDIALS
+        addAndConfigureLocalComponent(SUNDIALS
             USE_LAPACK=${SUNDIALS_WITH_LAPACK}
             BLAS_VERSION=${BLAS_VERSION}
             LAPACK_VERSION=${LAPACK_VERSION})
@@ -245,7 +245,7 @@ if (OCM_USE_PASTIX)
     find_package(PASTIX ${PASTIX_VERSION} QUIET)
     if(NOT PASTIX_FOUND)
         SET(PASTIX_FWD_DEPS PETSC IRON)
-        ADD_COMPONENT(PASTIX
+        addAndConfigureLocalComponent(PASTIX
             BLAS_VERSION=${BLAS_VERSION}
             USE_THREADS=${PASTIX_USE_THREADS}
             USE_METIS=${PASTIX_USE_METIS}
@@ -259,7 +259,7 @@ if (OCM_USE_SOWING)
     find_package(SOWING ${SOWING_VERSION} QUIET)
     if(NOT SOWING_FOUND)
         SET(SOWING_FWD_DEPS PETSC)
-        ADD_COMPONENT(SOWING)
+        addAndConfigureLocalComponent(SOWING)
     endif()
 endif()
 
@@ -268,7 +268,7 @@ if (OCM_USE_PETSC)
     find_package(PETSC ${PETSC_VERSION} QUIET)
     if(NOT PETSC_FOUND)
         SET(PETSC_FWD_DEPS SLEPC IRON)
-        ADD_COMPONENT(PETSC
+        addAndConfigureLocalComponent(PETSC
             HYPRE_VERSION=${HYPRE_VERSION}
             MUMPS_VERSION=${MUMPS_VERSION}
             PARMETIS_VERSION=${PARMETIS_VERSION}
@@ -288,7 +288,7 @@ if (OCM_USE_SLEPC)
     find_package(SLEPC ${SLEPC_VERSION} QUIET)
     if(NOT SLEPC_FOUND)
         SET(SLEPC_FWD_DEPS IRON)
-        ADD_COMPONENT(SLEPC
+        addAndConfigureLocalComponent(SLEPC
             HYPRE_VERSION=${HYPRE_VERSION}
             MUMPS_VERSION=${MUMPS_VERSION}
             PARMETIS_VERSION=${PARMETIS_VERSION}
@@ -308,7 +308,7 @@ if (OCM_USE_LIBCELLML)
     find_package(LIBCELLML ${LIBCELLML_VERSION} QUIET)
     if (NOT LIBCELLML_FOUND)
         SET(LIBCELLML_FWD_DEPS CSIM CELLML IRON)
-        ADD_COMPONENT(LIBCELLML)
+        addAndConfigureLocalComponent(LIBCELLML)
     endif()
 endif()
 
@@ -318,7 +318,7 @@ if (OCM_USE_CELLML)
         # For now cellml is in OpenCMISS organization on GitHub
         set(GITHUB_ORGANIZATION OpenCMISS)
         SET(CELLML_FWD_DEPS IRON)
-        ADD_COMPONENT(CELLML
+        addAndConfigureLocalComponent(CELLML
             LIBXML2_VERSION=${LIBXML2_VERSION})
         # Set back
         set(GITHUB_ORGANIZATION OpenCMISS-Dependencies)
@@ -329,14 +329,14 @@ if (OCM_USE_LLVM)
     find_package(LLVM ${LLVM_VERSION} QUIET)
     if (NOT LLVM_FOUND)
         SET(LLVM_FWD_DEPS CSIM)
-        ADD_COMPONENT(LLVM)
+        addAndConfigureLocalComponent(LLVM)
     endif()
 endif()
 if (OCM_USE_CSIM)
     find_package(CSIM ${CSIM_VERSION} QUIET)
     if (NOT CSIM_FOUND)
         SET(CSIM_FWD_DEPS IRON)
-        ADD_COMPONENT(CSIM)
+        addAndConfigureLocalComponent(CSIM)
     endif()
 endif()
 
@@ -346,7 +346,7 @@ endif()
 if (OCM_USE_IRON)
     set(SUBGROUP_PATH .)
     set(GITHUB_ORGANIZATION OpenCMISS)
-    ADD_COMPONENT(IRON
+    addAndConfigureLocalComponent(IRON
         WITH_CELLML=${IRON_WITH_CELLML}
         CELLML_VERSION=${CELLML_VERSION}
         WITH_FIELDML=${IRON_WITH_FIELDML}

@@ -1,17 +1,29 @@
-MACRO(ADD_COMPONENT COMPONENT_NAME)
+########################################################################################################################
+# This is the main function that adds an OpenCMISS component to the build tree.
+#
+# Consumes all sorts of global variables, where SUBGROUP_PATH and GITHUB_ORGANIZATION are the ones 
+# subsequently changed between function calls in ConfigureComponents 
+function(addAndConfigureLocalComponent COMPONENT_NAME)
     # Get lowercase folder name from project name
-    string(TOLOWER ${COMPONENT_NAME} FOLDER_NAME) 
+    string(TOLOWER ${COMPONENT_NAME} FOLDER_NAME)
     
-    # set source directory
+    # Keep track of self-build components (thus far only used for "update" target)
+    #list(APPEND _OCM_SELECTED_COMPONENTS ${COMPONENT_NAME})
+    # Need this since it's a function
+    set(_OCM_SELECTED_COMPONENTS ${_OCM_SELECTED_COMPONENTS} ${COMPONENT_NAME} PARENT_SCOPE)
+    
+    ##############################################################
+    # Set source directory
     SET(COMPONENT_SOURCE ${OPENCMISS_ROOT}/src/${SUBGROUP_PATH}/${FOLDER_NAME})
-    SET(COMPONENT_DEFS ${COMPONENT_COMMON_DEFS})
+    
+    ##############################################################
+    # Set build/binary directory
     
     # Complete build dir with debug/release AFTER everything else (consistent with windows)
-    get_build_type_extra(BUILDTYPEEXTRA)
+    getBuildTypePathElem(BUILDTYPEEXTRA)
     
     # Check which build dir is required - depending on whether this component can be built against mpi
-    list(FIND OPENCMISS_COMPONENTS_WITHMPI ${COMPONENT_NAME} COMP_WITH_MPI)
-    if (COMP_WITH_MPI GREATER -1)
+    if (${COMPONENT_NAME} IN_LIST OPENCMISS_COMPONENTS_WITHMPI)
         SET(COMPONENT_BUILD_DIR ${OPENCMISS_COMPONENTS_BINARY_DIR_MPI}/${SUBGROUP_PATH}/${FOLDER_NAME}/${BUILDTYPEEXTRA})
         LIST(APPEND COMPONENT_DEFS -DCMAKE_INSTALL_PREFIX=${OPENCMISS_COMPONENTS_INSTALL_PREFIX_MPI})
     else()
@@ -19,7 +31,9 @@ MACRO(ADD_COMPONENT COMPONENT_NAME)
         LIST(APPEND COMPONENT_DEFS -DCMAKE_INSTALL_PREFIX=${OPENCMISS_COMPONENTS_INSTALL_PREFIX})
     endif()
     
-    message(STATUS "Configuring build of ${COMPONENT_NAME} in ${COMPONENT_BUILD_DIR}...")
+    ##############################################################
+    # Collect component definitions
+    SET(COMPONENT_DEFS ${COMPONENT_COMMON_DEFS})
     
     # OpenMP multithreading
     if(${COMPONENT_NAME} IN_LIST OPENCMISS_COMPONENTS_WITH_OPENMP)
@@ -65,11 +79,27 @@ MACRO(ADD_COMPONENT COMPONENT_NAME)
     endforeach()
     
     #message(STATUS "OpenCMISS component ${COMPONENT_NAME} extra args:\n${COMPONENT_DEFS}")
+    
+    ##############################################################
+    # Create actual external projects
+    
+    # Create the external projects
+    createExternalProjects(${COMPONENT_NAME} ${COMPONENT_SOURCE} ${COMPONENT_BUILD_DIR} ${COMPONENT_DEFS})
+	
+	# Create some convenience targets like clean, update etc
+	addConvenienceTargets(${COMPONENT_NAME} ${COMPONENT_BUILD_DIR})
+		
+	# Add the dependency information for other downstream packages that might use this one
+	addDownstreamDependencies(${COMPONENT_NAME})
+    
+endfunction()
 
-	GET_BUILD_COMMANDS(BUILD_COMMAND INSTALL_COMMAND ${COMPONENT_BUILD_DIR} TRUE)
-
-    SET(DOWNLOAD_CMDS )
-    # Developer mode
+########################################################################################################################
+function(getExtProjDownloadUpdateCommands COMPONENT_NAME TARGET_SOURCE_DIR DL_VAR UP_VAR)
+    # Convention: github repo is the lowercase equivalent of the component name
+    string(TOLOWER ${COMPONENT_NAME} FOLDER_NAME)
+    
+    # Git clone mode
     if (${OCM_GIT_CLONE_${COMPONENT_NAME}})
         find_package(Git)
         if(GIT_FOUND)
@@ -90,9 +120,8 @@ MACRO(ADD_COMPONENT COMPONENT_NAME)
             SET(DOWNLOAD_CMDS
                 GIT_REPOSITORY ${${COMPONENT_NAME}_REPO}
                 GIT_TAG ${${COMPONENT_NAME}_BRANCH}
-                
             )
-            set(_UPDATE_COMMAND UPDATE_COMMAND ${GIT_EXECUTABLE} pull)
+            set(${UP_VAR} UPDATE_COMMAND ${GIT_EXECUTABLE} pull PARENT_SCOPE)
             #message(STATUS "DOWNLOAD_CMDS=${DOWNLOAD_CMDS}")
         else()
             message(FATAL_ERROR "Could not find GIT. GIT is required if OCM_GIT_CLONE_${COMPONENT_NAME} is set.")
@@ -108,13 +137,24 @@ MACRO(ADD_COMPONENT COMPONENT_NAME)
         endif()
         ################@TEMP@#################
         SET(DOWNLOAD_CMDS
-            DOWNLOAD_DIR ${COMPONENT_SOURCE}/src-download
+            DOWNLOAD_DIR ${TARGET_SOURCE_DIR}/src-download
             #URL https://github.com/${GITHUB_ORGANIZATION}/${FOLDER_NAME}/archive/${${COMPONENT_NAME}_BRANCH}.zip
             ################@TEMP@#################
             URL ${${COMPONENT_NAME}_REPO}/archive/${${COMPONENT_NAME}_BRANCH}.zip
             ################@TEMP@#################
         )
     endif()
+endfunction()
+
+########################################################################################################################
+
+function(createExternalProjects COMPONENT_NAME SOURCE_DIR BINARY_DIR DEFS)
+
+    message(STATUS "Configuring build of '${COMPONENT_NAME}' in ${BINARY_DIR}...")
+
+    getBuildCommands(BUILD_COMMAND INSTALL_COMMAND ${BINARY_DIR} TRUE)
+
+    getExtProjDownloadUpdateCommands(${COMPONENT_NAME} ${SOURCE_DIR} DOWNLOAD_COMMANDS UPDATE_COMMANDS)
     
     # Log settings
     if (OCM_CREATE_LOGS)
@@ -127,16 +167,15 @@ MACRO(ADD_COMPONENT COMPONENT_NAME)
     #
     # This is separate from the actual build project for the component, as we want to use the same
     # source for different builds/architecture paths (shared/static, different MPI)
-    LIST(APPEND _OCM_REQUIRED_SOURCES ${COMPONENT_NAME})
     ExternalProject_Add(${COMPONENT_NAME}_SRC
         PREFIX ${OPENCMISS_ROOT}/src/download/
         EXCLUDE_FROM_ALL 1
         TMP_DIR ${OPENCMISS_ROOT}/src/download/tmp
         STAMP_DIR ${OPENCMISS_ROOT}/src/download/stamps
         #--Download step--------------
-        ${DOWNLOAD_CMDS}
-        SOURCE_DIR ${COMPONENT_SOURCE}
-        ${_UPDATE_COMMAND}
+        ${DOWNLOAD_COMMANDS}
+        SOURCE_DIR ${SOURCE_DIR}
+        ${UPDATE_COMMANDS}
         CONFIGURE_COMMAND ""
         BUILD_COMMAND ""
         INSTALL_COMMAND ""
@@ -149,7 +188,7 @@ MACRO(ADD_COMPONENT COMPONENT_NAME)
 	add_custom_target(CHECK_${COMPONENT_NAME}_SOURCES 
 	        COMMAND ${CMAKE_COMMAND}
                 -DCOMPONENT=${COMPONENT_NAME}
-                -DFOLDER=${COMPONENT_SOURCE}
+                -DFOLDER=${SOURCE_DIR}
                 -DBINDIR=${CMAKE_CURRENT_BINARY_DIR}
                 -DSTAMP_DIR=${OPENCMISS_ROOT}/src/download/stamps
                 -P ${OPENCMISS_MANAGE_DIR}/CMakeScripts/CheckSourceExists.cmake
@@ -158,10 +197,10 @@ MACRO(ADD_COMPONENT COMPONENT_NAME)
     
 	ExternalProject_Add(${COMPONENT_NAME}
 		DEPENDS ${${COMPONENT_NAME}_DEPS} CHECK_${COMPONENT_NAME}_SOURCES
-		PREFIX ${COMPONENT_BUILD_DIR}
+		PREFIX ${BINARY_DIR}
 		LIST_SEPARATOR ${OCM_LIST_SEPARATOR}
-		TMP_DIR ${COMPONENT_BUILD_DIR}/ep_tmp
-		STAMP_DIR ${COMPONENT_BUILD_DIR}/ep_stamps
+		TMP_DIR ${BINARY_DIR}/ep_tmp
+		STAMP_DIR ${BINARY_DIR}/ep_stamps
 		
 		#--Download step--------------
 		# Ideal solution - include in the external project that also builds.
@@ -175,9 +214,9 @@ MACRO(ADD_COMPONENT COMPONENT_NAME)
 		
 		#--Configure step-------------
 		CMAKE_COMMAND ${CMAKE_COMMAND} --no-warn-unused-cli # disables warnings for unused cmdline options
-		SOURCE_DIR ${COMPONENT_SOURCE}
-		BINARY_DIR ${COMPONENT_BUILD_DIR}
-		CMAKE_ARGS ${COMPONENT_DEFS}
+		SOURCE_DIR ${SOURCE_DIR}
+		BINARY_DIR ${BINARY_DIR}
+		CMAKE_ARGS ${DEFS}
 		
 		#--Build step-----------------
 		BUILD_COMMAND ${BUILD_COMMAND}
@@ -193,62 +232,61 @@ MACRO(ADD_COMPONENT COMPONENT_NAME)
 		
 	# See OpenCMISSDeveloper.cmake
 	if (OCM_CLEAN_REBUILDS_COMPONENTS)
-        set_directory_properties(PROPERTIES ADDITIONAL_MAKE_CLEAN_FILES ${COMPONENT_BUILD_DIR}/CMakeCache.txt)
+        set_directory_properties(PROPERTIES ADDITIONAL_MAKE_CLEAN_FILES ${BINARY_DIR}/CMakeCache.txt)
     endif()
-	
-	# Add convenience direct-access clean target for component
+endfunction()
+
+function(addDownstreamDependencies COMPONENT_NAME)
+    if (${COMPONENT_NAME}_FWD_DEPS)
+        #message(STATUS "Component ${COMPONENT_NAME} has forward dependencies: ${${COMPONENT_NAME}_FWD_DEPS}")
+        # Initialize with current values
+        set(_DEPS ${${FWD_DEP}_DEPS})
+        # Add all new forward dependencies of component
+        foreach(FWD_DEP ${${COMPONENT_NAME}_FWD_DEPS})
+            #message(STATUS "adding ${COMPONENT_NAME} to fwd-dep ${FWD_DEP}_DEPS")  
+            LIST(APPEND _DEPS ${COMPONENT_NAME})
+        endforeach()
+        # Update in parent scope
+        set(${FWD_DEP}_DEPS ${_DEPS} PARENT_SCOPE)
+    endif()
+    #message(STATUS "Dependencies of ${COMPONENT_NAME}: ${${COMPONENT_NAME}_DEPS}")
+endfunction()
+
+function(addConvenienceTargets COMPONENT_NAME BINARY_DIR)
+    # Add convenience direct-access clean target for component
 	add_custom_target(${COMPONENT_NAME}-clean
-	    COMMAND ${CMAKE_COMMAND} -E remove -f ${COMPONENT_BUILD_DIR}/ep_stamps/*-configure 
-	    COMMAND ${CMAKE_COMMAND} --build ${COMPONENT_BUILD_DIR} --target clean
-	    COMMAND ${CMAKE_COMMAND} -E remove -f ${COMPONENT_BUILD_DIR}/CMakeCache.txt
+	    COMMAND ${CMAKE_COMMAND} -E remove -f ${BINARY_DIR}/ep_stamps/*-configure 
+	    COMMAND ${CMAKE_COMMAND} --build ${BINARY_DIR} --target clean
+	    COMMAND ${CMAKE_COMMAND} -E remove -f ${BINARY_DIR}/CMakeCache.txt
 	)
 	# Add convenience direct-access update target for component
 	# (This just invokes the ${COMPONENT_NAME}_SRC-update target exposed in the source external project,
 	# essentially allowing to call ${COMPONENT_NAME}-update instead of ${COMPONENT_NAME}_SRC-update)
 	add_custom_target(${COMPONENT_NAME}-update
-	    #COMMAND ${CMAKE_COMMAND} -E remove -f ${COMPONENT_BUILD_DIR}/ep_stamps/*-configure 
-	    COMMAND ${CMAKE_COMMAND} --build ${COMPONENT_BUILD_DIR} --target ${COMPONENT_NAME}_SRC-update
+	    #COMMAND ${CMAKE_COMMAND} -E remove -f ${BINARY_DIR}/ep_stamps/*-configure 
+	    COMMAND ${CMAKE_COMMAND} --build ${CMAKE_CURRENT_BINARY_DIR} --target ${COMPONENT_NAME}_SRC-update
 	)
 	# Add convenience direct-access forced build target for component
 	add_custom_target(${COMPONENT_NAME}-build
-	    COMMAND ${CMAKE_COMMAND} -E remove -f ${COMPONENT_BUILD_DIR}/ep_stamps/*-build 
-	    COMMAND ${CMAKE_COMMAND} --build ${COMPONENT_BUILD_DIR} --target install
+	    COMMAND ${CMAKE_COMMAND} -E remove -f ${BINARY_DIR}/ep_stamps/*-build 
+	    COMMAND ${CMAKE_COMMAND} --build ${BINARY_DIR} --target install
 	)
 	if (BUILD_TESTS)
     	# Add convenience direct-access test target for component
     	add_custom_target(${COMPONENT_NAME}-test
-    	    COMMAND ${CMAKE_COMMAND} --build ${COMPONENT_BUILD_DIR} --target test
+    	    COMMAND ${CMAKE_COMMAND} --build ${BINARY_DIR} --target test
     	)
     	# Add a global test to run the external project's tests
-    	add_test(${COMPONENT_NAME}-test ${CMAKE_COMMAND} --build ${COMPONENT_BUILD_DIR} --target test)
+    	add_test(${COMPONENT_NAME}-test ${CMAKE_COMMAND} --build ${BINARY_DIR} --target test)
 	endif()
-	
-	# Be a tidy kiwi
-	UNSET( BUILD_COMMAND )
-	UNSET( INSTALL_COMMAND )
-	
-	# Add the dependency information for other downstream packages that might use this one
-	ADD_DOWNSTREAM_DEPS(${COMPONENT_NAME})
-    #message(STATUS "Dependencies of ${COMPONENT_NAME}: ${${COMPONENT_NAME}_DEPS}")
-    
-ENDMACRO()
+endfunction()
 
-MACRO(ADD_DOWNSTREAM_DEPS PACKAGE)
-    if (${PACKAGE}_FWD_DEPS)
-        #message(STATUS "Package ${PACKAGE} has forward dependencies: ${${PACKAGE}_FWD_DEPS}")
-        foreach(FWD_DEP ${${PACKAGE}_FWD_DEPS})
-            #message(STATUS "adding ${PACKAGE} to fwd-dep ${FWD_DEP}_DEPS")  
-            LIST(APPEND ${FWD_DEP}_DEPS ${PACKAGE})
-        endforeach()
-    endif()
-ENDMACRO()
-
-macro(GET_BUILD_COMMANDS BUILD_CMD_VAR INSTALL_CMD_VAR DIR PARALLEL)
+function(getBuildCommands BUILD_CMD_VAR INSTALL_CMD_VAR DIR PARALLEL)
     
     SET( BUILD_CMD ${CMAKE_COMMAND} --build ${DIR})
     SET( INSTALL_CMD ${CMAKE_COMMAND} --build ${DIR} --target install)
     
-    if(PARALLEL_BUILDS AND ${PARALLEL})
+    if(PARALLEL_BUILDS AND PARALLEL)
         include(ProcessorCount)
         ProcessorCount(NUM_PROCESSORS)
         if (NUM_PROCESSORS EQUAL 0)
@@ -276,6 +314,6 @@ macro(GET_BUILD_COMMANDS BUILD_CMD_VAR INSTALL_CMD_VAR DIR PARALLEL)
         endif()
     endif()
 
-	SET(${BUILD_CMD_VAR} ${BUILD_CMD})
-	SET(${INSTALL_CMD_VAR} ${INSTALL_CMD})
-endmacro()
+	SET(${BUILD_CMD_VAR} ${BUILD_CMD} PARENT_SCOPE)
+	SET(${INSTALL_CMD_VAR} ${INSTALL_CMD} PARENT_SCOPE)
+endfunction()

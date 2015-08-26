@@ -4,7 +4,7 @@
 # MPI mnemonic in the path. Instead, we use "mpi" as common top folder to collect all local MPI builds.
 # Only the debug/release versions of MPI are located in different folders (for own builds only - the behaviour using system mpi
 # in debug mode is unspecified) 
-get_architecture_path(SHORT_ARCH_PATH SHORT)
+getShortArchitecturePath(SHORT_ARCH_PATH)
 # This is where our own build of MPI will reside if compilation is needed
 set(OWN_MPI_INSTALL_DIR ${OPENCMISS_ROOT}/install/${SHORT_ARCH_PATH}/mpi/${MPI}/${MPI_BUILD_TYPE})
     
