@@ -13,31 +13,30 @@ function(addAndConfigureLocalComponent COMPONENT_NAME)
     set(_OCM_SELECTED_COMPONENTS ${_OCM_SELECTED_COMPONENTS} ${COMPONENT_NAME} PARENT_SCOPE)
     
     ##############################################################
-    # Set source directory
-    SET(COMPONENT_SOURCE ${OPENCMISS_ROOT}/src/${SUBGROUP_PATH}/${FOLDER_NAME})
-    
-    ##############################################################
-    # Set build/binary directory
-    
+    # Compute directories
+    SET(COMPONENT_SOURCE "${OPENCMISS_ROOT}/src/${SUBGROUP_PATH}/${FOLDER_NAME}")
+    # Check which build dir is required - depending on whether this component can be built against mpi
+    if (COMPONENT_NAME IN_LIST OPENCMISS_COMPONENTS_WITHMPI)
+        set(BUILD_DIR_BASE "${OPENCMISS_COMPONENTS_BINARY_DIR_MPI}")
+        set(_INSTALL_PREFIX ${OPENCMISS_COMPONENTS_INSTALL_PREFIX_MPI})
+    else()
+        set(BUILD_DIR_BASE "${OPENCMISS_COMPONENTS_BINARY_DIR}")
+        set(_INSTALL_PREFIX ${OPENCMISS_COMPONENTS_INSTALL_PREFIX})
+    endif()
     # Complete build dir with debug/release AFTER everything else (consistent with windows)
     getBuildTypePathElem(BUILDTYPEEXTRA)
-    
-    # Check which build dir is required - depending on whether this component can be built against mpi
-    if (${COMPONENT_NAME} IN_LIST OPENCMISS_COMPONENTS_WITHMPI)
-        SET(COMPONENT_BUILD_DIR ${OPENCMISS_COMPONENTS_BINARY_DIR_MPI}/${SUBGROUP_PATH}/${FOLDER_NAME}/${BUILDTYPEEXTRA})
-        LIST(APPEND COMPONENT_DEFS -DCMAKE_INSTALL_PREFIX=${OPENCMISS_COMPONENTS_INSTALL_PREFIX_MPI})
-    else()
-        SET(COMPONENT_BUILD_DIR ${OPENCMISS_COMPONENTS_BINARY_DIR}/${SUBGROUP_PATH}/${FOLDER_NAME}/${BUILDTYPEEXTRA})
-        LIST(APPEND COMPONENT_DEFS -DCMAKE_INSTALL_PREFIX=${OPENCMISS_COMPONENTS_INSTALL_PREFIX})
-    endif()
+    set(COMPONENT_BUILD_DIR ${BUILD_DIR_BASE}/${SUBGROUP_PATH}/${FOLDER_NAME}/${BUILDTYPEEXTRA})
     
     ##############################################################
     # Collect component definitions
-    SET(COMPONENT_DEFS ${COMPONENT_COMMON_DEFS})
+    SET(COMPONENT_DEFS
+        ${COMPONENT_COMMON_DEFS} 
+        -DCMAKE_INSTALL_PREFIX:STRING=${_INSTALL_PREFIX}
+    )
     
     # OpenMP multithreading
-    if(${COMPONENT_NAME} IN_LIST OPENCMISS_COMPONENTS_WITH_OPENMP)
-        LIST(APPEND COMPONENT_DEFS
+    if(COMPONENT_NAME IN_LIST OPENCMISS_COMPONENTS_WITH_OPENMP)
+        list(APPEND COMPONENT_DEFS
             -DWITH_OPENMP=${OCM_USE_MT}
         )
     endif()
@@ -77,20 +76,19 @@ function(addAndConfigureLocalComponent COMPONENT_NAME)
         LIST(APPEND COMPONENT_DEFS -D${extra_def})
         #message(STATUS "${COMPONENT_NAME}: Using extra definition -D${extra_def}")
     endforeach()
-    
     #message(STATUS "OpenCMISS component ${COMPONENT_NAME} extra args:\n${COMPONENT_DEFS}")
     
     ##############################################################
     # Create actual external projects
     
     # Create the external projects
-    createExternalProjects(${COMPONENT_NAME} ${COMPONENT_SOURCE} ${COMPONENT_BUILD_DIR} ${COMPONENT_DEFS})
+    createExternalProjects(${COMPONENT_NAME} "${COMPONENT_SOURCE}" "${COMPONENT_BUILD_DIR}" "${COMPONENT_DEFS}")
 	
 	# Create some convenience targets like clean, update etc
-	addConvenienceTargets(${COMPONENT_NAME} ${COMPONENT_BUILD_DIR})
+	addConvenienceTargets(${COMPONENT_NAME} "${COMPONENT_BUILD_DIR}")
 		
 	# Add the dependency information for other downstream packages that might use this one
-	addDownstreamDependencies(${COMPONENT_NAME})
+	addDownstreamDependencies(${COMPONENT_NAME} TRUE)
     
 endfunction()
 
@@ -195,6 +193,7 @@ function(createExternalProjects COMPONENT_NAME SOURCE_DIR BINARY_DIR DEFS)
             COMMENT "Checking ${COMPONENT_NAME} sources are present"
     )  
     
+    #message(STATUS "Adding ${COMPONENT_NAME} with DEPS=${${COMPONENT_NAME}_DEPS}, DEFS=${DEFS}")    
 	ExternalProject_Add(${COMPONENT_NAME}
 		DEPENDS ${${COMPONENT_NAME}_DEPS} CHECK_${COMPONENT_NAME}_SOURCES
 		PREFIX ${BINARY_DIR}
@@ -236,22 +235,6 @@ function(createExternalProjects COMPONENT_NAME SOURCE_DIR BINARY_DIR DEFS)
     endif()
 endfunction()
 
-function(addDownstreamDependencies COMPONENT_NAME)
-    if (${COMPONENT_NAME}_FWD_DEPS)
-        #message(STATUS "Component ${COMPONENT_NAME} has forward dependencies: ${${COMPONENT_NAME}_FWD_DEPS}")
-        # Initialize with current values
-        set(_DEPS ${${FWD_DEP}_DEPS})
-        # Add all new forward dependencies of component
-        foreach(FWD_DEP ${${COMPONENT_NAME}_FWD_DEPS})
-            #message(STATUS "adding ${COMPONENT_NAME} to fwd-dep ${FWD_DEP}_DEPS")  
-            LIST(APPEND _DEPS ${COMPONENT_NAME})
-        endforeach()
-        # Update in parent scope
-        set(${FWD_DEP}_DEPS ${_DEPS} PARENT_SCOPE)
-    endif()
-    #message(STATUS "Dependencies of ${COMPONENT_NAME}: ${${COMPONENT_NAME}_DEPS}")
-endfunction()
-
 function(addConvenienceTargets COMPONENT_NAME BINARY_DIR)
     # Add convenience direct-access clean target for component
 	add_custom_target(${COMPONENT_NAME}-clean
@@ -267,9 +250,10 @@ function(addConvenienceTargets COMPONENT_NAME BINARY_DIR)
 	    COMMAND ${CMAKE_COMMAND} --build ${CMAKE_CURRENT_BINARY_DIR} --target ${COMPONENT_NAME}_SRC-update
 	)
 	# Add convenience direct-access forced build target for component
+	getBuildCommands(_DUMMY INSTALL_COMMAND ${BINARY_DIR} TRUE)
 	add_custom_target(${COMPONENT_NAME}-build
 	    COMMAND ${CMAKE_COMMAND} -E remove -f ${BINARY_DIR}/ep_stamps/*-build 
-	    COMMAND ${CMAKE_COMMAND} --build ${BINARY_DIR} --target install
+	    COMMAND ${INSTALL_COMMAND}
 	)
 	if (BUILD_TESTS)
     	# Add convenience direct-access test target for component
@@ -317,3 +301,20 @@ function(getBuildCommands BUILD_CMD_VAR INSTALL_CMD_VAR DIR PARALLEL)
 	SET(${BUILD_CMD_VAR} ${BUILD_CMD} PARENT_SCOPE)
 	SET(${INSTALL_CMD_VAR} ${INSTALL_CMD} PARENT_SCOPE)
 endfunction()
+
+# IN_PARENT_SCOPE: Set results in PARENT_SCOPE.
+#   Thus far used here in addAndConfigureLocalComponent and in OCMPIConfig.cmake for MPI
+macro(addDownstreamDependencies COMPONENT_NAME IN_PARENT_SCOPE)
+    if (${COMPONENT_NAME}_FWD_DEPS)
+        #message(STATUS "Component ${COMPONENT_NAME} has forward dependencies: ${${COMPONENT_NAME}_FWD_DEPS}")
+        # Add all new forward dependencies of component
+        foreach(FWD_DEP ${${COMPONENT_NAME}_FWD_DEPS})
+            #message(STATUS "adding ${COMPONENT_NAME} to ${FWD_DEP}_DEPS")  
+            list(APPEND ${FWD_DEP}_DEPS ${COMPONENT_NAME})
+            # Propagate the changed variable to outside this function - its a function
+            if (${IN_PARENT_SCOPE})
+                set(${FWD_DEP}_DEPS ${${FWD_DEP}_DEPS} PARENT_SCOPE)
+            endif()
+        endforeach()
+    endif()
+endmacro()

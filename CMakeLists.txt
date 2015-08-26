@@ -152,27 +152,18 @@ configure_file(
     @ONLY # only @-tags
 )
 
-set(MAIN_BUILD_STAMPDIR ${MAIN_BINARY_DIR}/ep_stamps)
-set(MAIN_BUILD_NAME opencmiss_build_${BUILD_IDENT})
-# Remove the build file for the main project so that a "make" invocation
-# Always at least triggers the build command for the current configured build.
-# As that in turn re-invokes the configure stage if any changes happened, this
-# ensures no dummy user tries to call "make" but the project just says "done" because the
-# current external-project build stamp was still unchanged.
-add_custom_target(${MAIN_BUILD_NAME}_ensurebuild
-    COMMAND ${CMAKE_COMMAND} -E remove -f ${MAIN_BUILD_STAMPDIR}/${MAIN_BUILD_NAME}-build
+# This makes sure the configure step for the current main project is run at the beginning;
+# later the build call to the main project will detect for itself if new builds are necessary.
+add_custom_command(OUTPUT ${MAIN_BINARY_DIR}/CMakeCache.txt
+    COMMAND ${CMAKE_COMMAND} . # Configure
+    WORKING_DIRECTORY ${MAIN_BINARY_DIR}
+    COMMENT "Initializing OpenCMISS configuration ${BUILD_IDENT}"
 )
-# Actual main project here
-include(ExternalProject)
-ExternalProject_Add(${MAIN_BUILD_NAME}
-    DEPENDS ${MAIN_BUILD_NAME}_ensurebuild
-    PREFIX ${MAIN_BINARY_DIR}
-    TMP_DIR ${MAIN_BINARY_DIR}/ep_tmp
-    STAMP_DIR ${MAIN_BUILD_STAMPDIR}
-    DOWNLOAD_COMMAND ""
-    CMAKE_COMMAND ${MY_CMAKE_COMMAND} # Set in Config/CMakeCheck.cmake, might be own build
-    SOURCE_DIR ${MAIN_BINARY_DIR}
-    BUILD_IN_SOURCE 1 # replaces the build command
+# This creates the main target 
+add_custom_target(${BUILD_IDENT} ALL
+    DEPENDS ${MAIN_BINARY_DIR}/CMakeCache.txt
+    COMMAND ${CMAKE_COMMAND} --build ${MAIN_BINARY_DIR} --target install
+    COMMENT "Building OpenCMISS configuration ${BUILD_IDENT}"
 )
 
 # Convenience/Maintenance targets
@@ -225,7 +216,7 @@ message(STATUS "*")
 message(STATUS "@@@@@@@@@@@@@@@@@@@ NEXT STEPS @@@@@@@@@@@@@@@@@@@@@@")
 message(STATUS "*")
 message(STATUS "* Change ${MAIN_BINARY_DIR}/OpenCMISSLocalConfig.cmake according to your setup/needs")
-message(STATUS "* Run your native build command (${CMAKE_MAKE_PROGRAM}) to start the build process")
+message(STATUS "* Run your native build command (e.g. '${CMAKE_MAKE_PROGRAM}') to start the build process")
 message(STATUS "* Refer to ${OPENCMISS_MANAGE_DIR}/OpenCMISSBuildEnvironment.docx.pdf for customization instructions")
 message(STATUS "*")
 message(STATUS "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@")

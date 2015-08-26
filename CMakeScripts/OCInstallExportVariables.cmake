@@ -1,4 +1,4 @@
-set(TOOLCHAIN_VARS ${CMAKE_CURRENT_BINARY_DIR}/export/toolchain_vars.cmake)
+#set(TOOLCHAIN_VARS ${CMAKE_CURRENT_BINARY_DIR}/export/toolchain_vars.cmake)
 set(OPENCMISS_CONTEXT ${CMAKE_CURRENT_BINARY_DIR}/export/context.cmake)
 
 function(do_export CFILE)
@@ -19,37 +19,29 @@ endfunction()
 
 # Toolchain config first
 set(EXPORT_VARS 
-    CMAKE_C_COMPILER CMAKE_CXX_COMPILER CMAKE_Fortran_COMPILER
-    CMAKE_C_FLAGS CMAKE_CXX_FLAGS CMAKE_Fortran_FLAGS
-    CMAKE_C_FLAGS_RELEASE CMAKE_CXX_FLAGS_RELEASE CMAKE_Fortran_FLAGS_RELEASE
-    CMAKE_C_FLAGS_DEBUG CMAKE_CXX_FLAGS_DEBUG CMAKE_Fortran_FLAGS_DEBUG
-    MPI MPI_HOME MPI_BUILD_TYPE FORTRAN_MANGLING
-    OCM_SYSTEM_MPI
-)
-foreach(lang C CXX Fortran)
-    list(APPEND EXPORT_VARS 
-        MPI_${lang}_COMPILER
-        MPI_${lang}_LIBRARIES
-        MPI_${lang}_INCLUDE_PATH
-        MPI_${lang}_COMPILE_FLAGS
-    ) 
-endforeach()
-do_export(${TOOLCHAIN_VARS})
-
-# Build config second    
-set(EXPORT_VARS
-    CMAKE_POSITION_INDEPENDENT_CODE
+    #CMAKE_C_COMPILER CMAKE_CXX_COMPILER CMAKE_Fortran_COMPILER
+    #CMAKE_C_FLAGS CMAKE_CXX_FLAGS CMAKE_Fortran_FLAGS
+    #CMAKE_C_FLAGS_RELEASE CMAKE_CXX_FLAGS_RELEASE CMAKE_Fortran_FLAGS_RELEASE
+    #CMAKE_C_FLAGS_DEBUG CMAKE_CXX_FLAGS_DEBUG CMAKE_Fortran_FLAGS_DEBUG
     OPENCMISS_PREFIX_PATH
-    OCM_USE_MT OCM_SYSTEM_MPI
-    OPENCMISS_COMPONENTS BLA_VENDOR
-    OPENCMISS_CMAKE_MIN_VERSION
-    OPENCMISS_BUILD_SHARED_LIBS
-    CMAKE_COMMAND)
+    MPI MPI_HOME MPI_VERSION OCM_SYSTEM_MPI
+    #FORTRAN_MANGLING
+)
+#foreach(lang C CXX Fortran)
+#    list(APPEND EXPORT_VARS
+#        MPI_${lang}_COMPILER
+#        MPI_${lang}_LIBRARIES
+#        MPI_${lang}_INCLUDE_PATH
+#        MPI_${lang}_COMPILE_FLAGS
+#    ) 
+#endforeach()
+
 # Add the build type if on single-config platform
 if (DEFINED CMAKE_BUILD_TYPE AND NOT "" STREQUAL CMAKE_BUILD_TYPE)
     set(OPENCMISS_BUILD_TYPE ${CMAKE_BUILD_TYPE})
     list(APPEND EXPORT_VARS OPENCMISS_BUILD_TYPE)
-endif() 
+endif()
+
 foreach(OCM_COMP ${OPENCMISS_COMPONENTS})
     list(APPEND EXPORT_VARS OCM_USE_${OCM_COMP} OCM_SYSTEM_${OCM_COMP})
     # Export the "correct" cased names for components as well (we have solely uppercase names,
@@ -62,8 +54,21 @@ foreach(OCM_COMP ${OPENCMISS_COMPONENTS})
     endif()
 endforeach()
 
-# OpenCMISS find modules - wrapper and extra find library scripts
-list(APPEND EXPORT_VARS OPENCMISS_MODULE_PATH)
-
 do_export(${OPENCMISS_CONTEXT})
-unset(EXPORT_VARS)
+
+# Build config second
+#set(EXPORT_VARS
+#    CMAKE_POSITION_INDEPENDENT_CODE
+#    OPENCMISS_PREFIX_PATH
+#    OCM_USE_MT OCM_SYSTEM_MPI
+#    OPENCMISS_COMPONENTS BLA_VENDOR
+#    OPENCMISS_CMAKE_MIN_VERSION
+#    OPENCMISS_BUILD_SHARED_LIBS
+#    CMAKE_COMMAND)
+
+
+# OpenCMISS find modules - wrapper and extra find library scripts
+#list(APPEND EXPORT_VARS OPENCMISS_MODULE_PATH)
+
+#do_export(${OPENCMISS_CONTEXT})
+#unset(EXPORT_VARS)

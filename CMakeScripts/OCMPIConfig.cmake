@@ -30,8 +30,6 @@ find_package(MPI QUIET)
 if (NOT MPI_FOUND)
     # This is supported yet only on Unix systems
     if (UNIX)
-        # Set the forward dependencies of MPI only if we build it ourselves
-        SET(MPI_FWD_DEPS ${OPENCMISS_COMPONENTS_WITHMPI})
         # The choice is ... 
         if (MPI STREQUAL openmpi)
             SET(_MPI_VERSION ${OPENMPI_VERSION})
@@ -129,7 +127,9 @@ if (NOT MPI_FOUND)
     		#LOG_INSTALL 1
     		STEP_TARGETS install
     	)
-        ADD_DOWNSTREAM_DEPS(MPI)
+    	# Set the forward dependencies of MPI to have it build before the consuming components
+        SET(MPI_FWD_DEPS ${OPENCMISS_COMPONENTS_WITHMPI})
+        addDownstreamDependencies(MPI FALSE)
     else()
         message(FATAL_ERROR "MPI (${MPI}) installation support not yet implemented for this platform.")
     endif()
