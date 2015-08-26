@@ -46,12 +46,12 @@ function(addAndConfigureLocalComponent COMPONENT_NAME)
     if(${COMPONENT_NAME} IN_LIST OPENCMISS_COMPONENTS_WITHMPI)
         # Pass on settings and take care to undefine them if no longer used at this level
         if (MPI)
-            LIST(APPEND COMPONENT_DEFS -DMPI=${MPI})
+            list(APPEND COMPONENT_DEFS -DMPI=${MPI})
         else()
-            LIST(APPEND COMPONENT_DEFS -UMPI)
+            list(APPEND COMPONENT_DEFS -UMPI)
         endif()
         if (MPI_HOME)
-            LIST(APPEND COMPONENT_DEFS -DMPI_HOME=${MPI_HOME})
+            list(APPEND COMPONENT_DEFS -DMPI_HOME=${MPI_HOME})
         else()
             LIST(APPEND COMPONENT_DEFS -UMPI_HOME)
         endif()
@@ -59,7 +59,7 @@ function(addAndConfigureLocalComponent COMPONENT_NAME)
         # for all components that may use MPI
         foreach(lang C CXX Fortran)
             if(MPI_${lang}_COMPILER)
-                LIST(APPEND COMPONENT_DEFS
+                list(APPEND COMPONENT_DEFS
                     # Directly specify the compiler wrapper as compiler!
                     # That is a perfect workaround for the "finding MPI after compilers have been initialized" problem
                     # that occurs when building a component directly. 
@@ -73,7 +73,7 @@ function(addAndConfigureLocalComponent COMPONENT_NAME)
     
 	# Forward any other variables
     foreach(extra_def ${ARGN})
-        LIST(APPEND COMPONENT_DEFS -D${extra_def})
+        list(APPEND COMPONENT_DEFS -D${extra_def})
         #message(STATUS "${COMPONENT_NAME}: Using extra definition -D${extra_def}")
     endforeach()
     #message(STATUS "OpenCMISS component ${COMPONENT_NAME} extra args:\n${COMPONENT_DEFS}")
@@ -98,7 +98,7 @@ function(getExtProjDownloadUpdateCommands COMPONENT_NAME TARGET_SOURCE_DIR DL_VA
     string(TOLOWER ${COMPONENT_NAME} FOLDER_NAME)
     
     # Git clone mode
-    if (${OCM_GIT_CLONE_${COMPONENT_NAME}})
+    if (OCM_GIT_CLONE_${COMPONENT_NAME})
         find_package(Git)
         if(GIT_FOUND)
             #message(STATUS "GITHUB_ORGANIZATION=${GITHUB_ORGANIZATION}, GITHUB_USERNAME=${GITHUB_USERNAME}")
@@ -115,11 +115,15 @@ function(getExtProjDownloadUpdateCommands COMPONENT_NAME TARGET_SOURCE_DIR DL_VA
                 endif()
                 set(${COMPONENT_NAME}_REPO ${GITHUB_PROTOCOL}${_GITHUB_USERNAME}/${FOLDER_NAME})
             endif()
-            SET(DOWNLOAD_CMDS
+            set(${DL_VAR}
                 GIT_REPOSITORY ${${COMPONENT_NAME}_REPO}
                 GIT_TAG ${${COMPONENT_NAME}_BRANCH}
+                PARENT_SCOPE
             )
-            set(${UP_VAR} UPDATE_COMMAND ${GIT_EXECUTABLE} pull PARENT_SCOPE)
+            set(${UP_VAR} 
+                UPDATE_COMMAND ${GIT_EXECUTABLE} pull
+                PARENT_SCOPE
+            )
             #message(STATUS "DOWNLOAD_CMDS=${DOWNLOAD_CMDS}")
         else()
             message(FATAL_ERROR "Could not find GIT. GIT is required if OCM_GIT_CLONE_${COMPONENT_NAME} is set.")
@@ -134,12 +138,13 @@ function(getExtProjDownloadUpdateCommands COMPONENT_NAME TARGET_SOURCE_DIR DL_VA
             SET(${COMPONENT_NAME}_REPO https://github.com/${GITHUB_ORGANIZATION}/${FOLDER_NAME})
         endif()
         ################@TEMP@#################
-        SET(DOWNLOAD_CMDS
+        set(${DL_VAR}
             DOWNLOAD_DIR ${TARGET_SOURCE_DIR}/src-download
             #URL https://github.com/${GITHUB_ORGANIZATION}/${FOLDER_NAME}/archive/${${COMPONENT_NAME}_BRANCH}.zip
             ################@TEMP@#################
             URL ${${COMPONENT_NAME}_REPO}/archive/${${COMPONENT_NAME}_BRANCH}.zip
             ################@TEMP@#################
+            PARENT_SCOPE
         )
     endif()
 endfunction()
