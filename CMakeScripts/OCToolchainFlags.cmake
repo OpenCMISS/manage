@@ -1,14 +1,40 @@
-macro(ADDFLAG VARNAME VALUE)
-    SET(${VARNAME} "${${VARNAME}} ${VALUE}")
+# Macro for adding a compile flag for a certain language (and optionally build type)
+# Also performs a check if the current compiler supports the flag
+macro(addFlag VALUE LANGUAGE)
+    getFlagCheckVariableName(${VALUE} ${LANGUAGE} CHK_VAR)
+    if (${LANGUAGE} STREQUAL C)
+        CHECK_C_COMPILER_FLAG("${VALUE}" ${CHK_VAR})
+    elseif(${LANGUAGE} STREQUAL CXX)
+        CHECK_CXX_COMPILER_FLAG("${VALUE}" ${CHK_VAR})
+    elseif(${LANGUAGE} STREQUAL Fortran)
+        CHECK_Fortran_COMPILER_FLAG("${VALUE}" ${CHK_VAR})
+    endif()
+    # Only add the flag if the check succeeded
+    if (${CHK_VAR})
+        set(__FLAGS_VARNAME CMAKE_${LANGUAGE}_FLAGS)
+        if (NOT "${ARGV2}" STREQUAL "")
+            set(__FLAGS_VARNAME ${__FLAGS_VARNAME}_${ARGV2})
+        endif()
+        set(${__FLAGS_VARNAME} "${${__FLAGS_VARNAME}} ${VALUE}")
+    endif()
 endmacro()
 
-macro(ADDFLAGALL SUFFIX VALUE)
-    foreach(lang C CXX Fortran)        
-        SET(CMAKE_${lang}_${SUFFIX} "${CMAKE_${lang}_${SUFFIX}} ${VALUE}")
+macro(addFlagAll VALUE)
+    foreach(lang C CXX Fortran)
+        addFlag(${VALUE} ${lang} ${ARGV1})
     endforeach()
 endmacro()
 
+function(getFlagCheckVariableName FLAG LANGUAGE RESULT_VAR)
+    if (${FLAG} MATCHES "^-.*")
+        string(SUBSTRING ${FLAG} 1 -1 FLAG) 
+    endif()
+    string(REGEX REPLACE "[^a-zA-Z0-9 ]" "_" RES ${FLAG})
+    set(${RESULT_VAR} ${LANGUAGE}_COMPILER_FLAG_${RES} PARENT_SCOPE)
+endfunction()
+
 include(CheckCCompilerFlag)
+include(CheckCXXCompilerFlag)
 include(CheckFortranCompilerFlag)
 
 # ABI detection - no crosscompiling implemented yet, so will use native
@@ -26,95 +52,107 @@ include(CheckFortranCompilerFlag)
 if (CMAKE_COMPILER_IS_GNUC OR CMAKE_C_COMPILER_ID STREQUAL "GNU" OR MINGW)
     # ABI Flag -m$(ABI)
     
-    # Release
-    CHECK_C_COMPILER_FLAG("-Ofast" HAVE_OFAST_SUPPORT)
-    if (HAVE_OFAST_SUPPORT)
-        ADDFLAGALL(FLAGS_RELEASE "-Ofast")
-    else()
-        ADDFLAGALL(FLAGS_RELEASE "-O3")
-    endif()
+    # These flags are set by CMake by default anyways.
+    # addFlagAll("-O3" RELEASE)
+    addFlagAll("-O0" DEBUG)
     
+    # Release
+    
+    addFlagAll("-Ofast" RELEASE)
+        
     # Debug
-    ADDFLAGALL(FLAGS_DEBUG "-O0")
+    
     if (OCM_WARN_ALL)
-        ADDFLAGALL(FLAGS_DEBUG "-Wall")
+        addFlagAll("-Wall" DEBUG)
     endif()
-    ADDFLAG(CMAKE_Fortran_FLAGS_DEBUG -fbacktrace)
+    addFlag("-fbacktrace" Fortran DEBUG)
     # Compiler minor >= 8
     if (CMAKE_Fortran_COMPILER_VERSION VERSION_GREATER 4.7)
-        ADDFLAG(CMAKE_Fortran_FLAGS_DEBUG "-Warray-temporaries -Wextra -Wsurprising -Wrealloc-lhs-all")
+        addFlag("-Warray-temporaries" Fortran DEBUG)
+        addFlag("-Wextra" Fortran DEBUG)
+        addFlag("-Wsurprising" Fortran DEBUG)
+        addFlag("-Wrealloc-lhs-all" Fortran DEBUG)
     endif()
     if (OCM_CHECK_ALL)
         # Compiler version 4.4
         if (CMAKE_Fortran_COMPILER_VERSION VERSION_EQUAL 4.4)
-            ADDFLAG(CMAKE_Fortran_FLAGS_DEBUG "-fbounds-check")
+            addFlag("-fbounds-check" Fortran DEBUG)
         endif()
         # Compiler minor >= 8
         if (CMAKE_Fortran_COMPILER_VERSION VERSION_GREATER 4.7)
-            ADDFLAG(CMAKE_Fortran_FLAGS_DEBUG "-finit-real=snan")
+            addFlag("-finit-real=snan" Fortran DEBUG)
         endif()
         # Newer versions
-        ADDFLAG(CMAKE_Fortran_FLAGS_DEBUG "-fcheck=all")
+        addFlag("-fcheck=all" Fortran DEBUG)
     endif()
     
 elseif (CMAKE_C_COMPILER_ID STREQUAL "Intel" OR CMAKE_CXX_COMPILER_ID STREQUAL "Intel")
     # ABI Flag -m$(ABI)
     
+    # CMake default anyways
+    #addFlagAll("-O3" RELEASE)
+    
     # Release
-    #ADDFLAGALL(FLAGS_RELEASE "-fast") - commented out in original file
-    ADDFLAGALL(FLAGS_RELEASE "-O3")
+    addFlagAll("-fast" RELEASE)
     
     # Debug
-    ADDFLAGALL(FLAGS_DEBUG "-traceback")
+    addFlagAll("-traceback" DEBUG)
     if (OCM_WARN_ALL)
-        ADDFLAG(CMAKE_C_FLAGS_DEBUG "-Wall")
-        ADDFLAG(CMAKE_CXX_FLAGS_DEBUG "-Wall")
-        ADDFLAG(CMAKE_Fortran_FLAGS_DEBUG "-warn all")
+        addFlag("-Wall" C DEBUG)
+        addFlag("-Wall" CXX DEBUG)
+        addFlag("-warn all" Fortran DEBUG)
     endif()
     if (OCM_CHECK_ALL)
-        ADDFLAG(CMAKE_C_FLAGS_DEBUG "-Wcheck -fp-trap=common -ftrapuv")
-        ADDFLAG(CMAKE_CXX_FLAGS_DEBUG "-Wcheck -fp-trap=common -ftrapuv")
-        ADDFLAG(CMAKE_Fortran_FLAGS_DEBUG "-check all -fpe-all=0 -ftrapuv")
+        foreach(lang C CXX)
+            addFlag("-Wcheck" ${lang} DEBUG)
+            addFlag("-fp-trap=common" ${lang} DEBUG)
+            addFlag("-ftrapuv" ${lang} DEBUG)
+        endforeach()
+        addFlag("-check all" Fortran DEBUG)
+        addFlag("-fpe-all=0" Fortran DEBUG)
+        addFlag("-ftrapuv" Fortran DEBUG)
     endif()
     
 elseif(CMAKE_C_COMPILER_ID STREQUAL "XL" OR CMAKE_CXX_COMPILER_ID STREQUAL "XL") # IBM case
     if (OCM_USE_MT)
         # FindOpenMP uses "-qsmp" for multithreading.. will need to see.
-        ADDFLAGALL(FLAGS_RELEASE "-qomp")
-        ADDFLAGALL(FLAGS_DEBUG "-qomp:noopt")
+        addFlagAll("-qomp" RELEASE)
+        addFlagAll("-qomp:noopt" DEBUG)
     endif()
     # ABI Flag -q$(ABI)
     
     # Instruction type - use auto here (pwr4-pwr7 available)
-    ADDFLAGALL(FLAGS "-qarch=auto -qtune=auto")
+    addFlagAll("-qarch=auto")
+    addFlagAll("-qtune=auto")
     
     # Release
-    ADDFLAGALL(FLAGS_RELEASE "-qstrict")
+    addFlagAll("-qstrict" RELEASE)
     
     # Debug
     if (OCM_WARN_ALL)
         # Assuming 64bit builds here. will need to see if that irritates the compiler for 32bit arch
-        ADDFLAGALL(FLAGS_DEBUG "-qflag=i:i -qwarn64")
+        addFlagAll("-qflag=i:i" DEBUG)
+        addFlagAll("-qwarn64" DEBUG)
     endif()
     if (OCM_CHECK_ALL)
-        ADDFLAGALL(FLAGS_DEBUG "-qcheck")
+        addFlagAll("-qcheck" DEBUG)
     endif()
 endif()
 
 # Thus far all compilers seem to use the -p flag for profiling
 if (OCM_WITH_PROFILING)
-    ADDFLAGALL(FLAGS "-p")
+    addFlagAll("-p" )
 endif()
 
 # Some verbose output for summary
 foreach(lang C CXX Fortran)
     if (CMAKE_${lang}_FLAGS)
-        message(STATUS "${lang} FLAGS=${CMAKE_${lang}_FLAGS}")
+        message(STATUS "${lang} flags=${CMAKE_${lang}_FLAGS}")
     endif()
     if (CMAKE_${lang}_FLAGS_RELEASE)
-        message(STATUS "${lang} FLAGS (RELEASE)=${CMAKE_${lang}_FLAGS_RELEASE}")
+        message(STATUS "${lang} flags (RELEASE)=${CMAKE_${lang}_FLAGS_RELEASE}")
     endif()
     if (CMAKE_${lang}_FLAGS_DEBUG)
-        message(STATUS "${lang} FLAGS (DEBUG)=${CMAKE_${lang}_FLAGS_DEBUG}")
+        message(STATUS "${lang} flags (DEBUG)=${CMAKE_${lang}_FLAGS_DEBUG}")
     endif()
 endforeach()
