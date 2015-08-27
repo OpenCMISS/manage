@@ -2,8 +2,10 @@
 if (NOT FORTRAN_MANGLING)
     include(FortranCInterface)
     message(STATUS "Detected Fortran mangling: Suffix '${FortranCInterface_GLOBAL_SUFFIX}', Case '${FortranCInterface_GLOBAL_CASE}'")
-    FortranCInterface_VERIFY()
-    FortranCInterface_VERIFY(CXX)
+    if (NOT MINGW)
+        FortranCInterface_VERIFY()
+        FortranCInterface_VERIFY(CXX)
+    endif()
     #FortranCInterface_HEADER(${CMAKE_CURRENT_BINARY_DIR}/OPENCMISS_FC.h
     #    MACRO_NAMESPACE "OPENCMISS_FMANGLE_")
     if (FortranCInterface_GLOBAL_SUFFIX STREQUAL _ AND FortranCInterface_GLOBAL_CASE STREQUAL LOWER)

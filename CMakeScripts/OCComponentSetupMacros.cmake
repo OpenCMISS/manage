@@ -246,13 +246,15 @@ function(addConvenienceTargets COMPONENT_NAME BINARY_DIR)
 	    COMMAND ${CMAKE_COMMAND} -E remove -f ${BINARY_DIR}/ep_stamps/*-configure 
 	    COMMAND ${CMAKE_COMMAND} --build ${BINARY_DIR} --target clean
 	    COMMAND ${CMAKE_COMMAND} -E remove -f ${BINARY_DIR}/CMakeCache.txt
+	    COMMENT "Cleaning ${COMPONENT_NAME}"
 	)
 	# Add convenience direct-access update target for component
-	# (This just invokes the ${COMPONENT_NAME}_SRC-update target exposed in the source external project,
-	# essentially allowing to call ${COMPONENT_NAME}-update instead of ${COMPONENT_NAME}_SRC-update)
+	# This removes the external project stamp for the last update and hence triggers execution of the update, e.g.
+	# a new source download or "git pull"
 	add_custom_target(${COMPONENT_NAME}-update
-	    #COMMAND ${CMAKE_COMMAND} -E remove -f ${BINARY_DIR}/ep_stamps/*-configure 
+	    COMMAND ${CMAKE_COMMAND} -E remove -f ${OPENCMISS_ROOT}/src/download/stamps/${COMPONENT_NAME}_SRC-update
 	    COMMAND ${CMAKE_COMMAND} --build ${CMAKE_CURRENT_BINARY_DIR} --target ${COMPONENT_NAME}_SRC-update
+	    COMMENT "Updating ${COMPONENT_NAME} sources"
 	)
 	# Add convenience direct-access forced build target for component
 	getBuildCommands(_DUMMY INSTALL_COMMAND ${BINARY_DIR} TRUE)
