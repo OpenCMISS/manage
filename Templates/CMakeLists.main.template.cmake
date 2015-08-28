@@ -66,7 +66,6 @@ endif()
 
 ########################################################################
 # MPI
-
 # Unless we said to not have MPI or MPI_HOME is given, see that it's available.
 if(NOT (DEFINED MPI_HOME OR MPI STREQUAL none))
     include(OCMPIConfig)
@@ -78,9 +77,24 @@ endif()
 # in the MPIPreflight.cmake script upon generation time of this script.
 
 # Checks for known issues as good as possible
-# TODO: move this to the generator script (suitably)!
+# TODO: move this to the generator script?!
 if (CMAKE_COMPILER_IS_GNUC AND MPI STREQUAL intel)
     message(FATAL_ERROR "Invalid compiler/MPI combination: Cannot build with GNU compiler and Intel MPI.")
+endif()
+
+########################################################################
+# Remote installations - pre check
+# This pre-check is needed to enable use of the architecture path
+# Read OPENCMISS_INSTALL_DIR_REMOTE from environment if not specified directly
+if (NOT OPENCMISS_INSTALL_DIR_REMOTE AND EXISTS "$ENV{OPENCMISS_INSTALL_DIR_REMOTE}")
+    file(TO_CMAKE_PATH "$ENV{OPENCMISS_INSTALL_DIR_REMOTE}" OPENCMISS_INSTALL_DIR_REMOTE)
+endif()
+if (OPENCMISS_INSTALL_DIR_REMOTE)
+    if (EXISTS "${OPENCMISS_INSTALL_DIR_REMOTE}")
+        set(OCM_USE_ARCHITECTURE_PATH YES)
+    else()
+        message(FATAL_ERROR "Invalid OPENCMISS_INSTALL_DIR_REMOTE directory: ${OPENCMISS_INSTALL_DIR_REMOTE}")
+    endif()
 endif()
 
 ########################################################################
