@@ -57,7 +57,7 @@ if(OCM_USE_ZLIB)
     if(NOT ZLIB_FOUND)
         SET(ZLIB_FWD_DEPS 
             SCOTCH PTSCOTCH 
-            MUMPS LIBXML2 FIELDML-API
+            MUMPS LIBXML2 HDF5 FIELDML-API
             IRON CSIM LLVM CELLML)
         ADD_COMPONENT(ZLIB)
     endif()
@@ -80,6 +80,33 @@ if(OCM_USE_LIBXML2)
         ADD_COMPONENT(LIBXML2
             WITH_ZLIB=${LIBXML2_WITH_ZLIB}
             ZLIB_VERSION=${ZLIB_VERSION}
+        )
+    endif()
+endif()
+
+# szip
+if(OCM_USE_SZIP)
+    find_package(SZIP ${SZIP_VERSION} QUIET)
+    if(NOT SZIP_FOUND)
+        SET(SZIP_FWD_DEPS HDF5 FIELDML-API IRON)
+        ADD_COMPONENT(SZIP
+            OCM_INSTALL_ADDITIONAL_SZIP_HEADERS_FOR_HDF5=${HDF5_WITH_SZIP}
+        )
+    endif()
+endif()
+
+# hdf5
+if(OCM_USE_HDF5)
+    find_package(HDF5 ${HDF5_VERSION} QUIET)
+    if(NOT HDF5_FOUND)
+        SET(HDF5_FWD_DEPS FIELDML-API IRON)
+        ADD_COMPONENT(HDF5
+            HDF5_VERSION=${HDF5_VERSION}
+            HDF5_EXTERNALLY_CONFIGURED=${HDF5_EXTERNALLY_CONFIGURED}
+            HDF5_WITH_MPI=${HDF5_WITH_MPI}
+            HDF5_ENABLE_SZIP_SUPPORT=${HDF5_WITH_SZIP}
+            HDF5_ENABLE_SZIP_ENCODING=${HDF5_WITH_SZIP}
+            HDF5_ENABLE_Z_LIB_SUPPORT=${HDF5_WITH_ZLIB}
         )
     endif()
 endif()
