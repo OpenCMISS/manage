@@ -66,7 +66,7 @@
 # Developer setup
 # ==============================
 # If you want to initialize your OpenCMISS installation to developer defaults,
-# add the line "-DEVIL=YES" to your initial cmake call. Done. (not a typo)
+# add the line "-DEVIL=666" to your initial cmake call. Done. (not a typo)
 
 ########################################################
 # If your cmake is older than 2.6 - goodbye. 
@@ -215,8 +215,8 @@ if (DEFINED EVIL)
         configure_file(
             ${CMAKE_CURRENT_SOURCE_DIR}/Templates/OpenCMISSDeveloper.template.cmake
             ${CMAKE_CURRENT_SOURCE_DIR}/OpenCMISSDeveloper.cmake
-            @COPYONLY)
-        set(EVIL_MESSAGE "Being a Dev(i)loper! Copied the OpenCMISSDeveloper template.")
+            COPYONLY)
+        set(EVIL_MESSAGE "Being a Developer! Evilness level: ${EVIL}. Copied the OpenCMISSDeveloper template.")
     else()
         set(EVIL_MESSAGE "OpenCMISSDeveloper script already copied. Not overwriting.")
     endif()
