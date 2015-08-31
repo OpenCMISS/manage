@@ -85,21 +85,15 @@ endif()
 ########################################################################
 # Remote installations - pre check
 # This pre-check is needed to enable use of the architecture path
-# Read OPENCMISS_INSTALL_DIR_REMOTE from environment if not specified directly
-if (NOT OPENCMISS_INSTALL_DIR_REMOTE AND EXISTS "$ENV{OPENCMISS_INSTALL_DIR_REMOTE}")
-    file(TO_CMAKE_PATH "$ENV{OPENCMISS_INSTALL_DIR_REMOTE}" OPENCMISS_INSTALL_DIR_REMOTE)
-endif()
-if (OPENCMISS_INSTALL_DIR_REMOTE)
-    if (EXISTS "${OPENCMISS_INSTALL_DIR_REMOTE}")
-        set(OCM_USE_ARCHITECTURE_PATH YES)
-    else()
-        message(FATAL_ERROR "Invalid OPENCMISS_INSTALL_DIR_REMOTE directory: ${OPENCMISS_INSTALL_DIR_REMOTE}")
-    endif()
-endif()
+
 
 ########################################################################
 # General paths & preps
-getArchitecturePath(ARCHITECTURE_PATH ARCHITECTURE_PATH_MPI)
+set(ARCHITECTURE_PATH .)
+set(ARCHITECTURE_PATH_MPI .)
+if (OCM_USE_ARCHITECTURE_PATH)
+    getArchitecturePath(ARCHITECTURE_PATH ARCHITECTURE_PATH_MPI)
+endif()
 # Build tree location for components (with/without mpi)
 SET(OPENCMISS_COMPONENTS_BINARY_DIR ${OPENCMISS_ROOT}/build/${ARCHITECTURE_PATH})
 SET(OPENCMISS_COMPONENTS_BINARY_DIR_MPI ${OPENCMISS_ROOT}/build/${ARCHITECTURE_PATH_MPI})

@@ -30,14 +30,13 @@ if (DEFINED MPI_BUILD_TYPE)
     string(TOUPPER ${MPI_BUILD_TYPE} MPI_BUILD_TYPE)
 else()
     set(MPI_BUILD_TYPE @MPI_BUILD_TYPE@)
-    messageo("No MPI_BUILD_TYPE specified. Using OpenCMISS default build type '@MPI_BUILD_TYPE@'")
+    messageo("No MPI_BUILD_TYPE specified. Using OpenCMISS default MPI build type '@MPI_BUILD_TYPE@'")
 endif()
 if (NOT DEFINED BUILD_SHARED_LIBS)
     set(BUILD_SHARED_LIBS @BUILD_SHARED_LIBS@)
     messageo("No library type specified. Using OpenCMISS default BUILD_SHARED_LIBS=@BUILD_SHARED_LIBS@")
 endif()
 set(BLA_VENDOR @BLA_VENDOR@)
-set(OCM_USE_ARCHITECTURE_PATH @OCM_USE_ARCHITECTURE_PATH@)
 
 # Set the build type to OpenCMISS default if not explicitly given 
 if (CMAKE_BUILD_TYPE_INITIALIZED_TO_DEFAULT OR NOT CMAKE_BUILD_TYPE)
@@ -51,8 +50,11 @@ list(APPEND CMAKE_MODULE_PATH @OPENCMISS_MODULE_PATH@)
 #############################################################################
 # Assemble architecture-path dependent search locations
 get_filename_component(_HERE ${CMAKE_CURRENT_LIST_FILE} PATH)
-include(OCArchitecturePath)
-getArchitecturePath(_UNUSED ARCHPATH)
+set(ARCHPATH .)
+if (@OCM_USE_ARCHITECTURE_PATH@)
+    include(OCArchitecturePath)
+    getArchitecturePath(_UNUSED ARCHPATH)
+endif()
 
 # This is the order we look for opencmiss installations for a given build type.
 # 1. Use OPENCMISS_BUILD_TYPE: This can be explicitly set to use a specific build type of OpenCMISS to link against
@@ -74,13 +76,13 @@ foreach(BUILDTYPE_SUFFIX ${_BUILDTYPES})
     set(_INSTALL_PATH "${_HERE}/${ARCHPATH}/${BUILDTYPE_SUFFIX_PATH}")
     list(APPEND _SEARCHED_PATHS "${_INSTALL_PATH}")
     
-    set(OPENCMISS_CONFIG ${_INSTALL_PATH}/context.cmake)
-    if (EXISTS "${OPENCMISS_CONFIG}")
-        messageo("Looking for ${BUILDTYPE_SUFFIX} installation - ${OPENCMISS_CONFIG} ... success")
+    set(OPENCMISS_CONTEXT ${_INSTALL_PATH}/context.cmake)
+    if (EXISTS "${OPENCMISS_CONTEXT}")
+        messageo("Looking for ${BUILDTYPE_SUFFIX} installation - ${OPENCMISS_CONTEXT} ... success")
         set(_FOUND TRUE)
         break()
     else()
-        messageo("Looking for ${BUILDTYPE_SUFFIX} installation - ${OPENCMISS_CONFIG} ... failed")
+        messageo("Looking for ${BUILDTYPE_SUFFIX} installation - ${OPENCMISS_CONTEXT} ... failed")
     endif()
 endforeach()
 if (NOT _FOUND)
@@ -114,11 +116,10 @@ if (NOT _FOUND)
 endif()
 
 # Include the build info
-include(${OPENCMISS_CONFIG})
+include(${OPENCMISS_CONTEXT})
 messageo("Using ${OPENCMISS_BUILD_TYPE} installation at ${_INSTALL_PATH}")
 
 ###########################################################################
-# Archpath-dependent initializations
 # This calls the FindMPI in the OpenCMISSExtraFindPackages folder, which
 # respects the MPI settings exported in the OpenCMISS installation  
 find_package(MPI REQUIRED)

@@ -5,34 +5,29 @@
 # and the second for applications that link against an mpi implementation (VARNAME_MPI)
 #
 # Requires the extra (=non-cmake default) variables:
-# OCM_USE_ARCHITECTURE_PATH
 # MPI
 #
 # See also: getShortArchitecturePath
 function(getArchitecturePath VARNAME VARNAME_MPI)
-    SET(ARCHPATH )
-    if(OCM_USE_ARCHITECTURE_PATH)
-        # Get short version to start with
-        getShortArchitecturePath(ARCHPATH)
-        
-        # MPI version information
-        if (MPI STREQUAL none)
-            SET(MPI_PART "no_mpi")
-        else()
-            # Add the build type of MPI to the architecture path - we obtain different libraries
-            # for different mpi build types
-            SET(MPI_PART ${MPI}_${MPI_BUILD_TYPE})
-        endif()
-        SET(ARCHPATH ${ARCHPATH}/${MPI_PART})
-        
-        # Library type (static/shared)
-        if (BUILD_SHARED_LIBS)
-            SET(ARCHPATH ${ARCHPATH}/shared)    
-        else()
-            SET(ARCHPATH ${ARCHPATH}/static)
-        endif()
+    
+    # Get short version to start with
+    getShortArchitecturePath(ARCHPATH)
+    
+    # MPI version information
+    if (MPI STREQUAL none)
+        SET(MPI_PART "no_mpi")
     else()
-        SET(ARCHPATH .)
+        # Add the build type of MPI to the architecture path - we obtain different libraries
+        # for different mpi build types
+        SET(MPI_PART ${MPI}_${MPI_BUILD_TYPE})
+    endif()
+    SET(ARCHPATH ${ARCHPATH}/${MPI_PART})
+    
+    # Library type (static/shared)
+    if (BUILD_SHARED_LIBS)
+        SET(ARCHPATH ${ARCHPATH}/shared)    
+    else()
+        SET(ARCHPATH ${ARCHPATH}/static)
     endif()
     
     # Append to desired variable
@@ -45,32 +40,26 @@ endfunction()
 # This function assembles a short version (the beginning) of the architecture path
 # We have [ARCH][COMPILER][MT]
 #
-# Requires the extra (=non-cmake default) variables:
-# OCM_USE_ARCHITECTURE_PATH
 function(getShortArchitecturePath VARNAME)
-    SET(ARCHPATH )
-    if(OCM_USE_ARCHITECTURE_PATH)
-        # Architecture/System
-        STRING(TOLOWER ${CMAKE_SYSTEM_NAME} CMAKE_SYSTEM_NAME_LOWER)
-        SET(ARCHPATH ${CMAKE_SYSTEM_PROCESSOR}_${CMAKE_SYSTEM_NAME_LOWER})
-        
-        # Bit/Adressing bandwidth
-        #if (ABI)
-        #    SET(ARCHPATH ${ARCHPATH}/${ABI}bit)
-        #endif()
-        
-        # Compiler
-        getCompilerPathElem(COMPILER)
-        SET(ARCHPATH ${ARCHPATH}/${COMPILER})
-        
-        # Profiling
-        
-        # Multithreading
-        if (OCM_USE_MT)
-            SET(ARCHPATH ${ARCHPATH}/mt)
-        endif()
-    else()
-        SET(ARCHPATH .)
+    
+    # Architecture/System
+    STRING(TOLOWER ${CMAKE_SYSTEM_NAME} CMAKE_SYSTEM_NAME_LOWER)
+    SET(ARCHPATH ${CMAKE_SYSTEM_PROCESSOR}_${CMAKE_SYSTEM_NAME_LOWER})
+    
+    # Bit/Adressing bandwidth
+    #if (ABI)
+    #    SET(ARCHPATH ${ARCHPATH}/${ABI}bit)
+    #endif()
+    
+    # Compiler
+    getCompilerPathElem(COMPILER)
+    SET(ARCHPATH ${ARCHPATH}/${COMPILER})
+    
+    # Profiling
+    
+    # Multithreading
+    if (OCM_USE_MT)
+        SET(ARCHPATH ${ARCHPATH}/mt)
     endif()
     
     # Append to desired variable
