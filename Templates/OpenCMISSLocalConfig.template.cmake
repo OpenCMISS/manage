@@ -1,35 +1,48 @@
+####################################################################
+################# GENERAL SETTINGS
+####################################################################
 #SET(BUILD_PRECISION sdcz)
 #SET(INT_TYPE int32)
 #SET(BUILD_TESTS ON)
-#SET(BUILD_SHARED_LIBS YES)
-#set(CMAKE_BUILD_TYPE DEBUG)
-
-# If you have a remote installation of opencmiss components 
-# (e.g. you are using OpenCMISS in a shared network environment
-# specify the installation directory here.
-# This will have the build environment search for opencmiss components there.
-#set(OPENCMISS_DEPENDENCIES_DIR )
-# e.g.
-#set(OPENCMISS_DEPENDENCIES_DIR ~/software/opencmiss/install/x86_64_linux/gnu-4.8.4/openmpi_release/static/release)
-
-# Alternatively, if you are using architecture paths, you can just specify the root "install" folder
-# of the dependencies, and the build system will automatically look for dependencies at the matching architecture subpaths. 
-#set(OPENCMISS_DEPENDENCIES_ROOT )
-#set(OPENCMISS_DEPENDENCIES_ROOT ~/software/opencmiss/install)
 
 # Define a BLAS library vendor here.
 # This is consumed by the FindBLAS package, see its documentation for all possible values.
 #set(BLA_VENDOR Intel10_64lp)
 
-# ==============================
-# Misc
-# ==============================
-# If you want more verbose output during builds, uncomment this line.
-#SET(CMAKE_VERBOSE_MAKEFILE ON)
+####################################################################
+################# REMOTE INSTALLATIONS
+####################################################################
+# If you have a remote installation of opencmiss components, 
+# (e.g. you are using OpenCMISS in a shared network environment)
+# specify the installation directory here.
+# This will have the build environment search for opencmiss components at that location.
+#set(OPENCMISS_REMOTE_INSTALL_DIR ~/software/opencmiss/install)
+# Note:
+# You can also set OPENCMISS_REMOTE_INSTALL_DIR in your system environment to have the build system use that automatically. 
+# Note:
+# You do NOT have to specify the full architecture-path dependend installation directory.
+# OpenCMISS will try to find a matching subpath for your local compiler and mpi settings and issue a warning
+# if no matching installation can be found.
 
-###########################################################################
-# Component configuration
-###########################################################################
+# However, if that fails and you are sure that the remote installation is compatible, you can
+# also directly specify the remote directory containing the "context.cmake" file in this variable:
+#set(OPENCMISS_REMOTE_INSTALL_DIR_FORCE ~/software/opencmiss/install/x86_64_linux/gnu-4.8.4/openmpi_release/static/release)
+
+####################################################################
+################# BUILD CONTROL
+####################################################################
+# If you want more verbose output during builds, uncomment this line.
+#set(CMAKE_VERBOSE_MAKEFILE ON)
+# In order to build shared libraries (.so/.dll) set this to YES
+#set(BUILD_SHARED_LIBS YES)
+# For different build types, use this variable.
+# Possible values are (in general): [RELEASE]|DEBUG|MINSIZEREL|RELWITHDEBINFO
+#set(CMAKE_BUILD_TYPE DEBUG)
+
+
+####################################################################
+################# COMPONENT CONFIGURATION
+####################################################################
 # This is the value initially specified at the top level. 
 
 # Allow all components to be searched for on the local system first.
