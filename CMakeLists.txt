@@ -62,6 +62,12 @@
 #SET(MPI_CXX_COMPILER mpic++)
 #SET(MPI_Fortran_COMPILER mpif77)
 
+# ==============================
+# Developer setup
+# ==============================
+# If you want to initialize your OpenCMISS installation to developer defaults,
+# add the line "-DEVIL=YES" to your initial cmake call. Done. (not a typo)
+
 ########################################################
 # If your cmake is older than 2.6 - goodbye. 
 CMAKE_MINIMUM_REQUIRED(VERSION 2.6.0 FATAL_ERROR)
@@ -201,8 +207,23 @@ endif()
 # This script dumps all available variables if invoked with "-DUMP=YES" :-)
 include(OCMSupportHelper)
 
+# The Devil's part!
+# Used if one defines -DEVIL on the command line. Just a convenience hack to have
+# OpenCMISS copy the developer defaults config file over.
+if (DEFINED EVIL)
+    if (NOT EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/OpenCMISSDeveloper.cmake)
+        configure_file(
+            ${CMAKE_CURRENT_SOURCE_DIR}/Templates/OpenCMISSDeveloper.template.cmake
+            ${CMAKE_CURRENT_SOURCE_DIR}/OpenCMISSDeveloper.cmake
+            @COPYONLY)
+        set(EVIL_MESSAGE "Being a Dev(i)loper! Copied the OpenCMISSDeveloper template.")
+    else()
+        set(EVIL_MESSAGE "OpenCMISSDeveloper script already copied. Not overwriting.")
+    endif()
+endif()
+
 # Print a neat summary
-message(STATUS "@@@@@@@@@@@@@@ TOOLCHAIN & MPI SETUP SUMMARY @@@@@@@@@@@@@@")
+message(STATUS "@@@@@@@@@@@@@@@@@@@ SETUP SUMMARY @@@@@@@@@@@@@@@@@@@")
 message(STATUS "*")
 message(STATUS "* OPENCMISS_ROOT: ${OPENCMISS_ROOT}")
 message(STATUS "* OPENCMISS_MANAGE_DIR: ${OPENCMISS_MANAGE_DIR}")
@@ -214,10 +235,16 @@ endif()
 if (TOOLCHAIN)
     message(STATUS "* TOOLCHAIN: ${TOOLCHAIN}")
 endif()
+if (DEFINED EVIL)
+    message(STATUS "* ${EVIL_MESSAGE}")
+endif()
 message(STATUS "*")
 message(STATUS "@@@@@@@@@@@@@@@@@@@ NEXT STEPS @@@@@@@@@@@@@@@@@@@@@@")
 message(STATUS "*")
 message(STATUS "* Change ${MAIN_BINARY_DIR}/OpenCMISSLocalConfig.cmake according to your setup/needs")
+if (DEFINED EVIL)
+    message(STATUS "* Change ${CMAKE_CURRENT_SOURCE_DIR}/OpenCMISSDeveloper.cmake according to your developing setup/needs (Overrides anything in OpenCMISSLocalConfig!)")        
+endif()
 message(STATUS "* Run your native build command (e.g. '${CMAKE_MAKE_PROGRAM}') to start the build process")
 message(STATUS "* Refer to ${OPENCMISS_MANAGE_DIR}/OpenCMISSBuildEnvironment.docx.pdf for customization instructions")
 message(STATUS "*")
