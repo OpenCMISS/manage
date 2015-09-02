@@ -98,9 +98,7 @@ function(getExtProjDownloadUpdateCommands COMPONENT_NAME TARGET_SOURCE_DIR DL_VA
     string(TOLOWER ${COMPONENT_NAME} FOLDER_NAME)
     
     # Git clone mode
-    if (OCM_GIT_CLONE_${COMPONENT_NAME})
-        find_package(Git)
-        if(GIT_FOUND)
+    if(GIT_FOUND)
             #message(STATUS "GITHUB_ORGANIZATION=${GITHUB_ORGANIZATION}, GITHUB_USERNAME=${GITHUB_USERNAME}")
             if (NOT ${COMPONENT_NAME}_REPO)
                 if(GITHUB_USERNAME)
@@ -124,11 +122,7 @@ function(getExtProjDownloadUpdateCommands COMPONENT_NAME TARGET_SOURCE_DIR DL_VA
                 UPDATE_COMMAND ${GIT_EXECUTABLE} pull
                 PARENT_SCOPE
             )
-            #message(STATUS "DOWNLOAD_CMDS=${DOWNLOAD_CMDS}")
-        else()
-            message(FATAL_ERROR "Could not find GIT. GIT is required if OCM_GIT_CLONE_${COMPONENT_NAME} is set.")
-        endif()
-    
+            #message(STATUS "DOWNLOAD_CMDS=${DOWNLOAD_CMDS}")    
     # Default: Download the current version branch as zip of no git clone flag is set
     else()
         ################@TEMP@#################
@@ -156,7 +150,18 @@ function(createExternalProjects COMPONENT_NAME SOURCE_DIR BINARY_DIR DEFS)
     message(STATUS "Configuring build of '${COMPONENT_NAME}' in ${BINARY_DIR}...")
 
     getBuildCommands(BUILD_COMMAND INSTALL_COMMAND ${BINARY_DIR} TRUE)
-
+    
+    if (COMPONENT_NAME STREQUAL "EXAMPLES")
+        # Special hack for the examples - we want the build to continue even if some examples wont compile.
+        # TODO remove later.    
+        set(INSTALL_COMMAND ${CMAKE_COMMAND} -E echo "Nothing to install for OpenCMISS examples.")
+        if (UNIX)
+            list(APPEND BUILD_COMMAND "-i")
+        endif()
+    #else()
+    #    set(INSTALL_COMMAND INSTALL_COMMAND ${INSTALL_COMMAND})
+    endif()
+        
     getExtProjDownloadUpdateCommands(${COMPONENT_NAME} ${SOURCE_DIR} DOWNLOAD_COMMANDS UPDATE_COMMANDS)
     
     # Log settings
@@ -274,8 +279,8 @@ endfunction()
 
 function(getBuildCommands BUILD_CMD_VAR INSTALL_CMD_VAR DIR PARALLEL)
     
-    SET( BUILD_CMD ${CMAKE_COMMAND} --build ${DIR})
-    SET( INSTALL_CMD ${CMAKE_COMMAND} --build ${DIR} --target install)
+    set( BUILD_CMD ${CMAKE_COMMAND} --build ${DIR})
+    set( INSTALL_CMD ${CMAKE_COMMAND} --build ${DIR} --target install)
     
     if(PARALLEL_BUILDS AND PARALLEL)
         include(ProcessorCount)

@@ -181,9 +181,13 @@ add_custom_target(${BUILD_IDENT} ALL
 add_custom_target(update
     COMMAND ${CMAKE_COMMAND} --build ${MAIN_BINARY_DIR} --target update
 )
-# Forward examples target
+# Forward examples target and test
 add_custom_target(examples
-    COMMAND ${CMAKE_COMMAND} --build ${MAIN_BINARY_DIR} --target examples
+    COMMAND ${CMAKE_COMMAND} --build ${MAIN_BINARY_DIR} --target EXAMPLES
+)
+add_custom_target(examples-test
+    DEPENDS examples
+    COMMAND ${CMAKE_COMMAND} --build ${MAIN_BINARY_DIR} --target examples-test
 )
 
 if (UNIX)

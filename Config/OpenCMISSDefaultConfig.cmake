@@ -110,6 +110,9 @@ SET(IRON_BRANCH iron)
 # Needs to be here until the repo's name is "iron", then it's compiled automatically (see Iron.cmake/BuildMacros)
 SET(IRON_REPO https://github.com/rondiplomatico/iron)
 
+SET(EXAMPLES_REPO https://github.com/rondiplomatico/examples)
+set(EXAMPLES_BRANCH cmake)
+
 # ==========================================================================================
 # Single module configuration
 #
