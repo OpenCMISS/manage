@@ -53,7 +53,7 @@ include(OCComponentSetupMacros)
 
 # Git is used by default to clone source repositories, unless disabled
 if (NOT DISABLE_GIT)
-    find_package(GIT)
+    find_package(Git)
     if (NOT GIT_FOUND)
         message(STATUS "ATTENTION: Could not find Git. Falling back to download sources as .zip files.")
     endif()

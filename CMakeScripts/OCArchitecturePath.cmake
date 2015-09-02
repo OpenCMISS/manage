@@ -23,13 +23,6 @@ function(getArchitecturePath VARNAME VARNAME_MPI)
     endif()
     SET(ARCHPATH ${ARCHPATH}/${MPI_PART})
     
-    # Library type (static/shared)
-    if (BUILD_SHARED_LIBS)
-        SET(ARCHPATH ${ARCHPATH}/shared)    
-    else()
-        SET(ARCHPATH ${ARCHPATH}/static)
-    endif()
-    
     # Append to desired variable
     SET(${VARNAME_MPI} ${ARCHPATH} PARENT_SCOPE)
     # The full architecture path without mpi is the same but with "no_mpi" at the same level

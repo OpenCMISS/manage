@@ -15,12 +15,12 @@ LIST(APPEND COMPONENT_COMMON_DEFS
     -DBUILD_TESTS=${BUILD_TESTS}
     -DCMAKE_PREFIX_PATH=${OPENCMISS_PREFIX_PATH_ESC}
     -DCMAKE_MODULE_PATH=${CMAKE_MODULE_PATH_ESC}
-    -DBUILD_SHARED_LIBS=${BUILD_SHARED_LIBS}
     -DFORTRAN_MANGLING=${FORTRAN_MANGLING}
     -DINT_TYPE=${INT_TYPE}
     -DPACKAGE_CONFIG_DIR=${COMMON_PACKAGE_CONFIG_DIR}
     -DCMAKE_NO_SYSTEM_FROM_IMPORTED=YES
     -DCMAKE_DEBUG_POSTFIX=${CMAKE_DEBUG_POSTFIX}
+    -DCMAKE_POSITION_INDEPENDENT_CODE=YES # -fPIC flag - always enable
 )
 
 # Add compilers and flags
@@ -53,14 +53,6 @@ foreach(COMP ${OPENCMISS_COMPONENTS})
 	    )
 	endif()
 endforeach()
-
-# fPIC flag
-# if BUILD_SHARED_LIBS is set to true, the POSITION_INDEPENDENT_CODE property is set automatically for EXECUTABLE and SHARED library targets.
-# However, OBJECT targets wont automatically have POSITION_INDEPENDENT_CODE if BUILD_SHARED_LIBS is set to true, so we manually set this
-# if we build shared libraries to enable linking of object libraries into shared libraries.
-if (BUILD_SHARED_LIBS OR OCM_POSITION_INDEPENDENT_CODE)
-    list(APPEND COMPONENT_COMMON_DEFS -DCMAKE_POSITION_INDEPENDENT_CODE=YES)
-endif()
 
 # For shared libs, use the correct install RPATH to enable binaries to find the shared libs.
 # See http://www.cmake.org/Wiki/CMake_RPATH_handling

@@ -34,6 +34,9 @@ function(addAndConfigureLocalComponent COMPONENT_NAME)
         -DCMAKE_INSTALL_PREFIX:STRING=${_INSTALL_PREFIX}
     )
     
+    # Shared or static?
+    list(APPEND COMPONENT_DEFS -DBUILD_SHARED_LIBS=${${COMPONENT_NAME}_SHARED})
+    
     # OpenMP multithreading
     if(COMPONENT_NAME IN_LIST OPENCMISS_COMPONENTS_WITH_OPENMP)
         list(APPEND COMPONENT_DEFS

@@ -20,9 +20,9 @@ option(BUILD_TESTS "Build OpenCMISS(-components) tests" OFF)
 option(PARALLEL_BUILDS "Use multithreading (-jN etc) for builds" ON)
 
 # Type of libraries to build
-option(BUILD_SHARED_LIBS "Build shared libraries" NO)
-
-option(OCM_POSITION_INDEPENDENT_CODE "Always generate position independent code (-fPIC flag)" NO)
+# The default is static for all dependencies and shared for main components (iron and zinc)
+# If set to yes, every component will 
+option(BUILD_SHARED_LIBS "Build shared libraries within/for every component" NO)
 
 # Have the build system wrap the builds of component into log files.
 # Selecting NO will directly print the build process to the standard output.
@@ -64,6 +64,8 @@ FOREACH(OCM_DEP ${OPENCMISS_COMPONENTS})
         SET(_VALUE YES)
     endif()
     option(OCM_SYSTEM_${OCM_DEP} "Enable local system search for ${OCM_DEP}" ${_VALUE})
+    # Initialize the default: static build for all components
+    option(${OCM_DEP}_SHARED "Build ${OCM_DEP} with shared libraries" NO)
 ENDFOREACH()
 
 # Main version
@@ -109,6 +111,8 @@ SET(CSIM_VERSION 1.0)
 SET(IRON_BRANCH iron)
 # Needs to be here until the repo's name is "iron", then it's compiled automatically (see Iron.cmake/BuildMacros)
 SET(IRON_REPO https://github.com/rondiplomatico/iron)
+set(IRON_SHARED YES)
+set(ZINC_SHARED YES)
 
 SET(EXAMPLES_REPO https://github.com/rondiplomatico/examples)
 set(EXAMPLES_BRANCH cmake)
