@@ -7,6 +7,9 @@
 # This script essentially defines an INTERFACE target opencmiss which is
 # then poulated with all the top level libraries configured in OpenCMISS.
 
+# Compute the installation prefix relative to this file. It might be a mounted location or whatever.
+get_filename_component(_IMPORT_PREFIX "${CMAKE_CURRENT_LIST_FILE}" DIRECTORY)
+
 # Debug verbose helper
 function(messaged TEXT)
     #message(STATUS ${TEXT})
@@ -32,10 +35,6 @@ else()
     set(MPI_BUILD_TYPE @MPI_BUILD_TYPE@)
     messageo("No MPI_BUILD_TYPE specified. Using OpenCMISS default MPI build type '@MPI_BUILD_TYPE@'")
 endif()
-if (NOT DEFINED BUILD_SHARED_LIBS)
-    set(BUILD_SHARED_LIBS @BUILD_SHARED_LIBS@)
-    messageo("No library type specified. Using OpenCMISS default BUILD_SHARED_LIBS=@BUILD_SHARED_LIBS@")
-endif()
 set(BLA_VENDOR @BLA_VENDOR@)
 
 # Set the build type to OpenCMISS default if not explicitly given 
@@ -45,11 +44,10 @@ if (CMAKE_BUILD_TYPE_INITIALIZED_TO_DEFAULT OR NOT CMAKE_BUILD_TYPE)
 endif()
 
 # Append the OpenCMISS module path to the current path
-list(APPEND CMAKE_MODULE_PATH @OPENCMISS_MODULE_PATH@)
+list(APPEND CMAKE_MODULE_PATH @OPENCMISS_MODULE_PATH_EXPORT@)
 
 #############################################################################
 # Assemble architecture-path dependent search locations
-get_filename_component(_HERE ${CMAKE_CURRENT_LIST_FILE} PATH)
 set(ARCHPATH .)
 if (@OCM_USE_ARCHITECTURE_PATH@)
     include(OCArchitecturePath)
@@ -73,7 +71,7 @@ foreach(BUILDTYPE_SUFFIX ${_BUILDTYPES})
     # Have lowercase paths
     string(TOLOWER ${BUILDTYPE_SUFFIX} BUILDTYPE_SUFFIX_PATH)
     # Full install path
-    set(_INSTALL_PATH "${_HERE}/${ARCHPATH}/${BUILDTYPE_SUFFIX_PATH}")
+    set(_INSTALL_PATH "${_IMPORT_PREFIX}/${ARCHPATH}/${BUILDTYPE_SUFFIX_PATH}")
     list(APPEND _SEARCHED_PATHS "${_INSTALL_PATH}")
     
     set(OPENCMISS_CONTEXT ${_INSTALL_PATH}/context.cmake)
@@ -102,7 +100,7 @@ if (NOT _FOUND)
                 endif()
             endforeach()
         endmacro()
-        _recurse(${_HERE})
+        _recurse(${_IMPORT_PREFIX})
         message(STATUS "Searched in")
         foreach(PATH ${_SEARCHED_PATHS})
             message(STATUS "${PATH}")
@@ -125,19 +123,18 @@ messageo("Using ${OPENCMISS_BUILD_TYPE} installation at ${_INSTALL_PATH}")
 find_package(MPI REQUIRED)
 
 # Add the prefix path so the config files can be found
-list(APPEND CMAKE_PREFIX_PATH ${OPENCMISS_PREFIX_PATH})
+list(APPEND CMAKE_PREFIX_PATH ${OPENCMISS_PREFIX_PATH_IMPORT})
 
 messaged("CMAKE_MODULE_PATH=${CMAKE_MODULE_PATH}\nCMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}")
 
 ###########################################################################
 # Misc
 
-# For shared libs, use the correct install RPATH to enable binaries to find the shared libs.
+# For shared libs (default), use the correct install RPATH to enable binaries to find the shared libs.
 # See http://www.cmake.org/Wiki/CMake_RPATH_handling
-if (OPENCMISS_BUILD_SHARED_LIBS)
-    set(CMAKE_INSTALL_RPATH ${OPENCMISS_INSTALL_DIR}/lib)
-    set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
-endif()
+# TODO FIXME/CHECKME
+set(CMAKE_INSTALL_RPATH ${OPENCMISS_LIBRARY_PATH})
+set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 
 ###########################################################################
 # Add the opencmiss library (INTERFACE type is new since 3.0)
@@ -174,6 +171,6 @@ endforeach()
 # Be a tidy kiwi
 unset(_INSTALL_PATH)
 unset(_BUILDTYPES)
-unset(_HERE)
+unset(_IMPORT_PREFIX)
 unset(_SEARCHED)
 unset(BUILDTYPE_SUFFIX)
