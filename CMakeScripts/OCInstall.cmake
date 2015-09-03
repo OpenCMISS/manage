@@ -9,18 +9,25 @@ function(messaged MSG)
     #message(STATUS "OCInstall: ${MSG}")
 endfunction()
 
-function(relativizePathList VARNAME RELATIVE_TO_DIR)
+###########################################################################################
+# Helper functions
+
+# Transforms a given list named VARNAME of paths.
+# At first determines the relative path to RELATIVE_TO_DIR and then prefixes
+# a variable named IMPORT_PREFIX_VARNAME to it, so that use of that list
+# will have dynamically computed prefixes.
+function(relativizePathList VARNAME RELATIVE_TO_DIR IMPORT_PREFIX_VARNAME)
     set(REL_LIST )
     foreach(path ${${VARNAME}})
         get_filename_component(path_abs "${path}" ABSOLUTE)
         messaged("Relativizing\n${path}\nto\n${RELATIVE_TO_DIR}")
         getRelativePath("${path_abs}" "${RELATIVE_TO_DIR}" RELPATH)
-        list(APPEND REL_LIST "\${_OPENCMISS_CONTEXT_IMPORT_PREFIX}/${RELPATH}")
+        list(APPEND REL_LIST "\${${IMPORT_PREFIX_VARNAME}}/${RELPATH}")
     endforeach()
     set(${VARNAME} ${REL_LIST} PARENT_SCOPE)
 endfunction()
 
-# Computes the path of a directory TO relative to FROM
+# Computes the path of a directory TO relative to FROM and stores the result in RESULT_VAR
 function(getRelativePath TO FROM RESULT_VAR)
     # Forward inclusion part
     set(TMP ${TO})
@@ -71,9 +78,9 @@ endfunction()
 
 # Create a copy to not destroy the original (its being used somewhere later maybe)
 set(OPENCMISS_PREFIX_PATH_EXPORT ${OPENCMISS_PREFIX_PATH})
-relativizePathList(OPENCMISS_PREFIX_PATH_EXPORT "${OPENCMISS_COMPONENTS_INSTALL_PREFIX_MPI}")
+relativizePathList(OPENCMISS_PREFIX_PATH_EXPORT "${OPENCMISS_COMPONENTS_INSTALL_PREFIX_MPI}" _OPENCMISS_CONTEXT_IMPORT_PREFIX)
 set(OPENCMISS_LIBRARY_PATH_EXPORT ${OPENCMISS_COMPONENTS_INSTALL_PREFIX}/lib ${OPENCMISS_COMPONENTS_INSTALL_PREFIX_MPI}/lib)
-relativizePathList(OPENCMISS_LIBRARY_PATH_EXPORT "${OPENCMISS_COMPONENTS_INSTALL_PREFIX_MPI}")
+relativizePathList(OPENCMISS_LIBRARY_PATH_EXPORT "${OPENCMISS_COMPONENTS_INSTALL_PREFIX_MPI}" _OPENCMISS_CONTEXT_IMPORT_PREFIX)
 
 # Introduce prefixed variants of the MPI variables - enables to check against them
 set(OPENCMISS_MPI ${MPI})
@@ -124,7 +131,7 @@ set(OPENCMISS_MODULE_PATH_EXPORT
     ${OPENCMISS_FINDMODULE_WRAPPER_DIR}
     ${OPENCMISS_INSTALL_ROOT}/cmake/OpenCMISSExtraFindModules
     ${OPENCMISS_INSTALL_ROOT}/cmake)
-relativizePathList(OPENCMISS_MODULE_PATH_EXPORT "${OPENCMISS_INSTALL_ROOT}")
+relativizePathList(OPENCMISS_MODULE_PATH_EXPORT "${OPENCMISS_INSTALL_ROOT}" _OPENCMISS_IMPORT_PREFIX)
 
 if (OC_DEVELOPER AND NOT OC_INSTALL_SUPPORT_EMAIL)
     message(WARNING "Dear developer! Please set the OC_INSTALL_SUPPORT_EMAIL variable in OpenCMISSDeveloper.cmake "

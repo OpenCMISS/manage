@@ -8,7 +8,7 @@
 # then poulated with all the top level libraries configured in OpenCMISS.
 
 # Compute the installation prefix relative to this file. It might be a mounted location or whatever.
-get_filename_component(_IMPORT_PREFIX "${CMAKE_CURRENT_LIST_FILE}" DIRECTORY)
+get_filename_component(_OPENCMISS_IMPORT_PREFIX "${CMAKE_CURRENT_LIST_FILE}" DIRECTORY)
 
 # Debug verbose helper
 function(messaged TEXT)
