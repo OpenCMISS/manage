@@ -15,7 +15,7 @@ function(append_link_library TARGET LIB)
         INTERFACE_LINK_LIBRARIES "${CURRENT_ILL};${LIB}")
 endfunction()
 
-#message(STATUS "OpenCMISS Find@PACKAGE_CASENAME@ wrapper called. (CMAKE_PREFIX_PATH: ${CMAKE_PREFIX_PATH})")
+message(STATUS "OpenCMISS Find@PACKAGE_CASENAME@ wrapper called.")#(CMAKE_PREFIX_PATH: ${CMAKE_PREFIX_PATH})
 
 # Default: Not found
 SET(@PACKAGE_CASENAME@_FOUND NO)
