@@ -5,4 +5,4 @@ OpenCMISSDeveloper.cmake
 test/
 unix/
 CMakeLists.txt.user
-.swp
+*.swp
