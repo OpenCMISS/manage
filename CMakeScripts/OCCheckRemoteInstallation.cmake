@@ -8,7 +8,7 @@ function(get_remote_prefix_path DIR RESULT_VAR)
     get_filename_component(DIR ${DIR} ABSOLUTE)
     if (EXISTS ${DIR}/context.cmake)
         include(${DIR}/context.cmake)
-        set(${RESULT_VAR} ${OPENCMISS_PREFIX_PATH} PARENT_SCOPE)
+        set(${RESULT_VAR} ${OPENCMISS_PREFIX_PATH_EXPORT} PARENT_SCOPE)
     endif()
 endfunction()
 

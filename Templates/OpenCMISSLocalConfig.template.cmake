@@ -24,7 +24,10 @@
 # This will have the build environment search for opencmiss components at that location.
 #set(OPENCMISS_REMOTE_INSTALL_DIR ~/software/opencmiss/install)
 # Note:
-# You can also set OPENCMISS_REMOTE_INSTALL_DIR in your system environment to have the build system use that automatically. 
+# There are alternate ways to specify the remote install directory:
+# - Set OPENCMISS_REMOTE_INSTALL_DIR in your system environment to have the build system use that automatically.
+# - Specify -DOPENCMISS_REMOTE_INSTALL_DIR at the main build already, it will cache the variable and insert it into this
+#   file automatically. This will be done for ALL subsequent builds using different toolchains or mpi implementations. 
 # Note:
 # You do NOT have to specify the full architecture-path dependend installation directory.
 # OpenCMISS will try to find a matching subpath for your local compiler and mpi settings and issue a warning

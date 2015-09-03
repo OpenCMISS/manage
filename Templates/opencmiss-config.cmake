@@ -114,7 +114,12 @@ if (NOT _FOUND)
             message(STATUS "${PATH}")
         endforeach()
     endif()
-    message(FATAL_ERROR "Could not find a matching OpenCMISS installation. Please check your compiler, MPI, build type etc. choices!")
+    if (SUPPORT_EMAIL)
+        set(msg "Please check your local settings or contact your installation administrator: ${SUPPORT_EMAIL}"
+    else()
+        set(msg "Please check your local settings. Unfortunately, the remote installation guy did not supply a contact eMail adress\nTrack him down, tell your worries and remind him to put in his eMail!")
+    endif()
+    message(FATAL_ERROR "Could not find a matching OpenCMISS installation. Please check your compiler, MPI, build type etc. choices!\n${msg}")
 endif()
 
 # Include the build info
