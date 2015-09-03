@@ -97,6 +97,16 @@ SET(LLVM_VERSION 3.4)
 SET(GTEST_VERSION 1.7.0)
 SET(SZIP_VERSION 2.1)
 set(HDF5_VERSION 1.8.14)
+set(JPEG_VERSION 6.0.0)
+set(NETGEN_VERSION 4.9.11)
+set(FREETYPE_VERSION 2.4.10)
+set(FTGL_VERSION 2.1.3)
+set(GLEW_VERSION 1.5.5)
+set(OPTPP_VERSION 681)
+set(LIBPNG_VERSION 1.5.2)
+set(TIFF_VERSION 3.8.2)
+set(GDCM_VERSION 2.0.12)
+
 # MPI
 SET(OPENMPI_VERSION 1.8.4)
 SET(MPICH_VERSION 3.1.3)
@@ -109,6 +119,9 @@ SET(CSIM_VERSION 1.0)
 SET(IRON_BRANCH iron)
 # Needs to be here until the repo's name is "iron", then it's compiled automatically (see Iron.cmake/BuildMacros)
 SET(IRON_REPO https://github.com/rondiplomatico/iron)
+
+SET(ZINC_BRANCH master)
+SET(ZINC_REPO https://github.com/hsorby/zinc)
 
 # ==========================================================================================
 # Single module configuration

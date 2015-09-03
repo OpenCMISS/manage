@@ -48,10 +48,10 @@ endforeach()
 # Pass on local lookup flags (consumed by find_package calls)
 foreach(COMP ${OPENCMISS_COMPONENTS})
     if (OCM_SYSTEM_${COMP})
-	    LIST(APPEND COMPONENT_COMMON_DEFS 
-	        -DOCM_SYSTEM_${COMP}=${OCM_SYSTEM_${COMP}}
-	    )
-	endif()
+        LIST(APPEND COMPONENT_COMMON_DEFS 
+            -DOCM_SYSTEM_${COMP}=${OCM_SYSTEM_${COMP}}
+        )
+    endif()
 endforeach()
 
 # fPIC flag
