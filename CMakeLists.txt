@@ -81,7 +81,7 @@ endif(ROOT)
 get_filename_component(OPENCMISS_ROOT ${OPENCMISS_ROOT} ABSOLUTE)
 
 # Set up include path required at this stage
-LIST(APPEND CMAKE_MODULE_PATH
+list(APPEND CMAKE_MODULE_PATH
     ${OPENCMISS_MANAGE_DIR}/CMakeScripts
     ${OPENCMISS_MANAGE_DIR}/CMakeModules
     ${OPENCMISS_MANAGE_DIR}/Config)
@@ -91,6 +91,7 @@ LIST(APPEND CMAKE_MODULE_PATH
 # The option is to either come up with a sufficiently new version yourself,
 # or to build cmake using the (then generated) "cmake" target.
 include(OCCMakeCheck)
+# Need to make this outside the include as the return is intended for the main level
 if (NOT CMAKE_COMPATIBLE)
     return()
 endif(NOT CMAKE_COMPATIBLE)
@@ -102,13 +103,13 @@ endif(NOT CMAKE_COMPATIBLE)
 # (e.g. find_library does not "work" if issued before a project command, as the CMAKE_FIND_LIBRARY_SUFFIXES are still empty)
 #
 # The variable CMAKE_MIN_VERSION is set inside the CMakeCheck script
-CMAKE_MINIMUM_REQUIRED(VERSION ${OPENCMISS_CMAKE_MIN_VERSION} FATAL_ERROR)
+cmake_minimum_required(VERSION ${OPENCMISS_CMAKE_MIN_VERSION} FATAL_ERROR)
 project(OpenCMISS-Generate-Build C)
 
 # See if we have a specified toolchain
 if (DEFINED TOOLCHAIN)
     string(TOLOWER ${TOOLCHAIN} TOOLCHAIN)
-    SET(TC_PART ${TOOLCHAIN})
+    set(TC_PART ${TOOLCHAIN})
 else()
     # if unspecified but we're on MINGW, use that instead of "default"
     if (MINGW)
@@ -135,8 +136,8 @@ include(OCMPIPreflight)
 
 # This is the main build file location for each compiler/mpi combination.
 # We need to have different base folders for MPI in release/debug modes.
-SET(BUILD_IDENT compiler.${TC_PART}-mpi.${MPI}.${MPI_BUILD_TYPE}) # dont care, take anything to combine stuff
-SET(MAIN_BINARY_DIR ${CMAKE_CURRENT_BINARY_DIR}/${BUILD_IDENT})
+set(BUILD_IDENT compiler.${TC_PART}-mpi.${MPI}.${MPI_BUILD_TYPE}) # dont care, take anything to combine stuff
+set(MAIN_BINARY_DIR ${CMAKE_CURRENT_BINARY_DIR}/${BUILD_IDENT})
 file(MAKE_DIRECTORY ${MAIN_BINARY_DIR})
 
 # # Create a local config file at target folder if not exists
@@ -162,8 +163,7 @@ configure_file(
 # later the build call to the main project will detect for itself if new builds are necessary.
 #add_custom_command(OUTPUT ${MAIN_BINARY_DIR}/OpenCMISSLocalConfig.cmake
 add_custom_target(${BUILD_IDENT}_CONFIGURE
-    COMMAND ${CMAKE_COMMAND} -G ${CMAKE_GENERATOR} .
-        #-DCMAKE_C_COMPILER=${CMAKE_C_COMPILER} 
+    COMMAND ${CMAKE_COMMAND} -G ${CMAKE_GENERATOR} . 
     WORKING_DIRECTORY ${MAIN_BINARY_DIR}
     COMMENT "Initializing OpenCMISS configuration ${BUILD_IDENT}"
 )
@@ -230,6 +230,9 @@ endif()
 message(STATUS "@@@@@@@@@@@@@@@@@@@ SETUP SUMMARY @@@@@@@@@@@@@@@@@@@")
 message(STATUS "*")
 message(STATUS "* OPENCMISS_ROOT: ${OPENCMISS_ROOT}")
+if (OPENCMISS_REMOTE_INSTALL_DIR)
+    message(STATUS "* OPENCMISS_REMOTE_INSTALL_DIR: ${OPENCMISS_REMOTE_INSTALL_DIR}")
+endif()
 message(STATUS "* OPENCMISS_MANAGE_DIR: ${OPENCMISS_MANAGE_DIR}")
 message(STATUS "* Main build directory: ${MAIN_BINARY_DIR}")
 message(STATUS "* MPI implementation: ${MPI}")

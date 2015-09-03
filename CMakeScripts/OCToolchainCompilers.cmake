@@ -6,6 +6,11 @@ if (TOOLCHAIN)
         SET(CMAKE_C_COMPILER gcc)
         SET(CMAKE_CXX_COMPILER g++)
         SET(CMAKE_Fortran_COMPILER gfortran)
+    
+    elseif (TOOLCHAIN STREQUAL "clang")
+        SET(CMAKE_C_COMPILER clang)
+        SET(CMAKE_CXX_COMPILER clang++)
+        SET(CMAKE_Fortran_COMPILER gfortran)
         
     elseif (TOOLCHAIN STREQUAL "intel")
         SET(CMAKE_C_COMPILER icc)

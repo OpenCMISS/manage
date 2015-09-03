@@ -72,15 +72,17 @@ function(getCompilerPathElem VARNAME)
 	elseif(MSVC OR MSVC_IDE OR MSVC60 OR MSVC70 OR MSVC71 OR MSVC80 OR CMAKE_COMPILER_2005 OR MSVC90 )
 		set(_COMP "msvc" )
 	elseif(CMAKE_COMPILER_IS_GNUCC)
-	    set(_COMP gnu-${CMAKE_C_COMPILER_VERSION})
-	elseif(${CMAKE_C_COMPILER} MATCHES icc 
-	    OR ${CMAKE_CXX_COMPILER} MATCHES icpc
-	    OR ${CMAKE_Fortran_COMPILER} MATCHES ifort)
+	    set(_COMP "gnu")
+	elseif(CMAKE_C_COMPILER_ID MATCHES Clang)
+	    set(_COMP "clang")
+	elseif(CMAKE_C_COMPILER_ID MATCHES Intel 
+	    OR CMAKE_CXX_COMPILER_ID MATCHES Intel
+	    OR CMAKE_Fortran_COMPILER_ID MATCHES Intel)
 	    set(_COMP "intel")
 	elseif( CYGWIN )
 		set(_COMP "cygwin")
 	endif()
-	set(${VARNAME} ${_COMP} PARENT_SCOPE)
+	set(${VARNAME} "${_COMP}-${CMAKE_C_COMPILER_VERSION}" PARENT_SCOPE)
 endfunction()
 
 function(getBuildTypePathElem VARNAME)

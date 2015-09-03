@@ -43,13 +43,16 @@ RELATIVIZE(OPENCMISS_PREFIX_PATH_EXPORT)
 set(OPENCMISS_LIBRARY_PATH_EXPORT ${OPENCMISS_COMPONENTS_INSTALL_PREFIX}/lib ${OPENCMISS_COMPONENTS_INSTALL_PREFIX_MPI}/lib)
 RELATIVIZE(OPENCMISS_LIBRARY_PATH_EXPORT)
 
+# Introduce prefixed variants of the MPI variables - enables to check against them
+set(OPENCMISS_MPI ${MPI})
+set(OPENCMISS_MPI_HOME "${MPI_HOME}")
+set(OPENCMISS_MPI_VERSION "${MPI_VERSION}")
 set(EXPORT_VARS
     OPENCMISS_PREFIX_PATH_EXPORT
     OPENCMISS_LIBRARY_PATH_EXPORT
-    MPI
-    MPI_HOME
+    OPENCMISS_MPI
+    OPENCMISS_MPI_HOME
     MPI_VERSION
-    OCM_SYSTEM_MPI
     #FORTRAN_MANGLING
 )
 
@@ -91,6 +94,18 @@ set(OPENCMISS_MODULE_PATH_EXPORT
     ${OPENCMISS_INSTALL_ROOT}/cmake)
 RELATIVIZE(OPENCMISS_MODULE_PATH_EXPORT)
 
+if (OC_DEVELOPER AND NOT OC_INSTALL_SUPPORT_EMAIL)
+    message(WARNING "Dear developer! Please set the OC_INSTALL_SUPPORT_EMAIL variable in OpenCMISSDeveloper.cmake "
+                    "to your eMail address so that people using your installation can contact you for support. Thanks!")
+endif()
+# Check if there are defaults - otherwise use the current build's settings
+if (NOT OC_DEFAULT_MPI)
+    set(OC_DEFAULT_MPI ${MPI})
+endif()
+if (NOT OC_DEFAULT_MPI_BUILD_TYPE)
+    set(OC_DEFAULT_MPI_BUILD_TYPE ${MPI_BUILD_TYPE})
+endif()
+
 # There's litte to configure yet, but could become more
 configure_file(${OPENCMISS_MANAGE_DIR}/Templates/opencmiss-config.cmake
  ${CMAKE_CURRENT_BINARY_DIR}/export/opencmiss-config.cmake @ONLY
@@ -107,14 +122,6 @@ install(
     DESTINATION ${OPENCMISS_INSTALL_ROOT}
 )
 
-###########################################################################################
-
-# Copy the config files to the non-build-type dependent install location    
-#install(
-#    FILES ${CMAKE_CURRENT_BINARY_DIR}/export/opencmisstoolchain-config.cmake 
-#    DESTINATION ${OPENCMISS_COMPONENTS_INSTALL_PREFIX_MPI_NO_BUILD_TYPE}
-#)
-
 # Copy the FindModule files so that the installation folder is self-contained
 install(DIRECTORY ${OPENCMISS_MANAGE_DIR}/CMakeModules/
     DESTINATION ${OPENCMISS_INSTALL_ROOT}/cmake/OpenCMISSExtraFindModules
@@ -122,3 +129,4 @@ install(DIRECTORY ${OPENCMISS_MANAGE_DIR}/CMakeModules/
 install(FILES ${OPENCMISS_MANAGE_DIR}/CMakeScripts/OCArchitecturePath.cmake
     ${OPENCMISS_MANAGE_DIR}/CMakeScripts/OCToolchainCompilers.cmake
     DESTINATION ${OPENCMISS_INSTALL_ROOT}/cmake)
+    

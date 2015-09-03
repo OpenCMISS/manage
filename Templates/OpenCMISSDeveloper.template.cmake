@@ -19,6 +19,20 @@ set(OCM_CLEAN_REBUILDS_COMPONENTS YES)
 set(OCM_CREATE_LOGS NO)
 
 ##############################################################################################
+############################################### Maintainer setup
+# Please set this to your email address, especially if you plan to provide several architecture installations and
+# expect people to use your installation
+#set(OC_INSTALL_SUPPORT_EMAIL "admin@institu.te")
+
+# When installing OpenCMISS, the opencmiss-config file defines a default MPI version.
+# If unspecified, this will always be set to the version used for the latest build
+#set(OC_DEFAULT_MPI "mpich|openmpi|...")
+
+# When installing OpenCMISS, the opencmiss-config file defines a default MPI build type version.
+# If unspecified, this will always be set to the version used for the latest build
+#set(OC_DEFAULT_MPI_BUILD_TYPE "RELEASE|DEBUG|...")
+
+##############################################################################################
 ############################################### Git
 # If you have Git on your system, you can further customize where repositories are going to be cloned from. 
 

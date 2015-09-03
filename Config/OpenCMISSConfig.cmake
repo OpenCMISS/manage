@@ -30,10 +30,12 @@ unset(_CONFIG_FOUND)
 
 # Look for an OpenCMISS Developer script
 SET(OCM_DEVELOPER_CONFIG ${CMAKE_CURRENT_LIST_DIR}/../OpenCMISSDeveloper.cmake)
+set(OC_DEVELOPER NO)
 if (EXISTS ${OCM_DEVELOPER_CONFIG})
     get_filename_component(OCM_DEVELOPER_CONFIG ${OCM_DEVELOPER_CONFIG} ABSOLUTE)
     message(STATUS "Applying OpenCMISS developer configuration at ${OCM_DEVELOPER_CONFIG}...")
     include(${OCM_DEVELOPER_CONFIG})
+    set(OC_DEVELOPER YES)
     unset(OCM_DEVELOPER_CONFIG)
 endif()
 
