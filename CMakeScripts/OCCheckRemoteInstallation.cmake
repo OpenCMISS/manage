@@ -49,7 +49,7 @@ if (OPENCMISS_REMOTE_INSTALL_DIR_ARCH)
         list(APPEND OPENCMISS_PREFIX_PATH ${REMOTE_PREFIX_PATH})
         unset(REMOTE_PREFIX_PATH) 
     else()
-        message(FATAL_ERROR "No matching remote OpenCMISS installation found for the current configuration subpath '${ARCH_SUBPATH}' under ${OPENCMISS_REMOTE_INSTALL_DIR}. Please check you local setup.")
+        message(FATAL_ERROR "No matching remote OpenCMISS installation found for the current configuration subpath '${ARCH_SUBPATH}' under ${OPENCMISS_REMOTE_INSTALL_DIR}. Please check your local setup.")
     endif()
 endif()
 
