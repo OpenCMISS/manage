@@ -89,7 +89,7 @@ endif()
 if(OCM_USE_JPEG)
     find_package(JPEG ${JPEG_VERSION} QUIET)
     if(NOT JPEG_FOUND)
-        set(JPEG_FWD_DEPS ZINC TIFF GDCM)
+        set(JPEG_FWD_DEPS ZINC TIFF GDCM IMAGEMAGICK)
         addAndConfigureLocalComponent(JPEG
             JPEG_BUILD_CJPEG=OFF
             JPEG_BUILD_DJPEG=OFF
@@ -485,6 +485,13 @@ addAndConfigureLocalComponent(GDCM
 GDCM_USE_SYSTEM_ZLIB=ON
 GDCM_USE_SYSTEM_EXPAT=ON
 GDCM_USE_SYSTEM_UUID=ON
+)
+endif()
+
+find_package(IMAGEMAGICK ${IMAGEMAGICK_VERSION} QUIET)
+if (NOT IMAGEMAGICK_FOUND)
+set(IMAGEMAGICK_FWD_DEPS ZINC)
+addAndConfigureLocalComponent(IMAGEMAGICK
 )
 endif()
 

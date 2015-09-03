@@ -99,7 +99,7 @@ else()
                     LIST(APPEND INCS ${@PACKAGE_NAME@${DIRSUFF}})
                 endif()
             endforeach()
-            message(STATUS "@PACKAGE_CASENAME@ include directories: ${INCS}")
+            #message(STATUS "@PACKAGE_CASENAME@ include directories: ${INCS}")
             
             #message(STATUS "Converting found module to imported targets for package @PACKAGE_NAME@")
                 #":\nLibraries: ${LIBS}\nIncludes: ${INCS}")
