@@ -50,6 +50,15 @@ include(OCComponentSetupMacros)
 
 ########################################################################
 # Utilities
+
+# Git is used by default to clone source repositories, unless disabled
+if (NOT DISABLE_GIT)
+    find_package(Git)
+    if (NOT GIT_FOUND)
+        message(STATUS "ATTENTION: Could not find Git. Falling back to download sources as .zip files.")
+    endif()
+endif()
+
 include(OCInstallFindModuleWrappers)
 # Add CMakeModules directory after wrapper module directory (set in above script)
 # This folder is also exported to the install tree upon "make install" and
@@ -81,11 +90,6 @@ endif()
 if (CMAKE_COMPILER_IS_GNUC AND MPI STREQUAL intel)
     message(FATAL_ERROR "Invalid compiler/MPI combination: Cannot build with GNU compiler and Intel MPI.")
 endif()
-
-########################################################################
-# Remote installations - pre check
-# This pre-check is needed to enable use of the architecture path
-
 
 ########################################################################
 # General paths & preps

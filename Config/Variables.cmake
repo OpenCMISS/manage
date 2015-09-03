@@ -24,3 +24,10 @@ SET(OPENCMISS_COMPONENTS_SYSTEM_BY_DEFAULT BLAS LAPACK LLVM LIBXML2 ZLIB JPEG FR
 # SCOTCH is disabled as PTSCOTCH is usually used.
 SET(OPENCMISS_COMPONENTS_DISABLED_BY_DEFAULT CSIM LLVM SCOTCH)
 #SET(OPENCMISS_COMPONENTS_DISABLED_BY_DEFAULT BLAS LAPACK PLAPACK SCALAPACK PARMETIS SUITESPARSE MUMPS SUPERLU SUPERLU_DIST SUNDIALS SCOTCH SOWING PASTIX HYPRE PETSC LIBCELLML CELLML SLEPC BZIP2 SZIP HDF5 FIELDML-API LIBXML2 IRON CSIM LLVM GTEST)
+
+# This is the support email for general enquiries and support about building opencmiss using the new CMake system.
+set(OC_BUILD_SUPPORT_EMAIL "users@opencmiss.org")
+# This is an email address being displayed for issues regarding (remote) installations.
+# This needs to be set in either LocalConfig or Developer (better) in order to be useful.
+# If not set, a warning will be issued 
+set(OC_INSTALL_SUPPORT_EMAIL FALSE)

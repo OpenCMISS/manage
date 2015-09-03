@@ -43,4 +43,13 @@ if (NOT EXISTS ${MAIN_BINARY_DIR}/OpenCMISSLocalConfig.cmake)
             )
         endforeach()
     endif()
+    if (OPENCMISS_REMOTE_INSTALL_DIR)
+        if (EXISTS "${OPENCMISS_REMOTE_INSTALL_DIR}")
+            file(APPEND ${MAIN_BINARY_DIR}/OpenCMISSLocalConfig.cmake
+                "set(OPENCMISS_REMOTE_INSTALL_DIR \"${OPENCMISS_REMOTE_INSTALL_DIR}\"})\r\n"
+            )
+        else()
+            message(FATAL_ERROR "Remote installation directory not found: ${OPENCMISS_REMOTE_INSTALL_DIR}")
+        endif()
+    endif()
 endif()

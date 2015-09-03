@@ -9,6 +9,12 @@
 # This is consumed by the FindBLAS package, see its documentation for all possible values.
 #set(BLA_VENDOR Intel10_64lp)
 
+# Disable use of Git to obtain sources.
+# The build systems automatically looks for Git and uses that to clone the respective source repositories
+# If Git is not found, a the build system falls back to download .zip files of the source.
+# To enforce that behaviour (e.g. for nightly tests), set this to YES
+#set(DISABLE_GIT YES)
+
 ####################################################################
 ################# REMOTE INSTALLATIONS
 ####################################################################
