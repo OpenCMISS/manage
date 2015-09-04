@@ -162,14 +162,15 @@ configure_file(
 # This makes sure the configure step for the current main project is run at the beginning;
 # later the build call to the main project will detect for itself if new builds are necessary.
 #add_custom_command(OUTPUT ${MAIN_BINARY_DIR}/OpenCMISSLocalConfig.cmake
-add_custom_target(${BUILD_IDENT}_CONFIGURE
-    COMMAND ${CMAKE_COMMAND} -G ${CMAKE_GENERATOR} . 
+add_custom_command(OUTPUT ${MAIN_BINARY_DIR}/configure_stamp
+    COMMAND ${CMAKE_COMMAND} -G ${CMAKE_GENERATOR} .
+    COMMAND ${CMAKE_COMMAND} -E touch ${MAIN_BINARY_DIR}/configure_stamp
     WORKING_DIRECTORY ${MAIN_BINARY_DIR}
     COMMENT "Initializing OpenCMISS configuration ${BUILD_IDENT}"
 )
 # This creates the main target 
 add_custom_target(${BUILD_IDENT} ALL
-    DEPENDS ${BUILD_IDENT}_CONFIGURE
+    DEPENDS ${MAIN_BINARY_DIR}/configure_stamp
     COMMAND ${CMAKE_COMMAND} --build ${MAIN_BINARY_DIR} --target install
     COMMENT "Building OpenCMISS configuration ${BUILD_IDENT}"
 )

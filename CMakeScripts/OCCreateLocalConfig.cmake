@@ -16,7 +16,7 @@ if (NOT EXISTS ${MAIN_BINARY_DIR}/OpenCMISSLocalConfig.cmake)
             set(_VALUE YES)
         endif()
         # Prepare the option to disable/enable here.
-        SET(OCM_USE_FLAGS "${OCM_USE_FLAGS}#SET(OCM_USE_${OCM_COMP} ${_VALUE})${_NL}")
+        SET(OCM_USE_FLAGS "${OCM_USE_FLAGS}#set(OCM_USE_${OCM_COMP} ${_VALUE})${_NL}")
         
         # Some components are looked for on the system by default. add option for opposite action here
         LIST(FIND OPENCMISS_COMPONENTS_SYSTEM_BY_DEFAULT ${OCM_COMP} _COMP_POS)
@@ -24,7 +24,7 @@ if (NOT EXISTS ${MAIN_BINARY_DIR}/OpenCMISSLocalConfig.cmake)
         if (_COMP_POS GREATER -1)
             SET(_VALUE NO)
         endif()
-        SET(OCM_USE_SYSTEM_FLAGS "${OCM_USE_SYSTEM_FLAGS}#SET(OCM_SYSTEM_${OCM_COMP} ${_VALUE})${_NL}")
+        SET(OCM_USE_SYSTEM_FLAGS "${OCM_USE_SYSTEM_FLAGS}#set(OCM_SYSTEM_${OCM_COMP} ${_VALUE})${_NL}")
     endforeach()
     configure_file(${OPENCMISS_MANAGE_DIR}/Templates/OpenCMISSLocalConfig.template.cmake
         ${MAIN_BINARY_DIR}/OpenCMISSLocalConfig.cmake)
