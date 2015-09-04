@@ -70,7 +70,7 @@
 
 ########################################################
 # If your cmake is older than 2.6 - goodbye. 
-CMAKE_MINIMUM_REQUIRED(VERSION 2.6.0 FATAL_ERROR)
+cmake_minimum_required(VERSION 2.6.0 FATAL_ERROR)
 # Set the manage directory
 SET(OPENCMISS_MANAGE_DIR ${CMAKE_CURRENT_SOURCE_DIR})
 # The default opencmiss root is the parent directory of "manage"

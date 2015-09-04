@@ -1,3 +1,6 @@
+set(OPENCMISS_CMAKE_MIN_VERSION @OPENCMISS_CMAKE_MIN_VERSION@)
+cmake_minimum_required(VERSION ${OPENCMISS_CMAKE_MIN_VERSION} FATAL_ERROR)
+
 ########################################################################
 # These values will be put in place at generation phase.
 # They could've also been passed over as command line definitions, however,
@@ -32,7 +35,6 @@ include(OCToolchainCompilers)
 
 ########################################################################
 # Ready to start the "build project"
-CMAKE_MINIMUM_REQUIRED(VERSION @OPENCMISS_CMAKE_MIN_VERSION@ FATAL_ERROR)
 project(OpenCMISS VERSION ${OPENCMISS_VERSION} LANGUAGES C CXX Fortran)
 
 # Need to set the compiler flags after any project call - this ensures the cmake platform values
@@ -154,7 +156,6 @@ include(OCAddExamplesProject)
 
 ########################################################################
 # Installation stuff
-set(OPENCMISS_CMAKE_MIN_VERSION @OPENCMISS_CMAKE_MIN_VERSION@)
 include(OCInstall)
 
 ########################################################################

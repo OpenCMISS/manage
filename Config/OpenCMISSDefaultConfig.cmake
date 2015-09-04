@@ -35,8 +35,8 @@ set(CMAKE_DEBUG_POSTFIX d CACHE STRING "Debug postfix for library names of DEBUG
 # Compilers
 # ==============================
 # Flag for DEBUG configuration builds only!
-SET(OCM_WARN_ALL YES)
-SET(OCM_CHECK_ALL YES)
+set(OCM_WARN_ALL YES)
+set(OCM_CHECK_ALL YES)
 
 # ==============================
 # Multithreading
@@ -48,56 +48,58 @@ option(OCM_USE_MT "Use multithreading in OpenCMISS (where applicable)" NO)
 # Defaults for all dependencies
 # ==============================
 # This is changeable in the OpenCMISSLocalConfig file
-FOREACH(OCM_DEP ${OPENCMISS_COMPONENTS})
-    LIST(FIND OPENCMISS_COMPONENTS_DISABLED_BY_DEFAULT ${OCM_DEP} _COMP_POS)
-    set(_VALUE YES)
-    if (_COMP_POS GREATER -1)
-        set(_VALUE NO)
+foreach(OCM_DEP ${OPENCMISS_COMPONENTS})
+    if (${OCM_DEP} IN_LIST OC_MANDATORY_COMPONENTS)
+        set(OCM_USE_${OCM_DEP} REQ)
+    else()
+        set(_VALUE YES)
+        if (${OCM_DEP} IN_LIST OPENCMISS_COMPONENTS_DISABLED_BY_DEFAULT)
+            set(_VALUE NO)
+        endif()
+        # Use everything but the components in OPENCMISS_COMPONENTS_DISABLED_BY_DEFAULT
+        option(OCM_USE_${OCM_DEP} "Use OpenCMISS component ${OCM_DEP}" ${_VALUE})
     endif()
-    # Use everything but the components in OPENCMISS_COMPONENTS_DISABLED_BY_DEFAULT
-    option(OCM_USE_${OCM_DEP} "Use OpenCMISS component ${OCM_DEP}" ${_VALUE})
     
     # Look for some components on the system first before building
-    LIST(FIND OPENCMISS_COMPONENTS_SYSTEM_BY_DEFAULT ${OCM_DEP} _COMP_POS)
-    SET(_VALUE NO)
-    if (_COMP_POS GREATER -1)
-        SET(_VALUE YES)
+    set(_VALUE NO)
+    if (${OCM_DEP} IN_LIST OPENCMISS_COMPONENTS_SYSTEM_BY_DEFAULT)
+        set(_VALUE YES)
     endif()
     option(OCM_SYSTEM_${OCM_DEP} "Enable local system search for ${OCM_DEP}" ${_VALUE})
     # Initialize the default: static build for all components
     option(${OCM_DEP}_SHARED "Build ${OCM_DEP} with shared libraries" NO)
-ENDFOREACH()
+endforeach()
 
 # Main version
-SET(OPENCMISS_VERSION 1.0)
+set(OPENCMISS_VERSION 1.0)
 
 # Component versions
-SET(BLAS_VERSION 3.5.0)
-SET(HYPRE_VERSION 2.10.0) # Alternatives: 2.9.0
-SET(LAPACK_VERSION 3.5.0)
-SET(LIBCELLML_VERSION 1.0)
-SET(METIS_VERSION 5.1)
-SET(MUMPS_VERSION 5.0.0) # Alternatives: 4.10.0
-SET(PASTIX_VERSION 5.2.2.16)
-SET(PARMETIS_VERSION 4.0.3)
-SET(PETSC_VERSION 3.5)
-SET(PLAPACK_VERSION 3.0)
-SET(PTSCOTCH_VERSION 6.0.3)
-SET(SCALAPACK_VERSION 2.8)
-SET(SCOTCH_VERSION 6.0.3)
-SET(SLEPC_VERSION 3.5)
-SET(SOWING_VERSION 1.1.16)
-SET(SUITESPARSE_VERSION 4.4.0)
-SET(SUNDIALS_VERSION 2.5)
-SET(SUPERLU_VERSION 4.3)
-SET(SUPERLU_DIST_VERSION 3.3)
-SET(ZLIB_VERSION 1.2.3)
-SET(BZIP2_VERSION 1.0.6) # Alternatives: 1.0.5
-SET(FIELDML-API_VERSION 0.5.0)
-SET(LIBXML2_VERSION 2.7.6)
-SET(LLVM_VERSION 3.4)
-SET(GTEST_VERSION 1.7.0)
-SET(SZIP_VERSION 2.1)
+set(BLAS_VERSION 3.5.0)
+set(HYPRE_VERSION 2.10.0) # Alternatives: 2.9.0
+set(LAPACK_VERSION 3.5.0)
+set(LIBCELLML_VERSION 1.0)
+set(METIS_VERSION 5.1)
+set(MUMPS_VERSION 5.0.0) # Alternatives: 4.10.0
+set(PASTIX_VERSION 5.2.2.16)
+set(PARMETIS_VERSION 4.0.3)
+set(PETSC_VERSION 3.5)
+set(PLAPACK_VERSION 3.0)
+set(PTSCOTCH_VERSION 6.0.3)
+set(SCALAPACK_VERSION 2.8)
+set(SCOTCH_VERSION 6.0.3)
+set(SLEPC_VERSION 3.5)
+set(SOWING_VERSION 1.1.16)
+set(SUITESPARSE_VERSION 4.4.0)
+set(SUNDIALS_VERSION 2.5)
+set(SUPERLU_VERSION 4.3)
+set(SUPERLU_DIST_VERSION 3.3)
+set(ZLIB_VERSION 1.2.3)
+set(BZIP2_VERSION 1.0.6) # Alternatives: 1.0.5
+set(FIELDML-API_VERSION 0.5.0)
+set(LIBXML2_VERSION 2.7.6)
+set(LLVM_VERSION 3.4)
+set(GTEST_VERSION 1.7.0)
+set(SZIP_VERSION 2.1)
 set(HDF5_VERSION 1.8.14)
 set(JPEG_VERSION 6.0.0)
 set(NETGEN_VERSION 4.9.11)
@@ -112,25 +114,25 @@ set(IMAGEMAGICK_VERSION 6.7.0.8)
 set(ITK_VERSION 3.20.0)
 
 # MPI
-SET(OPENMPI_VERSION 1.8.4)
-SET(MPICH_VERSION 3.1.3)
-SET(MVAPICH2_VERSION 2.1)
+set(OPENMPI_VERSION 1.8.4)
+set(MPICH_VERSION 3.1.3)
+set(MVAPICH2_VERSION 2.1)
 # Cellml
-SET(CELLML_VERSION 1.0) # any will do, not used
-SET(CSIM_VERSION 1.0)
+set(CELLML_VERSION 1.0) # any will do, not used
+set(CSIM_VERSION 1.0)
 
 # will be "master" finally
-SET(IRON_BRANCH iron)
+set(IRON_BRANCH iron)
 # Needs to be here until the repo's name is "iron", then it's compiled automatically (see Iron.cmake/BuildMacros)
-SET(IRON_REPO https://github.com/rondiplomatico/iron)
+set(IRON_REPO https://github.com/rondiplomatico/iron)
 set(IRON_SHARED YES)
 set(ZINC_SHARED YES)
 
-SET(EXAMPLES_REPO https://github.com/rondiplomatico/examples)
+set(EXAMPLES_REPO https://github.com/rondiplomatico/examples)
 set(EXAMPLES_BRANCH cmake)
 
-SET(ZINC_BRANCH master)
-SET(ZINC_REPO https://github.com/hsorby/zinc)
+set(ZINC_BRANCH master)
+set(ZINC_REPO https://github.com/hsorby/zinc)
 
 # ==========================================================================================
 # Single module configuration
@@ -143,22 +145,22 @@ SET(ZINC_REPO https://github.com/hsorby/zinc)
 # To be safe: E.g. if you wanted to use MUMPS with SCOTCH, also set OCM_USE_SCOTCH=YES so that
 # the build system ensures that SCOTCH will be available.
 # ==========================================================================================
-SET(MUMPS_WITH_SCOTCH NO)
-SET(MUMPS_WITH_PTSCOTCH YES)
-SET(MUMPS_WITH_METIS NO)
-SET(MUMPS_WITH_PARMETIS YES)
+set(MUMPS_WITH_SCOTCH NO)
+set(MUMPS_WITH_PTSCOTCH YES)
+set(MUMPS_WITH_METIS NO)
+set(MUMPS_WITH_PARMETIS YES)
 
-SET(SUNDIALS_WITH_LAPACK YES)
+set(SUNDIALS_WITH_LAPACK YES)
 
-SET(SCOTCH_USE_THREADS YES)
-SET(SCOTCH_WITH_ZLIB YES)
-SET(SCOTCH_WITH_BZIP2 YES)
+set(SCOTCH_USE_THREADS YES)
+set(SCOTCH_WITH_ZLIB YES)
+set(SCOTCH_WITH_BZIP2 YES)
 
-SET(SUPERLU_DIST_WITH_PARMETIS YES)
+set(SUPERLU_DIST_WITH_PARMETIS YES)
 
-SET(PASTIX_USE_THREADS YES)
-SET(PASTIX_USE_METIS YES)
-SET(PASTIX_USE_PTSCOTCH YES)
+set(PASTIX_USE_THREADS YES)
+set(PASTIX_USE_METIS YES)
+set(PASTIX_USE_PTSCOTCH YES)
 
 set(HDF5_WITH_MPI NO)
 set(HDF5_WITH_SZIP YES)
@@ -168,12 +170,12 @@ set(FIELDML-API_WITH_HDF5 NO)
 set(FIELDML-API_WITH_JAVA_BINDINGS NO)
 set(FIELDML-API_WITH_FORTRAN_BINDINGS YES)
 
-SET(IRON_WITH_CELLML YES)
-SET(IRON_WITH_FIELDML NO)
-SET(IRON_WITH_HYPRE YES)
-SET(IRON_WITH_SUNDIALS YES)
-SET(IRON_WITH_MUMPS YES)
-SET(IRON_WITH_SCALAPACK YES)
-SET(IRON_WITH_PETSC YES)
+set(IRON_WITH_CELLML YES)
+set(IRON_WITH_FIELDML NO)
+set(IRON_WITH_HYPRE YES)
+set(IRON_WITH_SUNDIALS YES)
+set(IRON_WITH_MUMPS YES)
+set(IRON_WITH_SCALAPACK YES)
+set(IRON_WITH_PETSC YES)
 
-SET(LIBXML2_WITH_ZLIB YES)
+set(LIBXML2_WITH_ZLIB YES)
