@@ -355,14 +355,6 @@ if (OCM_USE_IRON)
         endif()
     endif()
 
-
-
-
-
-
-
-
-
     if (OCM_USE_LLVM)
         find_package(LLVM ${LLVM_VERSION} QUIET)
         if (NOT LLVM_FOUND)
@@ -401,126 +393,126 @@ if (OCM_USE_IRON)
 endif()
 
 if (OCM_USE_ZINC)
-set(SUBGROUP_PATH dependencies)
-set(GITHUB_ORGANIZATION OpenCMISS-Dependencies)
-
-# jpeg
-if(OCM_USE_JPEG)
-    find_package(JPEG ${JPEG_VERSION} QUIET)
-    if(NOT JPEG_FOUND)
-        set(JPEG_FWD_DEPS ZINC TIFF GDCM IMAGEMAGICK)
-        addAndConfigureLocalComponent(JPEG
-            JPEG_BUILD_CJPEG=OFF
-            JPEG_BUILD_DJPEG=OFF
-            JPEG_BUILD_JPEGTRAN=OFF
-            JPEG_BUILD_RDJPGCOM=OFF
-            JPEG_BUILD_WRJPGCOM=OFF
-        )
+    set(SUBGROUP_PATH dependencies)
+    set(GITHUB_ORGANIZATION OpenCMISS-Dependencies)
+    
+    # jpeg
+    if(OCM_USE_JPEG)
+        find_package(JPEG ${JPEG_VERSION} QUIET)
+        if(NOT JPEG_FOUND)
+            set(JPEG_FWD_DEPS ZINC TIFF GDCM IMAGEMAGICK)
+            addAndConfigureLocalComponent(JPEG
+                JPEG_BUILD_CJPEG=OFF
+                JPEG_BUILD_DJPEG=OFF
+                JPEG_BUILD_JPEGTRAN=OFF
+                JPEG_BUILD_RDJPGCOM=OFF
+                JPEG_BUILD_WRJPGCOM=OFF
+            )
+        endif()
     endif()
-endif()
-
-# netgen
-find_package(NETGEN ${NETGEN_VERSION} QUIET)
+    
+    # netgen
+    find_package(NETGEN ${NETGEN_VERSION} QUIET)
     if (NOT NETGEN_FOUND)
         set(NETGEN_FWD_DEPS ZINC)
-            addAndConfigureLocalComponent(NETGEN
-                NETGEN_BUILD_TYPE=${CMAKE_BUILD_TYPE}
-                NETGEN_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX}
-)
-endif()
-
-# Freetype
-find_package(Freetype ${FREETYPE_VERSION} QUIET)
-    if (NOT FREETYPE_FOUND)
-    set(FREETYPE_FWD_DEPS FTGL)
-        addAndConfigureLocalComponent(FREETYPE)
-endif()
-
-# FTGL
-find_package(FTGL ${FTGL_VERSION} QUIET)
-if (NOT FTGL_FOUND)
-    set(FTGL_FWD_DEPS ZINC)
-    addAndConfigureLocalComponent(FTGL)
-endif()
-
-# GLEW
-find_package(GLEW ${GLEW_VERSION} QUIET)
-if (NOT GLEW_FOUND)
-    set(GLEW_FWD_DEPS ZINC)
-    addAndConfigureLocalComponent(GLEW)
-endif()
-
-# opt++
-find_package(OPTPP ${OPTPP_VERSION} QUIET)
-if (NOT OPTPP_FOUND)
-    addAndConfigureLocalComponent(OPTPP)
-endif()
-
-# libpng
-find_package(PNG ${LIBPNG_VERSION} QUIET)
-if (NOT PNG_FOUND)
-    set(PNG_FWD_DEPS ZINC ITK IMAGEMAGICK)
-    addAndConfigureLocalComponent(PNG
-        PNG_NO_CONSOLE_IO=OFF
-        PNG_NO_STDIO=OFF
+        addAndConfigureLocalComponent(NETGEN
+            NETGEN_BUILD_TYPE=${CMAKE_BUILD_TYPE}
+            NETGEN_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX}
+        )
+    endif()
+    
+    # Freetype
+    find_package(Freetype ${FREETYPE_VERSION} QUIET)
+        if (NOT FREETYPE_FOUND)
+        set(FREETYPE_FWD_DEPS FTGL)
+            addAndConfigureLocalComponent(FREETYPE)
+    endif()
+    
+    # FTGL
+    find_package(FTGL ${FTGL_VERSION} QUIET)
+    if (NOT FTGL_FOUND)
+        set(FTGL_FWD_DEPS ZINC)
+        addAndConfigureLocalComponent(FTGL)
+    endif()
+    
+    # GLEW
+    find_package(GLEW ${GLEW_VERSION} QUIET)
+    if (NOT GLEW_FOUND)
+        set(GLEW_FWD_DEPS ZINC)
+        addAndConfigureLocalComponent(GLEW)
+    endif()
+    
+    # opt++
+    find_package(OPTPP ${OPTPP_VERSION} QUIET)
+    if (NOT OPTPP_FOUND)
+        addAndConfigureLocalComponent(OPTPP)
+    endif()
+    
+    # libpng
+    find_package(PNG ${LIBPNG_VERSION} QUIET)
+    if (NOT PNG_FOUND)
+        set(PNG_FWD_DEPS ZINC ITK IMAGEMAGICK)
+        addAndConfigureLocalComponent(PNG
+            PNG_NO_CONSOLE_IO=OFF
+            PNG_NO_STDIO=OFF
+        )
+    endif()
+    
+    # tiff
+    find_package(TIFF ${TIFF_VERSION} QUIET)
+    if (NOT TIFF_FOUND)
+        set(TIFF_FWD_DEPS ZINC ITK IMAGEMAGICK)
+        addAndConfigureLocalComponent(TIFF
+            TIFF_BUILD_TOOLS=OFF
+        )
+    endif()
+    
+    # gdcm
+    find_package(GDCM ${GDCM_VERSION} QUIET)
+    if (NOT GDCM_FOUND)
+        set(GDCM_FWD_DEPS ZINC ITK IMAGEMAGICK)
+        # Make EXPAT and UUID platform dependent?
+        addAndConfigureLocalComponent(GDCM
+            GDCM_USE_SYSTEM_ZLIB=ON
+            GDCM_USE_SYSTEM_EXPAT=ON
+        )
+    endif()
+    
+    find_package(IMAGEMAGICK ${IMAGEMAGICK_VERSION} QUIET)
+    if (NOT IMAGEMAGICK_FOUND)
+        set(IMAGEMAGICK_FWD_DEPS ZINC)
+        addAndConfigureLocalComponent(IMAGEMAGICK
+            ZLIB_VERSION=${ZLIB_VERSION}
+            LIBXML2_VERSION=${LIBXML2_VERSION}
+            BZIP2_VERSION=${BZIP2_VERSION}
+            GDCM_VERSION=${GDCM_VERSION}
+            TIFF_VERSION=${TIFF_VERSION}
+            JPEG_VERSION=${JPEG_VERSION}
+        )
+    endif()
+    
+    find_package(ITK ${ITK_VERSION} QUIET)
+    if (NOT ITK_FOUND)
+        set(ITK_FWD_DEPS ZINC)
+        addAndConfigureLocalComponent(ITK
+            ITK_BUILD_TESTING=OFF
+            ITK_BUILD_EXAMPLES=OFF
+            ITK_USE_SYSTEM_PNG=ON
+            ITK_USE_SYSTEM_TIFF=ON
+            ITK_USE_SYSTEM_LIBXML2=ON
+            ITK_USE_SYSTEM_ZLIB=ON
+            ITK_USE_SYSTEM_GDCM=OFF
+            ITK_USE_KWSTYLE=OFF
+        )
+    endif()
+    
+    string(REPLACE ";" ${OCM_LIST_SEPARATOR} CMAKE_MODULE_PATH_ESC "${CMAKE_MODULE_PATH}")
+    set(SUBGROUP_PATH .)
+    set(GITHUB_ORGANIZATION OpenCMISS)
+    addAndConfigureLocalComponent(ZINC
+        ZINC_MODULE_PATH=${CMAKE_MODULE_PATH_ESC}
+        ZINC_DEPENDENCIES_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX}
     )
-endif()
-
-# tiff
-find_package(TIFF ${TIFF_VERSION} QUIET)
-if (NOT TIFF_FOUND)
-    set(TIFF_FWD_DEPS ZINC ITK IMAGEMAGICK)
-    addAndConfigureLocalComponent(TIFF
-        TIFF_BUILD_TOOLS=OFF
-    )
-endif()
-
-# gdcm
-find_package(GDCM ${GDCM_VERSION} QUIET)
-if (NOT GDCM_FOUND)
-    set(GDCM_FWD_DEPS ZINC ITK IMAGEMAGICK)
-    # Make EXPAT and UUID platform dependent?
-    addAndConfigureLocalComponent(GDCM
-        GDCM_USE_SYSTEM_ZLIB=ON
-        GDCM_USE_SYSTEM_EXPAT=ON
-    )
-endif()
-
-find_package(IMAGEMAGICK ${IMAGEMAGICK_VERSION} QUIET)
-if (NOT IMAGEMAGICK_FOUND)
-    set(IMAGEMAGICK_FWD_DEPS ZINC)
-    addAndConfigureLocalComponent(IMAGEMAGICK
-        ZLIB_VERSION=${ZLIB_VERSION}
-        LIBXML2_VERSION=${LIBXML2_VERSION}
-        BZIP2_VERSION=${BZIP2_VERSION}
-        GDCM_VERSION=${GDCM_VERSION}
-        TIFF_VERSION=${TIFF_VERSION}
-        JPEG_VERSION=${JPEG_VERSION}
-    )
-endif()
-
-find_package(ITK ${ITK_VERSION} QUIET)
-if (NOT ITK_FOUND)
-    set(ITK_FWD_DEPS ZINC)
-    addAndConfigureLocalComponent(ITK
-        ITK_BUILD_TESTING=OFF
-        ITK_BUILD_EXAMPLES=OFF
-        ITK_USE_SYSTEM_PNG=ON
-        ITK_USE_SYSTEM_TIFF=ON
-        ITK_USE_SYSTEM_LIBXML2=ON
-        ITK_USE_SYSTEM_ZLIB=ON
-        ITK_USE_SYSTEM_GDCM=OFF
-        ITK_USE_KWSTYLE=OFF
-    )
-endif()
-
-string(REPLACE ";" ${OCM_LIST_SEPARATOR} CMAKE_MODULE_PATH_ESC "${CMAKE_MODULE_PATH}")
-set(SUBGROUP_PATH .)
-set(GITHUB_ORGANIZATION OpenCMISS)
-addAndConfigureLocalComponent(ZINC
-    ZINC_MODULE_PATH=${CMAKE_MODULE_PATH_ESC}
-    ZINC_DEPENDENCIES_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX}
-)
 endif()
 
 # Notes:
