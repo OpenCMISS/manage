@@ -58,7 +58,7 @@ if(OCM_USE_ZLIB OR OCM_USE_ZINC)
         SET(ZLIB_FWD_DEPS 
             SCOTCH PTSCOTCH 
             MUMPS LIBXML2 HDF5 FIELDML-API
-            IRON CSIM LLVM CELLML LIBPNG
+            IRON CSIM LLVM CELLML PNG
             TIFF GDCM)
         addAndConfigureLocalComponent(ZLIB)
     endif()
@@ -448,10 +448,10 @@ if (NOT OPTPP_FOUND)
 endif()
 
 # libpng
-find_package(LIBPNG ${LIBPNG_VERSION} QUIET)
-if (NOT LIBPNG_FOUND)
-    set(LIBPNG_FWD_DEPS ZINC ITK IMAGEMAGICK)
-    addAndConfigureLocalComponent(LIBPNG
+find_package(PNG ${LIBPNG_VERSION} QUIET)
+if (NOT PNG_FOUND)
+    set(PNG_FWD_DEPS ZINC ITK IMAGEMAGICK)
+    addAndConfigureLocalComponent(PNG
         PNG_NO_CONSOLE_IO=OFF
         PNG_NO_STDIO=OFF
 )
