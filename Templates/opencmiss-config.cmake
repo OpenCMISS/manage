@@ -73,7 +73,7 @@ foreach(BUILDTYPE_SUFFIX ${_BUILDTYPES})
     # Have lowercase paths
     string(TOLOWER ${BUILDTYPE_SUFFIX} BUILDTYPE_SUFFIX_PATH)
     # Full install path
-    set(_INSTALL_PATH "${_IMPORT_PREFIX}/${ARCHPATH}/${BUILDTYPE_SUFFIX_PATH}")
+    set(_INSTALL_PATH "${_OPENCMISS_IMPORT_PREFIX}/${ARCHPATH}/${BUILDTYPE_SUFFIX_PATH}")
     list(APPEND _SEARCHED_PATHS "${_INSTALL_PATH}")
     
     set(OPENCMISS_CONTEXT ${_INSTALL_PATH}/context.cmake)
@@ -103,7 +103,7 @@ if (NOT _FOUND)
                 endif()
             endforeach()
         endmacro()
-        _recurse(${_IMPORT_PREFIX})
+        _recurse(${_OPENCMISS_IMPORT_PREFIX})
         
         message(STATUS "Searched in")
         foreach(PATH ${_SEARCHED_PATHS})
@@ -199,6 +199,6 @@ endif()
 # Be a tidy kiwi
 unset(_INSTALL_PATH)
 unset(_BUILDTYPES)
-unset(_IMPORT_PREFIX)
+unset(_OPENCMISS_IMPORT_PREFIX)
 unset(_SEARCHED)
 unset(BUILDTYPE_SUFFIX)
