@@ -36,8 +36,9 @@ if (NOT OCM_SYSTEM_@PACKAGE_NAME@)
         PATHS ${CMAKE_PREFIX_PATH}
         QUIET
         NO_DEFAULT_PATH)
-    if (@PACKAGE_NAME@_FOUND)
-        messageo("Found config at ${@PACKAGE_NAME@_DIR}")
+    if (@PACKAGE_CASENAME@_FOUND)
+        set(@PACKAGE_NAME@_FOUND YES)
+        messageo("Found version ${@PACKAGE_CASENAME@_FIND_VERSION} at ${@PACKAGE_CASENAME@_DIR} in CONFIG mode")
     endif()
 else()
     # If local lookup is enabled, try to look for packages in old-fashioned module mode and then config modes 

@@ -425,14 +425,19 @@ if (OCM_USE_ZINC)
     find_package(Freetype ${FREETYPE_VERSION} QUIET)
         if (NOT FREETYPE_FOUND)
         set(FREETYPE_FWD_DEPS FTGL)
-            addAndConfigureLocalComponent(FREETYPE)
+            addAndConfigureLocalComponent(FREETYPE
+                FREETYPE_USE_ZLIB=YES
+                FREETYPE_USE_BZIP2=YES
+                ZLIB_VERSION=${ZLIB_VERSION}
+                BZIP2_VERSION=${BZIP2_VERSION})
     endif()
     
     # FTGL
     find_package(FTGL ${FTGL_VERSION} QUIET)
     if (NOT FTGL_FOUND)
         set(FTGL_FWD_DEPS ZINC)
-        addAndConfigureLocalComponent(FTGL)
+        addAndConfigureLocalComponent(FTGL
+            FREETYPE_VERSION=${FREETYPE_VERSION})
     endif()
     
     # GLEW
@@ -448,13 +453,14 @@ if (OCM_USE_ZINC)
         addAndConfigureLocalComponent(OPTPP)
     endif()
     
-    # libpng
+    # png
     find_package(PNG ${LIBPNG_VERSION} QUIET)
     if (NOT PNG_FOUND)
-        set(PNG_FWD_DEPS ZINC ITK IMAGEMAGICK)
+        set(PNG_FWD_DEPS ZINC ITK IMAGEMAGICK PNG)
         addAndConfigureLocalComponent(PNG
             PNG_NO_CONSOLE_IO=OFF
             PNG_NO_STDIO=OFF
+            ZLIB_VERSION=${ZLIB_VERSION}
         )
     endif()
     
@@ -464,6 +470,9 @@ if (OCM_USE_ZINC)
         set(TIFF_FWD_DEPS ZINC ITK IMAGEMAGICK)
         addAndConfigureLocalComponent(TIFF
             TIFF_BUILD_TOOLS=OFF
+            ZLIB_VERSION=${ZLIB_VERSION}
+            PNG_VERSION=${PNG_VERSION}
+            JPEG_VERSION=${JPEG_VERSION}
         )
     endif()
     
@@ -503,6 +512,11 @@ if (OCM_USE_ZINC)
             ITK_USE_SYSTEM_ZLIB=ON
             ITK_USE_SYSTEM_GDCM=OFF
             ITK_USE_KWSTYLE=OFF
+            ZLIB_VERSION=${ZLIB_VERSION}
+            PNG_VERSION=${PNG_VERSION}
+            JPEG_VERSION=${JPEG_VERSION}
+            TIFF_VERSION=${TIFF_VERSION}
+            LIBXML2_VERSION=${LIBXML2_VERSION}
         )
     endif()
     
