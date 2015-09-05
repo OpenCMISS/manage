@@ -61,6 +61,15 @@ if (NOT DISABLE_GIT)
     endif()
 endif()
 
+# No point in building ZINC if there's no OpenGL around
+if (OCM_USE_ZINC)
+    find_package(OpenGL QUIET)
+    if (NOT OPENGL_FOUND)
+        set(OCM_USE_ZINC NO)
+        message(WARNING "OpenCMISS: No OpenGL found, cannot build Zinc. Disabling.")
+    endif()
+endif()
+
 include(OCInstallFindModuleWrappers)
 # Add CMakeModules directory after wrapper module directory (set in above script)
 # This folder is also exported to the install tree upon "make install" and
