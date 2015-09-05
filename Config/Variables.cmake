@@ -26,6 +26,19 @@ SET(OPENCMISS_COMPONENTS_SYSTEM_BY_DEFAULT BLAS LAPACK LLVM LIBXML2 JPEG FREETYP
 SET(OPENCMISS_COMPONENTS_DISABLED_BY_DEFAULT CSIM LLVM SCOTCH)
 #SET(OPENCMISS_COMPONENTS_DISABLED_BY_DEFAULT BLAS LAPACK PLAPACK SCALAPACK PARMETIS SUITESPARSE MUMPS SUPERLU SUPERLU_DIST SUNDIALS SCOTCH SOWING PASTIX HYPRE PETSC LIBCELLML CELLML SLEPC BZIP2 SZIP HDF5 FIELDML-API LIBXML2 IRON CSIM LLVM GTEST)
 
+# Platform pre-checks
+# No point in building ZINC if there's no OpenGL around
+find_package(OpenGL QUIET)
+if (NOT OPENGL_FOUND)
+    list(APPEND OPENCMISS_COMPONENTS_DISABLED_BY_DEFAULT ZINC)
+    message("OpenCMISS: No OpenGL found, disabling build of ZINC by default.")
+endif()
+# Currently, there's also little point to build IRON in Visual Studio
+if (MSVC)
+    list(APPEND OPENCMISS_COMPONENTS_DISABLED_BY_DEFAULT IRON)
+    message("OpenCMISS: VisualStudio detected, not building IRON by default.")
+endif()
+
 set(OC_MANDATORY_COMPONENTS FIELDML-API LIBXML2)
 
 # This is the support email for general enquiries and support about building opencmiss using the new CMake system.
