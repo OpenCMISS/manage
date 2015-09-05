@@ -115,7 +115,7 @@ if (NOT _FOUND)
         endforeach()
     endif()
     if (SUPPORT_EMAIL)
-        set(msg "Please check your local settings or contact your installation administrator: ${SUPPORT_EMAIL}"
+        set(msg "Please check your local settings or contact your installation administrator: ${SUPPORT_EMAIL}")
     else()
         set(msg "Please check your local settings. Unfortunately, the remote installation guy did not supply a contact eMail adress\nTrack him down, tell your worries and remind him to put in his eMail!")
     endif()
