@@ -54,11 +54,11 @@
 ####################################################################
 # This is the value initially specified at the top level. 
 
-# Allow all components to be searched for on the local system first.
-# In default config, this holds only for the components specified in OPENCMISS_COMPONENTS_SYSTEM_BY_DEFAULT (Config/Variables.cmake)
-#set(OCM_SYSTEM_ALL YES)
-# Other way round: disable any system lookup
-#set(OCM_SYSTEM_NONE YES)
+# Global setting to control use of system components. Possible values: [DEFAULT]|NONE|ALL
+# DEFAULT: Holds only for the components specified in OPENCMISS_COMPONENTS_SYSTEM_BY_DEFAULT (Config/Variables.cmake)
+# NONE: No system components may be used
+# ALL: Enable search for any component on the system 
+#set(OCM_COMPONENTS_SYSTEM DEFAULT) 
 
 # To enable local lookup of single components, set
 # OCM_SYSTEM_<COMPONENT_NAME> to YES

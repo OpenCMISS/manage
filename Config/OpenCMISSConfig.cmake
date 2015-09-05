@@ -46,11 +46,16 @@ foreach(OCM_COMP ${OPENCMISS_COMPONENTS})
         set(${OCM_COMP}_BRANCH "v${${OCM_COMP}_VERSION}")
     endif()
     
+    # Force mandatory ones to be switched on
+    if (${OCM_COMP} IN_LIST OC_MANDATORY_COMPONENTS)
+        set(OCM_USE_${OCM_COMP} REQ)
+    endif()
+    
     # All local enabled? Set to local search.
-    if (OCM_SYSTEM_NONE)
-        SET(OCM_SYSTEM_${OCM_COMP} NO)
-    elseif (OCM_SYSTEM_ALL)
-        SET(OCM_SYSTEM_${OCM_COMP} YES)
+    if (OCM_COMPONENTS_SYSTEM STREQUAL NONE)
+        set(OCM_SYSTEM_${OCM_COMP} NO)
+    elseif(OCM_COMPONENTS_SYSTEM STREQUAL ALL)
+        set(OCM_SYSTEM_${OCM_COMP} YES)
     endif()
     # Force "devel" branches for each component of DEVEL_ALL is set
     if (OCM_DEVEL_ALL)
@@ -67,7 +72,7 @@ foreach(OCM_COMP ${OPENCMISS_COMPONENTS})
     	string(SUBSTRING "${${OCM_COMP}_VERSION}       " 0 7 OCM_VERSION_FIXED_SIZE)
     	string(SUBSTRING "${${OCM_COMP}_SHARED}        " 0 3 OCM_SHARED_FIXED_SIZE)
     	# ${OCM_COMP}_BRANCH is as good as version (this is what is effectively checked out) and will also display "devel" correctly
-        message(STATUS "OpenCMISS component ${OCM_COMP_FIXED_SIZE}: Enabled ${OCM_USE_FIXED_SIZE}, System search ${OCM_SYSTEM_FIXED_SIZE}, Shared: ${OCM_SHARED_FIXED_SIZE}, Version '${OCM_VERSION_FIXED_SIZE}', Branch '${${OCM_COMP}_BRANCH}')")
+        message(STATUS "OpenCMISS component ${OCM_COMP_FIXED_SIZE}: Use ${OCM_USE_FIXED_SIZE}, System search ${OCM_SYSTEM_FIXED_SIZE}, Shared: ${OCM_SHARED_FIXED_SIZE}, Version '${OCM_VERSION_FIXED_SIZE}', Branch '${${OCM_COMP}_BRANCH}')")
     endif()
 endforeach()
 if (OCM_DEVEL_ALL)

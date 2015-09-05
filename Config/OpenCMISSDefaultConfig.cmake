@@ -48,26 +48,24 @@ option(OCM_USE_MT "Use multithreading in OpenCMISS (where applicable)" NO)
 # Defaults for all dependencies
 # ==============================
 # This is changeable in the OpenCMISSLocalConfig file
+set(OCM_COMPONENTS_SYSTEM DEFAULT)
+
 foreach(OCM_DEP ${OPENCMISS_COMPONENTS})
-    if (${OCM_DEP} IN_LIST OC_MANDATORY_COMPONENTS)
-        set(OCM_USE_${OCM_DEP} REQ)
-    else()
-        set(_VALUE YES)
-        if (${OCM_DEP} IN_LIST OPENCMISS_COMPONENTS_DISABLED_BY_DEFAULT)
-            set(_VALUE NO)
-        endif()
-        # Use everything but the components in OPENCMISS_COMPONENTS_DISABLED_BY_DEFAULT
-        option(OCM_USE_${OCM_DEP} "Use OpenCMISS component ${OCM_DEP}" ${_VALUE})
+    set(_VALUE YES)
+    if (${OCM_DEP} IN_LIST OPENCMISS_COMPONENTS_DISABLED_BY_DEFAULT)
+        set(_VALUE NO)
     endif()
+    # Use everything but the components in OPENCMISS_COMPONENTS_DISABLED_BY_DEFAULT
+    set(OCM_USE_${OCM_DEP} ${_VALUE})
     
     # Look for some components on the system first before building
     set(_VALUE NO)
     if (${OCM_DEP} IN_LIST OPENCMISS_COMPONENTS_SYSTEM_BY_DEFAULT)
         set(_VALUE YES)
     endif()
-    option(OCM_SYSTEM_${OCM_DEP} "Enable local system search for ${OCM_DEP}" ${_VALUE})
+    set(OCM_SYSTEM_${OCM_DEP} ${_VALUE})
     # Initialize the default: static build for all components
-    option(${OCM_DEP}_SHARED "Build ${OCM_DEP} with shared libraries" NO)
+    set(${OCM_DEP}_SHARED NO)
 endforeach()
 
 # Main version
