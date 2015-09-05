@@ -182,13 +182,16 @@ add_custom_target(${BUILD_IDENT} ALL
 add_custom_target(update
     COMMAND ${CMAKE_COMMAND} --build ${MAIN_BINARY_DIR} --target update
 )
-# Forward examples target and test
+# Forward examples target, test and support
 add_custom_target(examples
     COMMAND ${CMAKE_COMMAND} --build ${MAIN_BINARY_DIR} --target EXAMPLES
 )
 add_custom_target(examples-test
     DEPENDS examples
     COMMAND ${CMAKE_COMMAND} --build ${MAIN_BINARY_DIR} --target examples-test
+)
+add_custom_target(support
+    COMMAND ${CMAKE_COMMAND} --build ${MAIN_BINARY_DIR} --target support
 )
 
 if (UNIX)
@@ -208,9 +211,6 @@ if (UNIX)
         WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
     )
 endif()
-
-# This script dumps all available variables if invoked with "-DUMP=YES" :-)
-include(OCMSupportHelper)
 
 # The Devil's part!
 # Used if one defines -DEVIL on the command line. Just a convenience hack to have

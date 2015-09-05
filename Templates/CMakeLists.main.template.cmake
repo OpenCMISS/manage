@@ -164,8 +164,9 @@ include(OCConfigureComponents)
 include(OCAddExamplesProject)
 
 ########################################################################
-# Installation stuff
+# Installation and support
 include(OCInstall)
+include(OCSupport)
 
 ########################################################################
 # Misc targets for convenience
