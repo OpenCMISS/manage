@@ -14,8 +14,8 @@ set(BUILD_PRECISION sd CACHE STRING "Build precisions for OpenCMISS components. 
 # Used only by PASTIX yet
 set(INT_TYPE int32 CACHE STRING "OpenCMISS integer type (only used by PASTIX yet)")
 
-# Also build tests?
-option(BUILD_TESTS "Build OpenCMISS(-components) tests" OFF)
+# Always build tests.
+option(BUILD_TESTS "Build OpenCMISS(-components) tests" ON)
 
 option(PARALLEL_BUILDS "Use multithreading (-jN etc) for builds" ON)
 

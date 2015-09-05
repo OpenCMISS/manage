@@ -1,9 +1,27 @@
+#####################################################################
+# This is the local config file that you can use to change the
+# build parameters and component settings.
+# If applicable, this file is created for each choice of toolchain
+# and MPI.
+#
+# See the <OPENCMISS_ROOT>/manage/Config/OpenCMISSDefaultConfig.cmake
+# script for all other defaults
+#####################################################################
+
+
 ####################################################################
 ################# GENERAL SETTINGS
 ####################################################################
-#SET(BUILD_PRECISION sdcz)
-#SET(INT_TYPE int32)
-#SET(BUILD_TESTS ON)
+# The build precision defaults are "sd"
+#set(BUILD_PRECISION sdcz)
+
+# Some packages allow int64 or longint - this has not been tested for anything but int32
+# Used only by PASTIX yet
+#set(INT_TYPE int64)
+
+# Always build the test targets by default.
+# This does not mean they're run (which you should do!)
+#set(BUILD_TESTS OFF)
 
 # Define a BLAS library vendor here.
 # This is consumed by the FindBLAS package, see its documentation for all possible values.
