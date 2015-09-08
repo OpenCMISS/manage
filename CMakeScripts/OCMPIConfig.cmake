@@ -47,6 +47,9 @@ if (NOT MPI_FOUND)
             # See http://stackoverflow.com/questions/26901663/error-when-running-openmpi-based-library
             # This is also the default in the old build system.
             set(_MPI_VERSION ${OPENMPI_VERSION})
+            # HACK: disabling the shared builds for openmpi somehow causes error messages even though the code should have
+            # been compiled with -fPIC :-( so we'll disable it for now (only relevant for remote installation stuff)
+            set(_MPI_EXTRA_PARAMS )
             list(APPEND _MPI_EXTRA_PARAMS --enable-static --disable-heterogeneous)
             if (CMAKE_C_COMPILER_ID MATCHES Intel)
                 list(APPEND _MPI_EXTRA_PARAMS --enable-contrib-no-build=libnbc,vt)
