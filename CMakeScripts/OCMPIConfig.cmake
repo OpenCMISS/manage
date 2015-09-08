@@ -1,3 +1,7 @@
+function(messaged msg)
+    #message(STATUS "@OCMPIConfig: ${msg}")
+endfunction()
+messaged("Entering script")
 #################################
 # Construct installation path
 # For MPI we use a slightly different architecture path - we dont need to re-build MPI for static/shared builds nor do we need the actual
@@ -15,6 +19,7 @@ if (NOT DEFINED MPI_HOME)
     # If no system MPI is allowed, search ONLY at MPI_HOME, which is our own bake
     if(NOT OCM_SYSTEM_MPI)
         set(MPI_HOME ${OWN_MPI_INSTALL_DIR})
+        messaged("Setting MPI_HOME=${MPI_HOME}")
     else()
         # Educated guesses are used to look for an MPI implementation
         # This bit of logic is covered inside the FindMPI module where MPI is consumed
@@ -31,21 +36,32 @@ find_package(MPI QUIET)
 # If we get here without having found an MPI implementation, we need to build it.
 # But we will always have the MPI mnemonic set if we reach here.
 if (NOT MPI_FOUND)
+    messaged("No system MPI found or not allowed: OCM_SYSTEM_MPI=${OCM_SYSTEM_MPI}")
     # This is supported yet only on Unix systems
     if (UNIX)
-        # The choice is ... 
+        # No shared libs!
+        set(_MPI_EXTRA_PARAMS --disable-shared) 
         if (MPI STREQUAL openmpi)
-            SET(_MPI_VERSION ${OPENMPI_VERSION})
-            SET(_MPI_EXTRA_PARAMS )
+            # We need to build a static version of MPI so that symbols get pulled into iron
+            # Having a shared-version of OpenMPI wont work with Python bindings
+            # See http://stackoverflow.com/questions/26901663/error-when-running-openmpi-based-library
+            # This is also the default in the old build system.
+            set(_MPI_VERSION ${OPENMPI_VERSION})
+            list(APPEND _MPI_EXTRA_PARAMS --enable-static --disable-heterogeneous)
+            if (CMAKE_C_COMPILER_ID MATCHES Intel)
+                list(APPEND _MPI_EXTRA_PARAMS --enable-contrib-no-build=libnbc,vt)
+            endif()
+            # Define the MPI compilers that will be used later already - the configuration stage
+            # needs them so that other dependencies with MPI have the correct compilers defined right away.
             set(MPI_C_COMPILER ${OWN_MPI_INSTALL_DIR}/bin/mpicc)
             set(MPI_CXX_COMPILER ${OWN_MPI_INSTALL_DIR}/bin/mpicxx)
             set(MPI_Fortran_COMPILER ${OWN_MPI_INSTALL_DIR}/bin/mpifort)
         elseif (MPI STREQUAL mpich)
             SET(_MPI_VERSION ${MPICH_VERSION})
             if (MPI_BUILD_TYPE STREQUAL release)
-                SET(_MPI_EXTRA_PARAMS "--enable-fast=O3,ndebug --disable-error-checking --without-timing --without-mpit-pvars")
+                list(APPEND _MPI_EXTRA_PARAMS --enable-fast=O3,ndebug --disable-error-checking --without-timing --without-mpit-pvars)
             elseif(MPI_BUILD_TYPE STREQUAL debug)
-                SET(_MPI_EXTRA_PARAMS "--disable-fast")
+                list(APPEND _MPI_EXTRA_PARAMS --disable-fast)
             endif()
             # Define the MPI compilers that will be used later already - the configuration stage
             # needs them so that other dependencies with MPI have the correct compilers defined right away.
@@ -55,9 +71,9 @@ if (NOT MPI_FOUND)
         elseif (MPI STREQUAL mvapich2)
             SET(_MPI_VERSION ${MVAPICH2_VERSION})
             if (MPI_BUILD_TYPE STREQUAL release)
-                SET(_MPI_EXTRA_PARAMS "--enable-fast=O3,ndebug --disable-error-checking --without-timing --without-mpit-pvars")
+                list(APPEND _MPI_EXTRA_PARAMS --enable-fast=O3,ndebug --disable-error-checking --without-timing --without-mpit-pvars)
             elseif(MPI_BUILD_TYPE STREQUAL debug)
-                SET(_MPI_EXTRA_PARAMS "--disable-fast")
+                list(APPEND _MPI_EXTRA_PARAMS --disable-fast)
             endif()
             # Define the MPI compilers that will be used later already - the configuration stage
             # needs them so that other dependencies with MPI have the correct compilers defined right away.
@@ -77,7 +93,7 @@ if (NOT MPI_FOUND)
         
         message(STATUS "Configuring build of MPI (${MPI}-${_MPI_VERSION})")
         message(STATUS "Location: ${_MPI_BINARY_DIR}")
-        message(STATUS "Build params: ${_MPI_EXTRA_PARAMS}")
+        message(STATUS "Extra build parameters: ${_MPI_EXTRA_PARAMS}")
         
         # Dont download again if the target source folder already contains files 
         file(GLOB _MPI_FILES ${_MPI_SOURCE_DIR}/)
@@ -99,6 +115,7 @@ if (NOT MPI_FOUND)
         #    MATH(EXPR NUM_PROCESSORS ${NUM_PROCESSORS}+4)
         endif()
         
+        string(TOUPPER ${MPI_BUILD_TYPE} _TYPE)
         ExternalProject_Add(MPI
     		PREFIX ${_MPI_BINARY_DIR}
     		TMP_DIR ${_MPI_BINARY_DIR}/ep_tmp
@@ -114,6 +131,9 @@ if (NOT MPI_FOUND)
     		    CC=${CMAKE_C_COMPILER}
     		    CXX=${CMAKE_CXX_COMPILER}
     		    FC=${CMAKE_Fortran_COMPILER}
+    		    CFLAGS=-fPIC #${CMAKE_C_FLAGS_${_TYPE}} #TODO: does it make sense to pass on the flags to the mpi build?
+    		    CXXFLAGS=-fPIC #${CMAKE_CXX_FLAGS_${_TYPE}}
+    		    FFLAGS=-fPIC #${CMAKE_Fortran_FLAGS_${_TYPE}}
     		    ${_MPI_EXTRA_PARAMS}
     		BINARY_DIR ${_MPI_BINARY_DIR}
     		
@@ -136,4 +156,6 @@ if (NOT MPI_FOUND)
     else()
         message(FATAL_ERROR "MPI (${MPI}) installation support not yet implemented for this platform.")
     endif()
+else()
+    messaged("Found MPI: ${MPI_C_INCLUDE_DIRECTORIES} / ${MPI_C_LIBRARIES}")    
 endif()

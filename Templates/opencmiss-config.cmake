@@ -12,7 +12,7 @@ get_filename_component(_OPENCMISS_IMPORT_PREFIX "${CMAKE_CURRENT_LIST_FILE}" DIR
 
 # Debug verbose helper
 function(messaged TEXT)
-    #message(STATUS ${TEXT})
+    #message(STATUS "OpenCMISS (${_OPENCMISS_IMPORT_PREFIX}/opencmiss-config.cmake): ${TEXT}")
 endfunction()
 function(messageo TEXT)
     message(STATUS "OpenCMISS: ${TEXT}")
@@ -159,8 +159,8 @@ messaged("CMAKE_MODULE_PATH=${CMAKE_MODULE_PATH}\nCMAKE_PREFIX_PATH=${CMAKE_PREF
 # For shared libs (default), use the correct install RPATH to enable binaries to find the shared libs.
 # See http://www.cmake.org/Wiki/CMake_RPATH_handling
 # TODO FIXME/CHECKME
-set(CMAKE_INSTALL_RPATH ${OPENCMISS_LIBRARY_PATH})
-set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
+#set(CMAKE_INSTALL_RPATH ${OPENCMISS_LIBRARY_PATH_IMPORT})
+#set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 
 ###########################################################################
 # Add the opencmiss library (INTERFACE type is new since 3.0)
@@ -170,6 +170,10 @@ add_library(opencmiss INTERFACE)
 if (OCM_USE_IRON)
     find_package(IRON ${IRON_VERSION} REQUIRED)
     target_link_libraries(opencmiss INTERFACE iron)
+    # Add the C bindings target if built
+    if (TARGET iron_c)
+        target_link_libraries(opencmiss INTERFACE iron_c)
+    endif()
 endif()
 if (OCM_USE_ZINC)
     find_package(ZINC ${ZINC_VERSION} REQUIRED)

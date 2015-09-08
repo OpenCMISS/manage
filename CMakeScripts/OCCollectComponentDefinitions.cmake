@@ -54,13 +54,12 @@ foreach(COMP ${OPENCMISS_COMPONENTS})
     endif()
 endforeach()
 
-# For shared libs, use the correct install RPATH to enable binaries to find the shared libs.
+# Use the correct install RPATH to enable binaries to find the shared libs (if any, ignored otherwise).
 # See http://www.cmake.org/Wiki/CMake_RPATH_handling
-if (BUILD_SHARED_LIBS)
-    list(APPEND COMPONENT_COMMON_DEFS 
-        -DCMAKE_INSTALL_RPATH=${OPENCMISS_COMPONENTS_INSTALL_PREFIX}/lib
-        -DCMAKE_INSTALL_RPATH_USE_LINK_PATH=TRUE)
-endif()
+STRING(REPLACE ";" ${OCM_LIST_SEPARATOR} OPENCMISS_LIBRARY_PATH_ESC "${OPENCMISS_LIBRARY_PATH}")
+list(APPEND COMPONENT_COMMON_DEFS 
+    -DCMAKE_INSTALL_RPATH=${OPENCMISS_LIBRARY_PATH_ESC}
+    -DCMAKE_INSTALL_RPATH_USE_LINK_PATH=TRUE)
 
 # Forward verbosity if wanted
 if (CMAKE_VERBOSE_MAKEFILE)
