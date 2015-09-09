@@ -24,6 +24,8 @@ foreach(example_name ${FEATURE_TEST_EXAMPLES})
     )
     set(${example_name}_BRANCH devel)
     createExternalProjects(${example_name} "${SRC_DIR}" "${BIN_DIR}" "${DEFS}")
+    # Dont build with the main build, as installation of OpenCMISS has not been done by then.
+    set_target_properties(${example_name} PROPERTIES EXCLUDE_FROM_ALL YES)
     
     add_test(NAME feature_${example_name}
         COMMAND run ${${example_name}_ARGS}
@@ -32,6 +34,7 @@ foreach(example_name ${FEATURE_TEST_EXAMPLES})
 endforeach()
 # Add a top level target that runs only the feature tests
 add_custom_target(featuretests
+    DEPENDS ${FEATURE_TEST_EXAMPLES} # Triggers the build
     COMMAND ${CMAKE_CTEST_COMMAND} feature_*
     COMMENT "Running OpenCMISS feature tests"
 )
