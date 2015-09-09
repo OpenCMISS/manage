@@ -51,7 +51,7 @@ include(OCArchitecturePath)
 include(OCComponentSetupMacros)
 
 ########################################################################
-# Utilities
+# Utilities and external packages
 
 # Git is used by default to clone source repositories, unless disabled
 if (NOT DISABLE_GIT)
@@ -68,6 +68,12 @@ if (OCM_USE_ZINC)
         set(OCM_USE_ZINC NO)
         message(WARNING "OpenCMISS: No OpenGL found, cannot build Zinc. Disabling.")
     endif()
+endif()
+# Pre-check for Python availability so that bindings will be built automatically (unless explicitly specified)
+# The FOUND flag is used (at least) at OCConfigureComponents/IRON
+find_package(PythonInterp ${PYTHON_VERSION} QUIET)
+if (NOT DEFINED IRON_WITH_Python_BINDINGS)
+    set(IRON_WITH_Python_BINDINGS ${PYTHONINTERP_FOUND})
 endif()
 
 include(OCInstallFindModuleWrappers)
@@ -214,8 +220,5 @@ add_custom_target(reset_mpionly
 # Need to enable testing in order for any add_test calls (see OCComponentSetupMacros) to work
 enable_testing()
 include(OCFeatureTests)
-
-
-
 
 

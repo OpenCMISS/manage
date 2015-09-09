@@ -2,6 +2,9 @@ set(FEATURE_TEST_EXAMPLES
     classicalfield_laplace_laplace_fortran
     finiteelasticity_cantilever_fortran
 )
+if (IRON_WITH_C_BINDINGS)
+    list(APPEND FEATURE_TEST_EXAMPLES classicalfield_laplace_laplace_c)
+endif()
 if (OCM_USE_CELLML AND IRON_WITH_CELLML)
     list(APPEND FEATURE_TEST_EXAMPLES bioelectrics_monodomain_fortran)
 endif()
