@@ -209,14 +209,13 @@ add_custom_target(reset_mpionly
         ->${OPENCMISS_COMPONENTS_BINARY_DIR_MPI}"
 )
 
+########################################################################
+# Testing
 # Need to enable testing in order for any add_test calls (see OCComponentSetupMacros) to work
-if (BUILD_TESTS)
-    enable_testing()
-endif()
+enable_testing()
+include(OCFeatureTests)
 
-# I already foresee that we will have to have "download" and "update" targets for the less insighted user.
-# So lets just give it to them. Does the same as external project has initial download and update steps.
-#add_custom_target(download
-#    DEPENDS ${_OCM_SOURCE_DOWNLOAD_TARGETS}
-#)
-# Note: Added a <COMP>-SRC project that takes care to have the sources ready
+
+
+
+

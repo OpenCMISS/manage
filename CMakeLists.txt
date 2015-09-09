@@ -171,7 +171,10 @@ add_custom_command(OUTPUT ${MAIN_BINARY_DIR}/configure_stamp
 # This creates the main target 
 add_custom_target(${BUILD_IDENT} ALL
     DEPENDS ${MAIN_BINARY_DIR}/configure_stamp
+    # Invoke main build
     COMMAND ${CMAKE_COMMAND} --build "${MAIN_BINARY_DIR}" --target install
+    # Invoke feature tests
+    COMMAND ${CMAKE_COMMAND} --build "${MAIN_BINARY_DIR}" --target featuretests
     COMMENT "Building OpenCMISS configuration ${BUILD_IDENT}"
 )
 
