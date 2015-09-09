@@ -85,3 +85,6 @@ ${OCM_USE_SYSTEM_FLAGS}
 # To disable the use of selected components, uncomment the appropriate lines
 # The default is to build all.
 ${OCM_USE_FLAGS}
+
+# Disable build of Python bindings for iron (enabled if Python is found)
+#set(IRON_WITH_Python_BINDINGS NO)

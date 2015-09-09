@@ -206,7 +206,7 @@ function(createExternalProjects COMPONENT_NAME SOURCE_DIR BINARY_DIR DEFS)
             COMMENT "Checking ${COMPONENT_NAME} sources are present"
     )  
     
-    #message(STATUS "Adding ${COMPONENT_NAME} with DEPS=${${COMPONENT_NAME}_DEPS}, DEFS=${DEFS}")    
+    #message(STATUS "Adding ${COMPONENT_NAME} with DEPS=${${COMPONENT_NAME}_DEPS}, DEFS=${DEFS}")
     ExternalProject_Add(${COMPONENT_NAME}
         DEPENDS ${${COMPONENT_NAME}_DEPS} CHECK_${COMPONENT_NAME}_SOURCES
         PREFIX ${BINARY_DIR}
