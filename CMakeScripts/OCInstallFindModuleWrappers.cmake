@@ -31,7 +31,7 @@ foreach(PACKAGE_NAME ${PACKAGES_WITH_TARGETS})
         else()
             string(TOLOWER ${PACKAGE_NAME} PACKAGE_TARGET)    
         endif()
-        configure_file(${OPENCMISS_MANAGE_DIR}/Templates/FindXXX.template.cmake ${FILE} @ONLY)
+        configure_file("${OPENCMISS_MANAGE_DIR}/Templates/FindXXX.template.cmake" "${FILE}" @ONLY)
     #endif()
 endforeach()
 

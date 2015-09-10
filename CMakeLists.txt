@@ -137,8 +137,8 @@ include(OCMPIPreflight)
 # This is the main build file location for each compiler/mpi combination.
 # We need to have different base folders for MPI in release/debug modes.
 set(BUILD_IDENT compiler.${TC_PART}-mpi.${MPI}.${MPI_BUILD_TYPE}) # dont care, take anything to combine stuff
-set(MAIN_BINARY_DIR ${CMAKE_CURRENT_BINARY_DIR}/${BUILD_IDENT})
-file(MAKE_DIRECTORY ${MAIN_BINARY_DIR})
+set(MAIN_BINARY_DIR "${CMAKE_CURRENT_BINARY_DIR}/${BUILD_IDENT}")
+file(MAKE_DIRECTORY "${MAIN_BINARY_DIR}")
 
 # # Create a local config file at target folder if not exists
 include(OCCreateLocalConfig)
@@ -150,28 +150,26 @@ endif()
 if (MPI_HOME)
     SET(MPI_HOME_DEF "SET(MPI_HOME ${MPI_HOME})")
 endif()
-if (CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
-    set(CMAKE_INSTALL_PREFIX ${OPENCMISS_ROOT}/install CACHE STRING "OpenCMISS installation root" FORCE)
-endif()
+set(CMAKE_INSTALL_PREFIX "${OPENCMISS_ROOT}/install" CACHE STRING "OpenCMISS installation root" FORCE)
 configure_file(
-    ${OPENCMISS_MANAGE_DIR}/Templates/CMakeLists.main.template.cmake # from
-    ${MAIN_BINARY_DIR}/CMakeLists.txt # to
+    "${OPENCMISS_MANAGE_DIR}/Templates/CMakeLists.main.template.cmake" # from
+    "${MAIN_BINARY_DIR}/CMakeLists.txt" # to
     @ONLY # only @-tags
 )
 
 # This makes sure the configure step for the current main project is run at the beginning;
 # later the build call to the main project will detect for itself if new builds are necessary.
 #add_custom_command(OUTPUT ${MAIN_BINARY_DIR}/OpenCMISSLocalConfig.cmake
-add_custom_command(OUTPUT ${MAIN_BINARY_DIR}/configure_stamp
+add_custom_command(OUTPUT "${MAIN_BINARY_DIR}/configure_stamp"
     COMMAND ${CMAKE_COMMAND} -G ${CMAKE_GENERATOR} .
-    COMMAND ${CMAKE_COMMAND} -E touch ${MAIN_BINARY_DIR}/configure_stamp
+    COMMAND ${CMAKE_COMMAND} -E touch "${MAIN_BINARY_DIR}/configure_stamp"
     WORKING_DIRECTORY ${MAIN_BINARY_DIR}
     COMMENT "Initializing OpenCMISS configuration ${BUILD_IDENT}"
 )
 # This creates the main target 
 add_custom_target(${BUILD_IDENT} ALL
-    DEPENDS ${MAIN_BINARY_DIR}/configure_stamp
-    COMMAND ${CMAKE_COMMAND} --build ${MAIN_BINARY_DIR} --target install
+    DEPENDS "${MAIN_BINARY_DIR}/configure_stamp"
+    COMMAND ${CMAKE_COMMAND} --build "${MAIN_BINARY_DIR}" --target install
     COMMENT "Building OpenCMISS configuration ${BUILD_IDENT}"
 )
 
@@ -180,18 +178,18 @@ add_custom_target(${BUILD_IDENT} ALL
 # This is not global, as different configurations might use only a fraction of the sources,
 # and each of them only wants their choices updated.
 add_custom_target(update
-    COMMAND ${CMAKE_COMMAND} --build ${MAIN_BINARY_DIR} --target update
+    COMMAND ${CMAKE_COMMAND} --build "${MAIN_BINARY_DIR}" --target update
 )
 # Forward examples target, test and support
 add_custom_target(examples
-    COMMAND ${CMAKE_COMMAND} --build ${MAIN_BINARY_DIR} --target EXAMPLES
+    COMMAND ${CMAKE_COMMAND} --build "${MAIN_BINARY_DIR}" --target EXAMPLES
 )
 add_custom_target(examples-test
     DEPENDS examples
-    COMMAND ${CMAKE_COMMAND} --build ${MAIN_BINARY_DIR} --target examples-test
+    COMMAND ${CMAKE_COMMAND} --build "${MAIN_BINARY_DIR}" --target examples-test
 )
 add_custom_target(support
-    COMMAND ${CMAKE_COMMAND} --build ${MAIN_BINARY_DIR} --target support
+    COMMAND ${CMAKE_COMMAND} --build "${MAIN_BINARY_DIR}" --target support
 )
 
 if (UNIX)
@@ -203,11 +201,9 @@ if (UNIX)
         WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
     )
     add_custom_target(reset_all
-        COMMAND rm -rf ${OPENCMISS_ROOT}/build ${OPENCMISS_ROOT}/install/
-        COMMAND mv ${BUILD_IDENT}/OpenCMISSLocalConfig.cmake ../backup_localconfig.tmp
-        COMMAND rm -rf ${BUILD_IDENT}/*
-        COMMAND mv ../backup_localconfig.tmp ${BUILD_IDENT}/OpenCMISSLocalConfig.cmake
-        COMMENT "Blowing away main build config files and build/ and install/ folders"
+        DEPENDS reset_current
+        COMMAND rm -rf "${OPENCMISS_ROOT}/build" "${OPENCMISS_ROOT}/install"
+        COMMENT "Blowing away build/ and install/ folders"
         WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
     )
 endif()
@@ -216,10 +212,10 @@ endif()
 # Used if one defines -DEVIL on the command line. Just a convenience hack to have
 # OpenCMISS copy the developer defaults config file over.
 if (DEFINED EVIL)
-    if (NOT EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/OpenCMISSDeveloper.cmake)
+    if (NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/OpenCMISSDeveloper.cmake")
         configure_file(
-            ${CMAKE_CURRENT_SOURCE_DIR}/Templates/OpenCMISSDeveloper.template.cmake
-            ${CMAKE_CURRENT_SOURCE_DIR}/OpenCMISSDeveloper.cmake
+            "${CMAKE_CURRENT_SOURCE_DIR}/Templates/OpenCMISSDeveloper.template.cmake"
+            "${CMAKE_CURRENT_SOURCE_DIR}/OpenCMISSDeveloper.cmake"
             COPYONLY)
         set(EVIL_MESSAGE "Being a Developer! Evilness level: ${EVIL}. Copied the OpenCMISSDeveloper template.")
     else()
