@@ -18,8 +18,9 @@ SET(OPENCMISS_COMPONENTS_WITH_OPENMP HYPRE PARMETIS PASTIX
     PETSC PLAPACK SUITESPARSE SUPERLU_DIST)
 
 # The opencmiss components that are looked for on the local system instead of building it
-SET(OPENCMISS_COMPONENTS_SYSTEM_BY_DEFAULT BLAS LAPACK LLVM LIBXML2 JPEG FREETYPE TIFF)
-# local ZLIB PNG wont work (too new) with current other zinc dependencies
+SET(OPENCMISS_COMPONENTS_SYSTEM_BY_DEFAULT BLAS LAPACK LLVM LIBXML2 JPEG FREETYPE)
+# local ZLIB PNG wont work (too new) with e.g. Imagemagick
+# TIFF: older versions wont do with ITK
 
 # Disabled components - added but not compiling
 # SCOTCH is disabled as PTSCOTCH is usually used.

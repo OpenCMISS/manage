@@ -145,11 +145,12 @@ include(OCCreateLocalConfig)
 
 # Configure the main build CMakeLists.txt
 if (TOOLCHAIN)
-    SET(TOOLCHAIN_DEF "SET(TOOLCHAIN ${TOOLCHAIN})")
+    SET(TOOLCHAIN_DEF "set(TOOLCHAIN ${TOOLCHAIN})")
 endif()
 if (MPI_HOME)
-    SET(MPI_HOME_DEF "SET(MPI_HOME ${MPI_HOME})")
+    SET(MPI_HOME_DEF "set(MPI_HOME ${MPI_HOME})")
 endif()
+# We have a default install location within OPENCMISS_ROOT!
 set(CMAKE_INSTALL_PREFIX "${OPENCMISS_ROOT}/install" CACHE STRING "OpenCMISS installation root" FORCE)
 configure_file(
     "${OPENCMISS_MANAGE_DIR}/Templates/CMakeLists.main.template.cmake" # from
@@ -161,15 +162,18 @@ configure_file(
 # later the build call to the main project will detect for itself if new builds are necessary.
 #add_custom_command(OUTPUT ${MAIN_BINARY_DIR}/OpenCMISSLocalConfig.cmake
 add_custom_command(OUTPUT "${MAIN_BINARY_DIR}/configure_stamp"
-    COMMAND ${CMAKE_COMMAND} -G ${CMAKE_GENERATOR} .
+    COMMAND ${CMAKE_COMMAND} -G "${CMAKE_GENERATOR}" .
     COMMAND ${CMAKE_COMMAND} -E touch "${MAIN_BINARY_DIR}/configure_stamp"
-    WORKING_DIRECTORY ${MAIN_BINARY_DIR}
+    WORKING_DIRECTORY "${MAIN_BINARY_DIR}"
     COMMENT "Initializing OpenCMISS configuration ${BUILD_IDENT}"
 )
 # This creates the main target 
 add_custom_target(${BUILD_IDENT} ALL
     DEPENDS "${MAIN_BINARY_DIR}/configure_stamp"
+    # Invoke main build
     COMMAND ${CMAKE_COMMAND} --build "${MAIN_BINARY_DIR}" --target install
+    # Invoke feature tests
+    COMMAND ${CMAKE_COMMAND} --build "${MAIN_BINARY_DIR}" --target featuretests
     COMMENT "Building OpenCMISS configuration ${BUILD_IDENT}"
 )
 
@@ -192,26 +196,37 @@ add_custom_target(support
     COMMAND ${CMAKE_COMMAND} --build "${MAIN_BINARY_DIR}" --target support
 )
 
-if (UNIX)
-    add_custom_target(reset_current
-        COMMAND mv ${BUILD_IDENT}/OpenCMISSLocalConfig.cmake ../backup_localconfig.tmp
-        COMMAND rm -rf ${BUILD_IDENT}/*
-        COMMAND mv ../backup_localconfig.tmp ${BUILD_IDENT}/OpenCMISSLocalConfig.cmake
-        COMMENT "Blowing away main build config files, preserving OpenCMISSLocalConfig at /${BUILD_IDENT}"
-        WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
-    )
-    add_custom_target(reset_all
-        DEPENDS reset_current
-        COMMAND rm -rf "${OPENCMISS_ROOT}/build" "${OPENCMISS_ROOT}/install"
-        COMMENT "Blowing away build/ and install/ folders"
-        WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
-    )
-endif()
+# DANGER ZONE
+add_custom_target(reset_current
+    COMMAND ${CMAKE_COMMAND} --build "${MAIN_BINARY_DIR}" --target reset
+    COMMAND ${CMAKE_COMMAND} -E copy ${BUILD_IDENT}/OpenCMISSLocalConfig.cmake ../backup_localconfig.tmp
+    COMMAND ${CMAKE_COMMAND} -E remove_directory ${BUILD_IDENT}
+    COMMAND ${CMAKE_COMMAND} -E copy ../backup_localconfig.tmp ${BUILD_IDENT}/OpenCMISSLocalConfig.cmake
+    COMMENT "Resetting ${BUILD_IDENT}: Blowing away build files, preserving OpenCMISSLocalConfig"
+    WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
+)
+add_custom_target(reset_current_mpionly
+    COMMAND ${CMAKE_COMMAND} --build "${MAIN_BINARY_DIR}" --target reset_mpionly
+    COMMAND ${CMAKE_COMMAND} -E copy ${BUILD_IDENT}/OpenCMISSLocalConfig.cmake ../backup_localconfig.tmp
+    COMMAND ${CMAKE_COMMAND} -E remove_directory ${BUILD_IDENT}
+    COMMAND ${CMAKE_COMMAND} -E copy ../backup_localconfig.tmp ${BUILD_IDENT}/OpenCMISSLocalConfig.cmake
+    COMMENT "Resetting ${BUILD_IDENT}: Blowing away MPI-related build files, preserving OpenCMISSLocalConfig"
+    WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
+)
+add_custom_target(utter_destruction
+    COMMAND ${CMAKE_COMMAND} -E remove_directory "${OPENCMISS_ROOT}/build"
+    COMMAND ${CMAKE_COMMAND} -E remove_directory "${OPENCMISS_ROOT}/install"
+    COMMAND ${CMAKE_COMMAND} -E copy ${BUILD_IDENT}/OpenCMISSLocalConfig.cmake ../backup_localconfig.tmp
+    COMMAND ${CMAKE_COMMAND} -E remove_directory ${BUILD_IDENT}
+    COMMAND ${CMAKE_COMMAND} -E copy ../backup_localconfig.tmp ${BUILD_IDENT}/OpenCMISSLocalConfig.cmake
+    COMMENT "BAM! Deleting build & install folders. Only keeping OpenCMISSLocalConfig from last configuration in ${BUILD_IDENT}"
+    WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
+)
 
 # The Devil's part!
 # Used if one defines -DEVIL on the command line. Just a convenience hack to have
 # OpenCMISS copy the developer defaults config file over.
-if (DEFINED EVIL)
+if (DEFINED EVIL OR EVIL)
     if (NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/OpenCMISSDeveloper.cmake")
         configure_file(
             "${CMAKE_CURRENT_SOURCE_DIR}/Templates/OpenCMISSDeveloper.template.cmake"

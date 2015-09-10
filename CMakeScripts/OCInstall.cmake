@@ -21,44 +21,11 @@ function(relativizePathList VARNAME RELATIVE_TO_DIR IMPORT_PREFIX_VARNAME)
     foreach(path ${${VARNAME}})
         get_filename_component(path_abs "${path}" ABSOLUTE)
         messaged("Relativizing\n${path}\nto\n${RELATIVE_TO_DIR}")
-        getRelativePath("${path_abs}" "${RELATIVE_TO_DIR}" RELPATH)
+        file(RELATIVE_PATH RELPATH "${RELATIVE_TO_DIR}" "${path_abs}")
+        #getRelativePath("${path_abs}" "${RELATIVE_TO_DIR}" RELPATH)
         list(APPEND REL_LIST "\${${IMPORT_PREFIX_VARNAME}}/${RELPATH}")
     endforeach()
     set(${VARNAME} ${REL_LIST} PARENT_SCOPE)
-endfunction()
-
-# Computes the path of a directory TO relative to FROM and stores the result in RESULT_VAR
-function(getRelativePath TO FROM RESULT_VAR)
-    # Forward inclusion part
-    set(TMP ${TO})
-    string(REPLACE "${FROM}" "" RELPATH "${TO}")
-    # If no match was found, this is going to be unchanged.
-    # We have to assume that the "to" path is anchored higher up towards the common root.
-    if ("${RELPATH}" STREQUAL "${TO}")
-        messaged("Mismatch!\n${FROM}\nnot contained in\n${TO}\n, going up")
-        set(TMP ${FROM})
-        set(UPLINK )
-        set(COMMON_ANCHESTOR_FOUND FALSE)
-        while(NOT COMMON_ANCHESTOR_FOUND)
-            get_filename_component(TMP "${TMP}" DIRECTORY)
-            set(UPLINK "${UPLINK}../")
-            string(REPLACE "${TMP}/" "" RELPATH "${TO}")
-            if (NOT "${RELPATH}" STREQUAL "${TO}")
-                messaged("Match! Composing RELPATH=${UPLINK}-/-${RELPATH}")
-                set(RELPATH "${UPLINK}${RELPATH}")
-                set(COMMON_ANCHESTOR_FOUND YES)
-                break()
-            endif()
-            messaged("Mismatch!\n${TMP}\nnot contained in\n${TO}\n, going up")
-        endwhile()
-    endif()
-    # Remove beginning / if present
-    string(SUBSTRING "${RELPATH}" 0 1 GRRRRRRRR)
-    if (GRRRRRRRR STREQUAL /)
-        string(SUBSTRING "${RELPATH}" 1 -1 RELPATH)
-    endif()
-    messaged("found RELPATH=${RELPATH}")
-    set(${RESULT_VAR} "${RELPATH}" PARENT_SCOPE)
 endfunction()
 
 function(do_export CFILE VARS)
@@ -77,18 +44,18 @@ endfunction()
 # Create context.cmake in arch-path dir
 
 # Create a copy to not destroy the original (its being used somewhere later maybe)
-set(OPENCMISS_PREFIX_PATH_EXPORT ${OPENCMISS_PREFIX_PATH})
-relativizePathList(OPENCMISS_PREFIX_PATH_EXPORT "${OPENCMISS_COMPONENTS_INSTALL_PREFIX_MPI}" _OPENCMISS_CONTEXT_IMPORT_PREFIX)
-set(OPENCMISS_LIBRARY_PATH_EXPORT ${OPENCMISS_COMPONENTS_INSTALL_PREFIX}/lib ${OPENCMISS_COMPONENTS_INSTALL_PREFIX_MPI}/lib)
-relativizePathList(OPENCMISS_LIBRARY_PATH_EXPORT "${OPENCMISS_COMPONENTS_INSTALL_PREFIX_MPI}" _OPENCMISS_CONTEXT_IMPORT_PREFIX)
+set(OPENCMISS_PREFIX_PATH_IMPORT ${OPENCMISS_PREFIX_PATH})
+relativizePathList(OPENCMISS_PREFIX_PATH_IMPORT "${OPENCMISS_COMPONENTS_INSTALL_PREFIX_MPI}" _OPENCMISS_CONTEXT_IMPORT_PREFIX)
+set(OPENCMISS_LIBRARY_PATH_IMPORT ${OPENCMISS_LIBRARY_PATH})
+relativizePathList(OPENCMISS_LIBRARY_PATH_IMPORT "${OPENCMISS_COMPONENTS_INSTALL_PREFIX_MPI}" _OPENCMISS_CONTEXT_IMPORT_PREFIX)
 
 # Introduce prefixed variants of the MPI variables - enables to check against them
 set(OPENCMISS_MPI ${MPI})
 set(OPENCMISS_MPI_HOME "${MPI_HOME}")
 set(OPENCMISS_MPI_VERSION "${MPI_VERSION}")
 set(EXPORT_VARS
-    OPENCMISS_PREFIX_PATH_EXPORT
-    OPENCMISS_LIBRARY_PATH_EXPORT
+    OPENCMISS_PREFIX_PATH_IMPORT
+    OPENCMISS_LIBRARY_PATH_IMPORT
     OPENCMISS_MPI
     OPENCMISS_MPI_HOME
     MPI_VERSION
@@ -101,14 +68,9 @@ if (DEFINED CMAKE_BUILD_TYPE AND NOT "" STREQUAL CMAKE_BUILD_TYPE)
     list(APPEND EXPORT_VARS OPENCMISS_BUILD_TYPE)
 endif()
 
-# Export component versions
+# Export component info
 foreach(OCM_COMP ${OPENCMISS_COMPONENTS})
     list(APPEND EXPORT_VARS OCM_USE_${OCM_COMP} OCM_SYSTEM_${OCM_COMP})
-    # Export the "correct" cased names for components as well (we have solely uppercase names,
-    # but some packages have case-sensitive names like LibXml2 :-(
-    if (${OCM_COMP}_CASENAME)
-        list(APPEND EXPORT_VARS ${OCM_COMP}_CASENAME)
-    endif()
     if (${OCM_COMP}_VERSION)
         list(APPEND EXPORT_VARS ${OCM_COMP}_VERSION)
     endif()

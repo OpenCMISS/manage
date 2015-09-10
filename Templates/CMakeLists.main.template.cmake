@@ -13,7 +13,7 @@ set(OPENCMISS_INSTALL_ROOT @CMAKE_INSTALL_PREFIX@)
 ########################################################################
 
 # Set up include path
-LIST(APPEND CMAKE_MODULE_PATH
+list(APPEND CMAKE_MODULE_PATH
     ${OPENCMISS_MANAGE_DIR}
     ${OPENCMISS_MANAGE_DIR}/CMakeScripts
     ${OPENCMISS_MANAGE_DIR}/Config)
@@ -23,10 +23,10 @@ include(OpenCMISSConfig)
 
 ########################################################################
 @TOOLCHAIN_DEF@
-SET(MPI @MPI@)
-SET(OCM_SYSTEM_MPI @SYSTEM_MPI@)
-SET(OCM_DEBUG_MPI @DEBUG_MPI@)
-SET(MPI_BUILD_TYPE @MPI_BUILD_TYPE@)
+set(MPI @MPI@)
+set(OCM_SYSTEM_MPI @SYSTEM_MPI@)
+set(OCM_DEBUG_MPI @DEBUG_MPI@)
+set(MPI_BUILD_TYPE @MPI_BUILD_TYPE@)
 @MPI_HOME_DEF@
 ########################################################################
 
@@ -51,7 +51,7 @@ include(OCArchitecturePath)
 include(OCComponentSetupMacros)
 
 ########################################################################
-# Utilities
+# Utilities and external packages
 
 # Git is used by default to clone source repositories, unless disabled
 if (NOT DISABLE_GIT)
@@ -68,6 +68,12 @@ if (OCM_USE_ZINC)
         set(OCM_USE_ZINC NO)
         message(WARNING "OpenCMISS: No OpenGL found, cannot build Zinc. Disabling.")
     endif()
+endif()
+# Pre-check for Python availability so that bindings will be built automatically (unless explicitly specified)
+# The FOUND flag is used (at least) at OCConfigureComponents/IRON
+find_package(PythonInterp ${PYTHON_VERSION} QUIET)
+if (NOT DEFINED IRON_WITH_Python_BINDINGS)
+    set(IRON_WITH_Python_BINDINGS ${PYTHONINTERP_FOUND})
 endif()
 
 include(OCInstallFindModuleWrappers)
@@ -110,18 +116,19 @@ if (OCM_USE_ARCHITECTURE_PATH)
     getArchitecturePath(ARCHITECTURE_PATH ARCHITECTURE_PATH_MPI)
 endif()
 # Build tree location for components (with/without mpi)
-SET(OPENCMISS_COMPONENTS_BINARY_DIR ${OPENCMISS_ROOT}/build/${ARCHITECTURE_PATH})
-SET(OPENCMISS_COMPONENTS_BINARY_DIR_MPI ${OPENCMISS_ROOT}/build/${ARCHITECTURE_PATH_MPI})
+SET(OPENCMISS_COMPONENTS_BINARY_DIR "${OPENCMISS_ROOT}/build/${ARCHITECTURE_PATH}")
+SET(OPENCMISS_COMPONENTS_BINARY_DIR_MPI "${OPENCMISS_ROOT}/build/${ARCHITECTURE_PATH_MPI}")
 # Install dir
 # Extra path segment for single configuration case - will give release/debug/...
 getBuildTypePathElem(BUILDTYPEEXTRA)
 ########### everything from the OpenCMISS main project goes into install/
 # This is also used in Install.cmake to place the opencmiss config files.
-set(OPENCMISS_COMPONENTS_INSTALL_PREFIX_MPI_NO_BUILD_TYPE ${OPENCMISS_INSTALL_ROOT}/${ARCHITECTURE_PATH_MPI})
-# This is the install prefix for all components without mpi 
-SET(OPENCMISS_COMPONENTS_INSTALL_PREFIX ${OPENCMISS_INSTALL_ROOT}/${ARCHITECTURE_PATH}/${BUILDTYPEEXTRA})
+set(OPENCMISS_COMPONENTS_INSTALL_PREFIX_NO_BUILD_TYPE "${OPENCMISS_INSTALL_ROOT}/${ARCHITECTURE_PATH}")
+# This is the install prefix for all components without mpi
+set(OPENCMISS_COMPONENTS_INSTALL_PREFIX "${OPENCMISS_COMPONENTS_INSTALL_PREFIX_NO_BUILD_TYPE}/${BUILDTYPEEXTRA}")
 # This is the install path for mpi-aware components
-SET(OPENCMISS_COMPONENTS_INSTALL_PREFIX_MPI ${OPENCMISS_COMPONENTS_INSTALL_PREFIX_MPI_NO_BUILD_TYPE}/${BUILDTYPEEXTRA})
+set(OPENCMISS_COMPONENTS_INSTALL_PREFIX_MPI_NO_BUILD_TYPE "${OPENCMISS_INSTALL_ROOT}/${ARCHITECTURE_PATH_MPI}")
+set(OPENCMISS_COMPONENTS_INSTALL_PREFIX_MPI "${OPENCMISS_COMPONENTS_INSTALL_PREFIX_MPI_NO_BUILD_TYPE}/${BUILDTYPEEXTRA}")
 
 ######################
 # The COMMON_PACKAGE_CONFIG_DIR contains the cmake-generated target config files consumed by find_package(... CONFIG).
@@ -136,9 +143,20 @@ SET(COMMON_PACKAGE_CONFIG_DIR cmake)
 #SET(COMMON_PACKAGE_CONFIG_DIR ../cmake)
 # The path where find_package calls will find the cmake package config files for any opencmiss component
 set(OPENCMISS_PREFIX_PATH
-    ${OPENCMISS_COMPONENTS_INSTALL_PREFIX}/${COMMON_PACKAGE_CONFIG_DIR} 
-    ${OPENCMISS_COMPONENTS_INSTALL_PREFIX_MPI}/${COMMON_PACKAGE_CONFIG_DIR}
+    "${OPENCMISS_COMPONENTS_INSTALL_PREFIX}/${COMMON_PACKAGE_CONFIG_DIR}" 
+    "${OPENCMISS_COMPONENTS_INSTALL_PREFIX_MPI}/${COMMON_PACKAGE_CONFIG_DIR}"
 )
+# Also add
+#list(APPEND CMAKE_PREFIX_PATH ${OPENCMISS_PREFIX_PATH})
+# This is where the libraries will be put.
+set(OPENCMISS_LIBRARY_PATH
+    "${OPENCMISS_COMPONENTS_INSTALL_PREFIX}/lib"
+    "${OPENCMISS_COMPONENTS_INSTALL_PREFIX_MPI}/lib"
+)
+# If we have an explicit MPI_HOME, add this to the library path (+/lib)
+if (MPI_HOME)
+    list(APPEND OPENCMISS_LIBRARY_PATH "${MPI_HOME}/lib")
+endif()
 
 ######################
 # Checks if conditions for a remote installation of opencmiss are given and augments the prefix path
@@ -171,27 +189,36 @@ include(OCSupport)
 ########################################################################
 # Misc targets for convenience
 # update: Updates the whole source tree
-# reset:
+# reset: Blows away the current build and installation trees
 
 # Create a download target that depends on all other downloads
-SET(_OCM_SOURCE_UPDATE_TARGETS )
-#SET(_OCM_SOURCE_DOWNLOAD_TARGETS )
+set(_OCM_SOURCE_UPDATE_TARGETS )
 foreach(_COMP ${_OCM_SELECTED_COMPONENTS})
-    LIST(APPEND _OCM_SOURCE_UPDATE_TARGETS ${_COMP}-update)
-    #LIST(APPEND _OCM_SOURCE_DOWNLOAD_TARGETS ${_COMP}_SRC-download)
+    list(APPEND _OCM_SOURCE_UPDATE_TARGETS ${_COMP}-update)
 endforeach()
 add_custom_target(update
     DEPENDS ${_OCM_SOURCE_UPDATE_TARGETS}
 )
+add_custom_target(reset
+    DEPENDS reset_mpionly
+    COMMAND ${CMAKE_COMMAND} -E remove_directory "${OPENCMISS_COMPONENTS_INSTALL_PREFIX_NO_BUILD_TYPE}"
+    COMMAND ${CMAKE_COMMAND} -E remove_directory "${OPENCMISS_COMPONENTS_BINARY_DIR}"
+    COMMENT "Removing directories:
+        ->${OPENCMISS_COMPONENTS_INSTALL_PREFIX_NO_BUILD_TYPE}
+        ->${OPENCMISS_COMPONENTS_BINARY_DIR}"
+)
+add_custom_target(reset_mpionly
+    COMMAND ${CMAKE_COMMAND} -E remove_directory "${OPENCMISS_COMPONENTS_INSTALL_PREFIX_NO_BUILD_TYPE}"
+    COMMAND ${CMAKE_COMMAND} -E remove_directory "${OPENCMISS_COMPONENTS_BINARY_DIR_MPI}"
+    COMMENT "Removing directories:
+        ->${OPENCMISS_COMPONENTS_INSTALL_PREFIX_MPI_NO_BUILD_TYPE}
+        ->${OPENCMISS_COMPONENTS_BINARY_DIR_MPI}"
+)
 
+########################################################################
+# Testing
 # Need to enable testing in order for any add_test calls (see OCComponentSetupMacros) to work
-if (BUILD_TESTS)
-    enable_testing()
-endif()
+enable_testing()
+include(OCFeatureTests)
 
-# I already foresee that we will have to have "download" and "update" targets for the less insighted user.
-# So lets just give it to them. Does the same as external project has initial download and update steps.
-#add_custom_target(download
-#    DEPENDS ${_OCM_SOURCE_DOWNLOAD_TARGETS}
-#)
-# Note: Added a <COMP>-SRC project that takes care to have the sources ready
+

@@ -7,19 +7,29 @@
 # This script essentially defines an INTERFACE target opencmiss which is
 # then poulated with all the top level libraries configured in OpenCMISS.
 
+# Make sure we have a sufficient cmake version before doing anything else
+cmake_minimum_required(VERSION @OPENCMISS_CMAKE_MIN_VERSION@ FATAL_ERROR)
+
 # Compute the installation prefix relative to this file. It might be a mounted location or whatever.
 get_filename_component(_OPENCMISS_IMPORT_PREFIX "${CMAKE_CURRENT_LIST_FILE}" DIRECTORY)
 
+#############################################################################
+# Helper functions
 # Debug verbose helper
 function(messaged TEXT)
-    #message(STATUS ${TEXT})
+    #message(STATUS "OpenCMISS (${_OPENCMISS_IMPORT_PREFIX}/opencmiss-config.cmake): ${TEXT}")
 endfunction()
 function(messageo TEXT)
     message(STATUS "OpenCMISS: ${TEXT}")
 endfunction()
-
-# Make sure we have a sufficient cmake version before doing anything else
-cmake_minimum_required(VERSION @OPENCMISS_CMAKE_MIN_VERSION@ FATAL_ERROR)
+function(toAbsolutePaths LIST_VARNAME)
+    set(RES )
+    foreach(entry ${${LIST_VARNAME}})
+        get_filename_component(abs_entry "${entry}" ABSOLUTE)
+        list(APPEND RES "${abs_entry}")
+    endforeach()
+    set(${LIST_VARNAME} ${RES} PARENT_SCOPE)
+endfunction()
 
 #############################################################################
 # Initialize defaults - currently taken from latest OpenCMISS build (this file is replaced for each arch)
@@ -45,7 +55,9 @@ if (CMAKE_BUILD_TYPE_INITIALIZED_TO_DEFAULT OR NOT CMAKE_BUILD_TYPE)
 endif()
 
 # Append the OpenCMISS module path to the current path
-list(APPEND CMAKE_MODULE_PATH @OPENCMISS_MODULE_PATH_EXPORT@)
+set(OPENCMISS_MODULE_PATH @OPENCMISS_MODULE_PATH_EXPORT@)
+toAbsolutePaths(OPENCMISS_MODULE_PATH)
+list(APPEND CMAKE_MODULE_PATH ${OPENCMISS_MODULE_PATH})
 
 #############################################################################
 # Assemble architecture-path dependent search locations
@@ -149,6 +161,7 @@ messageo("Verifying installation settings ... success")
 find_package(MPI ${OPENCMISS_MPI_VERSION} REQUIRED)
 
 # Add the prefix path so the config files can be found
+toAbsolutePaths(OPENCMISS_PREFIX_PATH_IMPORT)
 list(APPEND CMAKE_PREFIX_PATH ${OPENCMISS_PREFIX_PATH_IMPORT})
 
 messaged("CMAKE_MODULE_PATH=${CMAKE_MODULE_PATH}\nCMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}")
@@ -159,8 +172,9 @@ messaged("CMAKE_MODULE_PATH=${CMAKE_MODULE_PATH}\nCMAKE_PREFIX_PATH=${CMAKE_PREF
 # For shared libs (default), use the correct install RPATH to enable binaries to find the shared libs.
 # See http://www.cmake.org/Wiki/CMake_RPATH_handling
 # TODO FIXME/CHECKME
-set(CMAKE_INSTALL_RPATH ${OPENCMISS_LIBRARY_PATH})
-set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
+#toAbsolutePaths(OPENCMISS_LIBRARY_PATH_IMPORT)
+#set(CMAKE_INSTALL_RPATH ${OPENCMISS_LIBRARY_PATH_IMPORT})
+#set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 
 ###########################################################################
 # Add the opencmiss library (INTERFACE type is new since 3.0)
@@ -170,6 +184,10 @@ add_library(opencmiss INTERFACE)
 if (OCM_USE_IRON)
     find_package(IRON ${IRON_VERSION} REQUIRED)
     target_link_libraries(opencmiss INTERFACE iron)
+    # Add the C bindings target if built
+    if (TARGET iron_c)
+        target_link_libraries(opencmiss INTERFACE iron_c)
+    endif()
 endif()
 if (OCM_USE_ZINC)
     find_package(ZINC ${ZINC_VERSION} REQUIRED)
