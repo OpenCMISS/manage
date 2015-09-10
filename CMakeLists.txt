@@ -227,7 +227,7 @@ add_custom_target(utter_destruction
 # The Devil's part!
 # Used if one defines -DEVIL on the command line. Just a convenience hack to have
 # OpenCMISS copy the developer defaults config file over.
-if (DEFINED EVIL)
+if (DEFINED EVIL OR EVIL)
     if (NOT EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/OpenCMISSDeveloper.cmake)
         configure_file(
             ${CMAKE_CURRENT_SOURCE_DIR}/Templates/OpenCMISSDeveloper.template.cmake
