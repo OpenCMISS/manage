@@ -1,3 +1,4 @@
+set(FEATURE_TEST_PREFIX opencmiss_feature_)
 set(FEATURE_TEST_EXAMPLES 
     classicalfield_laplace_laplace_fortran
     finiteelasticity_cantilever_fortran
@@ -27,7 +28,7 @@ foreach(example_name ${FEATURE_TEST_EXAMPLES})
     # Dont build with the main build, as installation of OpenCMISS has not been done by then.
     set_target_properties(${example_name} PROPERTIES EXCLUDE_FROM_ALL YES)
     
-    add_test(NAME feature_${example_name}
+    add_test(NAME ${FEATURE_TEST_PREFIX}${example_name}
         COMMAND run ${${example_name}_ARGS}
         WORKING_DIRECTORY ${SRC_DIR}     
     )
@@ -35,6 +36,6 @@ endforeach()
 # Add a top level target that runs only the feature tests
 add_custom_target(featuretests
     DEPENDS ${FEATURE_TEST_EXAMPLES} # Triggers the build
-    COMMAND ${CMAKE_CTEST_COMMAND} feature_*
+    COMMAND ${CMAKE_CTEST_COMMAND} -R ${FEATURE_TEST_PREFIX}*
     COMMENT "Running OpenCMISS feature tests"
 )
