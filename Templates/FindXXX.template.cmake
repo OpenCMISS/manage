@@ -22,8 +22,7 @@ function(messaged MSG)
     #message(STATUS "DEBUG Find@PACKAGE_NAME@ wrapper: ${MSG}")
 endfunction()
 
-messageo("Entering script")
-messaged("CMAKE_PREFIX_PATH: ${CMAKE_PREFIX_PATH}")
+messaged("Entering script. CMAKE_PREFIX_PATH: ${CMAKE_PREFIX_PATH}")
 
 # Default: Not found
 SET(@PACKAGE_CASENAME@_FOUND NO)
@@ -59,7 +58,7 @@ else()
     unset(_ENTRY_ABSOLUTE)
     
     # Make "native" call to find_package in MODULE mode first
-    messageo("Trying to find version ${@PACKAGE_CASENAME@_FIND_VERSION} in MODULE mode")
+    messageo("Trying to find version ${@PACKAGE_CASENAME@_FIND_VERSION} on system in MODULE mode")
     messaged("CMAKE_MODULE_PATH: ${CMAKE_MODULE_PATH}\nCMAKE_SYSTEM_PREFIX_PATH=${CMAKE_SYSTEM_PREFIX_PATH}\nPATH=$ENV{PATH}\nLD_LIBRARY_PATH=$ENV{LD_LIBRARY_PATH}")
     
     # Temporarily disable the required flag (if set from outside)
@@ -148,15 +147,18 @@ else()
             messageo("Avoiding double import of target '@PACKAGE_TARGET@'")
         endif()
     else()
-        messageo("Trying to find version ${@PACKAGE_CASENAME@_FIND_VERSION} in CONFIG mode")
+        messageo("Trying to find version ${@PACKAGE_CASENAME@_FIND_VERSION} on system in CONFIG mode")
         
         # First look outside the prefix path
         messaged("Calling find_package(@PACKAGE_CASENAME@ ${@PACKAGE_NAME@_FIND_VERSION} CONFIG QUIET NO_CMAKE_PATH)")
         find_package(@PACKAGE_CASENAME@ ${@PACKAGE_NAME@_FIND_VERSION} CONFIG QUIET NO_CMAKE_PATH)
         
         # If not found, look also at the prefix path
-        if (NOT @PACKAGE_CASENAME@_FOUND)
-            messageo("No system package found/available")
+        if (@PACKAGE_CASENAME@_FOUND)
+            set(@PACKAGE_NAME@_FOUND ${@PACKAGE_CASENAME@_FOUND})
+            messageo("Found at ${@PACKAGE_CASENAME@_DIR} in CONFIG mode")
+        else()
+            messageo("No system package found/available.")
             find_package(@PACKAGE_CASENAME@ ${@PACKAGE_CASENAME@_FIND_VERSION} CONFIG
                 QUIET
                 PATHS ${CMAKE_PREFIX_PATH}
@@ -165,7 +167,12 @@ else()
                 NO_CMAKE_BUILDS_PATH
                 NO_CMAKE_PACKAGE_REGISTRY
                 NO_CMAKE_SYSTEM_PATH
-                NO_CMAKE_SYSTEM_PACKAGE_REGISTRY)
+                NO_CMAKE_SYSTEM_PACKAGE_REGISTRY
+            )
+            if (@PACKAGE_CASENAME@_FOUND)
+                set(@PACKAGE_NAME@_FOUND ${@PACKAGE_CASENAME@_FOUND})
+                messageo("Found at ${@PACKAGE_CASENAME@_DIR} in CONFIG mode")
+            endif()
         endif()
     endif()
 endif()
