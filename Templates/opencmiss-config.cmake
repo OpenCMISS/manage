@@ -171,10 +171,9 @@ messaged("CMAKE_MODULE_PATH=${CMAKE_MODULE_PATH}\nCMAKE_PREFIX_PATH=${CMAKE_PREF
 
 # For shared libs (default), use the correct install RPATH to enable binaries to find the shared libs.
 # See http://www.cmake.org/Wiki/CMake_RPATH_handling
-# TODO FIXME/CHECKME
-#toAbsolutePaths(OPENCMISS_LIBRARY_PATH_IMPORT)
-#set(CMAKE_INSTALL_RPATH ${OPENCMISS_LIBRARY_PATH_IMPORT})
-#set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
+toAbsolutePaths(OPENCMISS_LIBRARY_PATH_IMPORT)
+set(CMAKE_INSTALL_RPATH ${OPENCMISS_LIBRARY_PATH_IMPORT})
+set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 
 ###########################################################################
 # Add the opencmiss library (INTERFACE type is new since 3.0)

@@ -9,7 +9,6 @@ cmake_minimum_required(VERSION ${OPENCMISS_CMAKE_MIN_VERSION} FATAL_ERROR)
 # choice, it's hard-coded rather than being modifiable (externally).
 set(OPENCMISS_ROOT @OPENCMISS_ROOT@)
 set(OPENCMISS_MANAGE_DIR @OPENCMISS_MANAGE_DIR@)
-set(OPENCMISS_INSTALL_ROOT @CMAKE_INSTALL_PREFIX@)
 ########################################################################
 
 # Set up include path

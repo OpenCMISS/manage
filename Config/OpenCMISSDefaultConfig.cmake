@@ -2,6 +2,9 @@
 # Build configuration
 # ==============================
 
+# Requires OPENCMISS_ROOT to be defined
+set(OPENCMISS_INSTALL_ROOT "${OPENCMISS_ROOT}/install")
+
 # Precision to build (if applicable)
 # Valid choices are s,d,c,z and any combinations.
 # s: Single / float precision

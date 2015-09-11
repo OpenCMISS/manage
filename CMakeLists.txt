@@ -150,8 +150,6 @@ endif()
 if (MPI_HOME)
     SET(MPI_HOME_DEF "set(MPI_HOME ${MPI_HOME})")
 endif()
-# We have a default install location within OPENCMISS_ROOT!
-set(CMAKE_INSTALL_PREFIX "${OPENCMISS_ROOT}/install" CACHE STRING "OpenCMISS installation root" FORCE)
 configure_file(
     "${OPENCMISS_MANAGE_DIR}/Templates/CMakeLists.main.template.cmake" # from
     "${MAIN_BINARY_DIR}/CMakeLists.txt" # to
