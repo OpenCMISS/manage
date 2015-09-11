@@ -147,7 +147,7 @@ function(getExtProjDownloadUpdateCommands COMPONENT_NAME TARGET_SOURCE_DIR DL_VA
 endfunction()
 
 ########################################################################################################################
-
+set(_OC_EXTPROJ_STAMP_DIR ep_stamps)
 function(createExternalProjects COMPONENT_NAME SOURCE_DIR BINARY_DIR DEFS)
 
     message(STATUS "Configuring build of '${COMPONENT_NAME}' in ${BINARY_DIR}...")
@@ -212,7 +212,7 @@ function(createExternalProjects COMPONENT_NAME SOURCE_DIR BINARY_DIR DEFS)
         PREFIX ${BINARY_DIR}
         LIST_SEPARATOR ${OCM_LIST_SEPARATOR}
         TMP_DIR ${BINARY_DIR}/ep_tmp
-        STAMP_DIR ${BINARY_DIR}/ep_stamps
+        STAMP_DIR ${BINARY_DIR}/${_OC_EXTPROJ_STAMP_DIR}
         
         #--Download step--------------
         # Ideal solution - include in the external project that also builds.
@@ -246,6 +246,9 @@ function(createExternalProjects COMPONENT_NAME SOURCE_DIR BINARY_DIR DEFS)
     if (OCM_CLEAN_REBUILDS_COMPONENTS)
         set_directory_properties(PROPERTIES ADDITIONAL_MAKE_CLEAN_FILES ${BINARY_DIR}/CMakeCache.txt)
     endif()
+    
+    doSupportStuff(${COMPONENT_NAME} "${SOURCE_DIR}" "${BINARY_DIR}" "${DEFS}")
+    
 endfunction()
 
 function(addConvenienceTargets COMPONENT_NAME BINARY_DIR)
@@ -333,3 +336,30 @@ macro(addDownstreamDependencies COMPONENT_NAME IN_PARENT_SCOPE)
         endforeach()
     endif()
 endmacro()
+
+function(doSupportStuff NAME SRC BIN DEFS)
+    # Write support log file
+    set(SUPPORT_FILE "${OC_SUPPORT_DIR}/${NAME}-buildconfig.txt")
+    file(WRITE "${SUPPORT_FILE}" "Build configuration file for component '${NAME}'
+Source directory: ${SRC}
+Build directory: ${BIN}
+Definitions:
+")
+    foreach(_DEF ${DEFS})
+        file(APPEND "${SUPPORT_FILE}" "${_DEF}\r\n")
+    endforeach()
+    
+    # Only create log-collecting commands if we create them 
+    if (OCM_CREATE_LOGS)
+        # Using PRE_BUILD directly for target support does not work :-| See docs.
+        # So we have an extra target in between. 
+        add_custom_command(TARGET collect_logs POST_BUILD
+            COMMAND ${CMAKE_COMMAND}
+                -DLOG_DIR=${BIN}/${_OC_EXTPROJ_STAMP_DIR}
+                -DSUPPORT_DIR=${OC_SUPPORT_DIR} 
+                -P ${OPENCMISS_MANAGE_DIR}/CMakeScripts/OCSupport.cmake
+            COMMENT "Support: Collecting ${COMPONENT_NAME} log files"
+        )
+    endif()
+    
+endfunction()
