@@ -91,6 +91,12 @@ elseif (CMAKE_C_COMPILER_ID STREQUAL "Intel" OR CMAKE_CXX_COMPILER_ID STREQUAL "
     
     # CMake default anyways
     #addFlagAll("-O3" RELEASE)
+
+    # Somehow CMake does not add the appropriate C-standard flags even though
+    # the C_STANDARD variable is set. Well do it manually for now.
+    if (UNIX)
+    	addFlag("-std=c99" C)
+    endif()
     
     # Release
 #    addFlagAll("-fast" RELEASE)
