@@ -93,7 +93,7 @@ elseif (CMAKE_C_COMPILER_ID STREQUAL "Intel" OR CMAKE_CXX_COMPILER_ID STREQUAL "
     #addFlagAll("-O3" RELEASE)
     
     # Release
-    addFlagAll("-fast" RELEASE)
+#    addFlagAll("-fast" RELEASE)
     
     # Debug
     addFlagAll("-traceback" DEBUG)
@@ -113,6 +113,10 @@ elseif (CMAKE_C_COMPILER_ID STREQUAL "Intel" OR CMAKE_CXX_COMPILER_ID STREQUAL "
         addFlag("-ftrapuv" Fortran DEBUG)
     endif()
     
+    if(MPI STREQUAL intel)
+	addFlagAll("-DMPICH_IGNORE_CXX_SEEK")
+    endif()
+
 elseif(CMAKE_C_COMPILER_ID STREQUAL "XL" OR CMAKE_CXX_COMPILER_ID STREQUAL "XL") # IBM case
     if (OCM_USE_MT)
         # FindOpenMP uses "-qsmp" for multithreading.. will need to see.
