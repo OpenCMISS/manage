@@ -9,7 +9,6 @@ cmake_minimum_required(VERSION ${OPENCMISS_CMAKE_MIN_VERSION} FATAL_ERROR)
 # choice, it's hard-coded rather than being modifiable (externally).
 set(OPENCMISS_ROOT @OPENCMISS_ROOT@)
 set(OPENCMISS_MANAGE_DIR @OPENCMISS_MANAGE_DIR@)
-set(OPENCMISS_INSTALL_ROOT @CMAKE_INSTALL_PREFIX@)
 ########################################################################
 
 # Set up include path
@@ -173,6 +172,11 @@ include(OCCollectComponentDefinitions)
 SET(_OCM_SELECTED_COMPONENTS )
 
 ########################################################################
+# Support - get help!
+set(OC_SUPPORT_DIR ${CMAKE_CURRENT_BINARY_DIR}/support)
+include(OCSupport)
+
+########################################################################
 # Actual external project configurations
 
 # Dependencies, Iron, ...
@@ -184,7 +188,6 @@ include(OCAddExamplesProject)
 ########################################################################
 # Installation and support
 include(OCInstall)
-include(OCSupport)
 
 ########################################################################
 # Misc targets for convenience
@@ -193,8 +196,10 @@ include(OCSupport)
 
 # Create a download target that depends on all other downloads
 set(_OCM_SOURCE_UPDATE_TARGETS )
+set(_OCM_COLLECT_LOG_TARGETS )
 foreach(_COMP ${_OCM_SELECTED_COMPONENTS})
     list(APPEND _OCM_SOURCE_UPDATE_TARGETS ${_COMP}-update)
+    list(APPEND _OCM_COLLECT_LOG_TARGETS _${_COMP}-collectlogs)
 endforeach()
 add_custom_target(update
     DEPENDS ${_OCM_SOURCE_UPDATE_TARGETS}

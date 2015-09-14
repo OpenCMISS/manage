@@ -131,3 +131,11 @@ install(FILES ${OPENCMISS_MANAGE_DIR}/CMakeScripts/OCArchitecturePath.cmake
     ${OPENCMISS_MANAGE_DIR}/CMakeScripts/OCToolchainCompilers.cmake
     DESTINATION ${OPENCMISS_INSTALL_ROOT}/cmake)
     
+# Install mingw libraries if we built with mingw
+if (MINGW AND WIN32)
+    get_filename_component(COMPILER_BIN_DIR ${CMAKE_C_COMPILER} PATH)
+    file(GLOB MINGW_DLLS "${COMPILER_BIN_DIR}/*.dll")
+    install(FILES ${MINGW_DLLS}
+        DESTINATION ${OPENCMISS_COMPONENTS_INSTALL_PREFIX_MPI}/lib)
+endif()
+    
