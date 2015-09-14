@@ -6,7 +6,8 @@ if (DEFINED LOG_DIR AND EXISTS "${LOG_DIR}")
 # Script mode for creating the support zip file    
 elseif(CREATE_ZIP)
     set(SUPPORT_ZIP "${CMAKE_CURRENT_BINARY_DIR}/buildinfo.zip")
-    execute_process(COMMAND ${CMAKE_COMMAND} -E tar c ${SUPPORT_ZIP} --format=zip -- 
+    execute_process(COMMAND ${CMAKE_COMMAND} -E tar c ${SUPPORT_ZIP} --format=zip
+            -- 
             "${SUPPORT_DIR}"
             "${BUILD_DIR}/export"
             "${BUILD_DIR}/CMakeCache.txt"
@@ -18,13 +19,13 @@ elseif(CREATE_ZIP)
         message(FATAL_ERROR "Creating ZIP file failed: ${ERR}")
     else()
         message(STATUS "
-@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 @ Ready to get help!
 @
-@ We've created a build report archive at
+@ We've created a configuration and build report at
 @ ${SUPPORT_ZIP}
 @
-@ Please send an eMail to ${OC_INSTALL_SUPPORT_EMAIL},
+@ Please send an eMail to ${EMAIL},
 @ describing briefly what happened or bothers you and attach the above file. 
 @
 @ This way, we can track down the problem faster and help you be on your way with OpenCMISS!
@@ -34,15 +35,36 @@ elseif(CREATE_ZIP)
 @
 @ Your OpenCMISS development team.
 @ http://opencmiss.org
-@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 ")
     endif()
 else()
 
+    # The export vars script will also collect these variables!
+    if (GIT_FOUND)
+        getGitRevision(OPENCMISS_MANAGE_GIT_REVISON)
+        getGitBranch(OPENCMISS_MANAGE_GIT_BRANCH)
+    endif()
+
     function(exportVars FILE)
-        file(WRITE ${FILE} "OpenCMISS Support Variable dump\r\n")
+        string(TIMESTAMP NOW)
+        file(WRITE ${FILE} "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+OpenCMISS Support variable dump file, ${NOW}
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+
+")
         get_cmake_property(_variableNames VARIABLES)
+        set(VARS_LATER )
+        file(APPEND ${FILE} "OpenCMISS related variables:\r\n")
         foreach (_variableName ${_variableNames})
+            if (_variableName MATCHES "^(OC_|OPENCMISS|OCM)")
+                file(APPEND ${FILE} "${_variableName}=${${_variableName}}\r\n")
+            else()
+                list(APPEND VARS_LATER ${_variableName})    
+            endif()
+        endforeach()
+        file(APPEND ${FILE} "\r\nOther CMake variables:\r\n")
+        foreach (_variableName ${VARS_LATER})
             file(APPEND ${FILE} "${_variableName}=${${_variableName}}\r\n")
         endforeach()
     endfunction()

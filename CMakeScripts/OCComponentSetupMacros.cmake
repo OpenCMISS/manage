@@ -340,10 +340,17 @@ endmacro()
 function(doSupportStuff NAME SRC BIN DEFS)
     # Write support log file
     set(SUPPORT_FILE "${OC_SUPPORT_DIR}/${NAME}-buildconfig.txt")
-    file(WRITE "${SUPPORT_FILE}" "Build configuration file for component '${NAME}'
-Source directory: ${SRC}
-Build directory: ${BIN}
-Definitions:
+    string(TIMESTAMP NOW)
+    file(WRITE "${SUPPORT_FILE}" "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+@ Automatically generated OpenCMISS support file, ${NOW}
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+
+Build configuration file for OpenCMISS component '${NAME}'
+    
+Source directory '${SRC}'
+Build directory '${BIN}'
+
+Configure definitions:
 ")
     foreach(_DEF ${DEFS})
         file(APPEND "${SUPPORT_FILE}" "${_DEF}\r\n")

@@ -52,13 +52,13 @@ include(OCComponentSetupMacros)
 ########################################################################
 # Utilities and external packages
 
-# Git is used by default to clone source repositories, unless disabled
-if (NOT DISABLE_GIT)
-    find_package(Git)
-    if (NOT GIT_FOUND)
-        message(STATUS "ATTENTION: Could not find Git. Falling back to download sources as .zip files.")
-    endif()
-endif()
+include(OCInstallFindModuleWrappers)
+# Add CMakeModules directory after wrapper module directory (set in above script)
+# This folder is also exported to the install tree upon "make install" and
+# then used within the FindOpenCMISS.cmake module script
+list(APPEND CMAKE_MODULE_PATH 
+    ${OPENCMISS_MANAGE_DIR}/CMakeModules
+)
 
 # No point in building ZINC if there's no OpenGL around
 if (OCM_USE_ZINC)
@@ -75,13 +75,14 @@ if (NOT DEFINED IRON_WITH_Python_BINDINGS)
     set(IRON_WITH_Python_BINDINGS ${PYTHONINTERP_FOUND})
 endif()
 
-include(OCInstallFindModuleWrappers)
-# Add CMakeModules directory after wrapper module directory (set in above script)
-# This folder is also exported to the install tree upon "make install" and
-# then used within the FindOpenCMISS.cmake module script
-list(APPEND CMAKE_MODULE_PATH 
-    ${OPENCMISS_MANAGE_DIR}/CMakeModules
-)
+# Git is used by default to clone source repositories, unless disabled
+if (NOT DISABLE_GIT)
+    find_package(Git)
+    if (NOT GIT_FOUND)
+        message(STATUS "ATTENTION: Could not find Git. Falling back to download sources as .zip files.")
+    endif()
+endif()
+
 include(OCDetectFortranMangling)
 
 # Multithreading
