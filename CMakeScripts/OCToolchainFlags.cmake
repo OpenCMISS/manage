@@ -94,9 +94,12 @@ elseif (CMAKE_C_COMPILER_ID STREQUAL "Intel" OR CMAKE_CXX_COMPILER_ID STREQUAL "
 
     # Somehow CMake does not add the appropriate C-standard flags even though
     # the C_STANDARD variable is set. Well do it manually for now.
-    if (UNIX)
-    	addFlag("-std=c99" C)
-    endif()
+    #
+    # EDIT: Unfortunately, this does not work out for all components. e.g. the gdcm build fails
+    # with that switched on. Currently, i've added that flag for the superlu_dist package only. 
+    #if (UNIX)
+    #	addFlag("-std=c99" C)
+    #endif()
     
     # Release
 #    addFlagAll("-fast" RELEASE)
@@ -120,7 +123,7 @@ elseif (CMAKE_C_COMPILER_ID STREQUAL "Intel" OR CMAKE_CXX_COMPILER_ID STREQUAL "
     endif()
     
     if(MPI STREQUAL intel)
-	addFlagAll("-DMPICH_IGNORE_CXX_SEEK")
+	    addFlagAll("-DMPICH_IGNORE_CXX_SEEK")
     endif()
 
 elseif(CMAKE_C_COMPILER_ID STREQUAL "XL" OR CMAKE_CXX_COMPILER_ID STREQUAL "XL") # IBM case
