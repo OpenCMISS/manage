@@ -22,6 +22,9 @@ foreach(example_name ${FEATURE_TEST_EXAMPLES})
     set(DEFS 
         -DOPENCMISS_INSTALL_DIR=${OPENCMISS_INSTALL_ROOT}
         -DCMAKE_INSTALL_PREFIX=${SRC_DIR}
+        -DCMAKE_C_COMPILER=${CMAKE_C_COMPILER} # For the feature tests, we want to use the same compilers as for the build!
+        -DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}
+        -DCMAKE_Fortran_COMPILER=${CMAKE_Fortran_COMPILER}
     )
     set(${example_name}_BRANCH devel)
     createExternalProjects(${example_name} "${SRC_DIR}" "${BIN_DIR}" "${DEFS}")
