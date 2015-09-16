@@ -83,7 +83,7 @@ set(METIS_VERSION 5.1)
 set(MUMPS_VERSION 5.0.0) # Alternatives: 4.10.0
 set(PASTIX_VERSION 5.2.2.16)
 set(PARMETIS_VERSION 4.0.3)
-set(PETSC_VERSION 3.5)
+set(PETSC_VERSION 3.6.1) # Alternatives: 3.5
 set(PLAPACK_VERSION 3.0)
 set(PTSCOTCH_VERSION 6.0.3)
 set(SCALAPACK_VERSION 2.8)
@@ -93,11 +93,11 @@ set(SOWING_VERSION 1.1.16)
 set(SUITESPARSE_VERSION 4.4.0)
 set(SUNDIALS_VERSION 2.5)
 set(SUPERLU_VERSION 4.3)
-set(SUPERLU_DIST_VERSION 3.3)
+set(SUPERLU_DIST_VERSION 4.1) # Alternatives: 3.3
 set(ZLIB_VERSION 1.2.3)
 set(BZIP2_VERSION 1.0.6) # Alternatives: 1.0.5
 set(FIELDML-API_VERSION 0.5.0)
-set(LIBXML2_VERSION 2.7.6)
+set(LIBXML2_VERSION 2.7.6) # Alternatives: 2.9.2
 set(LLVM_VERSION 3.4)
 set(GTEST_VERSION 1.7.0)
 set(SZIP_VERSION 2.1)
@@ -122,18 +122,21 @@ set(MVAPICH2_VERSION 2.1)
 set(CELLML_VERSION 1.0) # any will do, not used
 set(CSIM_VERSION 1.0)
 
-# will be "master" finally
-set(IRON_BRANCH iron)
-# Needs to be here until the repo's name is "iron", then it's compiled automatically (see Iron.cmake/BuildMacros)
-set(IRON_REPO https://github.com/rondiplomatico/iron)
+set(IRON_VERSION 0.4.0)
 set(IRON_SHARED YES)
+set(ZINC_VERSION 3.0.1)
 set(ZINC_SHARED YES)
 
-set(EXAMPLES_REPO https://github.com/rondiplomatico/examples)
-set(EXAMPLES_BRANCH cmake)
+# We override here the location of the iron/zinc/examples repositories until
+# the build system officiall switches over to CMake
+set(IRON_BRANCH iron)
+set(IRON_REPO https://github.com/rondiplomatico/iron)
 
 set(ZINC_BRANCH master)
 set(ZINC_REPO https://github.com/hsorby/zinc)
+
+set(EXAMPLES_REPO https://github.com/rondiplomatico/examples)
+set(EXAMPLES_BRANCH cmake)
 
 # ==========================================================================================
 # Single module configuration
