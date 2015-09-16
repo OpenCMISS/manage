@@ -88,7 +88,7 @@ set(PLAPACK_VERSION 3.0)
 set(PTSCOTCH_VERSION 6.0.3)
 set(SCALAPACK_VERSION 2.8)
 set(SCOTCH_VERSION 6.0.3)
-set(SLEPC_VERSION 3.5)
+set(SLEPC_VERSION 3.6.1) # Alternatives: 3.5, only if PETSC_VERSION matches
 set(SOWING_VERSION 1.1.16)
 set(SUITESPARSE_VERSION 4.4.0)
 set(SUNDIALS_VERSION 2.5)
@@ -124,19 +124,11 @@ set(CSIM_VERSION 1.0)
 
 set(IRON_VERSION 0.4.0)
 set(IRON_SHARED YES)
+
 set(ZINC_VERSION 3.0.1)
 set(ZINC_SHARED YES)
 
-# We override here the location of the iron/zinc/examples repositories until
-# the build system officiall switches over to CMake
-set(IRON_BRANCH iron)
-set(IRON_REPO https://github.com/rondiplomatico/iron)
-
-set(ZINC_BRANCH master)
-set(ZINC_REPO https://github.com/hsorby/zinc)
-
-set(EXAMPLES_REPO https://github.com/rondiplomatico/examples)
-set(EXAMPLES_BRANCH cmake)
+set(EXAMPLES_VERSION 1.0)
 
 # ==========================================================================================
 # Single module configuration

@@ -200,6 +200,7 @@ add_custom_target(reset_current
     COMMAND ${CMAKE_COMMAND} -E copy ${BUILD_IDENT}/OpenCMISSLocalConfig.cmake ../backup_localconfig.tmp
     COMMAND ${CMAKE_COMMAND} -E remove_directory ${BUILD_IDENT}
     COMMAND ${CMAKE_COMMAND} -E copy ../backup_localconfig.tmp ${BUILD_IDENT}/OpenCMISSLocalConfig.cmake
+    COMMAND ${CMAKE_COMMAND} -E remove ../backup_localconfig.tmp
     COMMENT "Resetting ${BUILD_IDENT}: Blowing away build files, preserving OpenCMISSLocalConfig"
     WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
 )
@@ -208,6 +209,7 @@ add_custom_target(reset_current_mpionly
     COMMAND ${CMAKE_COMMAND} -E copy ${BUILD_IDENT}/OpenCMISSLocalConfig.cmake ../backup_localconfig.tmp
     COMMAND ${CMAKE_COMMAND} -E remove_directory ${BUILD_IDENT}
     COMMAND ${CMAKE_COMMAND} -E copy ../backup_localconfig.tmp ${BUILD_IDENT}/OpenCMISSLocalConfig.cmake
+    COMMAND ${CMAKE_COMMAND} -E remove ../backup_localconfig.tmp
     COMMENT "Resetting ${BUILD_IDENT}: Blowing away MPI-related build files, preserving OpenCMISSLocalConfig"
     WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
 )
@@ -217,6 +219,7 @@ add_custom_target(utter_destruction
     COMMAND ${CMAKE_COMMAND} -E copy ${BUILD_IDENT}/OpenCMISSLocalConfig.cmake ../backup_localconfig.tmp
     COMMAND ${CMAKE_COMMAND} -E remove_directory ${BUILD_IDENT}
     COMMAND ${CMAKE_COMMAND} -E copy ../backup_localconfig.tmp ${BUILD_IDENT}/OpenCMISSLocalConfig.cmake
+    COMMAND ${CMAKE_COMMAND} -E remove ../backup_localconfig.tmp
     COMMENT "BAM! Deleting build & install folders. Only keeping OpenCMISSLocalConfig from last configuration in ${BUILD_IDENT}"
     WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
 )
