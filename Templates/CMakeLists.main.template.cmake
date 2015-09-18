@@ -1,3 +1,7 @@
+set(OC_SUPPORT_DIR ${CMAKE_CURRENT_BINARY_DIR}/support)
+string(TIMESTAMP NOW)
+file(WRITE "${OC_SUPPORT_DIR}/build.log" "Starting configuration in ${CMAKE_CURRENT_BINARY_DIR} at ${NOW}\r\n")
+
 set(OPENCMISS_CMAKE_MIN_VERSION @OPENCMISS_CMAKE_MIN_VERSION@)
 cmake_minimum_required(VERSION ${OPENCMISS_CMAKE_MIN_VERSION} FATAL_ERROR)
 
@@ -173,7 +177,6 @@ SET(_OCM_SELECTED_COMPONENTS )
 
 ########################################################################
 # Support - get help!
-set(OC_SUPPORT_DIR ${CMAKE_CURRENT_BINARY_DIR}/support)
 include(OCSupport)
 
 ########################################################################
@@ -214,6 +217,7 @@ add_custom_target(reset
     DEPENDS reset_mpionly reset_featuretests
     COMMAND ${CMAKE_COMMAND} -E remove_directory "${OPENCMISS_COMPONENTS_INSTALL_PREFIX_NO_BUILD_TYPE}"
     COMMAND ${CMAKE_COMMAND} -E remove_directory "${OPENCMISS_COMPONENTS_BINARY_DIR}"
+    COMMAND ${CMAKE_COMMAND} -E remove "${OC_SUPPORT_DIR}/build.log"
     COMMENT "Removing directories:
         ->${OPENCMISS_COMPONENTS_INSTALL_PREFIX_NO_BUILD_TYPE}
         ->${OPENCMISS_COMPONENTS_BINARY_DIR}"
@@ -225,6 +229,11 @@ add_custom_target(reset_mpionly
         ->${OPENCMISS_COMPONENTS_INSTALL_PREFIX_MPI_NO_BUILD_TYPE}
         ->${OPENCMISS_COMPONENTS_BINARY_DIR_MPI}"
 )
+
+string(TIMESTAMP NOW)
+file(APPEND "${OC_SUPPORT_DIR}/build.log" "Finished configuration in ${CMAKE_CURRENT_BINARY_DIR} at ${NOW}
+-------------------------------------------
+")
 
 
 

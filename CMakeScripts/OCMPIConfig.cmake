@@ -97,6 +97,7 @@ if (NOT MPI_FOUND)
         set(_MPI_BRANCH v${_MPI_VERSION})
         
         message(STATUS "Configuring build of 'MPI' (${MPI}-${_MPI_VERSION}) in ${_MPI_BINARY_DIR}...")
+        file(APPEND "${OC_SUPPORT_DIR}/build.log" "Configuring build of shipped 'MPI' (${MPI}-${_MPI_VERSION}) in ${_MPI_BINARY_DIR}\n")
         message(STATUS "Extra MPI build parameters: ${_MPI_EXTRA_PARAMS}")
         
         # Dont download again if the target source folder already contains files 

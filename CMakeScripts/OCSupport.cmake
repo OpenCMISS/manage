@@ -3,15 +3,20 @@ if (DEFINED LOG_DIR AND EXISTS "${LOG_DIR}")
     file(GLOB LOGS "${LOG_DIR}/*.log")
     file(COPY ${LOGS} DESTINATION ${SUPPORT_DIR})
 
+elseif(BUILD_STAMP)
+    string(TIMESTAMP NOW)
+    file(APPEND build.log "Build of OpenCMISS component ${COMPONENT_NAME} started at ${NOW}\r\n")
+
 # Script mode for creating the support zip file    
 elseif(CREATE_ZIP)
+
     set(SUPPORT_ZIP "${CMAKE_CURRENT_BINARY_DIR}/buildinfo.zip")
     execute_process(COMMAND ${CMAKE_COMMAND} -E tar c ${SUPPORT_ZIP} --format=zip
             -- 
             "${SUPPORT_DIR}"
-            "${BUILD_DIR}/export"
-            "${BUILD_DIR}/CMakeCache.txt"
-            "${BUILD_DIR}/OpenCMISSLocalConfig.cmake"
+            "${CMAKE_CURRENT_BINARY_DIR}/export"
+            "${CMAKE_CURRENT_BINARY_DIR}/CMakeCache.txt"
+            "${CMAKE_CURRENT_BINARY_DIR}/OpenCMISSLocalConfig.cmake"
             RESULT_VARIABLE RES
             ERROR_VARIABLE ERR
     )
@@ -60,12 +65,14 @@ OpenCMISS Support variable dump file, ${NOW}
             if (_variableName MATCHES "^(OC_|OPENCMISS|OCM)")
                 file(APPEND ${FILE} "${_variableName}=${${_variableName}}\r\n")
             else()
-                list(APPEND VARS_LATER ${_variableName})    
+                list(APPEND VARS_LATER ${_variableName})
             endif()
         endforeach()
         file(APPEND ${FILE} "\r\nOther CMake variables:\r\n")
         foreach (_variableName ${VARS_LATER})
-            file(APPEND ${FILE} "${_variableName}=${${_variableName}}\r\n")
+            if (NOT _variableName MATCHES "_PLATFORM_CONTENT$")
+                file(APPEND ${FILE} "${_variableName}=${${_variableName}}\r\n")
+            endif()
         endforeach()
     endfunction()
 
@@ -74,22 +81,27 @@ OpenCMISS Support variable dump file, ${NOW}
     
     set(_SUPPORT_DEPS )
     if (OCM_CREATE_LOGS)
+        # This is a dummy target, to which all single components add a "POST_BUILD" hook
+        # to collect their respective log files. Using PRE_BUILD directly on "support"
+        # does not work everywhere (only with Win/VS)
         add_custom_target(collect_logs
-            COMMAND -E echo "Collecting log files from build directories"
+            COMMAND ${CMAKE_COMMAND} -E echo "Collecting log files from build directories"
         )
-        set(_SUPPORT_DEPS DEPENDS collect_logs)
+        list(APPEND _SUPPORT_DEPS DEPENDS collect_logs)
     endif()
+    
     if (NOT DEFINED OC_INSTALL_SUPPORT_EMAIL)
         set(OC_INSTALL_SUPPORT_EMAIL users@list.opencmiss.org)
     endif()
+    
     add_custom_target(support
         ${_SUPPORT_DEPS}
         COMMAND ${CMAKE_COMMAND}
             -DCREATE_ZIP=YES
-            -DBUILD_DIR=${CMAKE_CURRENT_BINARY_DIR}
             -DEMAIL=${OC_INSTALL_SUPPORT_EMAIL}
             -DSUPPORT_DIR=${OC_SUPPORT_DIR}
             -P ${CMAKE_CURRENT_LIST_FILE}
+        WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
         COMMENT "Generating support files archive"
     )
 endif()
