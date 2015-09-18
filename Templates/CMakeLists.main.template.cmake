@@ -24,7 +24,6 @@ include(OpenCMISSConfig)
 @TOOLCHAIN_DEF@
 set(MPI @MPI@)
 set(OCM_SYSTEM_MPI @SYSTEM_MPI@)
-set(OCM_DEBUG_MPI @DEBUG_MPI@)
 set(MPI_BUILD_TYPE @MPI_BUILD_TYPE@)
 @MPI_HOME_DEF@
 ########################################################################
@@ -191,6 +190,12 @@ include(OCAddExamplesProject)
 include(OCInstall)
 
 ########################################################################
+# Testing
+# Need to enable testing in order for any add_test calls (see OCComponentSetupMacros) to work
+enable_testing()
+include(OCFeatureTests)
+
+########################################################################
 # Misc targets for convenience
 # update: Updates the whole source tree
 # reset: Blows away the current build and installation trees
@@ -206,7 +211,7 @@ add_custom_target(update
     DEPENDS ${_OCM_SOURCE_UPDATE_TARGETS}
 )
 add_custom_target(reset
-    DEPENDS reset_mpionly
+    DEPENDS reset_mpionly reset_featuretests
     COMMAND ${CMAKE_COMMAND} -E remove_directory "${OPENCMISS_COMPONENTS_INSTALL_PREFIX_NO_BUILD_TYPE}"
     COMMAND ${CMAKE_COMMAND} -E remove_directory "${OPENCMISS_COMPONENTS_BINARY_DIR}"
     COMMENT "Removing directories:
@@ -214,17 +219,13 @@ add_custom_target(reset
         ->${OPENCMISS_COMPONENTS_BINARY_DIR}"
 )
 add_custom_target(reset_mpionly
-    COMMAND ${CMAKE_COMMAND} -E remove_directory "${OPENCMISS_COMPONENTS_INSTALL_PREFIX_NO_BUILD_TYPE}"
+    COMMAND ${CMAKE_COMMAND} -E remove_directory "${OPENCMISS_COMPONENTS_INSTALL_PREFIX_MPI_NO_BUILD_TYPE}"
     COMMAND ${CMAKE_COMMAND} -E remove_directory "${OPENCMISS_COMPONENTS_BINARY_DIR_MPI}"
     COMMENT "Removing directories:
         ->${OPENCMISS_COMPONENTS_INSTALL_PREFIX_MPI_NO_BUILD_TYPE}
         ->${OPENCMISS_COMPONENTS_BINARY_DIR_MPI}"
 )
 
-########################################################################
-# Testing
-# Need to enable testing in order for any add_test calls (see OCComponentSetupMacros) to work
-enable_testing()
-include(OCFeatureTests)
+
 
 

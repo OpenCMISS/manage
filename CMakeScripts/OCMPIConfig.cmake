@@ -13,7 +13,8 @@ if (OCM_USE_ARCHITECTURE_PATH)
     getShortArchitecturePath(SHORT_ARCH_PATH)
 endif()
 # This is where our own build of MPI will reside if compilation is needed
-set(OWN_MPI_INSTALL_DIR ${OPENCMISS_ROOT}/install/${SHORT_ARCH_PATH}/mpi/${MPI}/${MPI_BUILD_TYPE})
+string(TOLOWER ${MPI_BUILD_TYPE} _MPI_BUILD_TYPE)
+set(OWN_MPI_INSTALL_DIR ${OPENCMISS_ROOT}/install/${SHORT_ARCH_PATH}/mpi/${MPI}/${_MPI_BUILD_TYPE})
     
 if (NOT DEFINED MPI_HOME)
     # If no system MPI is allowed, search ONLY at MPI_HOME, which is our own bake
@@ -40,7 +41,8 @@ if (NOT MPI_FOUND)
     # This is supported yet only on Unix systems
     if (UNIX)
         # No shared libs!
-        set(_MPI_EXTRA_PARAMS --disable-shared) 
+        set(_MPI_EXTRA_PARAMS --disable-shared)
+        set(MPI_C_FLAGS -fPIC) 
         if (MPI STREQUAL openmpi)
             # We need to build a static version of MPI so that symbols get pulled into iron
             # Having a shared-version of OpenMPI wont work with Python bindings
@@ -60,11 +62,12 @@ if (NOT MPI_FOUND)
             set(MPI_CXX_COMPILER ${OWN_MPI_INSTALL_DIR}/bin/mpicxx)
             set(MPI_Fortran_COMPILER ${OWN_MPI_INSTALL_DIR}/bin/mpifort)
         elseif (MPI STREQUAL mpich)
-            SET(_MPI_VERSION ${MPICH_VERSION})
-            if (MPI_BUILD_TYPE STREQUAL release)
+            set(_MPI_VERSION ${MPICH_VERSION})
+            if (MPI_BUILD_TYPE STREQUAL RELEASE)
                 list(APPEND _MPI_EXTRA_PARAMS --enable-fast=O3,ndebug --disable-error-checking --without-timing --without-mpit-pvars)
-            elseif(MPI_BUILD_TYPE STREQUAL debug)
-                list(APPEND _MPI_EXTRA_PARAMS --disable-fast)
+            elseif(MPI_BUILD_TYPE STREQUAL DEBUG)
+                list(APPEND _MPI_EXTRA_PARAMS --disable-fast --enable-g=all)
+                set(MPI_C_FLAGS "${MPI_C_FLAGS} -g3")
             endif()
             # Define the MPI compilers that will be used later already - the configuration stage
             # needs them so that other dependencies with MPI have the correct compilers defined right away.
@@ -72,11 +75,12 @@ if (NOT MPI_FOUND)
             set(MPI_CXX_COMPILER ${OWN_MPI_INSTALL_DIR}/bin/mpicxx)
             set(MPI_Fortran_COMPILER ${OWN_MPI_INSTALL_DIR}/bin/mpifort)
         elseif (MPI STREQUAL mvapich2)
-            SET(_MPI_VERSION ${MVAPICH2_VERSION})
-            if (MPI_BUILD_TYPE STREQUAL release)
+            set(_MPI_VERSION ${MVAPICH2_VERSION})
+            if (MPI_BUILD_TYPE STREQUAL RELEASE)
                 list(APPEND _MPI_EXTRA_PARAMS --enable-fast=O3,ndebug --disable-error-checking --without-timing --without-mpit-pvars)
-            elseif(MPI_BUILD_TYPE STREQUAL debug)
-                list(APPEND _MPI_EXTRA_PARAMS --disable-fast)
+            elseif(MPI_BUILD_TYPE STREQUAL DEBUG)
+                list(APPEND _MPI_EXTRA_PARAMS --disable-fast --enable-g=all)
+                set(MPI_C_FLAGS "${MPI_C_FLAGS} -g3")
             endif()
             # Define the MPI compilers that will be used later already - the configuration stage
             # needs them so that other dependencies with MPI have the correct compilers defined right away.
@@ -87,16 +91,13 @@ if (NOT MPI_FOUND)
     	    message(FATAL_ERROR "Own build of MPI - ${MPI} not yet implemented")
         endif()
         
-        message(STATUS "Using shipped MPI (${MPI}-${_MPI_VERSION})")
-        
         set(MPI_HOME ${OWN_MPI_INSTALL_DIR})
-        SET(_MPI_SOURCE_DIR ${OPENCMISS_ROOT}/src/dependencies/${MPI})
-        SET(_MPI_BINARY_DIR ${OPENCMISS_ROOT}/build/${SHORT_ARCH_PATH}/mpi/${MPI}/${MPI_BUILD_TYPE})
-        SET(_MPI_BRANCH v${_MPI_VERSION})
+        set(_MPI_SOURCE_DIR ${OPENCMISS_ROOT}/src/dependencies/${MPI})
+        set(_MPI_BINARY_DIR ${OPENCMISS_ROOT}/build/${SHORT_ARCH_PATH}/mpi/${MPI}/${_MPI_BUILD_TYPE})
+        set(_MPI_BRANCH v${_MPI_VERSION})
         
-        message(STATUS "Configuring build of MPI (${MPI}-${_MPI_VERSION})")
-        message(STATUS "Location: ${_MPI_BINARY_DIR}")
-        message(STATUS "Extra build parameters: ${_MPI_EXTRA_PARAMS}")
+        message(STATUS "Configuring build of 'MPI' (${MPI}-${_MPI_VERSION}) in ${_MPI_BINARY_DIR}...")
+        message(STATUS "Extra MPI build parameters: ${_MPI_EXTRA_PARAMS}")
         
         # Dont download again if the target source folder already contains files 
         file(GLOB _MPI_FILES ${_MPI_SOURCE_DIR}/)
@@ -113,12 +114,11 @@ if (NOT MPI_FOUND)
         include(ProcessorCount)
         ProcessorCount(NUM_PROCESSORS)
         if (NUM_PROCESSORS EQUAL 0)
-            SET(NUM_PROCESSORS 1)
+            set(NUM_PROCESSORS 1)
         #else()
         #    MATH(EXPR NUM_PROCESSORS ${NUM_PROCESSORS}+4)
         endif()
         
-        string(TOUPPER ${MPI_BUILD_TYPE} _TYPE)
         ExternalProject_Add(MPI
     		PREFIX ${_MPI_BINARY_DIR}
     		TMP_DIR ${_MPI_BINARY_DIR}/ep_tmp
@@ -134,9 +134,9 @@ if (NOT MPI_FOUND)
     		    CC=${CMAKE_C_COMPILER}
     		    CXX=${CMAKE_CXX_COMPILER}
     		    FC=${CMAKE_Fortran_COMPILER}
-    		    CFLAGS=-fPIC #${CMAKE_C_FLAGS_${_TYPE}} #TODO: does it make sense to pass on the flags to the mpi build?
-    		    CXXFLAGS=-fPIC #${CMAKE_CXX_FLAGS_${_TYPE}}
-    		    FFLAGS=-fPIC #${CMAKE_Fortran_FLAGS_${_TYPE}}
+    		    CFLAGS=${MPI_C_FLAGS}
+    		    CXXFLAGS=-fPIC 
+    		    FFLAGS=-fPIC
     		    ${_MPI_EXTRA_PARAMS}
     		BINARY_DIR ${_MPI_BINARY_DIR}
     		
@@ -154,7 +154,7 @@ if (NOT MPI_FOUND)
     		STEP_TARGETS install
     	)
     	# Set the forward dependencies of MPI to have it build before the consuming components
-        SET(MPI_FWD_DEPS ${OPENCMISS_COMPONENTS_WITHMPI})
+        set(MPI_FWD_DEPS ${OPENCMISS_COMPONENTS_WITHMPI})
         addDownstreamDependencies(MPI FALSE)
     else()
         message(FATAL_ERROR "MPI (${MPI}) installation support not yet implemented for this platform.")

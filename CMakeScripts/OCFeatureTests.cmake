@@ -19,13 +19,28 @@ set(GITHUB_ORGANIZATION OpenCMISS-Examples)
 foreach(example_name ${FEATURE_TEST_EXAMPLES})
     set(BIN_DIR "${BIN_DIR_ROOT}/${example_name}")
     set(SRC_DIR "${SRC_DIR_ROOT}/${example_name}")
+    # Set correct paths
     set(DEFS 
         -DOPENCMISS_INSTALL_DIR=${OPENCMISS_INSTALL_ROOT}
         -DCMAKE_INSTALL_PREFIX=${SRC_DIR}
-        -DCMAKE_C_COMPILER=${CMAKE_C_COMPILER} # For the feature tests, we want to use the same compilers as for the build!
-        -DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}
-        -DCMAKE_Fortran_COMPILER=${CMAKE_Fortran_COMPILER}
     )
+    # Use same compilers
+    foreach(lang C CXX Fortran)
+        if(MPI_${lang}_COMPILER)
+            list(APPEND DEFS
+                # Directly specify the compiler wrapper as compiler!
+                # That is a perfect workaround for the "finding MPI after compilers have been initialized" problem
+                # that occurs when building a component directly. 
+                -DCMAKE_${lang}_COMPILER=${MPI_${lang}_COMPILER}
+                # Also specify the MPI_ versions so that FindMPI is faster (checks them directly)
+                -DMPI_${lang}_COMPILER=${MPI_${lang}_COMPILER}
+            )
+        else()
+            list(APPEND DEFS
+                -DCMAKE_${lang}_COMPILER=${CMAKE_${lang}_COMPILER}
+            )
+        endif()
+    endforeach()
     set(${example_name}_BRANCH devel)
     createExternalProjects(${example_name} "${SRC_DIR}" "${BIN_DIR}" "${DEFS}")
     # Dont build with the main build, as installation of OpenCMISS has not been done by then.
@@ -41,4 +56,10 @@ add_custom_target(featuretests
     DEPENDS ${FEATURE_TEST_EXAMPLES} # Triggers the build
     COMMAND ${CMAKE_CTEST_COMMAND} -R ${FEATURE_TEST_PREFIX}*
     COMMENT "Running OpenCMISS feature tests"
+)
+# Also provide means to clean all feature tests
+add_custom_target(reset_featuretests
+    COMMAND ${CMAKE_COMMAND} -E remove_directory "${BIN_DIR_ROOT}"
+    COMMAND ${CMAKE_COMMAND} -E remove_directory "${SRC_DIR_ROOT}" # Also just remove the sources for now, they're not big
+    COMMENT "Cleaning up feature test builds"
 )

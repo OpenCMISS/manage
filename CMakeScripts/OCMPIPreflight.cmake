@@ -24,6 +24,24 @@ foreach (lang C CXX Fortran)
     SET(MPI_${lang}_FOUND FALSE)
 endforeach()
 
+# Ensure lower-case mpi and upper case mpi build type
+# Whether to allow a system search for MPI implementations
+option(SYSTEM_MPI "Allow to use a system MPI if found" YES)
+if (DEFINED MPI)
+    string(TOLOWER ${MPI} MPI)
+    set(MPI ${MPI} CACHE STRING "User-specified MPI implementation" FORCE)
+endif()
+if (DEFINED MPI_BUILD_TYPE)
+    string(TOUPPER ${MPI_BUILD_TYPE} MPI_BUILD_TYPE)
+    set(MPI_BUILD_TYPE ${MPI_BUILD_TYPE} CACHE STRING "User-specified MPI build type" FORCE)
+else()
+    set(MPI_BUILD_TYPE release CACHE STRING "MPI build type, initialized to default")    
+endif()
+if (MPI_BUILD_TYPE STREQUAL DEBUG AND SYSTEM_MPI)
+    message(WARNING "Cannot have debug MPI builds and SYSTEM_MPI at the same time. Setting SYSTEM_MPI=OFF")
+    set(SYSTEM_MPI OFF CACHE BOOL "Allow to use a system MPI if found" FORCE)
+endif()
+
 # The default implementation to use in all last-resort/unimplemented cases
 SET(OPENCMISS_MPI_DEFAULT mpich)
 
@@ -44,36 +62,8 @@ if(NOT DEFINED MPI)
     # If we have found MPI by now, it's either system MPI or the one specified at MPI_HOME.
     # Either way, we need to infer the MPI implementation from that.
     if (MPI_FOUND)
-        # If we find MPI, we need to infer the MPI implementation for use in e.g. architecture paths
-        SET(MNEMONICS mpich mpich2 openmpi intel mvapich2 msmpi)
-        # Patterns to match the include path
-        SET(PATTERNS ".*mpich([/|-].*|$)" ".*mpich(2)?([/|-].*|$)" ".*openmpi([/|-].*|$)"
-         ".*(intel|impi)[/|-].*" ".*mvapich(2)?([/|-].*|$)" ".*microsoft(.*|$)")
-        foreach(IDX RANGE 5)
-            LIST(GET MNEMONICS ${IDX} MNEMONIC)
-            LIST(GET PATTERNS ${IDX} PATTERN)
-            STRING(TOLOWER "${MPI_C_INCLUDE_PATH}" C_INC_PATH)
-            STRING(TOLOWER "${MPI_CXX_INCLUDE_PATH}" CXX_INC_PATH)
-            STRING(TOLOWER "${MPI_C_LIBRARIES}" C_LIBRARIES)
-            STRING(TOLOWER "${MPI_CXX_LIBRARIES}" CXX_LIBRARIES)
-            #message(STATUS "Architecture: checking '${MPI_C_INCLUDE_PATH} MATCHES ${PATTERN} OR ${MPI_CXX_INCLUDE_PATH} MATCHES ${PATTERN}'")
-            if (C_INC_PATH MATCHES ${PATTERN} OR CXX_INC_PATH MATCHES ${PATTERN}
-	        OR C_LIBRARIES MATCHES ${PATTERN} OR CXX_LIBRARIES MATCHES ${PATTERN})
-                SET(DETECTED_MPI ${MNEMONIC})
-                break()
-            endif()
-        endforeach()
-        if (NOT DETECTED_MPI)
-            if (MPI_C_COMPILER)
-                get_filename_component(COMP_NAME ${MPI_C_COMPILER} NAME)
-                STRING(TOLOWER DETECTED_MPI "unknown_${COMP_NAME}")
-            else()
-                SET(DETECTED_MPI "unknown") # This value is also checked against in FindMPI.cmake!
-            endif()
-            message(WARNING "MPI compiler '${MPI_C_COMPILER}' with include path '${MPI_C_INCLUDE_PATH}' not recognized.")
-        endif()
-        set(MPI ${DETECTED_MPI} CACHE STRING "Detected MPI implementation" FORCE)
-        unset(DETECTED_MPI)
+        # MPI_DETECTED is set by FindMPI.cmake to one of the mnemonics or unknown (MPI_TYPE_UNKNOWN in FindMPI.cmake)
+        set(MPI ${MPI_DETECTED} CACHE STRING "Detected MPI implementation" FORCE)
     else()
         # No MPI found - Prescribe a reasonable system default choice and go with that
         if (UNIX AND NOT APPLE)

@@ -25,6 +25,7 @@ LIST(APPEND COMPONENT_COMMON_DEFS
 
 # Add compilers and flags
 foreach(lang C CXX Fortran)
+    # Define flags
     if (CMAKE_${lang}_FLAGS)
         LIST(APPEND COMPONENT_COMMON_DEFS
             -DCMAKE_${lang}_FLAGS=${CMAKE_${lang}_FLAGS}
@@ -38,11 +39,10 @@ foreach(lang C CXX Fortran)
             )
         endif()
     endforeach()
-    if(CMAKE_${lang}_COMPILER)
-        LIST(APPEND COMPONENT_COMMON_DEFS
-            -DCMAKE_${lang}_COMPILER=${CMAKE_${lang}_COMPILER}
-        )
-    endif()
+    # Note: we dont define the compilers in the COMPONENT_COMMON_DEFS any more,
+    # as the OCComponentSetupMacros re-defines the compilers if MPI wrappers
+    # are found. To make the definitions list less confusing we'll completely leave
+    # out compiler definitions here and just define them in the OCComponentSetupMacros#addAndConfigureLocalComponent
 endforeach()
 
 # Pass on local lookup flags (consumed by find_package calls)

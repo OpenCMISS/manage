@@ -58,8 +58,10 @@ function(addAndConfigureLocalComponent COMPONENT_NAME)
         else()
             LIST(APPEND COMPONENT_DEFS -UMPI_HOME)
         endif()
-        # Override Compilers with MPI compilers
+        # Override (=defined later in the args list) Compilers with MPI compilers
         # for all components that may use MPI
+        # This takes precedence over the first definition of the compilers
+        # collected in COMPONENT_COMMON_DEFS
         foreach(lang C CXX Fortran)
             if(MPI_${lang}_COMPILER)
                 list(APPEND COMPONENT_DEFS
@@ -67,10 +69,17 @@ function(addAndConfigureLocalComponent COMPONENT_NAME)
                     # That is a perfect workaround for the "finding MPI after compilers have been initialized" problem
                     # that occurs when building a component directly. 
                     -DCMAKE_${lang}_COMPILER=${MPI_${lang}_COMPILER}
-                    # Also specify the MPI_ versions so that FindMPI is faster
+                    # Also specify the MPI_ versions so that FindMPI is faster (checks them directly)
                     -DMPI_${lang}_COMPILER=${MPI_${lang}_COMPILER}
                 )
             endif()
+        endforeach()
+    else()
+        # No MPI: simply set the same compilers.
+        foreach(lang C CXX Fortran)
+            list(APPEND COMPONENT_DEFS
+                -DCMAKE_${lang}_COMPILER=${CMAKE_${lang}_COMPILER}
+            )
         endforeach()
     endif()
     

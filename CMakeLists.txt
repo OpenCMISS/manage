@@ -66,7 +66,7 @@
 # Developer setup
 # ==============================
 # If you want to initialize your OpenCMISS installation to developer defaults,
-# add the line "-DEVIL=666" to your initial cmake call. Done. (not a typo)
+# add the line "-DEVIL=666" (not a typo!) to your initial cmake call. Done.
 
 ########################################################
 # If your cmake is older than 2.6 - goodbye. 
@@ -120,23 +120,13 @@ else()
 endif()
 
 # MPI
-if (DEFINED MPI)
-    string(TOLOWER ${MPI} MPI)
-endif()
-# Whether to allow a system search for MPI implementations
-option(SYSTEM_MPI "Allow to use a system MPI if found" YES)
-option(DEBUG_MPI "Use DEBUG version of MPI (works only for own builds thus far)" NO)
-if (DEBUG_MPI)
-    set(MPI_BUILD_TYPE debug)
-else()
-    set(MPI_BUILD_TYPE release)
-endif()
-unset(_SYSMPI_DEF)
 include(OCMPIPreflight)
 
 # This is the main build file location for each compiler/mpi combination.
 # We need to have different base folders for MPI in release/debug modes.
-set(BUILD_IDENT compiler.${TC_PART}-mpi.${MPI}.${MPI_BUILD_TYPE}) # dont care, take anything to combine stuff
+string(TOLOWER "${MPI_BUILD_TYPE}" _MPI_BUILD_TYPE)
+set(BUILD_IDENT compiler.${TC_PART}-mpi.${MPI}.${_MPI_BUILD_TYPE}) # dont care, take anything to combine stuff
+unset(_MPI_BUILD_TYPE)
 set(MAIN_BINARY_DIR "${CMAKE_CURRENT_BINARY_DIR}/${BUILD_IDENT}")
 file(MAKE_DIRECTORY "${MAIN_BINARY_DIR}")
 
