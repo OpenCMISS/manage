@@ -149,7 +149,7 @@ else()
     
     # Validate we've found a matching installation
     if (NOT MPI STREQUAL OPENCMISS_MPI)
-        message(FATAL_ERROR "Your MPI choice ${MPI} does not match the installed version '${OPENCMISS_MPI}' at ${_INSTALL_PATH}")
+        message(FATAL_ERROR "Your MPI type '${MPI}' does not match the installed version '${OPENCMISS_MPI}' at ${_INSTALL_PATH}")
     endif()
 endif()
 messageo("Verifying installation settings ... success")
