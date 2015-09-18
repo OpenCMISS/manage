@@ -378,4 +378,14 @@ Configure definitions:
         )
     endif()
     
+    add_custom_target(_${COMPONENT_NAME}_buildlog
+        COMMAND ${CMAKE_COMMAND}
+            -DBUILD_STAMP=YES 
+            -DCOMPONENT_NAME=${COMPONENT_NAME}
+            -P ${OPENCMISS_MANAGE_DIR}/CMakeScripts/OCSupport.cmake
+        WORKING_DIRECTORY "${OC_SUPPORT_DIR}")
+    add_dependencies(${COMPONENT_NAME} _${COMPONENT_NAME}_buildlog)
+    
+    string(TIMESTAMP NOW)
+    file(APPEND "${OC_SUPPORT_DIR}/build.log" "Configured component ${COMPONENT_NAME} at ${NOW}\r\n")
 endfunction()
