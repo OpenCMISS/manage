@@ -345,13 +345,9 @@ if (OCM_USE_IRON)
     if (OCM_USE_CELLML)
         find_package(CELLML ${CELLML_VERSION} QUIET)
         if (NOT CELLML_FOUND)
-            # For now cellml is in OpenCMISS organization on GitHub
-            set(GITHUB_ORGANIZATION OpenCMISS)
             SET(CELLML_FWD_DEPS IRON)
             addAndConfigureLocalComponent(CELLML
                 LIBXML2_VERSION=${LIBXML2_VERSION})
-            # Set back
-            set(GITHUB_ORGANIZATION OpenCMISS-Dependencies)
         endif()
     endif()
 
