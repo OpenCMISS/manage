@@ -9,7 +9,7 @@ messaged("Entering script")
 # Only the debug/release versions of MPI are located in different folders (for own builds only - the behaviour using system mpi
 # in debug mode is unspecified)
 set(SHORT_ARCH_PATH .)
-if (OCM_USE_ARCHITECTURE_PATH)
+if (OC_USE_ARCHITECTURE_PATH)
     getShortArchitecturePath(SHORT_ARCH_PATH)
 endif()
 # This is where our own build of MPI will reside if compilation is needed
@@ -18,7 +18,7 @@ set(OWN_MPI_INSTALL_DIR ${OPENCMISS_ROOT}/install/${SHORT_ARCH_PATH}/mpi/${MPI}/
     
 if (NOT DEFINED MPI_HOME)
     # If no system MPI is allowed, search ONLY at MPI_HOME, which is our own bake
-    if(NOT OCM_SYSTEM_MPI)
+    if(NOT OC_SYSTEM_MPI)
         set(MPI_HOME ${OWN_MPI_INSTALL_DIR})
         messaged("Setting MPI_HOME=${MPI_HOME}")
     else()
@@ -37,7 +37,7 @@ find_package(MPI QUIET)
 # If we get here without having found an MPI implementation, we need to build it.
 # But we will always have the MPI mnemonic set if we reach here.
 if (NOT MPI_FOUND)
-    messaged("No system MPI found or not allowed: OCM_SYSTEM_MPI=${OCM_SYSTEM_MPI}")
+    messaged("No system MPI found or not allowed: OC_SYSTEM_MPI=${OC_SYSTEM_MPI}")
     # This is supported yet only on Unix systems
     if (UNIX)
         # No shared libs!

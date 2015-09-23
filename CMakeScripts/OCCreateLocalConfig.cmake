@@ -1,8 +1,8 @@
 # Make sure a localconfig file exists
 if (NOT EXISTS ${MAIN_BINARY_DIR}/OpenCMISSLocalConfig.cmake)
     include(Variables)
-    SET(OCM_USE_SYSTEM_FLAGS )
-    SET(OCM_USE_FLAGS )
+    SET(OC_USE_SYSTEM_FLAGS )
+    SET(OC_USE_FLAGS )
     if (WIN32)
         SET(_NL "\r\n")
     else()
@@ -16,7 +16,7 @@ if (NOT EXISTS ${MAIN_BINARY_DIR}/OpenCMISSLocalConfig.cmake)
                 set(_VALUE YES)
             endif()
             # Prepare the option to disable/enable here.
-            SET(OCM_USE_FLAGS "${OCM_USE_FLAGS}#set(OCM_USE_${OCM_COMP} ${_VALUE})${_NL}")
+            SET(OC_USE_FLAGS "${OC_USE_FLAGS}#set(OC_USE_${OCM_COMP} ${_VALUE})${_NL}")
         endif()
         # Some components are looked for on the system by default. add option for opposite action here
         LIST(FIND OPENCMISS_COMPONENTS_SYSTEM_BY_DEFAULT ${OCM_COMP} _COMP_POS)
@@ -24,13 +24,13 @@ if (NOT EXISTS ${MAIN_BINARY_DIR}/OpenCMISSLocalConfig.cmake)
         if (${OCM_COMP} IN_LIST OPENCMISS_COMPONENTS_SYSTEM_BY_DEFAULT)
             SET(_VALUE NO)
         endif()
-        SET(OCM_USE_SYSTEM_FLAGS "${OCM_USE_SYSTEM_FLAGS}#set(OCM_SYSTEM_${OCM_COMP} ${_VALUE})${_NL}")
+        SET(OC_USE_SYSTEM_FLAGS "${OC_USE_SYSTEM_FLAGS}#set(OC_SYSTEM_${OCM_COMP} ${_VALUE})${_NL}")
     endforeach()
     configure_file(${OPENCMISS_MANAGE_DIR}/Templates/OpenCMISSLocalConfig.template.cmake
         ${MAIN_BINARY_DIR}/OpenCMISSLocalConfig.cmake)
     unset(_NL)
-    unset(OCM_USE_SYSTEM_FLAGS)
-    unset(OCM_USE_FLAGS)
+    unset(OC_USE_SYSTEM_FLAGS)
+    unset(OC_USE_FLAGS)
     
     # Extra development part - allows to set localconfig variables directly
     if (DEFINED DIRECT_VARS)

@@ -27,7 +27,7 @@ include(OpenCMISSConfig)
 ########################################################################
 @TOOLCHAIN_DEF@
 set(MPI @MPI@)
-set(OCM_SYSTEM_MPI @SYSTEM_MPI@)
+set(OC_SYSTEM_MPI @SYSTEM_MPI@)
 set(MPI_BUILD_TYPE @MPI_BUILD_TYPE@)
 @MPI_HOME_DEF@
 ########################################################################
@@ -64,10 +64,10 @@ list(APPEND CMAKE_MODULE_PATH
 )
 
 # No point in building ZINC if there's no OpenGL around
-if (OCM_USE_ZINC)
+if (OC_USE_ZINC)
     find_package(OpenGL QUIET)
     if (NOT OPENGL_FOUND)
-        set(OCM_USE_ZINC NO)
+        set(OC_USE_ZINC NO)
         message(WARNING "OpenCMISS: No OpenGL found, cannot build Zinc. Disabling.")
     endif()
 endif()
@@ -115,7 +115,7 @@ endif()
 # General paths & preps
 set(ARCHITECTURE_PATH .)
 set(ARCHITECTURE_PATH_MPI .)
-if (OCM_USE_ARCHITECTURE_PATH)
+if (OC_USE_ARCHITECTURE_PATH)
     getArchitecturePath(ARCHITECTURE_PATH ARCHITECTURE_PATH_MPI)
 endif()
 # Build tree location for components (with/without mpi)

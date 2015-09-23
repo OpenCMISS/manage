@@ -70,7 +70,7 @@ endif()
 
 # Export component info
 foreach(OCM_COMP ${OPENCMISS_COMPONENTS})
-    list(APPEND EXPORT_VARS OCM_USE_${OCM_COMP} OCM_SYSTEM_${OCM_COMP})
+    list(APPEND EXPORT_VARS OC_USE_${OCM_COMP} OC_SYSTEM_${OCM_COMP})
     if (${OCM_COMP}_VERSION)
         list(APPEND EXPORT_VARS ${OCM_COMP}_VERSION)
     endif()

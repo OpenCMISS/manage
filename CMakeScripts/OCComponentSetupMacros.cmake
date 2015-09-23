@@ -252,7 +252,7 @@ function(createExternalProjects COMPONENT_NAME SOURCE_DIR BINARY_DIR DEFS)
     )
         
     # See OpenCMISSDeveloper.cmake
-    if (OCM_CLEAN_REBUILDS_COMPONENTS)
+    if (OC_CLEAN_REBUILDS_COMPONENTS)
         set_directory_properties(PROPERTIES ADDITIONAL_MAKE_CLEAN_FILES ${BINARY_DIR}/CMakeCache.txt)
     endif()
     

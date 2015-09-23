@@ -1,19 +1,22 @@
-# We recommend using the architecture path for OpenCMISS developers.
-SET(OCM_USE_ARCHITECTURE_PATH YES)
+# Uncomment if you dont want to use architecture paths.
+#set(OC_USE_ARCHITECTURE_PATH NO)
 
 # Set this to YES to build with the -p profiling flags.
-set(OCM_WITH_PROFILING NO)
+set(OC_PROFILING NO)
 
 # Override any local variable and have CMake download/checkout the "devel" branch of any components repository
 #set(OCM_DEVEL_ALL YES)
 
 # If you issue "make clean" from the manage build folder, normally the external projects (i.e. dependencies) wont completely re-build.
 # Set this to true to have the build system remove the CMakeCache.txt of each dependency, which triggers a complete re-build. 
-set(OCM_CLEAN_REBUILDS_COMPONENTS YES)
+set(OC_CLEAN_REBUILDS_COMPONENTS YES)
 
 # The default for developers is to directly print the build output to the standard output/terminal.
 # This way developers directly see any errors instead of having to open log files.
 set(OC_CREATE_LOGS NO)
+
+# If you want more verbose output during builds, uncomment this line.
+#set(CMAKE_VERBOSE_MAKEFILE ON)
 
 ##############################################################################################
 ############################################### Maintainer setup
@@ -31,7 +34,11 @@ set(OC_CREATE_LOGS NO)
 
 ##############################################################################################
 ############################################### Git
-# If you have Git on your system, you can further customize where repositories are going to be cloned from. 
+# Disable use of Git to obtain sources.
+# The build systems automatically looks for Git and uses that to clone the respective source repositories
+# If Git is not found, a the build system falls back to download .zip files of the source.
+# To enforce that behaviour (e.g. for nightly tests), set this to YES
+#set(DISABLE_GIT YES)
 
 # If you set a github username, cmake will automatically try and locate all the components as repositories under that github account.
 #set(GITHUB_USERNAME )

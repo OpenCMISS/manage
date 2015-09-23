@@ -17,7 +17,7 @@
 # ================================================================ 
 
 # gTest
-if (OCM_USE_GTEST AND BUILD_TESTS)
+if (OC_USE_GTEST AND BUILD_TESTS)
     SET(GTEST_FWD_DEPS LLVM CSIM)
     set(SUBGROUP_PATH utilities)
     set(GITHUB_ORGANIZATION OpenCMISS-Utilities)
@@ -42,7 +42,7 @@ set(GITHUB_ORGANIZATION OpenCMISS-Dependencies)
 
 
 # zLIB
-if(OCM_USE_ZLIB OR OCM_USE_ZINC)
+if(OC_USE_ZLIB OR OC_USE_ZINC)
     find_package(ZLIB ${ZLIB_VERSION} QUIET)
     if(NOT ZLIB_FOUND)
         SET(ZLIB_FWD_DEPS 
@@ -66,7 +66,7 @@ if(NOT LIBXML2_FOUND)
 endif()
 
 # LAPACK (includes BLAS)
-if (OCM_USE_BLAS OR OCM_USE_LAPACK)
+if (OC_USE_BLAS OR OC_USE_LAPACK)
     find_package(BLAS ${BLAS_VERSION} QUIET)
     find_package(LAPACK ${LAPACK_VERSION} QUIET)
     if(NOT (LAPACK_FOUND AND BLAS_FOUND))
@@ -77,7 +77,7 @@ if (OCM_USE_BLAS OR OCM_USE_LAPACK)
 endif()
 
 # bzip2
-if(OCM_USE_BZIP2 OR OCM_USE_ZINC)
+if(OC_USE_BZIP2 OR OC_USE_ZINC)
     find_package(BZIP2 ${BZIP2_VERSION} QUIET)
     if(NOT BZIP2_FOUND)
         SET(BZIP2_FWD_DEPS SCOTCH PTSCOTCH GDCM IMAGEMAGICK)
@@ -86,10 +86,10 @@ if(OCM_USE_BZIP2 OR OCM_USE_ZINC)
 endif()
 
 # hdf5
-if(OCM_USE_HDF5)
+if(OC_USE_HDF5)
 
     # szip
-    if(OCM_USE_SZIP)
+    if(OC_USE_SZIP)
         find_package(SZIP ${SZIP_VERSION} QUIET)
         if(NOT SZIP_FOUND)
             SET(SZIP_FWD_DEPS HDF5)
@@ -128,10 +128,10 @@ endif()
 # ================================================================
 # Iron
 # ================================================================
-if (OCM_USE_IRON)
+if (OC_USE_IRON)
     
     # Scotch 6.0
-    if (OCM_USE_PTSCOTCH)
+    if (OC_USE_PTSCOTCH)
         find_package(PTSCOTCH ${PTSCOTCH_VERSION} QUIET)
         if(NOT PTSCOTCH_FOUND)
             SET(SCOTCH_FWD_DEPS PASTIX PETSC MUMPS IRON)
@@ -143,7 +143,7 @@ if (OCM_USE_IRON)
                 BZIP2_VERSION=${BZIP2_VERSION}
                 USE_THREADS=${SCOTCH_USE_THREADS})
         endif()
-    elseif(OCM_USE_SCOTCH)
+    elseif(OC_USE_SCOTCH)
         find_package(SCOTCH ${SCOTCH_VERSION} QUIET)
         if(NOT SCOTCH_FOUND)
             SET(PTSCOTCH_FWD_DEPS PASTIX PETSC MUMPS IRON)
@@ -158,7 +158,7 @@ if (OCM_USE_IRON)
     endif()
 
     # PLAPACK
-    if(OCM_USE_PLAPACK)
+    if(OC_USE_PLAPACK)
         find_package(PLAPACK ${PLAPACK_VERSION} QUIET)
         if(NOT PLAPACK_FOUND)
             SET(PLAPACK_FWD_DEPS IRON)
@@ -169,7 +169,7 @@ if (OCM_USE_IRON)
     endif()
     
     # ScaLAPACK
-    if(OCM_USE_SCALAPACK)
+    if(OC_USE_SCALAPACK)
         find_package(SCALAPACK ${SCALAPACK_VERSION} QUIET)
         if(NOT SCALAPACK_FOUND)
             SET(SCALAPACK_FWD_DEPS MUMPS PETSC IRON)
@@ -180,7 +180,7 @@ if (OCM_USE_IRON)
     endif()
     
     # parMETIS 4 (+METIS 5)
-    if(OCM_USE_PARMETIS)
+    if(OC_USE_PARMETIS)
         find_package(PARMETIS ${PARMETIS_VERSION} QUIET)
         if(NOT PARMETIS_FOUND)
             SET(PARMETIS_FWD_DEPS MUMPS SUITESPARSE SUPERLU_DIST PASTIX IRON)
@@ -189,7 +189,7 @@ if (OCM_USE_IRON)
     endif()
     
     # MUMPS
-    if (OCM_USE_MUMPS)
+    if (OC_USE_MUMPS)
         find_package(MUMPS ${MUMPS_VERSION} QUIET)
         if(NOT MUMPS_FOUND)
             SET(MUMPS_FWD_DEPS PETSC IRON)
@@ -210,7 +210,7 @@ if (OCM_USE_IRON)
     endif()
     
     # SUITESPARSE [CHOLMOD / UMFPACK]
-    if (OCM_USE_SUITESPARSE)
+    if (OC_USE_SUITESPARSE)
         find_package(SUITESPARSE ${SUITESPARSE_VERSION} QUIET)
         if(NOT SUITESPARSE_FOUND)
             SET(SUITESPARSE_FWD_DEPS PETSC IRON)
@@ -222,7 +222,7 @@ if (OCM_USE_IRON)
     endif()
     
     # SuperLU 4.3
-    if (OCM_USE_SUPERLU)
+    if (OC_USE_SUPERLU)
         find_package(SUPERLU ${SUPERLU_VERSION} QUIET)
         if(NOT SUPERLU_FOUND)
             SET(SUPERLU_FWD_DEPS PETSC IRON HYPRE)
@@ -233,7 +233,7 @@ if (OCM_USE_IRON)
     endif()
     
     # Hypre 2.9.0b
-    if (OCM_USE_HYPRE)
+    if (OC_USE_HYPRE)
         find_package(HYPRE ${HYPRE_VERSION} QUIET)
         if(NOT HYPRE_FOUND)
             SET(HYPRE_FWD_DEPS PETSC IRON)
@@ -244,7 +244,7 @@ if (OCM_USE_IRON)
     endif()
     
     # SuperLU-DIST 4.0
-    if (OCM_USE_SUPERLU_DIST)
+    if (OC_USE_SUPERLU_DIST)
         find_package(SUPERLU_DIST ${SUPERLU_DIST_VERSION} QUIET)
         if(NOT SUPERLU_DIST_FOUND)
             SET(SUPERLU_DIST_FWD_DEPS PETSC IRON)
@@ -259,7 +259,7 @@ if (OCM_USE_IRON)
     endif()
     
     # Sundials 2.5
-    if (OCM_USE_SUNDIALS)
+    if (OC_USE_SUNDIALS)
         find_package(SUNDIALS ${SUNDIALS_VERSION} QUIET)
         if(NOT SUNDIALS_FOUND)
             SET(SUNDIALS_FWD_DEPS CSIM PETSC IRON)
@@ -271,7 +271,7 @@ if (OCM_USE_IRON)
     endif()
     
     # Pastix 5.2.2.16
-    if (OCM_USE_PASTIX)
+    if (OC_USE_PASTIX)
         find_package(PASTIX ${PASTIX_VERSION} QUIET)
         if(NOT PASTIX_FOUND)
             SET(PASTIX_FWD_DEPS PETSC IRON)
@@ -285,7 +285,7 @@ if (OCM_USE_IRON)
     endif()
     
     # Sowing (only for PETSC ftn-auto generation)
-    if (OCM_USE_SOWING)
+    if (OC_USE_SOWING)
         find_package(SOWING ${SOWING_VERSION} QUIET)
         if(NOT SOWING_FOUND)
             SET(SOWING_FWD_DEPS PETSC)
@@ -294,7 +294,7 @@ if (OCM_USE_IRON)
     endif()
     
     # PETSc 3.5
-    if (OCM_USE_PETSC)
+    if (OC_USE_PETSC)
         find_package(PETSC ${PETSC_VERSION} QUIET)
         if(NOT PETSC_FOUND)
             SET(PETSC_FWD_DEPS SLEPC IRON)
@@ -314,7 +314,7 @@ if (OCM_USE_IRON)
     endif()
     
     # SLEPc 3.5
-    if (OCM_USE_SLEPC)
+    if (OC_USE_SLEPC)
         find_package(SLEPC ${SLEPC_VERSION} QUIET)
         if(NOT SLEPC_FOUND)
             SET(SLEPC_FWD_DEPS IRON)
@@ -334,7 +334,7 @@ if (OCM_USE_IRON)
     endif()
     
     # CellML
-    if (OCM_USE_LIBCELLML)
+    if (OC_USE_LIBCELLML)
         find_package(LIBCELLML ${LIBCELLML_VERSION} QUIET)
         if (NOT LIBCELLML_FOUND)
             SET(LIBCELLML_FWD_DEPS CSIM CELLML IRON)
@@ -342,7 +342,7 @@ if (OCM_USE_IRON)
         endif()
     endif()
     
-    if (OCM_USE_CELLML)
+    if (OC_USE_CELLML)
         find_package(CELLML ${CELLML_VERSION} QUIET)
         if (NOT CELLML_FOUND)
             SET(CELLML_FWD_DEPS IRON)
@@ -351,14 +351,14 @@ if (OCM_USE_IRON)
         endif()
     endif()
 
-    if (OCM_USE_LLVM)
+    if (OC_USE_LLVM)
         find_package(LLVM ${LLVM_VERSION} QUIET)
         if (NOT LLVM_FOUND)
             SET(LLVM_FWD_DEPS CSIM)
             addAndConfigureLocalComponent(LLVM)
         endif()
     endif()
-    if (OCM_USE_CSIM)
+    if (OC_USE_CSIM)
         find_package(CSIM ${CSIM_VERSION} QUIET)
         if (NOT CSIM_FOUND)
             SET(CSIM_FWD_DEPS IRON)
@@ -385,19 +385,18 @@ if (OCM_USE_IRON)
         SCALAPACK_VERSION=${SCALAPACK_VERSION}
         WITH_PETSC=${IRON_WITH_PETSC}
         PETSC_VERSION=${PETSC_VERSION}
-        WITH_PROFILING=${OCM_WITH_PROFILING}
+        WITH_PROFILING=${OC_PROFILING}
         WITH_C_BINDINGS=${IRON_WITH_C_BINDINGS}
         WITH_Python_BINDINGS=${IRON_WITH_Python_BINDINGS}
-        BUILD_SHARED_LIBS=${IRON_SHARED}
     )
 endif()
 
-if (OCM_USE_ZINC)
+if (OC_USE_ZINC)
     set(SUBGROUP_PATH dependencies)
     set(GITHUB_ORGANIZATION OpenCMISS-Dependencies)
     
     # jpeg
-    if(OCM_USE_JPEG)
+    if(OC_USE_JPEG)
         find_package(JPEG ${JPEG_VERSION} QUIET)
         if(NOT JPEG_FOUND)
             set(JPEG_FWD_DEPS ZINC TIFF GDCM IMAGEMAGICK)
@@ -526,7 +525,6 @@ if (OCM_USE_ZINC)
     addAndConfigureLocalComponent(ZINC
         ZINC_MODULE_PATH=${CMAKE_MODULE_PATH_ESC}
         ZINC_DEPENDENCIES_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX}
-        BUILD_SHARED_LIBS=${ZINC_SHARED}
     )
 endif()
 

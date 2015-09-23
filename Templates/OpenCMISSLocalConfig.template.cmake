@@ -51,6 +51,9 @@
 # To enforce that behaviour (e.g. for nightly tests), set this to YES
 #set(DISABLE_GIT YES)
 
+# Uncomment if you dont want to use architecture paths.
+#set(OC_USE_ARCHITECTURE_PATH NO)
+
 ####################################################################
 ################# REMOTE INSTALLATIONS
 ####################################################################
@@ -76,8 +79,6 @@
 ####################################################################
 ################# BUILD CONTROL
 ####################################################################
-# If you want more verbose output during builds, uncomment this line.
-#set(CMAKE_VERBOSE_MAKEFILE ON)
 
 # In order to build shared libraries (.so/.dll) set this to YES
 # The default is static for all dependencies and shared for main components (iron and zinc)
@@ -117,12 +118,48 @@
 #set(OC_COMPONENTS_SYSTEM DEFAULT NONE) 
 
 # To enable local lookup of single components, set
-# OCM_SYSTEM_<COMPONENT_NAME> to YES
-${OCM_USE_SYSTEM_FLAGS}
+# OC_SYSTEM_<COMPONENT_NAME> to YES
+${OC_USE_SYSTEM_FLAGS}
 
 # To disable the use of selected components, uncomment the appropriate lines
 # The default is to build all.
-${OCM_USE_FLAGS}
+${OC_USE_FLAGS}
 
 # Disable build of Python bindings for iron (enabled if Python is found)
 #set(IRON_WITH_Python_BINDINGS NO)
+
+#set(MUMPS_WITH_SCOTCH YES)
+#set(MUMPS_WITH_PTSCOTCH NO)
+#set(MUMPS_WITH_METIS YES)
+#set(MUMPS_WITH_PARMETIS NO)
+
+#set(SUNDIALS_WITH_LAPACK NO)
+
+#set(SCOTCH_USE_THREADS NO)
+#set(SCOTCH_WITH_ZLIB NO)
+#set(SCOTCH_WITH_BZIP2 NO)
+
+#set(SUPERLU_DIST_WITH_PARMETIS NO)
+
+#set(PASTIX_USE_THREADS NO)
+#set(PASTIX_USE_METIS NO)
+#set(PASTIX_USE_PTSCOTCH NO)
+
+#set(HDF5_WITH_MPI YES)
+#set(HDF5_WITH_SZIP NO)
+#set(HDF5_WITH_ZLIB NO)
+
+#set(FIELDML-API_WITH_HDF5 NO)
+#set(FIELDML-API_WITH_JAVA_BINDINGS NO)
+#set(FIELDML-API_WITH_FORTRAN_BINDINGS NO)
+
+#set(IRON_WITH_CELLML NO)
+#set(IRON_WITH_FIELDML NO)
+#set(IRON_WITH_HYPRE NO)
+#set(IRON_WITH_SUNDIALS NO)
+#set(IRON_WITH_MUMPS NO)
+#set(IRON_WITH_SCALAPACK NO)
+#set(IRON_WITH_PETSC NO)
+#set(IRON_WITH_C_BINDINGS NO)
+
+#set(LIBXML2_WITH_ZLIB NO)

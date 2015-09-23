@@ -47,9 +47,9 @@ endforeach()
 
 # Pass on local lookup flags (consumed by find_package calls)
 foreach(COMP ${OPENCMISS_COMPONENTS})
-    if (OCM_SYSTEM_${COMP})
+    if (OC_SYSTEM_${COMP})
         LIST(APPEND COMPONENT_COMMON_DEFS 
-            -DOCM_SYSTEM_${COMP}=${OCM_SYSTEM_${COMP}}
+            -DOC_SYSTEM_${COMP}=${OC_SYSTEM_${COMP}}
         )
     endif()
 endforeach()

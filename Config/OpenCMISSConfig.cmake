@@ -48,14 +48,14 @@ foreach(OCM_COMP ${OPENCMISS_COMPONENTS})
     
     # Force mandatory ones to be switched on
     if (${OCM_COMP} IN_LIST OC_MANDATORY_COMPONENTS)
-        set(OCM_USE_${OCM_COMP} REQ)
+        set(OC_USE_${OCM_COMP} REQ)
     endif()
     
     # All local enabled? Set to local search.
     if (OC_COMPONENTS_SYSTEM STREQUAL NONE)
-        set(OCM_SYSTEM_${OCM_COMP} NO)
+        set(OC_SYSTEM_${OCM_COMP} NO)
     elseif(OC_COMPONENTS_SYSTEM STREQUAL ALL)
-        set(OCM_SYSTEM_${OCM_COMP} YES)
+        set(OC_SYSTEM_${OCM_COMP} YES)
     endif()
     # Force "devel" branches for each component of DEVEL_ALL is set
     if (OCM_DEVEL_ALL)
@@ -67,12 +67,12 @@ foreach(OCM_COMP ${OPENCMISS_COMPONENTS})
     endif()
     if (NOT OCM_COMP STREQUAL MPI) # Dont show that for MPI - have different implementations
     	string(SUBSTRING "${OCM_COMP}                  " 0 12 OCM_COMP_FIXED_SIZE)
-    	string(SUBSTRING "${OCM_USE_${OCM_COMP}}       " 0 3 OCM_USE_FIXED_SIZE)
-    	string(SUBSTRING "${OCM_SYSTEM_${OCM_COMP}}    " 0 3 OCM_SYSTEM_FIXED_SIZE)
+    	string(SUBSTRING "${OC_USE_${OCM_COMP}}       " 0 3 OC_USE_FIXED_SIZE)
+    	string(SUBSTRING "${OC_SYSTEM_${OCM_COMP}}    " 0 3 OC_SYSTEM_FIXED_SIZE)
     	string(SUBSTRING "${${OCM_COMP}_VERSION}       " 0 7 OCM_VERSION_FIXED_SIZE)
     	string(SUBSTRING "${${OCM_COMP}_SHARED}        " 0 3 OCM_SHARED_FIXED_SIZE)
     	# ${OCM_COMP}_BRANCH is as good as version (this is what is effectively checked out) and will also display "devel" correctly
-        message(STATUS "OpenCMISS component ${OCM_COMP_FIXED_SIZE}: Use ${OCM_USE_FIXED_SIZE}, System search ${OCM_SYSTEM_FIXED_SIZE}, Shared: ${OCM_SHARED_FIXED_SIZE}, Version '${OCM_VERSION_FIXED_SIZE}', Branch '${${OCM_COMP}_BRANCH}')")
+        message(STATUS "OpenCMISS component ${OCM_COMP_FIXED_SIZE}: Use ${OC_USE_FIXED_SIZE}, System search ${OC_SYSTEM_FIXED_SIZE}, Shared: ${OCM_SHARED_FIXED_SIZE}, Version '${OCM_VERSION_FIXED_SIZE}', Branch '${${OCM_COMP}_BRANCH}')")
     endif()
 endforeach()
 if (OCM_DEVEL_ALL)

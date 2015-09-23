@@ -153,7 +153,7 @@ elseif(CMAKE_C_COMPILER_ID STREQUAL "XL" OR CMAKE_CXX_COMPILER_ID STREQUAL "XL")
 endif()
 
 # Thus far all compilers seem to use the -p flag for profiling
-if (OCM_WITH_PROFILING)
+if (OC_PROFILING)
     addFlagAll("-p" )
 endif()
 

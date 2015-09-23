@@ -14,6 +14,9 @@ set(OC_WARN_ALL YES) # Flag for DEBUG configuration builds only!
 set(OC_CHECK_ALL YES) # Flag for DEBUG configuration builds only!
 option(OC_MULTITHREADING "Use multithreading in OpenCMISS (where applicable)" NO)
 set(OC_COMPONENTS_SYSTEM DEFAULT)
+option(CMAKE_VERBOSE_MAKEFILE "Generate verbose makefiles/projects for builds" NO)
+set(OC_USE_ARCHITECTURE_PATH YES)
+set(GITHUB_USE_SSL NO)
 
 foreach(OCM_DEP ${OPENCMISS_COMPONENTS})
     set(_VALUE YES)
@@ -21,14 +24,14 @@ foreach(OCM_DEP ${OPENCMISS_COMPONENTS})
         set(_VALUE NO)
     endif()
     # Use everything but the components in OPENCMISS_COMPONENTS_DISABLED_BY_DEFAULT
-    set(OCM_USE_${OCM_DEP} ${_VALUE})
+    set(OC_USE_${OCM_DEP} ${_VALUE})
     
     # Look for some components on the system first before building
     set(_VALUE NO)
     if (${OCM_DEP} IN_LIST OPENCMISS_COMPONENTS_SYSTEM_BY_DEFAULT)
         set(_VALUE YES)
     endif()
-    set(OCM_SYSTEM_${OCM_DEP} ${_VALUE})
+    set(OC_SYSTEM_${OCM_DEP} ${_VALUE})
     # Initialize the default: static build for all components
     set(${OCM_DEP}_SHARED NO)
 endforeach()
@@ -100,7 +103,7 @@ set(EXAMPLES_VERSION 1.0)
 # appropriate consumed packages. No checks are performed on whether the consumed packages
 # will also be build by us or not, as they might be provided externally.
 #
-# To be safe: E.g. if you wanted to use MUMPS with SCOTCH, also set OCM_USE_SCOTCH=YES so that
+# To be safe: E.g. if you wanted to use MUMPS with SCOTCH, also set OC_USE_SCOTCH=YES so that
 # the build system ensures that SCOTCH will be available.
 # ==========================================================================================
 set(MUMPS_WITH_SCOTCH NO)
@@ -129,7 +132,7 @@ set(FIELDML-API_WITH_JAVA_BINDINGS NO)
 set(FIELDML-API_WITH_FORTRAN_BINDINGS YES)
 
 set(IRON_WITH_CELLML YES)
-set(IRON_WITH_FIELDML NO)
+set(IRON_WITH_FIELDML YES)
 set(IRON_WITH_HYPRE YES)
 set(IRON_WITH_SUNDIALS YES)
 set(IRON_WITH_MUMPS YES)
