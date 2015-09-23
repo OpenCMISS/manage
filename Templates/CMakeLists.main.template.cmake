@@ -89,7 +89,7 @@ endif()
 include(OCDetectFortranMangling)
 
 # Multithreading
-if(OCM_USE_MT)
+if(OC_MULTITHREADING)
     find_package(OpenMP REQUIRED)
 endif()
 

@@ -18,7 +18,7 @@ if (TOOLCHAIN)
         SET(CMAKE_Fortran_COMPILER ifort)
         
     elseif(TOOLCHAIN STREQUAL "ibm")
-        if (OCM_USE_MT)
+        if (OC_MULTITHREADING)
             SET(CMAKE_C_COMPILER xlc_r)
             SET(CMAKE_CXX_COMPILER xlC_r)
             # F77=xlf77_r

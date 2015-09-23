@@ -80,7 +80,7 @@ OpenCMISS Support variable dump file, ${NOW}
     exportVars("${OC_SUPPORT_DIR}/Variables.txt")
     
     set(_SUPPORT_DEPS )
-    if (OCM_CREATE_LOGS)
+    if (OC_CREATE_LOGS)
         # This is a dummy target, to which all single components add a "POST_BUILD" hook
         # to collect their respective log files. Using PRE_BUILD directly on "support"
         # does not work everywhere (only with Win/VS)

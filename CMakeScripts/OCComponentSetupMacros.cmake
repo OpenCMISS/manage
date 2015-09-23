@@ -40,7 +40,7 @@ function(addAndConfigureLocalComponent COMPONENT_NAME)
     # OpenMP multithreading
     if(COMPONENT_NAME IN_LIST OPENCMISS_COMPONENTS_WITH_OPENMP)
         list(APPEND COMPONENT_DEFS
-            -DWITH_OPENMP=${OCM_USE_MT}
+            -DWITH_OPENMP=${OC_MULTITHREADING}
         )
     endif()
     
@@ -177,7 +177,7 @@ function(createExternalProjects COMPONENT_NAME SOURCE_DIR BINARY_DIR DEFS)
     getExtProjDownloadUpdateCommands(${COMPONENT_NAME} ${SOURCE_DIR} DOWNLOAD_COMMANDS UPDATE_COMMANDS)
     
     # Log settings
-    if (OCM_CREATE_LOGS)
+    if (OC_CREATE_LOGS)
         set(_LOGFLAG 1)
     else()
         set(_LOGFLAG 0)
@@ -366,7 +366,7 @@ Configure definitions:
     endforeach()
     
     # Only create log-collecting commands if we create them 
-    if (OCM_CREATE_LOGS)
+    if (OC_CREATE_LOGS)
         # Using PRE_BUILD directly for target support does not work :-| See docs.
         # So we have an extra target in between. 
         add_custom_command(TARGET collect_logs POST_BUILD

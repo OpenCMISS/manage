@@ -13,7 +13,7 @@ set(OCM_CLEAN_REBUILDS_COMPONENTS YES)
 
 # The default for developers is to directly print the build output to the standard output/terminal.
 # This way developers directly see any errors instead of having to open log files.
-set(OCM_CREATE_LOGS NO)
+set(OC_CREATE_LOGS NO)
 
 ##############################################################################################
 ############################################### Maintainer setup

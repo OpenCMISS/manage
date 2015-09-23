@@ -51,7 +51,7 @@ function(getShortArchitecturePath VARNAME)
     # Profiling
     
     # Multithreading
-    if (OCM_USE_MT)
+    if (OC_MULTITHREADING)
         SET(ARCHPATH ${ARCHPATH}/mt)
     endif()
     

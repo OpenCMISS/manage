@@ -52,9 +52,9 @@ foreach(OCM_COMP ${OPENCMISS_COMPONENTS})
     endif()
     
     # All local enabled? Set to local search.
-    if (OCM_COMPONENTS_SYSTEM STREQUAL NONE)
+    if (OC_COMPONENTS_SYSTEM STREQUAL NONE)
         set(OCM_SYSTEM_${OCM_COMP} NO)
-    elseif(OCM_COMPONENTS_SYSTEM STREQUAL ALL)
+    elseif(OC_COMPONENTS_SYSTEM STREQUAL ALL)
         set(OCM_SYSTEM_${OCM_COMP} YES)
     endif()
     # Force "devel" branches for each component of DEVEL_ALL is set
