@@ -43,5 +43,5 @@ set(OC_MANDATORY_COMPONENTS FIELDML-API LIBXML2)
 set(OC_BUILD_SUPPORT_EMAIL "users@opencmiss.org")
 # This is an email address being displayed for issues regarding (remote) installations.
 # This needs to be set in either LocalConfig or Developer (better) in order to be useful.
-# If not set, a warning will be issued 
+# If not set, a warning will be issued!
 set(OC_INSTALL_SUPPORT_EMAIL FALSE)
