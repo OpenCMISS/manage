@@ -5,7 +5,7 @@
 set(OC_PROFILING NO)
 
 # Override any local variable and have CMake download/checkout the "devel" branch of any components repository
-#set(OCM_DEVEL_ALL YES)
+#set(OC_DEVEL_ALL YES)
 
 # If you issue "make clean" from the manage build folder, normally the external projects (i.e. dependencies) wont completely re-build.
 # Set this to true to have the build system remove the CMakeCache.txt of each dependency, which triggers a complete re-build. 

@@ -8,9 +8,9 @@ function(addAndConfigureLocalComponent COMPONENT_NAME)
     string(TOLOWER ${COMPONENT_NAME} FOLDER_NAME)
     
     # Keep track of self-build components (thus far only used for "update" target)
-    #list(APPEND _OCM_SELECTED_COMPONENTS ${COMPONENT_NAME})
+    #list(APPEND _OC_SELECTED_COMPONENTS ${COMPONENT_NAME})
     # Need this since it's a function
-    set(_OCM_SELECTED_COMPONENTS ${_OCM_SELECTED_COMPONENTS} ${COMPONENT_NAME} PARENT_SCOPE)
+    set(_OC_SELECTED_COMPONENTS ${_OC_SELECTED_COMPONENTS} ${COMPONENT_NAME} PARENT_SCOPE)
     
     ##############################################################
     # Compute directories
@@ -219,7 +219,7 @@ function(createExternalProjects COMPONENT_NAME SOURCE_DIR BINARY_DIR DEFS)
     ExternalProject_Add(${COMPONENT_NAME}
         DEPENDS ${${COMPONENT_NAME}_DEPS} CHECK_${COMPONENT_NAME}_SOURCES
         PREFIX ${BINARY_DIR}
-        LIST_SEPARATOR ${OCM_LIST_SEPARATOR}
+        LIST_SEPARATOR ${OC_LIST_SEPARATOR}
         TMP_DIR ${BINARY_DIR}/ep_tmp
         STAMP_DIR ${BINARY_DIR}/${_OC_EXTPROJ_STAMP_DIR}
         

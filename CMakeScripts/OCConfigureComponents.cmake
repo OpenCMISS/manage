@@ -519,7 +519,7 @@ if (OC_USE_ZINC)
         )
     endif()
     
-    string(REPLACE ";" ${OCM_LIST_SEPARATOR} CMAKE_MODULE_PATH_ESC "${CMAKE_MODULE_PATH}")
+    string(REPLACE ";" ${OC_LIST_SEPARATOR} CMAKE_MODULE_PATH_ESC "${CMAKE_MODULE_PATH}")
     set(SUBGROUP_PATH .)
     set(GITHUB_ORGANIZATION OpenCMISS)
     addAndConfigureLocalComponent(ZINC

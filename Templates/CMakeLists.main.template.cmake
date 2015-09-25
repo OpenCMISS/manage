@@ -173,7 +173,7 @@ include(OCCheckRemoteInstallation)
 include(OCCollectComponentDefinitions)
 
 # Those list variables will be filled by the build macros
-SET(_OCM_SELECTED_COMPONENTS )
+SET(_OC_SELECTED_COMPONENTS )
 
 ########################################################################
 # Support - get help!
@@ -204,14 +204,14 @@ include(OCFeatureTests)
 # reset: Blows away the current build and installation trees
 
 # Create a download target that depends on all other downloads
-set(_OCM_SOURCE_UPDATE_TARGETS )
-set(_OCM_COLLECT_LOG_TARGETS )
-foreach(_COMP ${_OCM_SELECTED_COMPONENTS})
-    list(APPEND _OCM_SOURCE_UPDATE_TARGETS ${_COMP}-update)
-    list(APPEND _OCM_COLLECT_LOG_TARGETS _${_COMP}-collectlogs)
+set(_OC_SOURCE_UPDATE_TARGETS )
+set(_OC_COLLECT_LOG_TARGETS )
+foreach(_COMP ${_OC_SELECTED_COMPONENTS})
+    list(APPEND _OC_SOURCE_UPDATE_TARGETS ${_COMP}-update)
+    list(APPEND _OC_COLLECT_LOG_TARGETS _${_COMP}-collectlogs)
 endforeach()
 add_custom_target(update
-    DEPENDS ${_OCM_SOURCE_UPDATE_TARGETS}
+    DEPENDS ${_OC_SOURCE_UPDATE_TARGETS}
 )
 add_custom_target(reset
     DEPENDS reset_mpionly reset_featuretests

@@ -29,52 +29,52 @@ unset(_LC_CDIR)
 unset(_CONFIG_FOUND)
 
 # Look for an OpenCMISS Developer script
-SET(OCM_DEVELOPER_CONFIG ${CMAKE_CURRENT_LIST_DIR}/../OpenCMISSDeveloper.cmake)
+SET(OC_DEVELOPER_CONFIG ${CMAKE_CURRENT_LIST_DIR}/../OpenCMISSDeveloper.cmake)
 set(OC_DEVELOPER NO)
-if (EXISTS ${OCM_DEVELOPER_CONFIG})
-    get_filename_component(OCM_DEVELOPER_CONFIG ${OCM_DEVELOPER_CONFIG} ABSOLUTE)
-    message(STATUS "Applying OpenCMISS developer configuration at ${OCM_DEVELOPER_CONFIG}...")
-    include(${OCM_DEVELOPER_CONFIG})
+if (EXISTS ${OC_DEVELOPER_CONFIG})
+    get_filename_component(OC_DEVELOPER_CONFIG ${OC_DEVELOPER_CONFIG} ABSOLUTE)
+    message(STATUS "Applying OpenCMISS developer configuration at ${OC_DEVELOPER_CONFIG}...")
+    include(${OC_DEVELOPER_CONFIG})
     set(OC_DEVELOPER YES)
-    unset(OCM_DEVELOPER_CONFIG)
+    unset(OC_DEVELOPER_CONFIG)
 endif()
 
 # Postprocessing
-foreach(OCM_COMP ${OPENCMISS_COMPONENTS})
+foreach(COMPONENT ${OPENCMISS_COMPONENTS})
     # Set default version number branch unless e.g. IRON_BRANCH is specified
-    if(NOT ${OCM_COMP}_BRANCH)
-        set(${OCM_COMP}_BRANCH "v${${OCM_COMP}_VERSION}")
+    if(NOT ${COMPONENT}_BRANCH)
+        set(${COMPONENT}_BRANCH "v${${COMPONENT}_VERSION}")
     endif()
     
     # Force mandatory ones to be switched on
-    if (${OCM_COMP} IN_LIST OC_MANDATORY_COMPONENTS)
-        set(OC_USE_${OCM_COMP} REQ)
+    if (${COMPONENT} IN_LIST OC_MANDATORY_COMPONENTS)
+        set(OC_USE_${COMPONENT} REQ)
     endif()
     
     # All local enabled? Set to local search.
     if (OC_COMPONENTS_SYSTEM STREQUAL NONE)
-        set(OC_SYSTEM_${OCM_COMP} NO)
+        set(OC_SYSTEM_${COMPONENT} NO)
     elseif(OC_COMPONENTS_SYSTEM STREQUAL ALL)
-        set(OC_SYSTEM_${OCM_COMP} YES)
+        set(OC_SYSTEM_${COMPONENT} YES)
     endif()
     # Force "devel" branches for each component of DEVEL_ALL is set
-    if (OCM_DEVEL_ALL)
-        SET(${OCM_COMP}_BRANCH devel)
+    if (OC_DEVEL_ALL)
+        SET(${COMPONENT}_BRANCH devel)
     endif()
     # Set all individual components build types to shared if the global BUILD_SHARED_LIBS is set
     if (BUILD_SHARED_LIBS)
-        set(${OCM_COMP}_SHARED ON)
+        set(${COMPONENT}_SHARED ON)
     endif()
-    if (NOT OCM_COMP STREQUAL MPI) # Dont show that for MPI - have different implementations
-    	string(SUBSTRING "${OCM_COMP}                  " 0 12 OCM_COMP_FIXED_SIZE)
-    	string(SUBSTRING "${OC_USE_${OCM_COMP}}       " 0 3 OC_USE_FIXED_SIZE)
-    	string(SUBSTRING "${OC_SYSTEM_${OCM_COMP}}    " 0 3 OC_SYSTEM_FIXED_SIZE)
-    	string(SUBSTRING "${${OCM_COMP}_VERSION}       " 0 7 OCM_VERSION_FIXED_SIZE)
-    	string(SUBSTRING "${${OCM_COMP}_SHARED}        " 0 3 OCM_SHARED_FIXED_SIZE)
-    	# ${OCM_COMP}_BRANCH is as good as version (this is what is effectively checked out) and will also display "devel" correctly
-        message(STATUS "OpenCMISS component ${OCM_COMP_FIXED_SIZE}: Use ${OC_USE_FIXED_SIZE}, System search ${OC_SYSTEM_FIXED_SIZE}, Shared: ${OCM_SHARED_FIXED_SIZE}, Version '${OCM_VERSION_FIXED_SIZE}', Branch '${${OCM_COMP}_BRANCH}')")
+    if (NOT COMPONENT STREQUAL MPI) # Dont show that for MPI - have different implementations
+    	string(SUBSTRING "${COMPONENT}                  " 0 12 COMPONENT_FIXED_SIZE)
+    	string(SUBSTRING "${OC_USE_${COMPONENT}}       " 0 3 OC_USE_FIXED_SIZE)
+    	string(SUBSTRING "${OC_SYSTEM_${COMPONENT}}    " 0 3 OC_SYSTEM_FIXED_SIZE)
+    	string(SUBSTRING "${${COMPONENT}_VERSION}       " 0 7 OC_VERSION_FIXED_SIZE)
+    	string(SUBSTRING "${${COMPONENT}_SHARED}        " 0 3 OC_SHARED_FIXED_SIZE)
+    	# ${COMPONENT}_BRANCH is as good as version (this is what is effectively checked out) and will also display "devel" correctly
+        message(STATUS "OpenCMISS component ${COMPONENT_FIXED_SIZE}: Use ${OC_USE_FIXED_SIZE}, System search ${OC_SYSTEM_FIXED_SIZE}, Shared: ${OC_SHARED_FIXED_SIZE}, Version '${OC_VERSION_FIXED_SIZE}', Branch '${${COMPONENT}_BRANCH}')")
     endif()
 endforeach()
-if (OCM_DEVEL_ALL)
+if (OC_DEVEL_ALL)
     set(EXAMPLES_BRANCH devel)
 endif()

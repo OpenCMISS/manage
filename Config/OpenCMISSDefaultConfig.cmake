@@ -18,22 +18,22 @@ option(CMAKE_VERBOSE_MAKEFILE "Generate verbose makefiles/projects for builds" N
 set(OC_USE_ARCHITECTURE_PATH YES)
 set(GITHUB_USE_SSL NO)
 
-foreach(OCM_DEP ${OPENCMISS_COMPONENTS})
+foreach(COMPONENT ${OPENCMISS_COMPONENTS})
     set(_VALUE YES)
-    if (${OCM_DEP} IN_LIST OPENCMISS_COMPONENTS_DISABLED_BY_DEFAULT)
+    if (${COMPONENT} IN_LIST OPENCMISS_COMPONENTS_DISABLED_BY_DEFAULT)
         set(_VALUE NO)
     endif()
     # Use everything but the components in OPENCMISS_COMPONENTS_DISABLED_BY_DEFAULT
-    set(OC_USE_${OCM_DEP} ${_VALUE})
+    set(OC_USE_${COMPONENT} ${_VALUE})
     
     # Look for some components on the system first before building
     set(_VALUE NO)
-    if (${OCM_DEP} IN_LIST OPENCMISS_COMPONENTS_SYSTEM_BY_DEFAULT)
+    if (${COMPONENT} IN_LIST OPENCMISS_COMPONENTS_SYSTEM_BY_DEFAULT)
         set(_VALUE YES)
     endif()
-    set(OC_SYSTEM_${OCM_DEP} ${_VALUE})
+    set(OC_SYSTEM_${COMPONENT} ${_VALUE})
     # Initialize the default: static build for all components
-    set(${OCM_DEP}_SHARED NO)
+    set(${COMPONENT}_SHARED NO)
 endforeach()
 
 # Main version
