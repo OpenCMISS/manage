@@ -9,7 +9,7 @@ message(STATUS "Checking CMake version..")
 set(CMAKE_COMPATIBLE YES)
 
 # check if system cmake has ssl support
-SET(CMAKE_HTTPS_TEST_URL "https://github.com/OpenCMISS-Utilities/gtest/blob/master/README.md")
+SET(CMAKE_HTTPS_TEST_URL "https://raw.githubusercontent.com/OpenCMISS/manage/v1.0/README.rst")
 SET(CMAKE_HTTPS_TEST_DOWNLOAD_PATH "${OPENCMISS_ROOT}/build/cmake_https_test_download.txt")
 file(DOWNLOAD ${CMAKE_HTTPS_TEST_URL} ${CMAKE_HTTPS_TEST_DOWNLOAD_PATH} STATUS https_status TIMEOUT 60 INACTIVITY_TIMEOUT 60)
 list(GET https_status 0 HTTPS_TEST_DOWNLOAD_ERROR_CODE)
