@@ -19,7 +19,8 @@ function(getArchitecturePath VARNAME VARNAME_MPI)
     else()
         # Add the build type of MPI to the architecture path - we obtain different libraries
         # for different mpi build types
-        SET(MPI_PART ${MPI}_${MPI_BUILD_TYPE})
+        string(TOLOWER "${MPI_BUILD_TYPE}" _MPI_BUILD_TYPE)
+        SET(MPI_PART ${MPI}_${_MPI_BUILD_TYPE})
     endif()
     SET(ARCHPATH ${ARCHPATH}/${MPI_PART})
     
