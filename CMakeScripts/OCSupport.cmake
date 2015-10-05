@@ -47,8 +47,8 @@ else()
 
     # The export vars script will also collect these variables!
     if (GIT_FOUND)
-        getGitRevision(OPENCMISS_MANAGE_GIT_REVISON)
-        getGitBranch(OPENCMISS_MANAGE_GIT_BRANCH)
+        git_get_revision(OPENCMISS_MANAGE_GIT_REVISON)
+        git_get_branch(OPENCMISS_MANAGE_GIT_BRANCH)
     endif()
 
     function(exportVars FILE)
