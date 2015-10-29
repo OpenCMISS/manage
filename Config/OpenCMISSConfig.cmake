@@ -64,7 +64,7 @@ foreach(COMPONENT ${OPENCMISS_COMPONENTS})
     # Set all individual components build types to shared if the global BUILD_SHARED_LIBS is set
     if (BUILD_SHARED_LIBS)
         set(${COMPONENT}_SHARED ON)
-    endif()
+    endif()    
     if (NOT COMPONENT STREQUAL MPI) # Dont show that for MPI - have different implementations
     	string(SUBSTRING "${COMPONENT}                  " 0 12 COMPONENT_FIXED_SIZE)
     	string(SUBSTRING "${OC_USE_${COMPONENT}}       " 0 3 OC_USE_FIXED_SIZE)
