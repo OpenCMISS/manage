@@ -42,7 +42,7 @@ set(GITHUB_ORGANIZATION OpenCMISS-Dependencies)
 
 
 # zLIB
-if(OC_USE_ZLIB OR OC_USE_ZINC)
+if(OC_USE_ZLIB OR OC_USE_ZINC OR OC_DEPENDENCIES_ONLY)
     find_package(ZLIB ${ZLIB_VERSION} QUIET)
     if(NOT ZLIB_FOUND)
         SET(ZLIB_FWD_DEPS 
@@ -77,7 +77,7 @@ if (OC_USE_BLAS OR OC_USE_LAPACK)
 endif()
 
 # bzip2
-if(OC_USE_BZIP2 OR OC_USE_ZINC)
+if(OC_USE_BZIP2 OR OC_USE_ZINC OR OC_DEPENDENCIES_ONLY)
     find_package(BZIP2 ${BZIP2_VERSION} QUIET)
     if(NOT BZIP2_FOUND)
         SET(BZIP2_FWD_DEPS SCOTCH PTSCOTCH GDCM IMAGEMAGICK)
@@ -128,7 +128,7 @@ endif()
 # ================================================================
 # Iron
 # ================================================================
-if (OC_USE_IRON)
+if (OC_USE_IRON OR OC_DEPENDENCIES_ONLY)
     
     # Scotch 6.0
     if (OC_USE_PTSCOTCH)
@@ -366,32 +366,33 @@ if (OC_USE_IRON)
         endif()
     endif()
 
-
-    set(SUBGROUP_PATH .)
-    set(GITHUB_ORGANIZATION OpenCMISS)
-    addAndConfigureLocalComponent(IRON
-        WITH_CELLML=${IRON_WITH_CELLML}
-        CELLML_VERSION=${CELLML_VERSION}
-        LIBCELLML_VERSION=${LIBCELLML_VERSION}
-        WITH_FIELDML=${IRON_WITH_FIELDML}
-        FIELDML-API_VERSION=${FIELDML-API_VERSION} 
-        WITH_HYPRE=${IRON_WITH_HYPRE}
-        HYPRE_VERSION=${HYPRE_VERSION}
-        WITH_SUNDIALS=${IRON_WITH_SUNDIALS}
-        SUNDIALS_VERSION=${SUNDIALS_VERSION}
-        WITH_MUMPS=${IRON_WITH_MUMPS}
-        MUMPS_VERSION=${MUMPS_VERSION}
-        WITH_SCALAPACK=${IRON_WITH_SCALAPACK}
-        SCALAPACK_VERSION=${SCALAPACK_VERSION}
-        WITH_PETSC=${IRON_WITH_PETSC}
-        PETSC_VERSION=${PETSC_VERSION}
-        WITH_PROFILING=${OC_PROFILING}
-        WITH_C_BINDINGS=${IRON_WITH_C_BINDINGS}
-        WITH_Python_BINDINGS=${IRON_WITH_Python_BINDINGS}
-    )
+    if(NOT OC_DEPENDENCIES_ONLY)
+        set(SUBGROUP_PATH .)
+        set(GITHUB_ORGANIZATION OpenCMISS)
+        addAndConfigureLocalComponent(IRON
+            WITH_CELLML=${IRON_WITH_CELLML}
+            CELLML_VERSION=${CELLML_VERSION}
+            LIBCELLML_VERSION=${LIBCELLML_VERSION}
+            WITH_FIELDML=${IRON_WITH_FIELDML}
+            FIELDML-API_VERSION=${FIELDML-API_VERSION} 
+            WITH_HYPRE=${IRON_WITH_HYPRE}
+            HYPRE_VERSION=${HYPRE_VERSION}
+            WITH_SUNDIALS=${IRON_WITH_SUNDIALS}
+            SUNDIALS_VERSION=${SUNDIALS_VERSION}
+            WITH_MUMPS=${IRON_WITH_MUMPS}
+            MUMPS_VERSION=${MUMPS_VERSION}
+            WITH_SCALAPACK=${IRON_WITH_SCALAPACK}
+            SCALAPACK_VERSION=${SCALAPACK_VERSION}
+            WITH_PETSC=${IRON_WITH_PETSC}
+            PETSC_VERSION=${PETSC_VERSION}
+            WITH_PROFILING=${OC_PROFILING}
+            WITH_C_BINDINGS=${IRON_WITH_C_BINDINGS}
+            WITH_Python_BINDINGS=${IRON_WITH_Python_BINDINGS}
+        )
+    endif()
 endif()
 
-if (OC_USE_ZINC)
+if (OC_USE_ZINC OR OC_DEPENDENCIES_ONLY)
     set(SUBGROUP_PATH dependencies)
     set(GITHUB_ORGANIZATION OpenCMISS-Dependencies)
     
@@ -519,13 +520,15 @@ if (OC_USE_ZINC)
         )
     endif()
     
-    string(REPLACE ";" ${OC_LIST_SEPARATOR} CMAKE_MODULE_PATH_ESC "${CMAKE_MODULE_PATH}")
-    set(SUBGROUP_PATH .)
-    set(GITHUB_ORGANIZATION OpenCMISS)
-    addAndConfigureLocalComponent(ZINC
-        ZINC_MODULE_PATH=${CMAKE_MODULE_PATH_ESC}
-        ZINC_DEPENDENCIES_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX}
-    )
+    if(NOT OC_DEPENDENCIES_ONLY)
+        string(REPLACE ";" ${OC_LIST_SEPARATOR} CMAKE_MODULE_PATH_ESC "${CMAKE_MODULE_PATH}")
+        set(SUBGROUP_PATH .)
+        set(GITHUB_ORGANIZATION OpenCMISS)
+        addAndConfigureLocalComponent(ZINC
+            ZINC_MODULE_PATH=${CMAKE_MODULE_PATH_ESC}
+            ZINC_DEPENDENCIES_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX}
+        )
+    endif()
 endif()
 
 # Notes:
@@ -534,13 +537,9 @@ endif()
 # plapack: some tests are not compiling
 # parmetis/metis: test programs not available (but for gklib, and they are also rudimental), linking executables instead to have a 50% "its working" test
 # mumps - not setup for libseq / sequential version
-# mumps - only have double precision arithmetics
-# mumps - no PORD is compiled (will have parmetis/scotch available)
-# mumps - hardcoded Add_ compiler flag for c/fortran interfacing.. dunno if that is the best idea
 # metis: have fixed IDXTYPEWIDTH 32
 # cholmod: could go with CUDA BLAS version (indicated by makefile)
 # umfpack: building only "int" version right now (Suitesparse_long impl for AMD,CAMD etc but not umfpack)
-
 
 # TODO
 # cholmod - use CUDA stuff

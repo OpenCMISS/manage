@@ -110,6 +110,9 @@
 #set(IRON_SHARED NO)
 #set(ZINC_SHARED NO)
 
+# If you want to compile the dependencies for iron/zinc only, enable this setting. 
+#set(OC_DEPENDENCIES_ONLY YES)
+
 # Global setting to control use of system components. Possible values: [DEFAULT]|NONE|ALL
 # DEFAULT: Holds only for the components specified in OPENCMISS_COMPONENTS_SYSTEM_BY_DEFAULT (Config/Variables.cmake)
 # NONE: The OpenCMISS build system exclusively builds components from its own repositories
