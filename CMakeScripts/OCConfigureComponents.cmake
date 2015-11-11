@@ -18,10 +18,13 @@
 
 # gTest
 if (OC_USE_GTEST AND BUILD_TESTS)
-    SET(GTEST_FWD_DEPS LLVM CSIM)
-    set(SUBGROUP_PATH utilities)
-    set(GITHUB_ORGANIZATION OpenCMISS-Utilities)
-    addAndConfigureLocalComponent(GTEST)
+    find_package(GTEST ${GTEST_VERSION} QUIET)
+    if(NOT GTEST_FOUND)
+        set(GTEST_FWD_DEPS LLVM CSIM)
+        set(SUBGROUP_PATH utilities)
+        set(GITHUB_ORGANIZATION OpenCMISS-Utilities)
+        addAndConfigureLocalComponent(GTEST)
+    endif()
 endif()
 
 # ================================================================
@@ -355,14 +358,16 @@ if (OC_USE_IRON OR OC_DEPENDENCIES_ONLY)
         find_package(LLVM ${LLVM_VERSION} QUIET)
         if (NOT LLVM_FOUND)
             SET(LLVM_FWD_DEPS CSIM)
-            addAndConfigureLocalComponent(LLVM)
+            addAndConfigureLocalComponent(LLVM
+                GTEST_VERSION=${GTEST_VERSION})
         endif()
     endif()
     if (OC_USE_CSIM)
         find_package(CSIM ${CSIM_VERSION} QUIET)
         if (NOT CSIM_FOUND)
             SET(CSIM_FWD_DEPS IRON)
-            addAndConfigureLocalComponent(CSIM)
+            addAndConfigureLocalComponent(CSIM
+                GTEST_VERSION=${GTEST_VERSION})
         endif()
     endif()
 
