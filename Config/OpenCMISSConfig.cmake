@@ -39,7 +39,14 @@ if (EXISTS ${OC_DEVELOPER_CONFIG})
     unset(OC_DEVELOPER_CONFIG)
 endif()
 
+######################################################################
 # Postprocessing
+
+# Disable iron/zinc if only dependencies should be built
+if (OC_DEPENDENCIES_ONLY)
+    set(OC_USE_IRON NO)
+    set(OC_USE_ZINC NO)
+endif()
 foreach(COMPONENT ${OPENCMISS_COMPONENTS})
     # Set default version number branch unless e.g. IRON_BRANCH is specified
     if(NOT ${COMPONENT}_BRANCH)

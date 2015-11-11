@@ -146,7 +146,6 @@ configure_file(
 
 # This makes sure the configure step for the current main project is run at the beginning;
 # later the build call to the main project will detect for itself if new builds are necessary.
-#add_custom_command(OUTPUT ${MAIN_BINARY_DIR}/OpenCMISSLocalConfig.cmake
 add_custom_command(OUTPUT "${MAIN_BINARY_DIR}/configure_stamp"
     COMMAND ${CMAKE_COMMAND} -G "${CMAKE_GENERATOR}" .
     COMMAND ${CMAKE_COMMAND} -E touch "${MAIN_BINARY_DIR}/configure_stamp"
