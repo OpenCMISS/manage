@@ -788,6 +788,85 @@ function(is_file_executable file result_var)
   endif()
 endfunction()
 
+function(unset_mpi lang)
+    set(MPI_${lang}_INCLUDE_PATH "MPI_${lang}_INCLUDE_PATH-NOTFOUND" CACHE PATH "Cleared" FORCE)
+    set(MPI_${lang}_LIBRARIES "MPI_${lang}_LIBRARIES-NOTFOUND" CACHE STRING "Cleared" FORCE)
+    set(MPI_${lang}_COMPILER "MPI_${lang}_COMPILER-NOTFOUND" CACHE FILEPATH "Cleared" FORCE)
+    unset(MPIEXEC CACHE)
+    unset(MPI_${lang}_FOUND CACHE)
+endfunction()
+
+function(verify_mpi_type lang)
+    foreach(IDX RANGE 5)
+        list(GET _MNEMONICS ${IDX} MNEMONIC)
+        list(GET _PATTERNS ${IDX} PATTERN)
+        # Case insensitive match not possible with cmake regex :-(
+        string(TOLOWER "${MPI_${lang}_INCLUDE_PATH}" INC_PATH)
+        string(TOLOWER "${MPI_${lang}_LIBRARIES}" LIB_PATH)
+        messagev("Checking '${INC_PATH} MATCHES ${PATTERN} OR ${LIB_PATH} MATCHES ${PATTERN}'")
+        if (INC_PATH MATCHES ${PATTERN} OR LIB_PATH MATCHES ${PATTERN})
+            # Pattern matches and we dont have a desired MPI type - detect! 
+            if (NOT DEFINED MPI)
+                messagev("Detected MPI-${lang} implementation: ${MNEMONIC}")
+                list(APPEND _MPI_DETECTED_MNEMONICS ${MNEMONIC})
+                break()
+            endif()
+        else()
+            # Pattern does not match but we have a matching desired MPI type - set to not found!
+            if (MPI STREQUAL ${MNEMONIC})
+                messagev("The found MPI_${lang} compiler '${MPI_${lang}_COMPILER}' does not match the requested MPI implementation '${MNEMONIC}'.")
+#             messagev("Check your include paths (suffixes '${_BIN_SUFFIX}' each):
+#1. CMAKE_PREFIX_PATH ${CMAKE_PREFIX_PATH}
+#2. Build system guess ${_MPI_PREFIX_PATH}
+#3. CMAKE_SYSTEM_PREFIX_PATH ${CMAKE_SYSTEM_PREFIX_PATH}
+#Alternatively, specify MPI_HOME or set a full path to MPI_${lang}_COMPILER")
+                set(MPI_${lang}_FOUND FALSE PARENT_SCOPE)
+                break()
+            endif()
+        endif()
+    endforeach()
+    # Pass results back
+    set(_MPI_DETECTED_MNEMONICS "${_MPI_DETECTED_MNEMONICS}" PARENT_SCOPE)
+endfunction()
+
+function(verify_mpi_toolchain_compatibility lang)
+    if (MPI_${lang}_COMPILER AND NOT MPI_${lang}_VERIFIED)
+        message(STATUS "Checking MPI ${lang} compiler compatibility: ${MPI_${lang}_COMPILER}")
+        set(base ${CMAKE_CURRENT_BINARY_DIR}/mpi_verification/${lang})
+        file(REMOVE_RECURSE ${base})
+        file(MAKE_DIRECTORY ${base}) 
+        file(WRITE "${base}/CMakeLists.txt" "
+            cmake_minimum_required(VERSION 3.0)
+            project(verify_mpi_compat VERSION 1.0 LANGUAGES ${lang})
+            file(WRITE compiler_info.cmake \"
+                set(MPI_${lang}_COMPILER_VERSION \${CMAKE_${lang}_COMPILER_VERSION})
+                set(MPI_${lang}_COMPILER_ID \${CMAKE_${lang}_COMPILER_ID})
+                \")
+        ")
+        execute_process(COMMAND ${CMAKE_COMMAND} 
+                "-DCMAKE_${lang}_COMPILER=${MPI_${lang}_COMPILER}" .
+            OUTPUT_VARIABLE _OUT 
+            ERROR_VARIABLE _ERR
+            RESULT_VARIABLE _RES
+            WORKING_DIRECTORY ${base})
+        if (_RES)
+            message(FATAL_ERROR "MPI verification script failed:\n${ERROR_VARIABLE}\n\n Please contact the program distributor.")
+        endif()
+        include(${base}/compiler_info.cmake)
+        messagev("CMAKE_${lang}_COMPILER_ID=${CMAKE_${lang}_COMPILER_ID}, CMAKE_${lang}_COMPILER_VERSION=${CMAKE_${lang}_COMPILER_VERSION}")
+        messagev("MPI_${lang}_COMPILER_ID=${MPI_${lang}_COMPILER_ID}, MPI_${lang}_COMPILER_VERSION=${MPI_${lang}_COMPILER_VERSION}")
+        if (NOT CMAKE_${lang}_COMPILER_ID STREQUAL MPI_${lang}_COMPILER_ID)
+            message(WARNING "Toolchain (=${CMAKE_${lang}_COMPILER_ID}) and MPI (=${MPI_${lang}_COMPILER_ID}) compiler IDs mismatch for language ${lang}.")
+            set(MPI_${lang}_FOUND FALSE PARENT_SCOPE)
+        endif()
+        if (NOT CMAKE_${lang}_COMPILER_VERSION STREQUAL MPI_${lang}_COMPILER_VERSION)
+            message(WARNING "Toolchain (=${CMAKE_${lang}_COMPILER_VERSION}) and MPI (=${MPI_${lang}_COMPILER_VERSION}) compiler versions mismatch for language ${lang}.")
+            set(MPI_${lang}_FOUND FALSE PARENT_SCOPE)
+        endif()
+        set(MPI_${lang}_VERIFIED TRUE CACHE BOOL "Compatibility of MPI with toolchain is verified")
+    endif()
+endfunction()
+
 ############################################################
 # Interrogation part - commence real work here.
 ############################################################
@@ -889,38 +968,11 @@ foreach (lang C CXX Fortran)
     # set the MPI mnemonic to the detected one
     if(MPI_${lang}_FOUND)
         messagev("Found MPI-${lang}!")
-        foreach(IDX RANGE 5)
-            list(GET _MNEMONICS ${IDX} MNEMONIC)
-            list(GET _PATTERNS ${IDX} PATTERN)
-            # Case insensitive match not possible with cmake regex :-(
-            string(TOLOWER "${MPI_${lang}_INCLUDE_PATH}" INC_PATH)
-            string(TOLOWER "${MPI_${lang}_LIBRARIES}" LIB_PATH)
-            messagev("Checking '${INC_PATH} MATCHES ${PATTERN} OR ${LIB_PATH} MATCHES ${PATTERN}'")
-            if (INC_PATH MATCHES ${PATTERN} OR LIB_PATH MATCHES ${PATTERN})
-                # Pattern matches and we dont have a desired MPI type - detect! 
-                if (NOT DEFINED MPI)
-                    messagev("Detected MPI-${lang} implementation: ${MNEMONIC}")
-                    list(APPEND _MPI_DETECTED_MNEMONICS ${MNEMONIC})
-                    break()
-                endif()
-            else()
-                # Pattern does not match but we have a matching desired MPI type - set to not found!
-                if (MPI STREQUAL ${MNEMONIC})
-                    messagev("The found MPI_${lang} compiler '${MPI_${lang}_COMPILER}' does not match the requested MPI implementation '${MNEMONIC}'.")
-    #             messagev("Check your include paths (suffixes '${_BIN_SUFFIX}' each):
-    #1. CMAKE_PREFIX_PATH ${CMAKE_PREFIX_PATH}
-    #2. Build system guess ${_MPI_PREFIX_PATH}
-    #3. CMAKE_SYSTEM_PREFIX_PATH ${CMAKE_SYSTEM_PREFIX_PATH}
-    #Alternatively, specify MPI_HOME or set a full path to MPI_${lang}_COMPILER")
-                    set(MPI_${lang}_INCLUDE_PATH "MPI_${lang}_INCLUDE_PATH-NOTFOUND" CACHE PATH "Cleared" FORCE)
-                    set(MPI_${lang}_LIBRARIES "MPI_${lang}_LIBRARIES-NOTFOUND" CACHE STRING "Cleared" FORCE)
-                    set(MPI_${lang}_COMPILER "MPI_${lang}_COMPILER-NOTFOUND" CACHE FILEPATH "Cleared" FORCE)
-                    unset(MPIEXEC CACHE)
-                    set(MPI_${lang}_FOUND FALSE)
-                    break()
-                endif()
-            endif()
-        endforeach()
+        verify_mpi_type(${lang})
+    endif()
+    
+    if(MPI_${lang}_FOUND AND NOT MPI_VERIFIED)
+        verify_mpi_toolchain_compatibility(${lang})
     endif()
     
     if (MPI_${lang}_FOUND)
@@ -951,7 +1003,8 @@ foreach (lang C CXX Fortran)
                 \tend program test_mpi_module"
                 MPI_Fortran_MODULE_COMPATIBLE)
         endif()
-        
+    else()
+        unset_mpi(${lang})
     endif()
 
     if (regular_compiler_worked)

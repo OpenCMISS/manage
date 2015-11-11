@@ -28,6 +28,14 @@ function(addAndConfigureLocalComponent COMPONENT_NAME)
     set(COMPONENT_BUILD_DIR ${BUILD_DIR_BASE}/${SUBGROUP_PATH}/${FOLDER_NAME}/${BUILDTYPEEXTRA})
     
     ##############################################################
+    # Verifications
+    if(COMPONENT_NAME IN_LIST OPENCMISS_COMPONENTS_WITH_F90 AND NOT CMAKE_Fortran_COMPILER_SUPPORTS_F90)
+        message(FATAL_ERROR "Your Fortran compiler ${CMAKE_Fortran_COMPILER} does not support the Fortran 90 standard,
+            which is required to build the OpenCMISS component ${COMPONENT}")
+    endif()
+    
+    
+    ##############################################################
     # Collect component definitions
     SET(COMPONENT_DEFS
         ${COMPONENT_COMMON_DEFS} 
