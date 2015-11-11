@@ -186,7 +186,9 @@ include(OCSupport)
 include(OCConfigureComponents)
 
 # Examples
-include(OCAddExamplesProject)
+if (NOT OC_DEPENDENCIES_ONLY)
+    include(OCAddExamplesProject)
+endif()
 
 ########################################################################
 # Installation and support
