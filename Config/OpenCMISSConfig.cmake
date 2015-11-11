@@ -38,6 +38,17 @@ if (EXISTS ${OC_DEVELOPER_CONFIG})
     set(OC_DEVELOPER YES)
     unset(OC_DEVELOPER_CONFIG)
 endif()
+# Half hack: The CMAKE_BUILD_TYPE variable is not initialized in the cache if it's "only" set
+# as a variable via cmake script. Consequently, issuing a project() command looks in the cache
+# and finds an uninitialized CMAKE_BUILD_TYPE and uses that, ignoring any set value in LocalConfig/DevelConfig.
+# As the DIRECT_VARS setting also inserts lines into the localconfig file, the build parameterization also
+# wont work.
+# A possible "workaround" would be to pass those variables via command line, which would add them to the cache and done.
+# However, as all the other variables are defined in the localconfig file, it would seem (especially with the build type)
+# unintuitive to have to define the build type differently. Hence, this solution simply sets the assigned value of 
+# CMAKE_BUILD_TYPE also in the cache.
+# If there appear other variables that require the same behaviour, one should consider alternative solutions to this.
+set(CMAKE_BUILD_TYPE ${CMAKE_BUILD_TYPE} CACHE STRING "The build type for OpenCMISS" FORCE)
 
 ######################################################################
 # Postprocessing
