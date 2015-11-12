@@ -64,13 +64,12 @@ list(APPEND CMAKE_MODULE_PATH
 )
 
 # No point in building ZINC if there's no OpenGL around
-if (OC_USE_ZINC)
-    find_package(OpenGL QUIET)
-    if (NOT OPENGL_FOUND)
-        set(OC_USE_ZINC NO)
-        message(WARNING "OpenCMISS: No OpenGL found, cannot build Zinc. Disabling.")
-    endif()
+find_package(OpenGL QUIET)
+if (NOT OPENGL_FOUND AND OC_USE_ZINC)
+    set(OC_USE_ZINC NO)
+    message(WARNING "OpenCMISS: No OpenGL found, cannot build Zinc. Disabling.")
 endif()
+
 # Pre-check for Python availability so that bindings will be built automatically (unless explicitly specified)
 # The FOUND flag is used (at least) at OCConfigureComponents/IRON
 find_package(PythonInterp ${PYTHON_VERSION} QUIET)
