@@ -1,5 +1,5 @@
 set(OC_SUPPORT_DIR ${CMAKE_CURRENT_BINARY_DIR}/support)
-string(TIMESTAMP NOW)
+string(TIMESTAMP NOW "%Y-%m-%d, %H:%M")
 file(WRITE "${OC_SUPPORT_DIR}/build.log" "Starting configuration in ${CMAKE_CURRENT_BINARY_DIR} at ${NOW}\r\n")
 
 set(OPENCMISS_CMAKE_MIN_VERSION @OPENCMISS_CMAKE_MIN_VERSION@)
@@ -233,7 +233,7 @@ add_custom_target(reset_mpionly
         ->${OPENCMISS_COMPONENTS_BINARY_DIR_MPI}"
 )
 
-string(TIMESTAMP NOW)
+string(TIMESTAMP NOW "%Y-%m-%d, %H:%M")
 file(APPEND "${OC_SUPPORT_DIR}/build.log" "Finished configuration in ${CMAKE_CURRENT_BINARY_DIR} at ${NOW}
 -------------------------------------------
 ")

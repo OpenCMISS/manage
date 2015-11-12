@@ -152,14 +152,19 @@ add_custom_command(OUTPUT "${MAIN_BINARY_DIR}/configure_stamp"
     WORKING_DIRECTORY "${MAIN_BINARY_DIR}"
     COMMENT "Initializing OpenCMISS configuration ${BUILD_IDENT}"
 )
-# This creates the main target 
+# This is the main target
+# The invocation of an extra script allows to catch build errors and display a custom
+# message and automatically create the support target! 
 add_custom_target(${BUILD_IDENT} ALL
     DEPENDS "${MAIN_BINARY_DIR}/configure_stamp"
-    # Invoke main build
     COMMAND ${CMAKE_COMMAND} --build "${MAIN_BINARY_DIR}" --target install
-    # Invoke feature tests
     COMMAND ${CMAKE_COMMAND} --build "${MAIN_BINARY_DIR}" --target featuretests
     COMMENT "Building OpenCMISS configuration ${BUILD_IDENT}"
+    # Currently implemented but disabled by default
+    #COMMAND ${CMAKE_COMMAND} 
+    #    -DMAIN_BINARY_DIR="${MAIN_BINARY_DIR}"
+    #    -DBUILD_IDENT="${BUILD_IDENT}"
+    #    -P ${OPENCMISS_MANAGE_DIR}/CMakeScripts/ScriptTryCatchBuild.cmake
 )
 
 # Convenience/Maintenance targets
@@ -254,6 +259,7 @@ if (DEFINED EVIL)
     message(STATUS "* Change ${CMAKE_CURRENT_SOURCE_DIR}/OpenCMISSDeveloper.cmake according to your developing setup/needs (Overrides anything in OpenCMISSLocalConfig!)")        
 endif()
 message(STATUS "* Run your native build command (e.g. '${CMAKE_MAKE_PROGRAM}') to start the build process")
+message(STATUS "* IF YOU ENCOUNTER BUILD ERRORS, TYPE '${CMAKE_MAKE_PROGRAM} support' TO GET HELP!")
 message(STATUS "* Refer to ${OPENCMISS_MANAGE_DIR}/OpenCMISSBuildEnvironment.docx.pdf for customization instructions")
 message(STATUS "*")
 message(STATUS "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@")
