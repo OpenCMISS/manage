@@ -8,9 +8,9 @@ function(addAndConfigureLocalComponent COMPONENT_NAME)
     string(TOLOWER ${COMPONENT_NAME} FOLDER_NAME)
     
     # Keep track of self-build components (thus far only used for "update" target)
-    #list(APPEND _OCM_SELECTED_COMPONENTS ${COMPONENT_NAME})
+    #list(APPEND _OC_SELECTED_COMPONENTS ${COMPONENT_NAME})
     # Need this since it's a function
-    set(_OCM_SELECTED_COMPONENTS ${_OCM_SELECTED_COMPONENTS} ${COMPONENT_NAME} PARENT_SCOPE)
+    set(_OC_SELECTED_COMPONENTS ${_OC_SELECTED_COMPONENTS} ${COMPONENT_NAME} PARENT_SCOPE)
     
     ##############################################################
     # Compute directories
@@ -28,6 +28,14 @@ function(addAndConfigureLocalComponent COMPONENT_NAME)
     set(COMPONENT_BUILD_DIR ${BUILD_DIR_BASE}/${SUBGROUP_PATH}/${FOLDER_NAME}/${BUILDTYPEEXTRA})
     
     ##############################################################
+    # Verifications
+    if(COMPONENT_NAME IN_LIST OPENCMISS_COMPONENTS_WITH_F90 AND NOT CMAKE_Fortran_COMPILER_SUPPORTS_F90)
+        message(FATAL_ERROR "Your Fortran compiler ${CMAKE_Fortran_COMPILER} does not support the Fortran 90 standard,
+            which is required to build the OpenCMISS component ${COMPONENT}")
+    endif()
+    
+    
+    ##############################################################
     # Collect component definitions
     SET(COMPONENT_DEFS
         ${COMPONENT_COMMON_DEFS} 
@@ -40,7 +48,7 @@ function(addAndConfigureLocalComponent COMPONENT_NAME)
     # OpenMP multithreading
     if(COMPONENT_NAME IN_LIST OPENCMISS_COMPONENTS_WITH_OPENMP)
         list(APPEND COMPONENT_DEFS
-            -DWITH_OPENMP=${OCM_USE_MT}
+            -DWITH_OPENMP=${OC_MULTITHREADING}
         )
     endif()
     
@@ -177,7 +185,7 @@ function(createExternalProjects COMPONENT_NAME SOURCE_DIR BINARY_DIR DEFS)
     getExtProjDownloadUpdateCommands(${COMPONENT_NAME} ${SOURCE_DIR} DOWNLOAD_COMMANDS UPDATE_COMMANDS)
     
     # Log settings
-    if (OCM_CREATE_LOGS)
+    if (OC_CREATE_LOGS)
         set(_LOGFLAG 1)
     else()
         set(_LOGFLAG 0)
@@ -219,7 +227,7 @@ function(createExternalProjects COMPONENT_NAME SOURCE_DIR BINARY_DIR DEFS)
     ExternalProject_Add(${COMPONENT_NAME}
         DEPENDS ${${COMPONENT_NAME}_DEPS} CHECK_${COMPONENT_NAME}_SOURCES
         PREFIX ${BINARY_DIR}
-        LIST_SEPARATOR ${OCM_LIST_SEPARATOR}
+        LIST_SEPARATOR ${OC_LIST_SEPARATOR}
         TMP_DIR ${BINARY_DIR}/ep_tmp
         STAMP_DIR ${BINARY_DIR}/${_OC_EXTPROJ_STAMP_DIR}
         
@@ -252,7 +260,7 @@ function(createExternalProjects COMPONENT_NAME SOURCE_DIR BINARY_DIR DEFS)
     )
         
     # See OpenCMISSDeveloper.cmake
-    if (OCM_CLEAN_REBUILDS_COMPONENTS)
+    if (OC_CLEAN_REBUILDS_COMPONENTS)
         set_directory_properties(PROPERTIES ADDITIONAL_MAKE_CLEAN_FILES ${BINARY_DIR}/CMakeCache.txt)
     endif()
     
@@ -283,12 +291,12 @@ function(addConvenienceTargets COMPONENT_NAME BINARY_DIR)
         COMMAND ${INSTALL_COMMAND}
     )
     if (BUILD_TESTS)
-    # Add convenience direct-access test target for component
-    add_custom_target(${COMPONENT_NAME}-test
-        COMMAND ${CMAKE_COMMAND} --build ${BINARY_DIR} --target test
-    )
-    # Add a global test to run the external project's tests
-    add_test(${COMPONENT_NAME}-test ${CMAKE_COMMAND} --build ${BINARY_DIR} --target test)
+        # Add convenience direct-access test target for component
+        add_custom_target(${COMPONENT_NAME}-test
+            COMMAND ${CMAKE_COMMAND} --build ${BINARY_DIR} --target test
+        )
+        # Add a global test to run the external project's tests
+        add_test(${COMPONENT_NAME}-test ${CMAKE_COMMAND} --build ${BINARY_DIR} --target test)
     endif()
 endfunction()
 
@@ -354,7 +362,7 @@ function(doSupportStuff NAME SRC BIN DEFS)
 @ Automatically generated OpenCMISS support file, ${NOW}
 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
-Build configuration file for OpenCMISS component '${NAME}'
+Build configuration file for OpenCMISS component ${NAME}-${${NAME}_VERSION}
     
 Source directory '${SRC}'
 Build directory '${BIN}'
@@ -366,7 +374,7 @@ Configure definitions:
     endforeach()
     
     # Only create log-collecting commands if we create them 
-    if (OCM_CREATE_LOGS)
+    if (OC_CREATE_LOGS)
         # Using PRE_BUILD directly for target support does not work :-| See docs.
         # So we have an extra target in between. 
         add_custom_command(TARGET collect_logs POST_BUILD
@@ -378,14 +386,14 @@ Configure definitions:
         )
     endif()
     
-    add_custom_target(_${COMPONENT_NAME}_buildlog
+    add_custom_target(_${NAME}_buildlog
         COMMAND ${CMAKE_COMMAND}
             -DBUILD_STAMP=YES 
-            -DCOMPONENT_NAME=${COMPONENT_NAME}
+            -DCOMPONENT_NAME=${NAME}
             -P ${OPENCMISS_MANAGE_DIR}/CMakeScripts/OCSupport.cmake
         WORKING_DIRECTORY "${OC_SUPPORT_DIR}")
-    add_dependencies(${COMPONENT_NAME} _${COMPONENT_NAME}_buildlog)
+    add_dependencies(${NAME} _${NAME}_buildlog)
     
-    string(TIMESTAMP NOW)
-    file(APPEND "${OC_SUPPORT_DIR}/build.log" "Configured component ${COMPONENT_NAME} at ${NOW}\r\n")
+    string(TIMESTAMP NOW "%Y-%m-%d, %H:%M")
+    file(APPEND "${OC_SUPPORT_DIR}/build.log" "Configured component ${NAME}-${${NAME}_VERSION} at ${NOW}\r\n")
 endfunction()

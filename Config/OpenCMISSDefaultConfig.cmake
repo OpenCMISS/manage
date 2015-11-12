@@ -1,74 +1,40 @@
 # ==============================
 # Build configuration
 # ==============================
-
-# Requires OPENCMISS_ROOT to be defined
+# See your OpenCMISSLocalConfig file for details on the possible options and values.
 set(OPENCMISS_INSTALL_ROOT "${OPENCMISS_ROOT}/install")
-
-# Precision to build (if applicable)
-# Valid choices are s,d,c,z and any combinations.
-# s: Single / float precision
-# d: Double precision
-# c: Complex / float precision
-# z: Complex / double precision
 set(BUILD_PRECISION sd CACHE STRING "Build precisions for OpenCMISS components. Choose any of [sdcz]")
-
-# The integer types that can be used (if applicable)
-# Used only by PASTIX yet
 set(INT_TYPE int32 CACHE STRING "OpenCMISS integer type (only used by PASTIX yet)")
-
-# Always build tests.
 option(BUILD_TESTS "Build OpenCMISS(-components) tests" ON)
-
 option(PARALLEL_BUILDS "Use multithreading (-jN etc) for builds" ON)
-
-# Type of libraries to build
-# The default is static for all dependencies and shared for main components (iron and zinc)
-# If set to yes, every component will 
 option(BUILD_SHARED_LIBS "Build shared libraries within/for every component" NO)
+set(OC_CREATE_LOGS YES)
+set(CMAKE_DEBUG_POSTFIX d CACHE STRING "Debug postfix for library names of DEBUG-builds") # Debug postfix
+set(OC_WARN_ALL YES) # Flag for DEBUG configuration builds only!
+set(OC_CHECK_ALL YES) # Flag for DEBUG configuration builds only!
+option(OC_MULTITHREADING "Use multithreading in OpenCMISS (where applicable)" NO)
+set(OC_COMPONENTS_SYSTEM DEFAULT)
+option(CMAKE_VERBOSE_MAKEFILE "Generate verbose makefiles/projects for builds" NO)
+set(OC_USE_ARCHITECTURE_PATH YES)
+set(GITHUB_USE_SSL NO)
+set(OC_DEPENDENCIES_ONLY NO)
 
-# Have the build system wrap the builds of component into log files.
-# Selecting NO will directly print the build process to the standard output.
-set(OCM_CREATE_LOGS YES)
-
-# Debug postfix
-set(CMAKE_DEBUG_POSTFIX d CACHE STRING "Debug postfix for library names of DEBUG-builds")
-
-# ==============================
-# Compilers
-# ==============================
-# Flag for DEBUG configuration builds only!
-set(OCM_WARN_ALL YES)
-set(OCM_CHECK_ALL YES)
-
-# ==============================
-# Multithreading
-# This controls openmp/OpenAcc
-# ==============================
-option(OCM_USE_MT "Use multithreading in OpenCMISS (where applicable)" NO)
-
-# ==============================
-# Defaults for all dependencies
-# ==============================
-# This is changeable in the OpenCMISSLocalConfig file
-set(OCM_COMPONENTS_SYSTEM DEFAULT)
-
-foreach(OCM_DEP ${OPENCMISS_COMPONENTS})
+foreach(COMPONENT ${OPENCMISS_COMPONENTS})
     set(_VALUE YES)
-    if (${OCM_DEP} IN_LIST OPENCMISS_COMPONENTS_DISABLED_BY_DEFAULT)
+    if (${COMPONENT} IN_LIST OPENCMISS_COMPONENTS_DISABLED_BY_DEFAULT)
         set(_VALUE NO)
     endif()
     # Use everything but the components in OPENCMISS_COMPONENTS_DISABLED_BY_DEFAULT
-    set(OCM_USE_${OCM_DEP} ${_VALUE})
+    set(OC_USE_${COMPONENT} ${_VALUE})
     
     # Look for some components on the system first before building
     set(_VALUE NO)
-    if (${OCM_DEP} IN_LIST OPENCMISS_COMPONENTS_SYSTEM_BY_DEFAULT)
+    if (${COMPONENT} IN_LIST OPENCMISS_COMPONENTS_SYSTEM_BY_DEFAULT)
         set(_VALUE YES)
     endif()
-    set(OCM_SYSTEM_${OCM_DEP} ${_VALUE})
+    set(OC_SYSTEM_${COMPONENT} ${_VALUE})
     # Initialize the default: static build for all components
-    set(${OCM_DEP}_SHARED NO)
+    set(${COMPONENT}_SHARED NO)
 endforeach()
 
 # Main version
@@ -138,7 +104,7 @@ set(EXAMPLES_VERSION 1.0)
 # appropriate consumed packages. No checks are performed on whether the consumed packages
 # will also be build by us or not, as they might be provided externally.
 #
-# To be safe: E.g. if you wanted to use MUMPS with SCOTCH, also set OCM_USE_SCOTCH=YES so that
+# To be safe: E.g. if you wanted to use MUMPS with SCOTCH, also set OC_USE_SCOTCH=YES so that
 # the build system ensures that SCOTCH will be available.
 # ==========================================================================================
 set(MUMPS_WITH_SCOTCH NO)
@@ -167,7 +133,7 @@ set(FIELDML-API_WITH_JAVA_BINDINGS NO)
 set(FIELDML-API_WITH_FORTRAN_BINDINGS YES)
 
 set(IRON_WITH_CELLML YES)
-set(IRON_WITH_FIELDML NO)
+set(IRON_WITH_FIELDML YES)
 set(IRON_WITH_HYPRE YES)
 set(IRON_WITH_SUNDIALS YES)
 set(IRON_WITH_MUMPS YES)

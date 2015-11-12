@@ -5,9 +5,9 @@ SET(COMPONENT_COMMON_DEFS )
 # As the CMAKE_ARGS are a list themselves, we need to treat the ; in the (possible) list of module_paths
 # specially. Therefore CMAKE has a special command LIST_SEPARATOR within the ExternalProject macros
 # See also OCComponentSetupMacros.cmake:144
-set(OCM_LIST_SEPARATOR "-<ocm_list_sep>-") # just use anything unlikely to be passed as an actual variable string
-STRING(REPLACE ";" ${OCM_LIST_SEPARATOR} CMAKE_MODULE_PATH_ESC "${CMAKE_MODULE_PATH}")
-STRING(REPLACE ";" ${OCM_LIST_SEPARATOR} OPENCMISS_PREFIX_PATH_ESC "${OPENCMISS_PREFIX_PATH}")
+set(OC_LIST_SEPARATOR "-<ocm_list_sep>-") # just use anything unlikely to be passed as an actual variable string
+STRING(REPLACE ";" ${OC_LIST_SEPARATOR} CMAKE_MODULE_PATH_ESC "${CMAKE_MODULE_PATH}")
+STRING(REPLACE ";" ${OC_LIST_SEPARATOR} OPENCMISS_PREFIX_PATH_ESC "${OPENCMISS_PREFIX_PATH}")
 
 LIST(APPEND COMPONENT_COMMON_DEFS
     -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
@@ -47,16 +47,16 @@ endforeach()
 
 # Pass on local lookup flags (consumed by find_package calls)
 foreach(COMP ${OPENCMISS_COMPONENTS})
-    if (OCM_SYSTEM_${COMP})
+    if (OC_SYSTEM_${COMP})
         LIST(APPEND COMPONENT_COMMON_DEFS 
-            -DOCM_SYSTEM_${COMP}=${OCM_SYSTEM_${COMP}}
+            -DOC_SYSTEM_${COMP}=${OC_SYSTEM_${COMP}}
         )
     endif()
 endforeach()
 
 # Use the correct install RPATH to enable binaries to find the shared libs (if any, ignored otherwise).
 # See http://www.cmake.org/Wiki/CMake_RPATH_handling
-STRING(REPLACE ";" ${OCM_LIST_SEPARATOR} OPENCMISS_LIBRARY_PATH_ESC "${OPENCMISS_LIBRARY_PATH}")
+STRING(REPLACE ";" ${OC_LIST_SEPARATOR} OPENCMISS_LIBRARY_PATH_ESC "${OPENCMISS_LIBRARY_PATH}")
 list(APPEND COMPONENT_COMMON_DEFS 
     -DCMAKE_INSTALL_RPATH=${OPENCMISS_LIBRARY_PATH_ESC}
     -DCMAKE_INSTALL_RPATH_USE_LINK_PATH=TRUE)

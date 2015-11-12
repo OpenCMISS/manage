@@ -29,52 +29,70 @@ unset(_LC_CDIR)
 unset(_CONFIG_FOUND)
 
 # Look for an OpenCMISS Developer script
-SET(OCM_DEVELOPER_CONFIG ${CMAKE_CURRENT_LIST_DIR}/../OpenCMISSDeveloper.cmake)
+SET(OC_DEVELOPER_CONFIG ${CMAKE_CURRENT_LIST_DIR}/../OpenCMISSDeveloper.cmake)
 set(OC_DEVELOPER NO)
-if (EXISTS ${OCM_DEVELOPER_CONFIG})
-    get_filename_component(OCM_DEVELOPER_CONFIG ${OCM_DEVELOPER_CONFIG} ABSOLUTE)
-    message(STATUS "Applying OpenCMISS developer configuration at ${OCM_DEVELOPER_CONFIG}...")
-    include(${OCM_DEVELOPER_CONFIG})
+if (EXISTS ${OC_DEVELOPER_CONFIG})
+    get_filename_component(OC_DEVELOPER_CONFIG ${OC_DEVELOPER_CONFIG} ABSOLUTE)
+    message(STATUS "Applying OpenCMISS developer configuration at ${OC_DEVELOPER_CONFIG}...")
+    include(${OC_DEVELOPER_CONFIG})
     set(OC_DEVELOPER YES)
-    unset(OCM_DEVELOPER_CONFIG)
+    unset(OC_DEVELOPER_CONFIG)
 endif()
+# Half hack: The CMAKE_BUILD_TYPE variable is not initialized in the cache if it's "only" set
+# as a variable via cmake script. Consequently, issuing a project() command looks in the cache
+# and finds an uninitialized CMAKE_BUILD_TYPE and uses that, ignoring any set value in LocalConfig/DevelConfig.
+# As the DIRECT_VARS setting also inserts lines into the localconfig file, the build parameterization also
+# wont work.
+# A possible "workaround" would be to pass those variables via command line, which would add them to the cache and done.
+# However, as all the other variables are defined in the localconfig file, it would seem (especially with the build type)
+# unintuitive to have to define the build type differently. Hence, this solution simply sets the assigned value of 
+# CMAKE_BUILD_TYPE also in the cache.
+# If there appear other variables that require the same behaviour, one should consider alternative solutions to this.
+set(CMAKE_BUILD_TYPE ${CMAKE_BUILD_TYPE} CACHE STRING "The build type for OpenCMISS" FORCE)
 
+######################################################################
 # Postprocessing
-foreach(OCM_COMP ${OPENCMISS_COMPONENTS})
+
+# Disable iron/zinc if only dependencies should be built
+if (OC_DEPENDENCIES_ONLY)
+    set(OC_USE_IRON NO)
+    set(OC_USE_ZINC NO)
+endif()
+foreach(COMPONENT ${OPENCMISS_COMPONENTS})
     # Set default version number branch unless e.g. IRON_BRANCH is specified
-    if(NOT ${OCM_COMP}_BRANCH)
-        set(${OCM_COMP}_BRANCH "v${${OCM_COMP}_VERSION}")
+    if(NOT ${COMPONENT}_BRANCH)
+        set(${COMPONENT}_BRANCH "v${${COMPONENT}_VERSION}")
     endif()
     
     # Force mandatory ones to be switched on
-    if (${OCM_COMP} IN_LIST OC_MANDATORY_COMPONENTS)
-        set(OCM_USE_${OCM_COMP} REQ)
+    if (${COMPONENT} IN_LIST OC_MANDATORY_COMPONENTS)
+        set(OC_USE_${COMPONENT} REQ)
     endif()
     
     # All local enabled? Set to local search.
-    if (OCM_COMPONENTS_SYSTEM STREQUAL NONE)
-        set(OCM_SYSTEM_${OCM_COMP} NO)
-    elseif(OCM_COMPONENTS_SYSTEM STREQUAL ALL)
-        set(OCM_SYSTEM_${OCM_COMP} YES)
+    if (OC_COMPONENTS_SYSTEM STREQUAL NONE)
+        set(OC_SYSTEM_${COMPONENT} NO)
+    elseif(OC_COMPONENTS_SYSTEM STREQUAL ALL)
+        set(OC_SYSTEM_${COMPONENT} YES)
     endif()
     # Force "devel" branches for each component of DEVEL_ALL is set
-    if (OCM_DEVEL_ALL)
-        SET(${OCM_COMP}_BRANCH devel)
+    if (OC_DEVEL_ALL)
+        SET(${COMPONENT}_BRANCH devel)
     endif()
     # Set all individual components build types to shared if the global BUILD_SHARED_LIBS is set
     if (BUILD_SHARED_LIBS)
-        set(${OCM_COMP}_SHARED ON)
-    endif()
-    if (NOT OCM_COMP STREQUAL MPI) # Dont show that for MPI - have different implementations
-    	string(SUBSTRING "${OCM_COMP}                  " 0 12 OCM_COMP_FIXED_SIZE)
-    	string(SUBSTRING "${OCM_USE_${OCM_COMP}}       " 0 3 OCM_USE_FIXED_SIZE)
-    	string(SUBSTRING "${OCM_SYSTEM_${OCM_COMP}}    " 0 3 OCM_SYSTEM_FIXED_SIZE)
-    	string(SUBSTRING "${${OCM_COMP}_VERSION}       " 0 7 OCM_VERSION_FIXED_SIZE)
-    	string(SUBSTRING "${${OCM_COMP}_SHARED}        " 0 3 OCM_SHARED_FIXED_SIZE)
-    	# ${OCM_COMP}_BRANCH is as good as version (this is what is effectively checked out) and will also display "devel" correctly
-        message(STATUS "OpenCMISS component ${OCM_COMP_FIXED_SIZE}: Use ${OCM_USE_FIXED_SIZE}, System search ${OCM_SYSTEM_FIXED_SIZE}, Shared: ${OCM_SHARED_FIXED_SIZE}, Version '${OCM_VERSION_FIXED_SIZE}', Branch '${${OCM_COMP}_BRANCH}')")
+        set(${COMPONENT}_SHARED ON)
+    endif()    
+    if (NOT COMPONENT STREQUAL MPI) # Dont show that for MPI - have different implementations
+    	string(SUBSTRING "${COMPONENT}                  " 0 12 COMPONENT_FIXED_SIZE)
+    	string(SUBSTRING "${OC_USE_${COMPONENT}}       " 0 3 OC_USE_FIXED_SIZE)
+    	string(SUBSTRING "${OC_SYSTEM_${COMPONENT}}    " 0 3 OC_SYSTEM_FIXED_SIZE)
+    	string(SUBSTRING "${${COMPONENT}_VERSION}       " 0 7 OC_VERSION_FIXED_SIZE)
+    	string(SUBSTRING "${${COMPONENT}_SHARED}        " 0 3 OC_SHARED_FIXED_SIZE)
+    	# ${COMPONENT}_BRANCH is as good as version (this is what is effectively checked out) and will also display "devel" correctly
+        message(STATUS "OpenCMISS component ${COMPONENT_FIXED_SIZE}: Use ${OC_USE_FIXED_SIZE}, System search ${OC_SYSTEM_FIXED_SIZE}, Shared: ${OC_SHARED_FIXED_SIZE}, Version '${OC_VERSION_FIXED_SIZE}', Branch '${${COMPONENT}_BRANCH}')")
     endif()
 endforeach()
-if (OCM_DEVEL_ALL)
+if (OC_DEVEL_ALL)
     set(EXAMPLES_BRANCH devel)
 endif()

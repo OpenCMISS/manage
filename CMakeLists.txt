@@ -1,80 +1,78 @@
 ########################################################
 # Welcome to the OpenCMISS build system!
 ########################################################
-# This script realises the top-level setup/generation
-# phase. All it does is making sure you have the minimum
-# cmake version available (if not, you can have us build for you)
-# and generates the actual main build project for any
-# choice of compiler/toolchain and MPI combination
-# you'd like.
+# This script realises the top-level setup/generation phase.
+# All it does is making sure you have the minimum cmake version available (if not, you can have us build for you)
+# and generates the actual main build project for any choice of compiler/toolchain and MPI combination you'd like.
 #
-# The easiest thing to do is nothing: CMake will detect
-# the system's default setup and try to use that.
+# The easiest thing to do is nothing: CMake will detect the system's default setup and try to use that.
+# Otherwise, here's what you can configure at this stage:
+# 
+# Configuration options
+# ########################################################
+# Specify any of the following variables on the command line via -DVARNAME=VALUE or set them in your CMake GUI.
+# The values in brackets indicate the default values, where [] denotes not set and | separates alternatives.
 #
-# ==============================
-# Toolchain setup - details
-# ==============================
-# Usually you dont need to tell CMake which compilers to use.
-# If you change compilers here, YOU SHOULD KNOW WHY!!!
-# If by some chance you have to, first try to specify your
-# desired toolchain via either CMakeGUI or -D command line
-# as one of the following: 
-# - gnu,mingw        # gcc,g++ and gfortran compilers
-# - intel      # icc, icpc, ifort compilers
-# - ibm        # xlc, xlC, xlf95 compilers
-# Note that this variable will be used case-insensitive.
+# ============== General ================
 #
-# If this does not cover you needs, you can specify each compiler using the CMAKE_<lang>_COMPILER variables,
-# where <lang> can be each of "C","CXX" or "Fortran".
-# For example, to have CMake use the GNU C compiler, set the binary name via e.g. 
-# -DCMAKE_C_COMPILER gcc
-# If that can not be found on CMake's PATH, you should specify an absolute path to the binary like
-# -DCMAKE_C_COMPILER /usr/local/mygcc/bin/gcc
+# ROOT: [Parent of the manage directory containing this file]
+#    Set this to any directory that you want to contain OpenCMISS sources, build- and install trees.
 #
-# If you still fail to have CMake successfully configure OpenCMISS with non-default compilers, please contact the OpenCMISS Team.
+# EVEL: []|<any value>
+#     If you want to initialize your OpenCMISS installation to developer defaults, define the EVEL variable to any value.
+#     It's not a typo, the command line for this results in -DEVEL=<myvalue> :-)
 #
-# ==============================
-# MPI
-# ==============================
-# MPI is a crucial part of OpenCMISS and defaults to be used.
-# You should not have to specify a specific MPI implementation, however, here
-# are the options:
+# ============== Toolchain ==============
+# 
+# TOOLCHAIN: []|gnu|clang|mingw|intel|ibm
+#    Usually you dont need to tell CMake which compilers to use.
+#    If you change compilers here, YOU SHOULD KNOW WHY!!!
 #
-# To select an MPI implementation, you can use the MPI
-# variable the same way by choosing from:
-# mpich mpich2 openmpi mvapich2 intel none
+#    gnu,mingw: gcc,g++ and gfortran compilers
+#    clang    : CLang c,c++ compilers and gfortran
+#    intel    : icc, icpc, ifort compilers
+#    ibm      : xlc, xlC, xlf95 compilers
+#    Note that this variable will be used case-insensitive.
+#    If you have a toolchain that differs from the above choices, please use the next
+#    method and also let us know what you are using: users@opencmiss.org
 #
-# The selection "none" will build OpenCMISS without MPI,
-# which is intended for future use but not implemented
-# yet.
+# CMAKE_<lang>_COMPILER: []|gcc (binary name)|/usr/local/mygcc/bin/gcc (absolute path)
+#    If this does not cover you needs, you can specify each compiler using the CMAKE_<lang>_COMPILER variables,
+#    where <lang> can be each of "C","CXX" or "Fortran".
 #
-# To have MPI build in debug mode, set DEBUG_MPI=YES (Default: NO)
-# This is only guaranteed to work for own MPI builds yet.
+# If you still fail to have CMake successfully configure OpenCMISS with non-default compilers,
+# please contact the OpenCMISS Team at users@opencmiss.org.
 #
-# - ALTERNATIVELY -
-# You can also specify a custom MPI root directory to have CMake look there EXCLUSIVELY.
-#SET(MPI_HOME ~/software/openmpi-1.8.3_install)
-
-# - ALTERNATIVELY -
-# Further, you can specify an explicit name of the compiler executable (full path or just the binary name)
-# This can be used independently of (but possibly with) the MPI_HOME setting.
-#SET(MPI_C_COMPILER mpicc)
-#SET(MPI_CXX_COMPILER mpic++)
-#SET(MPI_Fortran_COMPILER mpif77)
-
-# ==============================
-# Developer setup
-# ==============================
-# If you want to initialize your OpenCMISS installation to developer defaults,
-# add the line "-DEVIL=666" (not a typo!) to your initial cmake call. Done.
+# ============== MPI ====================
+#
+# MPI: []|mpich|mpich2|openmpi|mvapich2|intel|none
+#    MPI is a crucial part of OpenCMISS and defaults to be used.
+#    You should not have to specify a specific MPI implementation, as CMake will find your system default automatically.
+#     
+#    The selection "none" will build OpenCMISS without MPI,
+#    which is intended for future use but not implemented yet.
+#
+# MPI_BUILD_TYPE: [RELEASE]|DEBUG|...
+#    The MPI build type can be chosen independently from the OpenCMISS build type.
+#    For debug builds, OpenCMISS will build its own version of the selected (or default) MPI implementation
+#    as the detection of system debug builds is not reliable (yet)
+#
+# MPI_HOME: []|~/software/openmpi-1.8.3_install (absolute path to mpi installation)
+#    You can also specify a custom MPI root directory in case the detection mechanisms fail.
+#    Using this setting will override any other setting and have CMake look there EXCLUSIVELY.
+#
+# MPI_<lang>_COMPILER: []|mpicc (wrapper binary name)|/usr/local/bin/mpicc (absolute path to wrapper binary)
+#    Further, you can specify an explicit mpi compiler wrapper (full path or just the binary name) for each language,
+#    where <lang> can be each of "C","CXX" or "Fortran".
+#    This can be used independently of (but possibly with) the MPI_HOME setting.
 
 ########################################################
 # If your cmake is older than 2.6 - goodbye. 
 cmake_minimum_required(VERSION 2.6.0 FATAL_ERROR)
 # Set the manage directory
-SET(OPENCMISS_MANAGE_DIR ${CMAKE_CURRENT_SOURCE_DIR})
+set(OPENCMISS_MANAGE_DIR ${CMAKE_CURRENT_SOURCE_DIR})
 # The default opencmiss root is the parent directory of "manage"
-SET(OPENCMISS_ROOT "${OPENCMISS_MANAGE_DIR}/.." CACHE PATH "Root directory for OpenCMISS.")
+set(OPENCMISS_ROOT "${OPENCMISS_MANAGE_DIR}/.." CACHE PATH "Root directory for OpenCMISS.")
 if (ROOT)
     SET(OPENCMISS_ROOT "${ROOT}" CACHE PATH "Root directory for OpenCMISS." FORCE)
 endif(ROOT)
@@ -148,21 +146,25 @@ configure_file(
 
 # This makes sure the configure step for the current main project is run at the beginning;
 # later the build call to the main project will detect for itself if new builds are necessary.
-#add_custom_command(OUTPUT ${MAIN_BINARY_DIR}/OpenCMISSLocalConfig.cmake
 add_custom_command(OUTPUT "${MAIN_BINARY_DIR}/configure_stamp"
     COMMAND ${CMAKE_COMMAND} -G "${CMAKE_GENERATOR}" .
     COMMAND ${CMAKE_COMMAND} -E touch "${MAIN_BINARY_DIR}/configure_stamp"
     WORKING_DIRECTORY "${MAIN_BINARY_DIR}"
     COMMENT "Initializing OpenCMISS configuration ${BUILD_IDENT}"
 )
-# This creates the main target 
+# This is the main target
+# The invocation of an extra script allows to catch build errors and display a custom
+# message and automatically create the support target! 
 add_custom_target(${BUILD_IDENT} ALL
     DEPENDS "${MAIN_BINARY_DIR}/configure_stamp"
-    # Invoke main build
     COMMAND ${CMAKE_COMMAND} --build "${MAIN_BINARY_DIR}" --target install
-    # Invoke feature tests
     COMMAND ${CMAKE_COMMAND} --build "${MAIN_BINARY_DIR}" --target featuretests
     COMMENT "Building OpenCMISS configuration ${BUILD_IDENT}"
+    # Currently implemented but disabled by default
+    #COMMAND ${CMAKE_COMMAND} 
+    #    -DMAIN_BINARY_DIR="${MAIN_BINARY_DIR}"
+    #    -DBUILD_IDENT="${BUILD_IDENT}"
+    #    -P ${OPENCMISS_MANAGE_DIR}/CMakeScripts/ScriptTryCatchBuild.cmake
 )
 
 # Convenience/Maintenance targets
@@ -214,16 +216,17 @@ add_custom_target(utter_destruction
     WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
 )
 
-# The Devil's part!
-# Used if one defines -DEVIL on the command line. Just a convenience hack to have
-# OpenCMISS copy the developer defaults config file over.
+# Just a convenience hack to have OpenCMISS copy the developer defaults config file over.
 if (DEFINED EVIL OR EVIL)
+    set(EVEL ${EVIL})
+endif()
+if (DEFINED EVEL OR EVEL)
     if (NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/OpenCMISSDeveloper.cmake")
         configure_file(
             "${CMAKE_CURRENT_SOURCE_DIR}/Templates/OpenCMISSDeveloper.template.cmake"
             "${CMAKE_CURRENT_SOURCE_DIR}/OpenCMISSDeveloper.cmake"
             COPYONLY)
-        set(EVIL_MESSAGE "Being a Developer! Evilness level: ${EVIL}. Copied the OpenCMISSDeveloper template.")
+        set(EVIL_MESSAGE "Being a Developer: ${EVEL}. Copied the OpenCMISSDeveloper template.")
     else()
         set(EVIL_MESSAGE "OpenCMISSDeveloper script already copied. Not overwriting.")
     endif()
@@ -256,6 +259,7 @@ if (DEFINED EVIL)
     message(STATUS "* Change ${CMAKE_CURRENT_SOURCE_DIR}/OpenCMISSDeveloper.cmake according to your developing setup/needs (Overrides anything in OpenCMISSLocalConfig!)")        
 endif()
 message(STATUS "* Run your native build command (e.g. '${CMAKE_MAKE_PROGRAM}') to start the build process")
+message(STATUS "* IF YOU ENCOUNTER BUILD ERRORS, TYPE '${CMAKE_MAKE_PROGRAM} support' TO GET HELP!")
 message(STATUS "* Refer to ${OPENCMISS_MANAGE_DIR}/OpenCMISSBuildEnvironment.docx.pdf for customization instructions")
 message(STATUS "*")
 message(STATUS "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@")

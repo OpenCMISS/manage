@@ -28,9 +28,9 @@ messaged("Entering script. CMAKE_PREFIX_PATH: ${CMAKE_PREFIX_PATH}")
 SET(@PACKAGE_CASENAME@_FOUND NO)
     
 # The default way is to look for components in the current PREFIX_PATH, e.g. own build components.
-# If the OCM_SYSTEM_@PACKAGE_NAME@ flag is set for a package, the MODULE and CONFIG modes are tried outside the PREFIX PATH first.
-if (NOT OCM_SYSTEM_@PACKAGE_NAME@)
-     set(OCM_SYSTEM_@PACKAGE_NAME@ NO) # set it to NO so that we have a value if none is set at all (debug output)
+# If the OC_SYSTEM_@PACKAGE_NAME@ flag is set for a package, the MODULE and CONFIG modes are tried outside the PREFIX PATH first.
+if (NOT OC_SYSTEM_@PACKAGE_NAME@)
+     set(OC_SYSTEM_@PACKAGE_NAME@ NO) # set it to NO so that we have a value if none is set at all (debug output)
      find_package(@PACKAGE_CASENAME@ ${@PACKAGE_CASENAME@_FIND_VERSION} CONFIG
         PATHS ${CMAKE_PREFIX_PATH}
         QUIET
@@ -88,7 +88,7 @@ else()
     # xxx-config-dependencies, which in turn might be allowed as system lookup, the FindModuleWrapper dir
     # is missing and stuff breaks. Too a while to figure out the problem as you might guess ;-)
     # Scenario discovered on Michael Sprenger's Ubuntu 10 system with 
-    # OCM_SYSTEM_ZLIB=YES and found, OCM_SYSTEM_LIBXML2=ON but not found. This broke the CELLML-build as
+    # OC_SYSTEM_ZLIB=YES and found, OC_SYSTEM_LIBXML2=ON but not found. This broke the CELLML-build as
     # the wrapper call for LIBXML removed the wrapper dir from the module path, then found libxml2 in config mode,
     # which in turn called find_dependency(ZLIB), which used the native FindZLIB instead of the wrapper first.
     # This problem only was detected because the native zlib library is called "(lib)z", but we link against the 
@@ -182,7 +182,7 @@ if (@PACKAGE_CASENAME@_FIND_REQUIRED AND NOT @PACKAGE_CASENAME@_FOUND)
         "Could not find @PACKAGE_CASENAME@ ${@PACKAGE_CASENAME@_FIND_VERSION} with either MODULE or CONFIG mode.\n"
         "CMAKE_MODULE_PATH: ${CMAKE_MODULE_PATH}\n"
         "CMAKE_PREFIX_PATH: ${CMAKE_PREFIX_PATH}\n"
-        "Allow system @PACKAGE_NAME@: ${OCM_SYSTEM_@PACKAGE_NAME@}\n"
+        "Allow system @PACKAGE_NAME@: ${OC_SYSTEM_@PACKAGE_NAME@}\n"
         "Please check your OpenCMISSLocalConfig file and ensure to set USE_@PACKAGE_NAME@=YES\n"
         "Alternatively, refer to CMake(Output|Error).log in ${PROJECT_BINARY_DIR}/CMakeFiles\n"
     )

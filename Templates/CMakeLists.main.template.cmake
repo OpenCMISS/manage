@@ -1,5 +1,5 @@
 set(OC_SUPPORT_DIR ${CMAKE_CURRENT_BINARY_DIR}/support)
-string(TIMESTAMP NOW)
+string(TIMESTAMP NOW "%Y-%m-%d, %H:%M")
 file(WRITE "${OC_SUPPORT_DIR}/build.log" "Starting configuration in ${CMAKE_CURRENT_BINARY_DIR} at ${NOW}\r\n")
 
 set(OPENCMISS_CMAKE_MIN_VERSION @OPENCMISS_CMAKE_MIN_VERSION@)
@@ -27,7 +27,7 @@ include(OpenCMISSConfig)
 ########################################################################
 @TOOLCHAIN_DEF@
 set(MPI @MPI@)
-set(OCM_SYSTEM_MPI @SYSTEM_MPI@)
+set(OC_SYSTEM_MPI @SYSTEM_MPI@)
 set(MPI_BUILD_TYPE @MPI_BUILD_TYPE@)
 @MPI_HOME_DEF@
 ########################################################################
@@ -64,13 +64,12 @@ list(APPEND CMAKE_MODULE_PATH
 )
 
 # No point in building ZINC if there's no OpenGL around
-if (OCM_USE_ZINC)
-    find_package(OpenGL QUIET)
-    if (NOT OPENGL_FOUND)
-        set(OCM_USE_ZINC NO)
-        message(WARNING "OpenCMISS: No OpenGL found, cannot build Zinc. Disabling.")
-    endif()
+find_package(OpenGL QUIET)
+if (NOT OPENGL_FOUND AND OC_USE_ZINC)
+    set(OC_USE_ZINC NO)
+    message(WARNING "OpenCMISS: No OpenGL found, cannot build Zinc. Disabling.")
 endif()
+
 # Pre-check for Python availability so that bindings will be built automatically (unless explicitly specified)
 # The FOUND flag is used (at least) at OCConfigureComponents/IRON
 find_package(PythonInterp ${PYTHON_VERSION} QUIET)
@@ -89,7 +88,7 @@ endif()
 include(OCDetectFortranMangling)
 
 # Multithreading
-if(OCM_USE_MT)
+if(OC_MULTITHREADING)
     find_package(OpenMP REQUIRED)
 endif()
 
@@ -115,7 +114,7 @@ endif()
 # General paths & preps
 set(ARCHITECTURE_PATH .)
 set(ARCHITECTURE_PATH_MPI .)
-if (OCM_USE_ARCHITECTURE_PATH)
+if (OC_USE_ARCHITECTURE_PATH)
     getArchitecturePath(ARCHITECTURE_PATH ARCHITECTURE_PATH_MPI)
 endif()
 # Build tree location for components (with/without mpi)
@@ -173,7 +172,7 @@ include(OCCheckRemoteInstallation)
 include(OCCollectComponentDefinitions)
 
 # Those list variables will be filled by the build macros
-SET(_OCM_SELECTED_COMPONENTS )
+SET(_OC_SELECTED_COMPONENTS )
 
 ########################################################################
 # Support - get help!
@@ -186,7 +185,9 @@ include(OCSupport)
 include(OCConfigureComponents)
 
 # Examples
-include(OCAddExamplesProject)
+if (NOT OC_DEPENDENCIES_ONLY)
+    include(OCAddExamplesProject)
+endif()
 
 ########################################################################
 # Installation and support
@@ -198,20 +199,21 @@ include(OCInstall)
 enable_testing()
 include(OCFeatureTests)
 
+
 ########################################################################
 # Misc targets for convenience
 # update: Updates the whole source tree
 # reset: Blows away the current build and installation trees
 
 # Create a download target that depends on all other downloads
-set(_OCM_SOURCE_UPDATE_TARGETS )
-set(_OCM_COLLECT_LOG_TARGETS )
-foreach(_COMP ${_OCM_SELECTED_COMPONENTS})
-    list(APPEND _OCM_SOURCE_UPDATE_TARGETS ${_COMP}-update)
-    list(APPEND _OCM_COLLECT_LOG_TARGETS _${_COMP}-collectlogs)
+set(_OC_SOURCE_UPDATE_TARGETS )
+set(_OC_COLLECT_LOG_TARGETS )
+foreach(_COMP ${_OC_SELECTED_COMPONENTS})
+    list(APPEND _OC_SOURCE_UPDATE_TARGETS ${_COMP}-update)
+    list(APPEND _OC_COLLECT_LOG_TARGETS _${_COMP}-collectlogs)
 endforeach()
 add_custom_target(update
-    DEPENDS ${_OCM_SOURCE_UPDATE_TARGETS}
+    DEPENDS ${_OC_SOURCE_UPDATE_TARGETS}
 )
 add_custom_target(reset
     DEPENDS reset_mpionly reset_featuretests
@@ -230,7 +232,7 @@ add_custom_target(reset_mpionly
         ->${OPENCMISS_COMPONENTS_BINARY_DIR_MPI}"
 )
 
-string(TIMESTAMP NOW)
+string(TIMESTAMP NOW "%Y-%m-%d, %H:%M")
 file(APPEND "${OC_SUPPORT_DIR}/build.log" "Finished configuration in ${CMAKE_CURRENT_BINARY_DIR} at ${NOW}
 -------------------------------------------
 ")

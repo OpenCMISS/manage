@@ -62,7 +62,7 @@ if (CMAKE_COMPILER_IS_GNUC OR CMAKE_C_COMPILER_ID STREQUAL "GNU" OR MINGW)
         
     # Debug
     
-    if (OCM_WARN_ALL)
+    if (OC_WARN_ALL)
         addFlagAll("-Wall" DEBUG)
     endif()
     addFlag("-fbacktrace" Fortran DEBUG)
@@ -73,7 +73,7 @@ if (CMAKE_COMPILER_IS_GNUC OR CMAKE_C_COMPILER_ID STREQUAL "GNU" OR MINGW)
         addFlag("-Wsurprising" Fortran DEBUG)
         addFlag("-Wrealloc-lhs-all" Fortran DEBUG)
     endif()
-    if (OCM_CHECK_ALL)
+    if (OC_CHECK_ALL)
         # Compiler version 4.4
         if (CMAKE_Fortran_COMPILER_VERSION VERSION_EQUAL 4.4)
             addFlag("-fbounds-check" Fortran DEBUG)
@@ -106,12 +106,12 @@ elseif (CMAKE_C_COMPILER_ID STREQUAL "Intel" OR CMAKE_CXX_COMPILER_ID STREQUAL "
     
     # Debug
     addFlagAll("-traceback" DEBUG)
-    if (OCM_WARN_ALL)
+    if (OC_WARN_ALL)
         addFlag("-Wall" C DEBUG)
         addFlag("-Wall" CXX DEBUG)
         addFlag("-warn all" Fortran DEBUG)
     endif()
-    if (OCM_CHECK_ALL)
+    if (OC_CHECK_ALL)
         foreach(lang C CXX)
             addFlag("-Wcheck" ${lang} DEBUG)
             addFlag("-fp-trap=common" ${lang} DEBUG)
@@ -127,7 +127,7 @@ elseif (CMAKE_C_COMPILER_ID STREQUAL "Intel" OR CMAKE_CXX_COMPILER_ID STREQUAL "
     endif()
 
 elseif(CMAKE_C_COMPILER_ID STREQUAL "XL" OR CMAKE_CXX_COMPILER_ID STREQUAL "XL") # IBM case
-    if (OCM_USE_MT)
+    if (OC_MULTITHREADING)
         # FindOpenMP uses "-qsmp" for multithreading.. will need to see.
         addFlagAll("-qomp" RELEASE)
         addFlagAll("-qomp:noopt" DEBUG)
@@ -142,18 +142,18 @@ elseif(CMAKE_C_COMPILER_ID STREQUAL "XL" OR CMAKE_CXX_COMPILER_ID STREQUAL "XL")
     addFlagAll("-qstrict" RELEASE)
     
     # Debug
-    if (OCM_WARN_ALL)
+    if (OC_WARN_ALL)
         # Assuming 64bit builds here. will need to see if that irritates the compiler for 32bit arch
         addFlagAll("-qflag=i:i" DEBUG)
         addFlagAll("-qwarn64" DEBUG)
     endif()
-    if (OCM_CHECK_ALL)
+    if (OC_CHECK_ALL)
         addFlagAll("-qcheck" DEBUG)
     endif()
 endif()
 
 # Thus far all compilers seem to use the -p flag for profiling
-if (OCM_WITH_PROFILING)
+if (OC_PROFILING)
     addFlagAll("-p" )
 endif()
 

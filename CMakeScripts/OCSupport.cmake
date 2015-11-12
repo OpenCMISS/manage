@@ -4,7 +4,7 @@ if (DEFINED LOG_DIR AND EXISTS "${LOG_DIR}")
     file(COPY ${LOGS} DESTINATION ${SUPPORT_DIR})
 
 elseif(BUILD_STAMP)
-    string(TIMESTAMP NOW)
+    string(TIMESTAMP NOW "%Y-%m-%d, %H:%M")
     file(APPEND build.log "Build of OpenCMISS component ${COMPONENT_NAME} started at ${NOW}\r\n")
 
 # Script mode for creating the support zip file    
@@ -47,8 +47,8 @@ else()
 
     # The export vars script will also collect these variables!
     if (GIT_FOUND)
-        getGitRevision(OPENCMISS_MANAGE_GIT_REVISON)
-        getGitBranch(OPENCMISS_MANAGE_GIT_BRANCH)
+        git_get_revision(OPENCMISS_MANAGE_GIT_REVISON)
+        git_get_branch(OPENCMISS_MANAGE_GIT_BRANCH)
     endif()
 
     function(exportVars FILE)
@@ -80,7 +80,7 @@ OpenCMISS Support variable dump file, ${NOW}
     exportVars("${OC_SUPPORT_DIR}/Variables.txt")
     
     set(_SUPPORT_DEPS )
-    if (OCM_CREATE_LOGS)
+    if (OC_CREATE_LOGS)
         # This is a dummy target, to which all single components add a "POST_BUILD" hook
         # to collect their respective log files. Using PRE_BUILD directly on "support"
         # does not work everywhere (only with Win/VS)
@@ -90,8 +90,9 @@ OpenCMISS Support variable dump file, ${NOW}
         list(APPEND _SUPPORT_DEPS DEPENDS collect_logs)
     endif()
     
-    if (NOT DEFINED OC_INSTALL_SUPPORT_EMAIL)
-        set(OC_INSTALL_SUPPORT_EMAIL users@list.opencmiss.org)
+    # Fall back to the OC_BUILD_SUPPORT_EMAIL if no install email is set.
+    if (NOT OC_INSTALL_SUPPORT_EMAIL)
+        set(OC_INSTALL_SUPPORT_EMAIL ${OC_BUILD_SUPPORT_EMAIL})
     endif()
     
     add_custom_target(support

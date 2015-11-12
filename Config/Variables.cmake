@@ -16,6 +16,16 @@ set(OPENCMISS_COMPONENTS_WITHMPI MUMPS PARMETIS PASTIX PETSC
 # Used to determine which dependencies get the WITH_OPENMP flag
 set(OPENCMISS_COMPONENTS_WITH_OPENMP HYPRE PARMETIS PASTIX
     PETSC PLAPACK SUITESPARSE SUPERLU_DIST)
+    
+# Components with Fortran code
+set(OPENCMISS_COMPONENTS_WITH_Fortran CELLML HDF5 HYPRE LAPACK PASTIX
+    PLAPACK SCALAPACK SUITESPARSE SUNDIALS SUPERLU SUPERLU_DIST IRON)
+
+# Components that require Fortran 90 support.
+# Can be verified using the (internal) CMAKE_Fortran_COMPILER_SUPPORTS_F90 flag.
+#
+# Hypre has a fortran 90 example, which is not included in the examples build by default as of now. 
+set(OPENCMISS_COMPONENTS_WITH_F90 CELLML HDF5 PASTIX SOWING PETSC SUPERLU_DIST IRON)
 
 # The opencmiss components that are looked for on the local system instead of building it
 set(OPENCMISS_COMPONENTS_SYSTEM_BY_DEFAULT BLAS LAPACK LLVM LIBXML2 JPEG FREETYPE)
@@ -43,5 +53,5 @@ set(OC_MANDATORY_COMPONENTS FIELDML-API LIBXML2)
 set(OC_BUILD_SUPPORT_EMAIL "users@opencmiss.org")
 # This is an email address being displayed for issues regarding (remote) installations.
 # This needs to be set in either LocalConfig or Developer (better) in order to be useful.
-# If not set, a warning will be issued 
+# If not set, a warning will be issued!
 set(OC_INSTALL_SUPPORT_EMAIL FALSE)

@@ -19,7 +19,8 @@ function(getArchitecturePath VARNAME VARNAME_MPI)
     else()
         # Add the build type of MPI to the architecture path - we obtain different libraries
         # for different mpi build types
-        SET(MPI_PART ${MPI}_${MPI_BUILD_TYPE})
+        string(TOLOWER "${MPI_BUILD_TYPE}" _MPI_BUILD_TYPE)
+        SET(MPI_PART ${MPI}_${_MPI_BUILD_TYPE})
     endif()
     SET(ARCHPATH ${ARCHPATH}/${MPI_PART})
     
@@ -51,7 +52,7 @@ function(getShortArchitecturePath VARNAME)
     # Profiling
     
     # Multithreading
-    if (OCM_USE_MT)
+    if (OC_MULTITHREADING)
         SET(ARCHPATH ${ARCHPATH}/mt)
     endif()
     
@@ -82,7 +83,17 @@ function(getCompilerPathElem VARNAME)
 	elseif( CYGWIN )
 		set(_COMP "cygwin")
 	endif()
-	set(${VARNAME} "${_COMP}-${CMAKE_C_COMPILER_VERSION}" PARENT_SCOPE)
+	
+	# Get compiler major + minor versions
+	set(_COMPILER_VERSION_REGEX "^[0-9]+\.[0-9]+")
+	string(REGEX MATCH ${_COMPILER_VERSION_REGEX}
+       _C_COMPILER_VERSION_MM "${CMAKE_C_COMPILER_VERSION}")
+    # Also for the fortran compiler
+    string(REGEX MATCH ${_COMPILER_VERSION_REGEX}
+       _Fortran_COMPILER_VERSION_MM "${CMAKE_Fortran_COMPILER_VERSION}")
+    
+    # Combine into e.g. gnu-4.8-F4.5
+	set(${VARNAME} "${_COMP}-${_C_COMPILER_VERSION_MM}-F${_Fortran_COMPILER_VERSION_MM}" PARENT_SCOPE)
 endfunction()
 
 function(getBuildTypePathElem VARNAME)
