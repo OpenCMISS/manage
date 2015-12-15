@@ -41,7 +41,7 @@ foreach(example_name ${FEATURE_TEST_EXAMPLES})
             )
         endif()
     endforeach()
-    set(${example_name}_BRANCH devel)
+    set(${example_name}_BRANCH "v1.0")
     createExternalProjects(${example_name} "${SRC_DIR}" "${BIN_DIR}" "${DEFS}")
     # Dont build with the main build, as installation of OpenCMISS has not been done by then.
     set_target_properties(${example_name} PROPERTIES EXCLUDE_FROM_ALL YES)
