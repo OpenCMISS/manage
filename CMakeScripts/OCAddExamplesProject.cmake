@@ -10,11 +10,11 @@ if (NOT EXAMPLES_BRANCH)
 endif()
 createExternalProjects(EXAMPLES ${OPENCMISS_EXAMPLES_SRC_DIR} ${OPENCMISS_EXAMPLES_BUILD_DIR} "")
 # Dont build the examples with the normal main build!
-set_property(TARGET EXAMPLES PROPERTY EXCLUDE_FROM_ALL TRUE)
+set_property(TARGET ${OC_EP_PREFIX}EXAMPLES PROPERTY EXCLUDE_FROM_ALL TRUE)
 
 # Add a test target to run
 if (BUILD_TESTS)
     add_custom_target(examples-test
-        DEPENDS EXAMPLES
+        DEPENDS ${OC_EP_PREFIX}EXAMPLES
         COMMAND ${CMAKE_COMMAND} --build ${OPENCMISS_EXAMPLES_BUILD_DIR} --target test)
 endif()
