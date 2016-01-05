@@ -39,7 +39,7 @@ foreach(COMPONENT ${OPENCMISS_COMPONENTS})
 endforeach()
 
 # Main version
-set(OPENCMISS_VERSION 1.0)
+set(OPENCMISS_VERSION 1.1)
 
 # Component versions
 set(BLAS_VERSION 3.5.0)
@@ -82,17 +82,17 @@ set(IMAGEMAGICK_VERSION 6.7.0.8)
 set(ITK_VERSION 3.20.0)
 
 # MPI
-set(OPENMPI_VERSION 1.10.0) #1.8.4
+set(OPENMPI_VERSION 1.8.4) #1.8.4, 1.10.0 (unstable, does fail on e.g. ASES/Stuttgart)
 set(MPICH_VERSION 3.1.3)
 set(MVAPICH2_VERSION 2.1)
 # Cellml
 set(CELLML_VERSION 1.0) # any will do, not used
 set(CSIM_VERSION 1.0)
 
-set(IRON_VERSION 0.4.0)
+set(IRON_VERSION 0.5.0)
 set(IRON_SHARED YES)
 
-set(ZINC_VERSION 3.0.1)
+set(ZINC_VERSION 3.0.2)
 set(ZINC_SHARED YES)
 
 set(EXAMPLES_VERSION 1.0)
