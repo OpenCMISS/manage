@@ -18,6 +18,7 @@ option(CMAKE_VERBOSE_MAKEFILE "Generate verbose makefiles/projects for builds" N
 set(OC_USE_ARCHITECTURE_PATH YES)
 set(GITHUB_USE_SSL NO)
 set(OC_DEPENDENCIES_ONLY NO)
+set(OC_EP_PREFIX "OC_") # The prefix for opencmiss dependencies external projects
 
 foreach(COMPONENT ${OPENCMISS_COMPONENTS})
     set(_VALUE YES)

@@ -224,7 +224,7 @@ function(createExternalProjects COMPONENT_NAME SOURCE_DIR BINARY_DIR DEFS)
     )  
     
     #message(STATUS "Adding ${COMPONENT_NAME} with DEPS=${${COMPONENT_NAME}_DEPS}, DEFS=${DEFS}")
-    ExternalProject_Add(${COMPONENT_NAME}
+    ExternalProject_Add(${OC_EP_PREFIX}${COMPONENT_NAME}
         DEPENDS ${${COMPONENT_NAME}_DEPS} CHECK_${COMPONENT_NAME}_SOURCES
         PREFIX ${BINARY_DIR}
         LIST_SEPARATOR ${OC_LIST_SEPARATOR}
@@ -270,33 +270,33 @@ endfunction()
 
 function(addConvenienceTargets COMPONENT_NAME BINARY_DIR)
     # Add convenience direct-access clean target for component
-    add_custom_target(${COMPONENT_NAME}-clean
+    string(TOLOWER "${COMPONENT_NAME}" COMPONENT_NAME_LOWER)
+    add_custom_target(${COMPONENT_NAME_LOWER}-clean
         COMMAND ${CMAKE_COMMAND} -E remove -f ${BINARY_DIR}/ep_stamps/*-configure 
         COMMAND ${CMAKE_COMMAND} --build ${BINARY_DIR} --target clean
-        COMMAND ${CMAKE_COMMAND} -E remove -f ${BINARY_DIR}/CMakeCache.txt
         COMMENT "Cleaning ${COMPONENT_NAME}"
     )
     # Add convenience direct-access update target for component
     # This removes the external project stamp for the last update and hence triggers execution of the update, e.g.
     # a new source download or "git pull"
-    add_custom_target(${COMPONENT_NAME}-update
+    add_custom_target(${COMPONENT_NAME_LOWER}-update
         COMMAND ${CMAKE_COMMAND} -E remove -f ${OPENCMISS_ROOT}/src/download/stamps/${COMPONENT_NAME}_SRC-update
         COMMAND ${CMAKE_COMMAND} --build ${CMAKE_CURRENT_BINARY_DIR} --target ${COMPONENT_NAME}_SRC-update
         COMMENT "Updating ${COMPONENT_NAME} sources"
     )
     # Add convenience direct-access forced build target for component
     getBuildCommands(_DUMMY INSTALL_COMMAND ${BINARY_DIR} TRUE)
-    add_custom_target(${COMPONENT_NAME}-build
+    add_custom_target(${COMPONENT_NAME_LOWER}
         COMMAND ${CMAKE_COMMAND} -E remove -f ${BINARY_DIR}/ep_stamps/*-build 
         COMMAND ${INSTALL_COMMAND}
     )
     if (BUILD_TESTS)
         # Add convenience direct-access test target for component
-        add_custom_target(${COMPONENT_NAME}-test
+        add_custom_target(${COMPONENT_NAME_LOWER}-test
             COMMAND ${CMAKE_COMMAND} --build ${BINARY_DIR} --target test
         )
         # Add a global test to run the external project's tests
-        add_test(${COMPONENT_NAME}-test ${CMAKE_COMMAND} --build ${BINARY_DIR} --target test)
+        add_test(${COMPONENT_NAME_LOWER}-test ${CMAKE_COMMAND} --build ${BINARY_DIR} --target test)
     endif()
 endfunction()
 
@@ -345,7 +345,7 @@ macro(addDownstreamDependencies COMPONENT_NAME IN_PARENT_SCOPE)
         # Add all new forward dependencies of component
         foreach(FWD_DEP ${${COMPONENT_NAME}_FWD_DEPS})
             #message(STATUS "adding ${COMPONENT_NAME} to ${FWD_DEP}_DEPS")  
-            list(APPEND ${FWD_DEP}_DEPS ${COMPONENT_NAME})
+            list(APPEND ${FWD_DEP}_DEPS "${OC_EP_PREFIX}${COMPONENT_NAME}")
             # Propagate the changed variable to outside this function - its a function
             if (${IN_PARENT_SCOPE})
                 set(${FWD_DEP}_DEPS ${${FWD_DEP}_DEPS} PARENT_SCOPE)
@@ -386,13 +386,13 @@ Configure definitions:
         )
     endif()
     
-    add_custom_target(_${NAME}_buildlog
+    add_custom_target(${OC_EP_PREFIX}${NAME}_buildlog
         COMMAND ${CMAKE_COMMAND}
             -DBUILD_STAMP=YES 
             -DCOMPONENT_NAME=${NAME}
             -P ${OPENCMISS_MANAGE_DIR}/CMakeScripts/OCSupport.cmake
         WORKING_DIRECTORY "${OC_SUPPORT_DIR}")
-    add_dependencies(${NAME} _${NAME}_buildlog)
+    add_dependencies(${OC_EP_PREFIX}${NAME} ${OC_EP_PREFIX}${NAME}_buildlog)
     
     string(TIMESTAMP NOW "%Y-%m-%d, %H:%M")
     file(APPEND "${OC_SUPPORT_DIR}/build.log" "Configured component ${NAME}-${${NAME}_VERSION} at ${NOW}\r\n")
