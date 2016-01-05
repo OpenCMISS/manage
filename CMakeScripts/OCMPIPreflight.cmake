@@ -15,13 +15,13 @@
 
 # Cleanup - Have cmake truly re-look for everything MPI-related, the generation phase
 # is all about setup and does not need a cache
-UNSET(MPIEXEC CACHE)
-UNSET(MPI_FOUND CACHE)
+unset(MPIEXEC CACHE)
+unset(MPI_FOUND CACHE)
 foreach (lang C CXX Fortran)
-    UNSET(MPI_${lang}_INCLUDE_PATH CACHE)
-    UNSET(MPI_${lang}_LIBRARIES CACHE)
-    UNSET(MPI_${lang}_COMPILER CACHE)
-    SET(MPI_${lang}_FOUND FALSE)
+    unset(MPI_${lang}_INCLUDE_PATH CACHE)
+    unset(MPI_${lang}_LIBRARIES CACHE)
+    unset(MPI_${lang}_COMPILER CACHE)
+    set(MPI_${lang}_FOUND FALSE)
 endforeach()
 
 # Ensure lower-case mpi and upper case mpi build type
@@ -45,10 +45,18 @@ endif()
 # The default implementation to use in all last-resort/unimplemented cases
 SET(OPENCMISS_MPI_DEFAULT mpich)
 
+# Check if a new MPI_HOME was specified
+set(RECHECK_MPI FALSE)
+if (DEFINED MPI_HOME_OLD AND NOT MPI_HOME_OLD STREQUAL MPI_HOME)
+    set(RECHECK_MPI TRUE)
+    unset(MPI CACHE) # Currently also unsets MPI locally - contrary to documentation (cmake 3.4)
+    unset(MPI) 
+endif()
+
 # We did not get any user choice in terms of MPI
-if(NOT DEFINED MPI)
+if(NOT DEFINED MPI OR ())
     # MPI_HOME specified - use that and fail if there's no MPI
-    if (DEFINED MPI_HOME)
+    if (DEFINED MPI_HOME AND NOT MPI_HOME STREQUAL "")
         find_package(MPI QUIET)
         if (NOT MPI_FOUND)
             message(FATAL_ERROR "No MPI found at MPI_HOME=${MPI_HOME}")
@@ -104,3 +112,6 @@ if(NOT DEFINED MPI)
         unset(SUGGESTED_MPI)
     endif()
 endif()
+
+# Store the current MPI_HOME
+set(MPI_HOME_OLD "${MPI_HOME}" CACHE INTERNAL "Latest value of MPI_HOME")
