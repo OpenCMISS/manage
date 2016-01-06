@@ -272,7 +272,8 @@ function(addConvenienceTargets COMPONENT_NAME BINARY_DIR)
     # Add convenience direct-access clean target for component
     string(TOLOWER "${COMPONENT_NAME}" COMPONENT_NAME_LOWER)
     add_custom_target(${COMPONENT_NAME_LOWER}-clean
-        COMMAND ${CMAKE_COMMAND} -E remove -f ${BINARY_DIR}/ep_stamps/*-configure 
+        COMMAND ${CMAKE_COMMAND} -E remove -f ${BINARY_DIR}/ep_stamps/*-configure
+        COMMAND ${CMAKE_COMMAND} -E touch ${BINARY_DIR}/CMakeCache.txt # force cmake re-run to make sure
         COMMAND ${CMAKE_COMMAND} --build ${BINARY_DIR} --target clean
         COMMENT "Cleaning ${COMPONENT_NAME}"
     )

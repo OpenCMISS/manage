@@ -47,14 +47,14 @@ SET(OPENCMISS_MPI_DEFAULT mpich)
 
 # Check if a new MPI_HOME was specified
 set(RECHECK_MPI FALSE)
-if (DEFINED MPI_HOME_OLD AND NOT MPI_HOME_OLD STREQUAL MPI_HOME)
+if (MPI_HOME_OLD AND NOT MPI_HOME_OLD STREQUAL MPI_HOME)
     set(RECHECK_MPI TRUE)
     unset(MPI CACHE) # Currently also unsets MPI locally - contrary to documentation (cmake 3.4)
-    unset(MPI) 
+    unset(MPI)
 endif()
 
 # We did not get any user choice in terms of MPI
-if(NOT DEFINED MPI OR ())
+if(NOT DEFINED MPI)
     # MPI_HOME specified - use that and fail if there's no MPI
     if (DEFINED MPI_HOME AND NOT MPI_HOME STREQUAL "")
         find_package(MPI QUIET)
