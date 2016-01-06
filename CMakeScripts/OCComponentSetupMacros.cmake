@@ -11,10 +11,10 @@ function(addAndConfigureLocalComponent COMPONENT_NAME)
     #list(APPEND _OC_SELECTED_COMPONENTS ${COMPONENT_NAME})
     # Need this since it's a function
     set(_OC_SELECTED_COMPONENTS ${_OC_SELECTED_COMPONENTS} ${COMPONENT_NAME} PARENT_SCOPE)
-    
+
     ##############################################################
     # Compute directories
-    SET(COMPONENT_SOURCE "${OPENCMISS_ROOT}/src/${SUBGROUP_PATH}/${FOLDER_NAME}")
+    set(COMPONENT_SOURCE "${OPENCMISS_ROOT}/src/${SUBGROUP_PATH}/${FOLDER_NAME}")
     # Check which build dir is required - depending on whether this component can be built against mpi
     if (COMPONENT_NAME IN_LIST OPENCMISS_COMPONENTS_WITHMPI)
         set(BUILD_DIR_BASE "${OPENCMISS_COMPONENTS_BINARY_DIR_MPI}")
@@ -105,7 +105,7 @@ function(addAndConfigureLocalComponent COMPONENT_NAME)
     createExternalProjects(${COMPONENT_NAME} "${COMPONENT_SOURCE}" "${COMPONENT_BUILD_DIR}" "${COMPONENT_DEFS}")
     
     # Create some convenience targets like clean, update etc
-    addConvenienceTargets(${COMPONENT_NAME} "${COMPONENT_BUILD_DIR}")
+    addConvenienceTargets(${COMPONENT_NAME} "${COMPONENT_BUILD_DIR}" "${COMPONENT_SOURCE}")
     
     # Add the dependency information for other downstream packages that might use this one
     addDownstreamDependencies(${COMPONENT_NAME} TRUE)
@@ -268,7 +268,7 @@ function(createExternalProjects COMPONENT_NAME SOURCE_DIR BINARY_DIR DEFS)
     
 endfunction()
 
-function(addConvenienceTargets COMPONENT_NAME BINARY_DIR)
+function(addConvenienceTargets COMPONENT_NAME BINARY_DIR SOURCE_DIR)
     # Add convenience direct-access clean target for component
     string(TOLOWER "${COMPONENT_NAME}" COMPONENT_NAME_LOWER)
     add_custom_target(${COMPONENT_NAME_LOWER}-clean
@@ -285,6 +285,17 @@ function(addConvenienceTargets COMPONENT_NAME BINARY_DIR)
         COMMAND ${CMAKE_COMMAND} --build ${CMAKE_CURRENT_BINARY_DIR} --target ${COMPONENT_NAME}_SRC-update
         COMMENT "Updating ${COMPONENT_NAME} sources"
     )
+    
+    if (GIT_FOUND)
+        add_custom_target(${COMPONENT_NAME_LOWER}-gitstatus
+            COMMAND ${GIT_EXECUTABLE} status
+            COMMAND ${CMAKE_COMMAND} -E echo "Branches for ${COMPONENT_NAME_LOWER} repository"
+            COMMAND ${GIT_EXECUTABLE} branch -av -v 
+            WORKING_DIRECTORY ${SOURCE_DIR}
+            COMMENT "Git status report for ${COMPONENT_NAME_LOWER} at ${SOURCE_DIR}"
+        )
+    endif()
+    
     # Add convenience direct-access forced build target for component
     getBuildCommands(_DUMMY INSTALL_COMMAND ${BINARY_DIR} TRUE)
     add_custom_target(${COMPONENT_NAME_LOWER}
