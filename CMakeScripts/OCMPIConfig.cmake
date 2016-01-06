@@ -120,7 +120,7 @@ if (NOT MPI_FOUND)
         #    MATH(EXPR NUM_PROCESSORS ${NUM_PROCESSORS}+4)
         endif()
         
-        ExternalProject_Add(MPI
+        ExternalProject_Add(${OC_EP_PREFIX}MPI
     		PREFIX ${_MPI_BINARY_DIR}
     		TMP_DIR ${_MPI_BINARY_DIR}/ep_tmp
     		STAMP_DIR ${_MPI_BINARY_DIR}/ep_stamp
