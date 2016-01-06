@@ -94,8 +94,8 @@ endif()
 
 ########################################################################
 # MPI
-# Unless we said to not have MPI or MPI_HOME is given, see that it's available.
-if(NOT (DEFINED MPI_HOME OR MPI STREQUAL none))
+# Unless we said to not have MPI, see that it's available.
+if(NOT MPI STREQUAL none)
     include(OCMPIConfig)
 endif()
 # Note:
