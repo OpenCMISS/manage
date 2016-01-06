@@ -45,7 +45,7 @@ if (NOT OC_DEPENDENCIES_ONLY)
                 )
             endif()
         endforeach()
-        set(${example_name}_BRANCH devel)
+        set(${example_name}_BRANCH ${OC_FEATURETESTS_BRANCH})
         createExternalProjects(${example_name} "${SRC_DIR}" "${BIN_DIR}" "${DEFS}")
         # Dont build with the main build, as installation of OpenCMISS has not been done by then.
         set_target_properties(${OC_EP_PREFIX}${example_name} PROPERTIES EXCLUDE_FROM_ALL YES)
