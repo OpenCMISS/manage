@@ -814,14 +814,14 @@ function(verify_mpi_type lang)
         else()
             # Pattern does not match but we have a matching desired MPI type - set to not found!
             if (MPI STREQUAL ${MNEMONIC})
-                messagev("The found MPI_${lang} compiler '${MPI_${lang}_COMPILER}' does not match the requested MPI implementation '${MNEMONIC}'.")
-#             messagev("Check your include paths (suffixes '${_BIN_SUFFIX}' each):
-#1. CMAKE_PREFIX_PATH ${CMAKE_PREFIX_PATH}
-#2. Build system guess ${_MPI_PREFIX_PATH}
-#3. CMAKE_SYSTEM_PREFIX_PATH ${CMAKE_SYSTEM_PREFIX_PATH}
-#Alternatively, specify MPI_HOME or set a full path to MPI_${lang}_COMPILER")
-                set(MPI_${lang}_FOUND FALSE PARENT_SCOPE)
-                break()
+                message(STATUS "The found MPI_${lang} compiler '${MPI_${lang}_COMPILER}' does not match the requested MPI implementation '${MNEMONIC}'.")
+                message(STATUS "Check your include paths (suffixes '${_BIN_SUFFIX}' each):
+1. CMAKE_PREFIX_PATH ${CMAKE_PREFIX_PATH}
+2. Build system guess ${_MPI_PREFIX_PATH}
+3. CMAKE_SYSTEM_PREFIX_PATH ${CMAKE_SYSTEM_PREFIX_PATH}
+Searched compiler names: ${_MPI_${lang}_COMPILER_NAMES}
+Alternatively, specify MPI_HOME or set a full path to MPI_${lang}_COMPILER")
+		message(FATAL_ERROR "MPI detection mismatch. Aborting.")
             endif()
         endif()
     endforeach()
