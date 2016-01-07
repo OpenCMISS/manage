@@ -32,7 +32,6 @@ if (NOT EXISTS ${OPENCMISS_LOCALCONFIG})
     endforeach()
     configure_file(${OPENCMISS_MANAGE_DIR}/Templates/OpenCMISSLocalConfig.template.cmake
         ${OPENCMISS_LOCALCONFIG})
-    unset(_NL)
     unset(OC_USE_SYSTEM_FLAGS)
     unset(OC_USE_FLAGS)
     
@@ -55,5 +54,5 @@ if (NOT EXISTS ${OPENCMISS_LOCALCONFIG})
             )
         endforeach()
     endif()
-    
+    unset(_NL)
 endif()
