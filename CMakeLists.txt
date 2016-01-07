@@ -65,6 +65,8 @@
 #    Further, you can specify an explicit mpi compiler wrapper (full path or just the binary name) for each language,
 #    where <lang> can be each of "C","CXX" or "Fortran".
 #    This can be used independently of (but possibly with) the MPI_HOME setting.
+# 
+# OC_SYSTEM_MPI: 
 
 ########################################################
 # If your cmake is older than 2.6 - goodbye. 
@@ -81,8 +83,8 @@ get_filename_component(OPENCMISS_ROOT ${OPENCMISS_ROOT} ABSOLUTE)
 # Set up include path required at this stage
 list(APPEND CMAKE_MODULE_PATH
     ${OPENCMISS_MANAGE_DIR}/CMakeScripts
-    ${OPENCMISS_MANAGE_DIR}/CMakeModules
-    ${OPENCMISS_MANAGE_DIR}/Config)
+    ${OPENCMISS_MANAGE_DIR}/Config
+    ${OPENCMISS_MANAGE_DIR})
 
 # This ensures that CMake is new enough before anything else is done
 # If its too old, the script will stop with an appropriate error message.
@@ -95,171 +97,202 @@ if (NOT CMAKE_COMPATIBLE)
 endif(NOT CMAKE_COMPATIBLE)
 ############################## END OF FULLY BACKWARDS-COMPATIBLE PART ###############################
 
-# We start a fake project here that will use any encountered C compiler here.
-# It will NOT be used (unless we let cmake use its defaults), but starting a project is
-# initializing a lot more CMake variables that ensure proper functionality of all cmake commands
-# (e.g. find_library does not "work" if issued before a project command, as the CMAKE_FIND_LIBRARY_SUFFIXES are still empty)
-#
-# The variable CMAKE_MIN_VERSION is set inside the CMakeCheck script
+# OPENCMISS_CMAKE_MIN_VERSION is defined in OCCMakeCheck
 cmake_minimum_required(VERSION ${OPENCMISS_CMAKE_MIN_VERSION} FATAL_ERROR)
-project(OpenCMISS-Generate-Build C)
 
-# See if we have a specified toolchain
-if (DEFINED TOOLCHAIN)
-    string(TOLOWER ${TOOLCHAIN} TOOLCHAIN)
-    set(TC_PART ${TOOLCHAIN})
-else()
-    # if unspecified but we're on MINGW, use that instead of "default"
-    if (MINGW)
-        set(TC_PART mingw) 
-    else()
-        set(TC_PART default) # "default" name
-    endif()
-endif()
+# Need to set the compilers before any project call
+include(OCToolchainCompilers)
 
-# MPI
-include(OCMPIPreflight)
+########################################################################
+# Ready to start the "build project"
+project(OpenCMISS VERSION 1.1 LANGUAGES C CXX Fortran)
 
-# This is the main build file location for each compiler/mpi combination.
-# We need to have different base folders for MPI in release/debug modes.
-string(TOLOWER "${MPI_BUILD_TYPE}" _MPI_BUILD_TYPE)
-set(BUILD_IDENT compiler.${TC_PART}-mpi.${MPI}.${_MPI_BUILD_TYPE}) # dont care, take anything to combine stuff
-unset(_MPI_BUILD_TYPE)
-set(MAIN_BINARY_DIR "${CMAKE_CURRENT_BINARY_DIR}/${BUILD_IDENT}")
-file(MAKE_DIRECTORY "${MAIN_BINARY_DIR}")
+include(OCMiscFunctionsMacros)
 
-# # Create a local config file at target folder if not exists
+# Create a local config file if not exists
 include(OCCreateLocalConfig)
+    
+# This includes the configuration, both default and local
+include(OpenCMISSConfig)
 
-# Configure the main build CMakeLists.txt
-if (TOOLCHAIN)
-    SET(TOOLCHAIN_DEF "set(TOOLCHAIN ${TOOLCHAIN})")
+# Start log file for config run
+string(TIMESTAMP NOW "%Y-%m-%d, %H:%M")
+log("Starting configuration in ${CMAKE_CURRENT_BINARY_DIR} at ${NOW}")
+
+# Need to set the compiler flags after any project call - this ensures the cmake platform values
+# are used, too.
+include(OCToolchainFlags)
+
+if ((NOT WIN32 OR MINGW) AND CMAKE_BUILD_TYPE STREQUAL "")
+    SET(CMAKE_BUILD_TYPE RELEASE)
+    message(STATUS "No CMAKE_BUILD_TYPE has been defined. Using RELEASE.")
 endif()
-if (MPI_HOME)
-    SET(MPI_HOME_DEF "set(MPI_HOME ${MPI_HOME})")
+
+include(ExternalProject)
+include(OCArchitecturePath)
+include(OCComponentSetupMacros)
+
+########################################################################
+# Utilities and external packages
+
+include(OCInstallFindModuleWrappers)
+# Add CMakeModules directory after wrapper module directory (set in above script)
+# This folder is also exported to the install tree upon "make install" and
+# then used within the FindOpenCMISS.cmake module script
+list(APPEND CMAKE_MODULE_PATH 
+    ${OPENCMISS_MANAGE_DIR}/CMakeModules
+)
+
+# No point in building ZINC if there's no OpenGL around
+find_package(OpenGL QUIET)
+if (NOT OPENGL_FOUND AND OC_USE_ZINC)
+    set(OC_USE_ZINC NO)
+    message(WARNING "OpenCMISS: No OpenGL found, cannot build Zinc. Disabling.")
 endif()
-configure_file(
-    "${OPENCMISS_MANAGE_DIR}/Templates/CMakeLists.main.template.cmake" # from
-    "${MAIN_BINARY_DIR}/CMakeLists.txt" # to
-    @ONLY # only @-tags
-)
 
-# This makes sure the configure step for the current main project is run at the beginning;
-# later the build call to the main project will detect for itself if new builds are necessary.
-add_custom_command(OUTPUT "${MAIN_BINARY_DIR}/configure_stamp"
-    COMMAND ${CMAKE_COMMAND} -G "${CMAKE_GENERATOR}" .
-    COMMAND ${CMAKE_COMMAND} -E touch "${MAIN_BINARY_DIR}/configure_stamp"
-    WORKING_DIRECTORY "${MAIN_BINARY_DIR}"
-    COMMENT "Initializing OpenCMISS configuration ${BUILD_IDENT}"
-)
-# This is the main target
-# The invocation of an extra script allows to catch build errors and display a custom
-# message and automatically create the support target! 
-add_custom_target(${BUILD_IDENT} ALL
-    DEPENDS "${MAIN_BINARY_DIR}/configure_stamp"
-    COMMAND ${CMAKE_COMMAND} --build "${MAIN_BINARY_DIR}" --target install
-    COMMAND ${CMAKE_COMMAND} --build "${MAIN_BINARY_DIR}" --target featuretests
-    COMMENT "Building OpenCMISS configuration ${BUILD_IDENT}"
-    # Currently implemented but disabled by default
-    #COMMAND ${CMAKE_COMMAND} 
-    #    -DMAIN_BINARY_DIR="${MAIN_BINARY_DIR}"
-    #    -DBUILD_IDENT="${BUILD_IDENT}"
-    #    -P ${OPENCMISS_MANAGE_DIR}/CMakeScripts/ScriptTryCatchBuild.cmake
-)
-
-# Convenience/Maintenance targets
-# Add target that executes the update command of the generated main build.
-# This is not global, as different configurations might use only a fraction of the sources,
-# and each of them only wants their choices updated.
-add_custom_target(update
-    COMMAND ${CMAKE_COMMAND} --build "${MAIN_BINARY_DIR}" --target update
-)
-# Forward examples target, test and support
-add_custom_target(examples
-    COMMAND ${CMAKE_COMMAND} --build "${MAIN_BINARY_DIR}" --target EXAMPLES
-)
-add_custom_target(examples-test
-    DEPENDS examples
-    COMMAND ${CMAKE_COMMAND} --build "${MAIN_BINARY_DIR}" --target examples-test
-)
-add_custom_target(support
-    COMMAND ${CMAKE_COMMAND} --build "${MAIN_BINARY_DIR}" --target support
-)
-
-# DANGER ZONE
-add_custom_target(reset_current
-    COMMAND ${CMAKE_COMMAND} --build "${MAIN_BINARY_DIR}" --target reset
-    COMMAND ${CMAKE_COMMAND} -E copy ${BUILD_IDENT}/OpenCMISSLocalConfig.cmake ../backup_localconfig.tmp
-    COMMAND ${CMAKE_COMMAND} -E remove_directory ${BUILD_IDENT}
-    COMMAND ${CMAKE_COMMAND} -E copy ../backup_localconfig.tmp ${BUILD_IDENT}/OpenCMISSLocalConfig.cmake
-    COMMAND ${CMAKE_COMMAND} -E remove ../backup_localconfig.tmp
-    COMMENT "Resetting ${BUILD_IDENT}: Blowing away build files, preserving OpenCMISSLocalConfig"
-    WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
-)
-add_custom_target(reset_current_mpionly
-    COMMAND ${CMAKE_COMMAND} --build "${MAIN_BINARY_DIR}" --target reset_mpionly
-    COMMAND ${CMAKE_COMMAND} -E copy ${BUILD_IDENT}/OpenCMISSLocalConfig.cmake ../backup_localconfig.tmp
-    COMMAND ${CMAKE_COMMAND} -E remove_directory ${BUILD_IDENT}
-    COMMAND ${CMAKE_COMMAND} -E copy ../backup_localconfig.tmp ${BUILD_IDENT}/OpenCMISSLocalConfig.cmake
-    COMMAND ${CMAKE_COMMAND} -E remove ../backup_localconfig.tmp
-    COMMENT "Resetting ${BUILD_IDENT}: Blowing away MPI-related build files, preserving OpenCMISSLocalConfig"
-    WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
-)
-add_custom_target(utter_destruction
-    COMMAND ${CMAKE_COMMAND} -E remove_directory "${OPENCMISS_ROOT}/build"
-    COMMAND ${CMAKE_COMMAND} -E remove_directory "${OPENCMISS_ROOT}/install"
-    COMMAND ${CMAKE_COMMAND} -E copy ${BUILD_IDENT}/OpenCMISSLocalConfig.cmake ../backup_localconfig.tmp
-    COMMAND ${CMAKE_COMMAND} -E remove_directory ${BUILD_IDENT}
-    COMMAND ${CMAKE_COMMAND} -E copy ../backup_localconfig.tmp ${BUILD_IDENT}/OpenCMISSLocalConfig.cmake
-    COMMAND ${CMAKE_COMMAND} -E remove ../backup_localconfig.tmp
-    COMMENT "BAM! Deleting build & install folders. Only keeping OpenCMISSLocalConfig from last configuration in ${BUILD_IDENT}"
-    WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
-)
-
-# Just a convenience hack to have OpenCMISS copy the developer defaults config file over.
-if (DEFINED EVIL OR EVIL)
-    set(EVEL ${EVIL})
+# Pre-check for Python availability so that bindings will be built automatically (unless explicitly specified)
+# The FOUND flag is used (at least) at OCConfigureComponents/IRON
+find_package(PythonInterp ${PYTHON_VERSION} QUIET)
+if (NOT DEFINED IRON_WITH_Python_BINDINGS)
+    set(IRON_WITH_Python_BINDINGS ${PYTHONINTERP_FOUND})
 endif()
-if (DEFINED EVEL OR EVEL)
-    if (NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/OpenCMISSDeveloper.cmake")
-        configure_file(
-            "${CMAKE_CURRENT_SOURCE_DIR}/Templates/OpenCMISSDeveloper.template.cmake"
-            "${CMAKE_CURRENT_SOURCE_DIR}/OpenCMISSDeveloper.cmake"
-            COPYONLY)
-        set(EVIL_MESSAGE "Being a Developer: ${EVEL}. Copied the OpenCMISSDeveloper template.")
-    else()
-        set(EVIL_MESSAGE "OpenCMISSDeveloper script already copied. Not overwriting.")
+
+# Git is used by default to clone source repositories, unless disabled
+if (NOT DISABLE_GIT)
+    find_package(Git)
+    if (NOT GIT_FOUND)
+        message(STATUS "ATTENTION: Could not find Git. Falling back to download sources as .zip files.")
     endif()
 endif()
+
+include(OCDetectFortranMangling)
+
+# Multithreading
+if(OC_MULTITHREADING)
+    find_package(OpenMP REQUIRED)
+endif()
+
+########################################################################
+# MPI
+# Unless we said to not have MPI, see that it's available.
+if(NOT MPI STREQUAL none)
+    include(OCMPIConfig)
+endif()
+
+# Checks for known issues as good as possible
+# TODO: move this to the generator script?!
+#if (CMAKE_COMPILER_IS_GNUC AND MPI STREQUAL intel)
+#    message(FATAL_ERROR "Invalid compiler/MPI combination: Cannot build with GNU compiler and Intel MPI.")
+#endif()
+
+########################################################################
+# General paths & preps
+set(ARCHITECTURE_PATH .)
+set(ARCHITECTURE_PATH_MPI .)
+if (OC_USE_ARCHITECTURE_PATH)
+    getArchitecturePath(ARCHITECTURE_PATH ARCHITECTURE_PATH_MPI)
+endif()
+# Build tree location for components (with/without mpi)
+SET(OPENCMISS_COMPONENTS_BINARY_DIR "${OPENCMISS_ROOT}/build/${ARCHITECTURE_PATH}")
+SET(OPENCMISS_COMPONENTS_BINARY_DIR_MPI "${OPENCMISS_ROOT}/build/${ARCHITECTURE_PATH_MPI}")
+# Install dir
+# Extra path segment for single configuration case - will give release/debug/...
+getBuildTypePathElem(BUILDTYPEEXTRA)
+########### everything from the OpenCMISS main project goes into install/
+# This is also used in Install.cmake to place the opencmiss config files.
+set(OPENCMISS_COMPONENTS_INSTALL_PREFIX_NO_BUILD_TYPE "${OPENCMISS_INSTALL_ROOT}/${ARCHITECTURE_PATH}")
+# This is the install prefix for all components without mpi
+set(OPENCMISS_COMPONENTS_INSTALL_PREFIX "${OPENCMISS_COMPONENTS_INSTALL_PREFIX_NO_BUILD_TYPE}/${BUILDTYPEEXTRA}")
+# This is the install path for mpi-aware components
+set(OPENCMISS_COMPONENTS_INSTALL_PREFIX_MPI_NO_BUILD_TYPE "${OPENCMISS_INSTALL_ROOT}/${ARCHITECTURE_PATH_MPI}")
+set(OPENCMISS_COMPONENTS_INSTALL_PREFIX_MPI "${OPENCMISS_COMPONENTS_INSTALL_PREFIX_MPI_NO_BUILD_TYPE}/${BUILDTYPEEXTRA}")
+
+######################
+# The COMMON_PACKAGE_CONFIG_DIR contains the cmake-generated target config files consumed by find_package(... CONFIG).
+# Those are "usually" placed under the lib/ folders of the installation tree, however, the OpenCMISS build system
+# install trees also have the build type as subfolders. As the config-files generated natively create differently named files
+# for each build type, they can be collected in a common subfolder. As the build type subfolder-element is the last in line,
+# we simply use the parent folder of the component's CMAKE_INSTALL_PREFIX to place the cmake package config files.
+# ATTENTION: this is (still) not usable. While older cmake versions deleted other-typed config files, they are now kept at least.
+# However, having the config file OUTSIDE the install prefix path still does not work correctly, and the fact that
+# we need to be able to determine build types for examples/iron/dependencies separately requires separate folders, for now.
+SET(COMMON_PACKAGE_CONFIG_DIR cmake)
+#SET(COMMON_PACKAGE_CONFIG_DIR ../cmake)
+# The path where find_package calls will find the cmake package config files for any opencmiss component
+set(OPENCMISS_PREFIX_PATH
+    "${OPENCMISS_COMPONENTS_INSTALL_PREFIX}/${COMMON_PACKAGE_CONFIG_DIR}" 
+    "${OPENCMISS_COMPONENTS_INSTALL_PREFIX_MPI}/${COMMON_PACKAGE_CONFIG_DIR}"
+)
+# Also add
+#list(APPEND CMAKE_PREFIX_PATH ${OPENCMISS_PREFIX_PATH})
+# This is where the libraries will be put.
+set(OPENCMISS_LIBRARY_PATH
+    "${OPENCMISS_COMPONENTS_INSTALL_PREFIX}/lib"
+    "${OPENCMISS_COMPONENTS_INSTALL_PREFIX_MPI}/lib"
+)
+# If we have an explicit MPI_HOME, add this to the library path (+/lib)
+if (MPI_HOME)
+    list(APPEND OPENCMISS_LIBRARY_PATH "${MPI_HOME}/lib")
+endif()
+
+######################
+# Checks if conditions for a remote installation of opencmiss are given and augments the prefix path
+# by a matching remote one
+# If the according remote directory does not exist or any package is not build there, it will be built
+# locally.
+include(OCCheckRemoteInstallation)
+
+###################### 
+# Collect the common arguments for any package/component
+include(OCCollectComponentDefinitions)
+
+# Those list variables will be filled by the build macros
+SET(_OC_SELECTED_COMPONENTS )
+
+########################################################################
+# Support - get help!
+include(OCSupport)
+
+########################################################################
+# Actual external project configurations
+
+# Dependencies, Iron, ...
+include(OCConfigureComponents)
+
+# Examples
+if (NOT OC_DEPENDENCIES_ONLY)
+    include(OCAddExamplesProject)
+endif()
+
+########################################################################
+# Installation and support
+include(OCInstall)
+
+########################################################################
+# Testing
+# Need to enable testing in order for any add_test calls (see OCComponentSetupMacros) to work
+enable_testing()
+include(OCFeatureTests)
+
+########################################################################
+# Misc targets for convenience
+include(OCCustomTargets)
 
 # Print a neat summary
-message(STATUS "@@@@@@@@@@@@@@@@@@@ SETUP SUMMARY @@@@@@@@@@@@@@@@@@@")
-message(STATUS "*")
-message(STATUS "* OPENCMISS_ROOT: ${OPENCMISS_ROOT}")
+message(STATUS "@@@@@@@@@@@@@@@@@@@ SUMMARY @@@@@@@@@@@@@@@@@@@")
+message(STATUS "@")
+message(STATUS "@ OPENCMISS_ROOT: ${OPENCMISS_ROOT}")
 if (OPENCMISS_REMOTE_INSTALL_DIR)
-    message(STATUS "* OPENCMISS_REMOTE_INSTALL_DIR: ${OPENCMISS_REMOTE_INSTALL_DIR}")
+    message(STATUS "@ OPENCMISS_REMOTE_INSTALL_DIR: ${OPENCMISS_REMOTE_INSTALL_DIR}")
 endif()
-message(STATUS "* OPENCMISS_MANAGE_DIR: ${OPENCMISS_MANAGE_DIR}")
-message(STATUS "* Main build directory: ${MAIN_BINARY_DIR}")
-message(STATUS "* MPI implementation: ${MPI}")
+message(STATUS "@ MPI implementation: ${MPI}")
 if (MPI_HOME)
-    message(STATUS "* MPI HOME: ${MPI_HOME}")
+    message(STATUS "@ MPI HOME: ${MPI_HOME}")
 endif()
 if (TOOLCHAIN)
-    message(STATUS "* TOOLCHAIN: ${TOOLCHAIN}")
+    message(STATUS "@ TOOLCHAIN: ${TOOLCHAIN}")
 endif()
-if (DEFINED EVIL)
-    message(STATUS "* ${EVIL_MESSAGE}")
-endif()
-message(STATUS "*")
-message(STATUS "@@@@@@@@@@@@@@@@@@@ NEXT STEPS @@@@@@@@@@@@@@@@@@@@@@")
-message(STATUS "*")
-message(STATUS "* Change ${MAIN_BINARY_DIR}/OpenCMISSLocalConfig.cmake according to your setup/needs")
-if (DEFINED EVIL)
-    message(STATUS "* Change ${CMAKE_CURRENT_SOURCE_DIR}/OpenCMISSDeveloper.cmake according to your developing setup/needs (Overrides anything in OpenCMISSLocalConfig!)")        
-endif()
-message(STATUS "* Run your native build command (e.g. '${CMAKE_MAKE_PROGRAM}') to start the build process")
-message(STATUS "* IF YOU ENCOUNTER BUILD ERRORS, TYPE '${CMAKE_MAKE_PROGRAM} support' TO GET HELP!")
-message(STATUS "* Refer to ${OPENCMISS_MANAGE_DIR}/OpenCMISSBuildEnvironment.docx.pdf for customization instructions")
-message(STATUS "*")
-message(STATUS "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@")
+message(STATUS "@")
+printnextsteps()
+
+log("Finished configuration in ${CMAKE_CURRENT_BINARY_DIR}")

@@ -18,6 +18,14 @@ set(OC_CREATE_LOGS NO)
 # If you want more verbose output during builds, uncomment this line.
 #set(CMAKE_VERBOSE_MAKEFILE ON)
 
+# The levels of log entries written to the config build log.
+# This is the same as for normal users but also contains the DEBUG entries
+# More values are: VERBOSE
+set(OC_CONFIG_LOG_LEVELS SCREEN WARNING ERROR DEBUG)
+
+# For developers, all non SCREEN-level logs are also printed on the console by default.
+#set(OC_CONFIG_LOG_TO_SCREEN YES)
+
 ##############################################################################################
 ############################################### Maintainer setup
 # Please set this to your email address, especially if you plan to provide several architecture installations and

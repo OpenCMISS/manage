@@ -48,7 +48,7 @@ endif()
 # unintuitive to have to define the build type differently. Hence, this solution simply sets the assigned value of 
 # CMAKE_BUILD_TYPE also in the cache.
 # If there appear other variables that require the same behaviour, one should consider alternative solutions to this.
-set(CMAKE_BUILD_TYPE ${CMAKE_BUILD_TYPE} CACHE STRING "The build type for OpenCMISS" FORCE)
+#set(CMAKE_BUILD_TYPE ${CMAKE_BUILD_TYPE} CACHE STRING "The build type for OpenCMISS" FORCE)
 
 ######################################################################
 # Postprocessing
@@ -97,5 +97,5 @@ if (OC_DEVEL_ALL)
     set(EXAMPLES_BRANCH devel)
     set(OC_FEATURETESTS_BRANCH devel)
 else()
-    set(OC_FEATURETESTS_BRANCH v${OPENCMISS_VERSION})
+    set(OC_FEATURETESTS_BRANCH v${OpenCMISS_VERSION})
 endif()

@@ -1,5 +1,9 @@
 # Make sure a localconfig file exists
-if (NOT EXISTS ${MAIN_BINARY_DIR}/OpenCMISSLocalConfig.cmake)
+set(OPENCMISS_LOCALCONFIG ${PROJECT_BINARY_DIR}/OpenCMISSLocalConfig.cmake)
+set(_OC_LOCALCONFIG_CREATED NO)
+if (NOT EXISTS ${OPENCMISS_LOCALCONFIG})
+    log("Creating OpenCMISSLocalConfig file in ${PROJECT_BINARY_DIR}")
+    set(_OC_LOCALCONFIG_CREATED YES)
     include(Variables)
     SET(OC_USE_SYSTEM_FLAGS )
     SET(OC_USE_FLAGS )
@@ -27,30 +31,33 @@ if (NOT EXISTS ${MAIN_BINARY_DIR}/OpenCMISSLocalConfig.cmake)
         SET(OC_USE_SYSTEM_FLAGS "${OC_USE_SYSTEM_FLAGS}#set(OC_SYSTEM_${COMPONENT} ${_VALUE})${_NL}")
     endforeach()
     configure_file(${OPENCMISS_MANAGE_DIR}/Templates/OpenCMISSLocalConfig.template.cmake
-        ${MAIN_BINARY_DIR}/OpenCMISSLocalConfig.cmake)
+        ${OPENCMISS_LOCALCONFIG})
     unset(_NL)
     unset(OC_USE_SYSTEM_FLAGS)
     unset(OC_USE_FLAGS)
     
-    # Extra development part - allows to set localconfig variables directly
-    if (DEFINED DIRECT_VARS)
-        file(APPEND ${MAIN_BINARY_DIR}/OpenCMISSLocalConfig.cmake
-            "# Directly forwarded variables:\r\n"
-        )
-        foreach(VARNAME ${DIRECT_VARS})
-            file(APPEND ${MAIN_BINARY_DIR}/OpenCMISSLocalConfig.cmake
-                "set(${VARNAME} ${${VARNAME}})\r\n"
-            )
-        endforeach()
-    endif()
     if (OPENCMISS_REMOTE_INSTALL_DIR)
         get_filename_component(OPENCMISS_REMOTE_INSTALL_DIR "${OPENCMISS_REMOTE_INSTALL_DIR}" ABSOLUTE)
         if (EXISTS "${OPENCMISS_REMOTE_INSTALL_DIR}")
-            file(APPEND ${MAIN_BINARY_DIR}/OpenCMISSLocalConfig.cmake
-                "set(OPENCMISS_REMOTE_INSTALL_DIR \"${OPENCMISS_REMOTE_INSTALL_DIR}\")\r\n"
+            file(APPEND "${OPENCMISS_LOCALCONFIG}" "set(OPENCMISS_REMOTE_INSTALL_DIR \"${OPENCMISS_REMOTE_INSTALL_DIR}\")\r\n"
             )
         else()
-            message(FATAL_ERROR "Remote installation directory not found: ${OPENCMISS_REMOTE_INSTALL_DIR}")
+            log("Remote installation directory not found: ${OPENCMISS_REMOTE_INSTALL_DIR}" ERROR)
         endif()
     endif()
+    
+    # This does nothing but tell CMake that this file is relevant for the build and cmake needs to re-run
+    # if that file changes!
+    #include("${OPENCMISS_LOCALCONFIG}")
+    # This creates the (in this case ONLY) target to build - which does nothing but re-running
+    # CMake and invoking the main build target.
+    # Careful: touching the localconfig file and running the main build (=this custom target)
+    # gives an endless loop :-| Hence, this way.
+    #add_custom_target(freddy_the_magic_build_invoker ALL
+    #    COMMAND ${CMAKE_COMMAND} -G "${CMAKE_GENERATOR}" ${PROJECT_SOURCE_DIR} 
+    #    COMMAND ${CMAKE_COMMAND} --build ${PROJECT_BINARY_DIR}
+    #)
+    
+    #printnextsteps()
+    
 endif()
