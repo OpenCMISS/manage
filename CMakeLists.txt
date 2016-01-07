@@ -65,8 +65,6 @@
 #    Further, you can specify an explicit mpi compiler wrapper (full path or just the binary name) for each language,
 #    where <lang> can be each of "C","CXX" or "Fortran".
 #    This can be used independently of (but possibly with) the MPI_HOME setting.
-# 
-# OC_SYSTEM_MPI: 
 
 ########################################################
 # If your cmake is older than 2.6 - goodbye. 

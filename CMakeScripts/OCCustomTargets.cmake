@@ -1,10 +1,6 @@
-# update: Updates the whole source tree
-# reset: Blows away the current build and installation trees
-
 # This makes sure the install and featuretests targets are build when invoking "make"
-add_custom_target(finish_build ALL)
-add_custom_command(TARGET finish_build
-    POST_BUILD
+add_custom_target(opencmiss
+    COMMAND ${CMAKE_COMMAND} --build ${PROJECT_BINARY_DIR}
     COMMAND ${CMAKE_COMMAND} --build ${PROJECT_BINARY_DIR} --target install
     COMMAND ${CMAKE_COMMAND} --build ${PROJECT_BINARY_DIR} --target featuretests
 )

@@ -23,6 +23,13 @@ if (DEFINED MPI_HOME AND NOT MPI_HOME STREQUAL "")
     find_package(MPI REQUIRED)
     # MPI_DETECTED is set by FindMPI.cmake to one of the mnemonics or unknown (MPI_TYPE_UNKNOWN in FindMPI.cmake)
     set(MPI ${MPI_DETECTED} CACHE STRING "Detected MPI implementation" FORCE)
+    if (NOT DEFINED MPI_BUILD_TYPE)
+        log("Using MPI via MPI_HOME variable.
+If you want to use different build types for the same MPI implementation, please
+you have to specify MPI_BUILD_TYPE
+https://github.com/OpenCMISS/manage/issues/28        
+        " WARNING)
+    endif()
 else()
 
     # Ensure lower-case mpi and upper case mpi build type
@@ -98,23 +105,26 @@ else()
 endif()
 
 ####################################################################################################
+# Find local MPI (own build dir or system-wide)
 ####################################################################################################
 # As of here we always have an MPI mnemonic set.
 
-# Construct installation path
-# For MPI we use a slightly different architecture path - we dont need to re-build MPI for static/shared builds nor do we need the actual
-# MPI mnemonic in the path. Instead, we use "mpi" as common top folder to collect all local MPI builds.
-# Only the debug/release versions of MPI are located in different folders (for own builds only - the behaviour using system mpi
-# in debug mode is unspecified)
-set(SHORT_ARCH_PATH .)
-if (OC_USE_ARCHITECTURE_PATH)
-    getShortArchitecturePath(SHORT_ARCH_PATH)
-endif()
-# This is where our own build of MPI will reside if compilation is needed
-string(TOLOWER ${MPI_BUILD_TYPE} _MPI_BUILD_TYPE)
-set(OWN_MPI_INSTALL_DIR ${OPENCMISS_ROOT}/install/${SHORT_ARCH_PATH}/mpi/${MPI}/${_MPI_BUILD_TYPE})
+# This variable is also used in the main CMakeLists file at path computations!
+string(TOLOWER "${MPI_BUILD_TYPE}" MPI_BUILD_TYPE_LOWER)
 
-if (NOT MPI_FOUND)    
+if (NOT MPI_FOUND)
+    # Construct installation path
+    # For MPI we use a slightly different architecture path - we dont need to re-build MPI for static/shared builds nor do we need the actual
+    # MPI mnemonic in the path. Instead, we use "mpi" as common top folder to collect all local MPI builds.
+    # Only the debug/release versions of MPI are located in different folders (for own builds only - the behaviour using system mpi
+    # in debug mode is unspecified)
+    set(SHORT_ARCH_PATH .)
+    if (OC_USE_ARCHITECTURE_PATH)
+        getShortArchitecturePath(SHORT_ARCH_PATH)
+    endif()
+    # This is where our own build of MPI will reside if compilation is needed    
+    set(OWN_MPI_INSTALL_DIR ${OPENCMISS_ROOT}/install/${SHORT_ARCH_PATH}/mpi/${MPI}/${MPI_BUILD_TYPE_LOWER})
+    
     # If no system MPI is allowed, search ONLY at MPI_HOME, which is our own bake
     if(NOT SYSTEM_MPI)
         set(MPI_HOME ${OWN_MPI_INSTALL_DIR})
@@ -122,7 +132,7 @@ if (NOT MPI_FOUND)
     else()
         # Educated guesses are used to look for an MPI implementation
         # This bit of logic is covered inside the FindMPI module where MPI is consumed
-        log("Looking for '${MPI}' on local system..")
+        log("Looking for '${MPI}' MPI on local system..")
     endif()
     # This call either only looks at MPI_HOME if no system lookup is allowed or searches at system locations
     find_package(MPI QUIET)
@@ -190,7 +200,7 @@ if (NOT MPI_FOUND)
         
         set(MPI_HOME ${OWN_MPI_INSTALL_DIR})
         set(_MPI_SOURCE_DIR ${OPENCMISS_ROOT}/src/dependencies/${MPI})
-        set(_MPI_BINARY_DIR ${OPENCMISS_ROOT}/build/${SHORT_ARCH_PATH}/mpi/${MPI}/${_MPI_BUILD_TYPE})
+        set(_MPI_BINARY_DIR ${OPENCMISS_ROOT}/build/${SHORT_ARCH_PATH}/mpi/${MPI}/${MPI_BUILD_TYPE_LOWER})
         set(_MPI_BRANCH v${_MPI_VERSION})
         
         log("Configuring build of 'MPI' (${MPI}-${_MPI_VERSION}) in ${_MPI_BINARY_DIR}...")
