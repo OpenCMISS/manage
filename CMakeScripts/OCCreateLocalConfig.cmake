@@ -39,25 +39,21 @@ if (NOT EXISTS ${OPENCMISS_LOCALCONFIG})
     if (OPENCMISS_REMOTE_INSTALL_DIR)
         get_filename_component(OPENCMISS_REMOTE_INSTALL_DIR "${OPENCMISS_REMOTE_INSTALL_DIR}" ABSOLUTE)
         if (EXISTS "${OPENCMISS_REMOTE_INSTALL_DIR}")
-            file(APPEND "${OPENCMISS_LOCALCONFIG}" "set(OPENCMISS_REMOTE_INSTALL_DIR \"${OPENCMISS_REMOTE_INSTALL_DIR}\")\r\n"
+            file(APPEND "${OPENCMISS_LOCALCONFIG}" "set(OPENCMISS_REMOTE_INSTALL_DIR \"${OPENCMISS_REMOTE_INSTALL_DIR}\")${_NL}"
             )
         else()
             log("Remote installation directory not found: ${OPENCMISS_REMOTE_INSTALL_DIR}" ERROR)
         endif()
     endif()
     
-    # This does nothing but tell CMake that this file is relevant for the build and cmake needs to re-run
-    # if that file changes!
-    #include("${OPENCMISS_LOCALCONFIG}")
-    # This creates the (in this case ONLY) target to build - which does nothing but re-running
-    # CMake and invoking the main build target.
-    # Careful: touching the localconfig file and running the main build (=this custom target)
-    # gives an endless loop :-| Hence, this way.
-    #add_custom_target(freddy_the_magic_build_invoker ALL
-    #    COMMAND ${CMAKE_COMMAND} -G "${CMAKE_GENERATOR}" ${PROJECT_SOURCE_DIR} 
-    #    COMMAND ${CMAKE_COMMAND} --build ${PROJECT_BINARY_DIR}
-    #)
-    
-    #printnextsteps()
+    # Extra development part - allows to set localconfig variables directly
+    if (DEFINED DIRECT_VARS)
+        file(APPEND "${OPENCMISS_LOCALCONFIG}" "# Directly forwarded variables:${_NL}"
+        )
+        foreach(VARNAME ${DIRECT_VARS})
+            file(APPEND "${OPENCMISS_LOCALCONFIG}" "set(${VARNAME} ${${VARNAME}})${_NL}"
+            )
+        endforeach()
+    endif()
     
 endif()
