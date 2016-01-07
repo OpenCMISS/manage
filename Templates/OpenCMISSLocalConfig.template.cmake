@@ -18,6 +18,9 @@
 # Selecting NO will directly print the build process to the standard output.
 #set(OC_CREATE_LOGS NO)
 
+# Have all non SCREEN-level logs are also printed on the console (helps debugging).
+#set(OC_CONFIG_LOG_TO_SCREEN YES)
+
 # Set the installation directory for OpenCMISS.
 # You can use the variable OPENCMISS_ROOT.
 #set(OPENCMISS_INSTALL_ROOT "${OPENCMISS_ROOT}/install")
