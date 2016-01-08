@@ -5,7 +5,7 @@ if (DEFINED LOG_DIR AND EXISTS "${LOG_DIR}")
 
 elseif(BUILD_STAMP)
     string(TIMESTAMP NOW "%Y-%m-%d, %H:%M")
-    file(APPEND build.log "Build of OpenCMISS component ${COMPONENT_NAME} started at ${NOW}\r\n")
+    file(APPEND "${LOGFILE}" "Build of OpenCMISS component ${COMPONENT_NAME} started at ${NOW}\r\n")
 
 # Script mode for creating the support zip file    
 elseif(CREATE_ZIP)

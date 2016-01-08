@@ -1,5 +1,9 @@
 # Make sure a localconfig file exists
-if (NOT EXISTS ${MAIN_BINARY_DIR}/OpenCMISSLocalConfig.cmake)
+set(OPENCMISS_LOCALCONFIG ${PROJECT_BINARY_DIR}/OpenCMISSLocalConfig.cmake)
+set(_OC_LOCALCONFIG_CREATED NO)
+if (NOT EXISTS ${OPENCMISS_LOCALCONFIG})
+    log("Creating OpenCMISSLocalConfig file in ${PROJECT_BINARY_DIR}")
+    set(_OC_LOCALCONFIG_CREATED YES)
     include(Variables)
     SET(OC_USE_SYSTEM_FLAGS )
     SET(OC_USE_FLAGS )
@@ -27,30 +31,28 @@ if (NOT EXISTS ${MAIN_BINARY_DIR}/OpenCMISSLocalConfig.cmake)
         SET(OC_USE_SYSTEM_FLAGS "${OC_USE_SYSTEM_FLAGS}#set(OC_SYSTEM_${COMPONENT} ${_VALUE})${_NL}")
     endforeach()
     configure_file(${OPENCMISS_MANAGE_DIR}/Templates/OpenCMISSLocalConfig.template.cmake
-        ${MAIN_BINARY_DIR}/OpenCMISSLocalConfig.cmake)
-    unset(_NL)
+        ${OPENCMISS_LOCALCONFIG})
     unset(OC_USE_SYSTEM_FLAGS)
     unset(OC_USE_FLAGS)
     
-    # Extra development part - allows to set localconfig variables directly
-    if (DEFINED DIRECT_VARS)
-        file(APPEND ${MAIN_BINARY_DIR}/OpenCMISSLocalConfig.cmake
-            "# Directly forwarded variables:\r\n"
-        )
-        foreach(VARNAME ${DIRECT_VARS})
-            file(APPEND ${MAIN_BINARY_DIR}/OpenCMISSLocalConfig.cmake
-                "set(${VARNAME} ${${VARNAME}})\r\n"
-            )
-        endforeach()
-    endif()
     if (OPENCMISS_REMOTE_INSTALL_DIR)
         get_filename_component(OPENCMISS_REMOTE_INSTALL_DIR "${OPENCMISS_REMOTE_INSTALL_DIR}" ABSOLUTE)
         if (EXISTS "${OPENCMISS_REMOTE_INSTALL_DIR}")
-            file(APPEND ${MAIN_BINARY_DIR}/OpenCMISSLocalConfig.cmake
-                "set(OPENCMISS_REMOTE_INSTALL_DIR \"${OPENCMISS_REMOTE_INSTALL_DIR}\")\r\n"
+            file(APPEND "${OPENCMISS_LOCALCONFIG}" "set(OPENCMISS_REMOTE_INSTALL_DIR \"${OPENCMISS_REMOTE_INSTALL_DIR}\")${_NL}"
             )
         else()
-            message(FATAL_ERROR "Remote installation directory not found: ${OPENCMISS_REMOTE_INSTALL_DIR}")
+            log("Remote installation directory not found: ${OPENCMISS_REMOTE_INSTALL_DIR}" ERROR)
         endif()
     endif()
+    
+    # Extra development part - allows to set localconfig variables directly
+    if (DEFINED DIRECT_VARS)
+        file(APPEND "${OPENCMISS_LOCALCONFIG}" "# Directly forwarded variables:${_NL}"
+        )
+        foreach(VARNAME ${DIRECT_VARS})
+            file(APPEND "${OPENCMISS_LOCALCONFIG}" "set(${VARNAME} ${${VARNAME}})${_NL}"
+            )
+        endforeach()
+    endif()
+    unset(_NL)
 endif()

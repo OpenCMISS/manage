@@ -30,8 +30,8 @@ function(addAndConfigureLocalComponent COMPONENT_NAME)
     ##############################################################
     # Verifications
     if(COMPONENT_NAME IN_LIST OPENCMISS_COMPONENTS_WITH_F90 AND NOT CMAKE_Fortran_COMPILER_SUPPORTS_F90)
-        message(FATAL_ERROR "Your Fortran compiler ${CMAKE_Fortran_COMPILER} does not support the Fortran 90 standard,
-            which is required to build the OpenCMISS component ${COMPONENT}")
+        log("Your Fortran compiler ${CMAKE_Fortran_COMPILER} does not support the Fortran 90 standard,
+            which is required to build the OpenCMISS component ${COMPONENT}" ERROR)
     endif()
     
     
@@ -94,9 +94,8 @@ function(addAndConfigureLocalComponent COMPONENT_NAME)
     # Forward any other variables
     foreach(extra_def ${ARGN})
         list(APPEND COMPONENT_DEFS -D${extra_def})
-        #message(STATUS "${COMPONENT_NAME}: Using extra definition -D${extra_def}")
     endforeach()
-    #message(STATUS "OpenCMISS component ${COMPONENT_NAME} extra args:\n${COMPONENT_DEFS}")
+    log("OpenCMISS component ${COMPONENT_NAME} extra args:\n${COMPONENT_DEFS}" DEBUG)
     
     ##############################################################
     # Create actual external projects
@@ -119,30 +118,29 @@ function(getExtProjDownloadUpdateCommands COMPONENT_NAME TARGET_SOURCE_DIR DL_VA
     
     # Git clone mode
     if(GIT_FOUND)
-            #message(STATUS "GITHUB_ORGANIZATION=${GITHUB_ORGANIZATION}, GITHUB_USERNAME=${GITHUB_USERNAME}")
-            if (NOT ${COMPONENT_NAME}_REPO)
-                if(GITHUB_USERNAME)
-                    SET(_GITHUB_USERNAME ${GITHUB_USERNAME})
-                else()
-                    SET(_GITHUB_USERNAME ${GITHUB_ORGANIZATION})
-                endif()
-                if (GITHUB_USE_SSL)
-                    SET(GITHUB_PROTOCOL "git@github.com:")
-                else()
-                    SET(GITHUB_PROTOCOL "https://github.com/")
-                endif()
-                set(${COMPONENT_NAME}_REPO ${GITHUB_PROTOCOL}${_GITHUB_USERNAME}/${FOLDER_NAME})
+        if (NOT ${COMPONENT_NAME}_REPO)
+            if(GITHUB_USERNAME)
+                SET(_GITHUB_USERNAME ${GITHUB_USERNAME})
+            else()
+                SET(_GITHUB_USERNAME ${GITHUB_ORGANIZATION})
             endif()
-            set(${DL_VAR}
-                GIT_REPOSITORY ${${COMPONENT_NAME}_REPO}
-                GIT_TAG ${${COMPONENT_NAME}_BRANCH}
-                PARENT_SCOPE
-            )
-            set(${UP_VAR} 
-                UPDATE_COMMAND ${GIT_EXECUTABLE} pull
-                PARENT_SCOPE
-            )
-            #message(STATUS "DOWNLOAD_CMDS=${DOWNLOAD_CMDS}")    
+            if (GITHUB_USE_SSL)
+                SET(GITHUB_PROTOCOL "git@github.com:")
+            else()
+                SET(GITHUB_PROTOCOL "https://github.com/")
+            endif()
+            set(${COMPONENT_NAME}_REPO ${GITHUB_PROTOCOL}${_GITHUB_USERNAME}/${FOLDER_NAME})
+        endif()
+        set(${DL_VAR}
+            GIT_REPOSITORY ${${COMPONENT_NAME}_REPO}
+            GIT_TAG ${${COMPONENT_NAME}_BRANCH}
+            PARENT_SCOPE
+        )
+        set(${UP_VAR} 
+            UPDATE_COMMAND ${GIT_EXECUTABLE} pull
+            PARENT_SCOPE
+        )
+        log("DOWNLOAD_CMDS=${DOWNLOAD_CMDS}" DEBUG)    
     # Default: Download the current version branch as zip of no git clone flag is set
     else()
         ################@TEMP@#################
@@ -167,7 +165,7 @@ endfunction()
 set(_OC_EXTPROJ_STAMP_DIR ep_stamps)
 function(createExternalProjects COMPONENT_NAME SOURCE_DIR BINARY_DIR DEFS)
 
-    message(STATUS "Configuring build of '${COMPONENT_NAME}' in ${BINARY_DIR}...")
+    log("Configuring build of '${COMPONENT_NAME} ${${COMPONENT_NAME}_VERSION}' in ${BINARY_DIR}...")
 
     getBuildCommands(BUILD_COMMAND INSTALL_COMMAND ${BINARY_DIR} TRUE)
     
@@ -223,7 +221,7 @@ function(createExternalProjects COMPONENT_NAME SOURCE_DIR BINARY_DIR DEFS)
             COMMENT "Checking ${COMPONENT_NAME} sources are present"
     )  
     
-    #message(STATUS "Adding ${COMPONENT_NAME} with DEPS=${${COMPONENT_NAME}_DEPS}, DEFS=${DEFS}")
+    log("Adding ${COMPONENT_NAME} with DEPS=${${COMPONENT_NAME}_DEPS}" VERBOSE)
     ExternalProject_Add(${OC_EP_PREFIX}${COMPONENT_NAME}
         DEPENDS ${${COMPONENT_NAME}_DEPS} CHECK_${COMPONENT_NAME}_SOURCES
         PREFIX ${BINARY_DIR}
@@ -353,10 +351,10 @@ endfunction()
 #   Thus far used here in addAndConfigureLocalComponent and in OCMPIConfig.cmake for MPI
 macro(addDownstreamDependencies COMPONENT_NAME IN_PARENT_SCOPE)
     if (${COMPONENT_NAME}_FWD_DEPS)
-        #message(STATUS "Component ${COMPONENT_NAME} has forward dependencies: ${${COMPONENT_NAME}_FWD_DEPS}")
+        log("Component ${COMPONENT_NAME} has forward dependencies: ${${COMPONENT_NAME}_FWD_DEPS}" VERBOSE)
         # Add all new forward dependencies of component
         foreach(FWD_DEP ${${COMPONENT_NAME}_FWD_DEPS})
-            #message(STATUS "adding ${COMPONENT_NAME} to ${FWD_DEP}_DEPS")  
+            log("Adding ${COMPONENT_NAME} to ${FWD_DEP}_DEPS" VERBOSE)  
             list(APPEND ${FWD_DEP}_DEPS "${OC_EP_PREFIX}${COMPONENT_NAME}")
             # Propagate the changed variable to outside this function - its a function
             if (${IN_PARENT_SCOPE})
@@ -402,10 +400,8 @@ Configure definitions:
         COMMAND ${CMAKE_COMMAND}
             -DBUILD_STAMP=YES 
             -DCOMPONENT_NAME=${NAME}
+            -DLOGFILE="${OC_BUILDLOG}"
             -P ${OPENCMISS_MANAGE_DIR}/CMakeScripts/OCSupport.cmake
         WORKING_DIRECTORY "${OC_SUPPORT_DIR}")
     add_dependencies(${OC_EP_PREFIX}${NAME} ${OC_EP_PREFIX}${NAME}_buildlog)
-    
-    string(TIMESTAMP NOW "%Y-%m-%d, %H:%M")
-    file(APPEND "${OC_SUPPORT_DIR}/build.log" "Configured component ${NAME}-${${NAME}_VERSION} at ${NOW}\r\n")
 endfunction()

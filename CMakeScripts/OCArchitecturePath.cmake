@@ -19,16 +19,16 @@ function(getArchitecturePath VARNAME VARNAME_MPI)
     else()
         # Add the build type of MPI to the architecture path - we obtain different libraries
         # for different mpi build types
-        string(TOLOWER "${MPI_BUILD_TYPE}" _MPI_BUILD_TYPE)
-        SET(MPI_PART ${MPI}_${_MPI_BUILD_TYPE})
+        string(TOLOWER "${MPI_BUILD_TYPE}" MPI_BUILD_TYPE_LOWER)
+        set(MPI_PART ${MPI}_${MPI_BUILD_TYPE_LOWER})
     endif()
-    SET(ARCHPATH ${ARCHPATH}/${MPI_PART})
+    set(ARCHPATH ${ARCHPATH}/${MPI_PART})
     
     # Append to desired variable
-    SET(${VARNAME_MPI} ${ARCHPATH} PARENT_SCOPE)
+    set(${VARNAME_MPI} ${ARCHPATH} PARENT_SCOPE)
     # The full architecture path without mpi is the same but with "no_mpi" at the same level
     string(REPLACE "/${MPI_PART}" "/no_mpi" ARCHPATH_NOMPI ${ARCHPATH})
-    SET(${VARNAME} ${ARCHPATH_NOMPI} PARENT_SCOPE)
+    set(${VARNAME} ${ARCHPATH_NOMPI} PARENT_SCOPE)
 endfunction()
 
 # This function assembles a short version (the beginning) of the architecture path

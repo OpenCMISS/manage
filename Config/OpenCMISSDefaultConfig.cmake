@@ -19,6 +19,10 @@ set(OC_USE_ARCHITECTURE_PATH YES)
 set(GITHUB_USE_SSL NO)
 set(OC_DEPENDENCIES_ONLY NO)
 set(OC_EP_PREFIX "OC_") # The prefix for opencmiss dependencies external projects
+# The default implementation to use in all last-resort/unimplemented cases
+set(OPENCMISS_MPI_DEFAULT mpich)
+set(OC_CONFIG_LOG_LEVELS SCREEN WARNING ERROR) #VERBOSE DEBUG
+set(OC_CONFIG_LOG_TO_SCREEN NO)
 
 foreach(COMPONENT ${OPENCMISS_COMPONENTS})
     set(_VALUE YES)
@@ -37,9 +41,6 @@ foreach(COMPONENT ${OPENCMISS_COMPONENTS})
     # Initialize the default: static build for all components
     set(${COMPONENT}_SHARED NO)
 endforeach()
-
-# Main version
-set(OPENCMISS_VERSION 1.1)
 
 # Component versions
 set(BLAS_VERSION 3.5.0)
