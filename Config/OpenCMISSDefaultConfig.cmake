@@ -5,24 +5,28 @@
 set(OPENCMISS_INSTALL_ROOT "${OPENCMISS_ROOT}/install")
 set(BUILD_PRECISION sd CACHE STRING "Build precisions for OpenCMISS components. Choose any of [sdcz]")
 set(INT_TYPE int32 CACHE STRING "OpenCMISS integer type (only used by PASTIX yet)")
+set(CMAKE_DEBUG_POSTFIX d CACHE STRING "Debug postfix for library names of DEBUG-builds") # Debug postfix
+
 option(BUILD_TESTS "Build OpenCMISS(-components) tests" ON)
 option(PARALLEL_BUILDS "Use multithreading (-jN etc) for builds" ON)
 option(BUILD_SHARED_LIBS "Build shared libraries within/for every component" NO)
-set(OC_CREATE_LOGS YES)
-set(CMAKE_DEBUG_POSTFIX d CACHE STRING "Debug postfix for library names of DEBUG-builds") # Debug postfix
-set(OC_WARN_ALL YES) # Flag for DEBUG configuration builds only!
-set(OC_CHECK_ALL YES) # Flag for DEBUG configuration builds only!
+option(OC_CREATE_LOGS "Create logfiles instead of direct output to screen" YES)
+option(OC_WARN_ALL "Compiler flags choices - all warnings on" YES)
+option(OC_CHECK_ALL "Compiler flags choices - all checks on" YES)
 option(OC_MULTITHREADING "Use multithreading in OpenCMISS (where applicable)" NO)
-set(OC_COMPONENTS_SYSTEM DEFAULT)
 option(CMAKE_VERBOSE_MAKEFILE "Generate verbose makefiles/projects for builds" NO)
-set(OC_USE_ARCHITECTURE_PATH YES)
-set(GITHUB_USE_SSL NO)
-set(OC_DEPENDENCIES_ONLY NO)
+option(OC_USE_ARCHITECTURE_PATH "Use an architecture path for build and install trees" YES)
+option(GITHUB_USE_SSL "Use SSL connection to (default) GitHub repositories" NO)
+option(OC_DEPENDENCIES_ONLY "Build dependencies only (no Iron or Zinc)" NO)
+option(OC_CONFIG_LOG_TO_SCREEN "Also print the created log file entries to console output" NO)
+
+# Those "options" have non-boolean values and its not clear yet what is better to use.. just leave it as that
+# for the time being
+set(OC_COMPONENTS_SYSTEM DEFAULT)
 set(OC_EP_PREFIX "OC_") # The prefix for opencmiss dependencies external projects
 # The default implementation to use in all last-resort/unimplemented cases
 set(OPENCMISS_MPI_DEFAULT mpich)
 set(OC_CONFIG_LOG_LEVELS SCREEN WARNING ERROR) #VERBOSE DEBUG
-set(OC_CONFIG_LOG_TO_SCREEN NO)
 
 foreach(COMPONENT ${OPENCMISS_COMPONENTS})
     set(_VALUE YES)
@@ -30,16 +34,16 @@ foreach(COMPONENT ${OPENCMISS_COMPONENTS})
         set(_VALUE NO)
     endif()
     # Use everything but the components in OPENCMISS_COMPONENTS_DISABLED_BY_DEFAULT
-    set(OC_USE_${COMPONENT} ${_VALUE})
+    option(OC_USE_${COMPONENT} "Enable use/build of ${COMPONENT}" ${_VALUE})
     
     # Look for some components on the system first before building
     set(_VALUE NO)
     if (${COMPONENT} IN_LIST OPENCMISS_COMPONENTS_SYSTEM_BY_DEFAULT)
         set(_VALUE YES)
     endif()
-    set(OC_SYSTEM_${COMPONENT} ${_VALUE})
+    option(OC_SYSTEM_${COMPONENT} "Allow ${COMPONENT} to be used from local environment/system" ${_VALUE})
     # Initialize the default: static build for all components
-    set(${COMPONENT}_SHARED NO)
+    option(${COMPONENT}_SHARED "Build all libraries of ${COMPONENT} as shared" NO)
 endforeach()
 
 # Component versions
@@ -109,38 +113,39 @@ set(EXAMPLES_VERSION 1.0)
 # To be safe: E.g. if you wanted to use MUMPS with SCOTCH, also set OC_USE_SCOTCH=YES so that
 # the build system ensures that SCOTCH will be available.
 # ==========================================================================================
-set(MUMPS_WITH_SCOTCH NO)
-set(MUMPS_WITH_PTSCOTCH YES)
-set(MUMPS_WITH_METIS NO)
-set(MUMPS_WITH_PARMETIS YES)
+option(MUMPS_WITH_SCOTCH "Have MUMPS use Scotch" NO)
+option(MUMPS_WITH_PTSCOTCH "Have MUMPS use PT-Scotch" YES)
+option(MUMPS_WITH_METIS "Have MUMPS use Metis" NO)
+option(MUMPS_WITH_PARMETIS "Have MUMPS use Parmetis" YES)
 
-set(SUNDIALS_WITH_LAPACK YES)
+option(SUNDIALS_WITH_LAPACK "Have Sundials use LAPACK" YES)
 
-set(SCOTCH_USE_THREADS YES)
-set(SCOTCH_WITH_ZLIB YES)
-set(SCOTCH_WITH_BZIP2 YES)
+option(SCOTCH_USE_THREADS "Enable use of threading for Scotch/PT-Scotch" YES)
+option(SCOTCH_WITH_ZLIB "Have Scotch/PT-Scotch use zlib" YES)
+option(SCOTCH_WITH_BZIP2 "Have Scotch/PT-Scotch use bzip2" YES)
 
-set(SUPERLU_DIST_WITH_PARMETIS YES)
+option(SUPERLU_DIST_WITH_PARMETIS "Enable Parmetis support for SuperLU-Dist" YES)
 
-set(PASTIX_USE_THREADS YES)
-set(PASTIX_USE_METIS YES)
-set(PASTIX_USE_PTSCOTCH YES)
+option(PASTIX_USE_THREADS "Enable use of threading for PASTIX" YES)
+option(PASTIX_USE_METIS "Have PASTIX use Metis" YES)
+option(PASTIX_USE_PTSCOTCH "Have PASTIX use PT-Scotch" YES)
 
-set(HDF5_WITH_MPI NO)
-set(HDF5_WITH_SZIP YES)
-set(HDF5_WITH_ZLIB YES)
+option(HDF5_WITH_MPI "Build HDF5 with MPI support" NO)
+option(HDF5_WITH_SZIP "Have HDF5 use szip" YES)
+option(HDF5_WITH_ZLIB "Have HDF5 use zlib" YES)
 
-set(FIELDML-API_WITH_HDF5 NO)
-set(FIELDML-API_WITH_JAVA_BINDINGS NO)
-set(FIELDML-API_WITH_FORTRAN_BINDINGS YES)
+option(FIELDML-API_WITH_HDF5 "Enable FieldML HDF5 support" NO)
+option(FIELDML-API_WITH_JAVA_BINDINGS "Build Java bindings for FieldML" NO)
+option(FIELDML-API_WITH_FORTRAN_BINDINGS "Build Fortran bindings for FieldML" YES)
 
-set(IRON_WITH_CELLML YES)
-set(IRON_WITH_FIELDML YES)
-set(IRON_WITH_HYPRE YES)
-set(IRON_WITH_SUNDIALS YES)
-set(IRON_WITH_MUMPS YES)
-set(IRON_WITH_SCALAPACK YES)
-set(IRON_WITH_PETSC YES)
-set(IRON_WITH_C_BINDINGS YES)
+option(IRON_WITH_CELLML "Have Iron use CellML" YES)
+option(IRON_WITH_FIELDML "Have Iron use FieldML" YES)
+option(IRON_WITH_HYPRE "Have Iron use Hypre" YES)
+option(IRON_WITH_SUNDIALS "Have Iron use Sundials" YES)
+option(IRON_WITH_MUMPS "Have Iron use MUMPS" YES)
+option(IRON_WITH_SCALAPACK "Have Iron use ScaLAPACK" YES)
+option(IRON_WITH_PETSC "Have Iron use PetSC" YES)
+option(IRON_WITH_C_BINDINGS "Build Iron-C bindings" YES)
+# IRON_WITH_Python_BINDINGS is automatically set if python is found
 
-set(LIBXML2_WITH_ZLIB YES)
+option(LIBXML2_WITH_ZLIB "Have Iron use CellML"  YES)
