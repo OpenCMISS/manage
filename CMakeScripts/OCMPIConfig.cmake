@@ -25,10 +25,8 @@ if (DEFINED MPI_HOME AND NOT MPI_HOME STREQUAL "")
     set(MPI ${MPI_DETECTED} CACHE STRING "Detected MPI implementation" FORCE)
     if (NOT DEFINED MPI_BUILD_TYPE)
         log("Using MPI via MPI_HOME variable.
-If you want to use different build types for the same MPI implementation, please
-you have to specify MPI_BUILD_TYPE
-https://github.com/OpenCMISS/manage/issues/28        
-        " WARNING)
+If you want to use different build types for the same MPI implementation, you have to specify MPI_BUILD_TYPE.
+See also https://github.com/OpenCMISS/manage/issues/28" WARNING)
     endif()
 else()
 
