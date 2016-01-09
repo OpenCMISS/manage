@@ -1,19 +1,26 @@
 # Only run the feature tests if we build more than the dependencies
 if (NOT OC_DEPENDENCIES_ONLY)
     set(FEATURE_TEST_PREFIX opencmiss_feature_)
-    set(FEATURE_TEST_EXAMPLES 
-        classicalfield_laplace_laplace_fortran
-        finiteelasticity_cantilever_fortran
-    )
-    if (IRON_WITH_C_BINDINGS)
-        list(APPEND FEATURE_TEST_EXAMPLES classicalfield_laplace_laplace_c)
+    # Iron-related feature tests
+    if (OC_USE_IRON)
+        set(FEATURE_TEST_EXAMPLES 
+            classicalfield_laplace_laplace_fortran
+            finiteelasticity_cantilever_fortran
+        )
+        if (IRON_WITH_C_BINDINGS)
+            list(APPEND FEATURE_TEST_EXAMPLES classicalfield_laplace_laplace_c)
+        endif()
+        if (OC_USE_CELLML AND IRON_WITH_CELLML)
+            list(APPEND FEATURE_TEST_EXAMPLES bioelectrics_monodomain_fortran)
+        endif()
+        # Collect any arguments
+        # n98.xml is the only currently working xml file
+        set(bioelectrics_monodomain_fortran_ARGS 0.005 0.1001 70 n98.xml)
     endif()
-    if (OC_USE_CELLML AND IRON_WITH_CELLML)
-        list(APPEND FEATURE_TEST_EXAMPLES bioelectrics_monodomain_fortran)
+    # Iron-related feature tests
+    if (OC_USE_ZINC)
+        #TODO
     endif()
-    # Collect any arguments
-    # n98.xml is the only currently working xml file
-    set(bioelectrics_monodomain_fortran_ARGS 0.005 0.1001 70 n98.xml)
     
     set(BIN_DIR_ROOT ${OPENCMISS_COMPONENTS_BINARY_DIR_MPI}/featuretests)
     set(SRC_DIR_ROOT ${OPENCMISS_ROOT}/src/featuretests)
