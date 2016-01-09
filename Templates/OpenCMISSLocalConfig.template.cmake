@@ -93,6 +93,10 @@
 # Possible values are (in general): [RELEASE]|DEBUG|MINSIZEREL|RELWITHDEBINFO
 #set(CMAKE_BUILD_TYPE DEBUG)
 
+# For different MPI build types, use this variable.
+# Possible values are (in general): [RELEASE]|DEBUG|MINSIZEREL|RELWITHDEBINFO
+#set(MPI_BUILD_TYPE DEBUG)
+
 # Set compiler flags for all warnings and checks.
 # DEBUG builds only!
 #set(OC_WARN_ALL NO)
