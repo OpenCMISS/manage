@@ -6,13 +6,14 @@
 # handle it.
 #
 # 1. MPI_HOME specified - Look exclusively at that location for binaries/libraries
-#  a. MPI FOUND - ok, detect type and forward that
+#  a. MPI FOUND - ok, detect type and use that
 #  b. MPI NOT FOUND - Error and abort
 # 2. Nothing specified - Call FindMPI and let it come up with whatever is found on the default path
 #  a. SYSTEM_MPI = NO AND/OR No MPI found - Prescribe a reasonable system default choice and go with that
 #  b. SYSTEM_MPI = YES AND MPI found - Use the MPI implementation found on PATH/environment 
 # 3. MPI mnemonic/variable specified
-#  Just forward that to the generated script
+#  b. SYSTEM_MPI = YES Try to find the specific version on the system
+#  a. SYSTEM_MPI = NO Build your own (unix only)
 
 # MPI_HOME specified - use that and fail if there's no MPI
 # We also infer the MPI mnemonic from the installation at MPI_HOME
@@ -234,6 +235,13 @@ if (NOT MPI_FOUND)
         #    MATH(EXPR NUM_PROCESSORS ${NUM_PROCESSORS}+4)
         endif()
         
+        # Log settings
+        if (OC_CREATE_LOGS)
+            set(_LOGFLAG 1)
+        else()
+            set(_LOGFLAG 0)
+        endif()
+        
         ExternalProject_Add(${OC_EP_PREFIX}MPI
     		PREFIX ${_MPI_BINARY_DIR}
     		TMP_DIR ${_MPI_BINARY_DIR}/ep_tmp
@@ -263,9 +271,10 @@ if (NOT MPI_FOUND)
     		#INSTALL_DIR ${OPENMPI_INSTALL_DIR}
     		INSTALL_COMMAND make install #${INSTALL_COMMAND}
     		
-    		#LOG_CONFIGURE 1
-    		#LOG_BUILD 1
-    		#LOG_INSTALL 1
+    		# Logging
+            LOG_CONFIGURE ${_LOGFLAG}
+            LOG_BUILD ${_LOGFLAG}
+            LOG_INSTALL ${_LOGFLAG}
     		STEP_TARGETS install
     	)
     	# Set the forward dependencies of MPI to have it build before the consuming components
