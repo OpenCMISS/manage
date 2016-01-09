@@ -29,17 +29,17 @@ set(OPENCMISS_MPI_DEFAULT mpich)
 set(OC_CONFIG_LOG_LEVELS SCREEN WARNING ERROR) #VERBOSE DEBUG
 
 foreach(COMPONENT ${OPENCMISS_COMPONENTS})
-    set(_VALUE YES)
+    set(_VALUE ON)
     if (${COMPONENT} IN_LIST OPENCMISS_COMPONENTS_DISABLED_BY_DEFAULT)
-        set(_VALUE NO)
+        set(_VALUE OFF)
     endif()
     # Use everything but the components in OPENCMISS_COMPONENTS_DISABLED_BY_DEFAULT
     option(OC_USE_${COMPONENT} "Enable use/build of ${COMPONENT}" ${_VALUE})
     
     # Look for some components on the system first before building
-    set(_VALUE NO)
+    set(_VALUE OFF)
     if (${COMPONENT} IN_LIST OPENCMISS_COMPONENTS_SYSTEM_BY_DEFAULT)
-        set(_VALUE YES)
+        set(_VALUE ON)
     endif()
     option(OC_SYSTEM_${COMPONENT} "Allow ${COMPONENT} to be used from local environment/system" ${_VALUE})
     # Initialize the default: static build for all components

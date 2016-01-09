@@ -55,8 +55,8 @@ endif()
 
 # Disable iron/zinc if only dependencies should be built
 if (OC_DEPENDENCIES_ONLY)
-    set(OC_USE_IRON NO)
-    set(OC_USE_ZINC NO)
+    set(OC_USE_IRON OFF)
+    set(OC_USE_ZINC OFF)
 endif()
 foreach(COMPONENT ${OPENCMISS_COMPONENTS})
     # Set default version number branch unless e.g. IRON_BRANCH is specified
@@ -71,9 +71,9 @@ foreach(COMPONENT ${OPENCMISS_COMPONENTS})
     
     # All local enabled? Set to local search.
     if (OC_COMPONENTS_SYSTEM STREQUAL NONE)
-        set(OC_SYSTEM_${COMPONENT} NO)
+        set(OC_SYSTEM_${COMPONENT} OFF)
     elseif(OC_COMPONENTS_SYSTEM STREQUAL ALL)
-        set(OC_SYSTEM_${COMPONENT} YES)
+        set(OC_SYSTEM_${COMPONENT} ON)
     endif()
     # Force "devel" branches for each component of DEVEL_ALL is set
     if (OC_DEVEL_ALL)
