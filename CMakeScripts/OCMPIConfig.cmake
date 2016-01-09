@@ -24,9 +24,12 @@ if (DEFINED MPI_HOME AND NOT MPI_HOME STREQUAL "")
     # MPI_DETECTED is set by FindMPI.cmake to one of the mnemonics or unknown (MPI_TYPE_UNKNOWN in FindMPI.cmake)
     set(MPI ${MPI_DETECTED} CACHE STRING "Detected MPI implementation" FORCE)
     if (NOT DEFINED MPI_BUILD_TYPE)
+        set(MPI_BUILD_TYPE USER_MPIHOME)
         log("Using MPI via MPI_HOME variable.
-If you want to use different build types for the same MPI implementation, you have to specify MPI_BUILD_TYPE.
-See also https://github.com/OpenCMISS/manage/issues/28" WARNING)
+If you want to use different build types for the same MPI implementation, please
+you have to specify MPI_BUILD_TYPE. Using '${MPI_BUILD_TYPE}'.
+https://github.com/OpenCMISS/manage/issues/28        
+        " WARNING)
     endif()
 else()
 
@@ -52,7 +55,7 @@ else()
     if(NOT DEFINED MPI)
         # No MPI or MPI_HOME - let cmake look and find the default MPI.
         if(SYSTEM_MPI)
-            log("Looking for system MPI...")
+            log("Looking for default system MPI...")
             find_package(MPI QUIET)
         endif()
         
@@ -105,12 +108,22 @@ endif()
 ####################################################################################################
 # Find local MPI (own build dir or system-wide)
 ####################################################################################################
-# As of here we always have an MPI mnemonic set.
+# As of here we always have an MPI mnemonic set, either by manual definition or detection
+# of default MPI type. In the latter case we already have MPI_FOUND=TRUE.
 
 # This variable is also used in the main CMakeLists file at path computations!
 string(TOLOWER "${MPI_BUILD_TYPE}" MPI_BUILD_TYPE_LOWER)
 
+if (NOT MPI_FOUND AND SYSTEM_MPI) 
+    # Educated guesses are used to look for an MPI implementation
+    # This bit of logic is covered inside the FindMPI module where MPI is consumed
+    log("Looking for '${MPI}' MPI on local system..")
+    find_package(MPI QUIET)
+endif()
+
+# Last check before building - there might be an own already built MPI implementation
 if (NOT MPI_FOUND)
+    log("No (matching) system MPI found or not allowed: SYSTEM_MPI=${SYSTEM_MPI}. Checking if own build exists." DEBUG)
     # Construct installation path
     # For MPI we use a slightly different architecture path - we dont need to re-build MPI for static/shared builds nor do we need the actual
     # MPI mnemonic in the path. Instead, we use "mpi" as common top folder to collect all local MPI builds.
@@ -122,18 +135,15 @@ if (NOT MPI_FOUND)
     endif()
     # This is where our own build of MPI will reside if compilation is needed    
     set(OWN_MPI_INSTALL_DIR ${OPENCMISS_ROOT}/install/${SHORT_ARCH_PATH}/mpi/${MPI}/${MPI_BUILD_TYPE_LOWER})
-    
-    # If no system MPI is allowed, search ONLY at MPI_HOME, which is our own bake
-    if(NOT SYSTEM_MPI)
-        set(MPI_HOME ${OWN_MPI_INSTALL_DIR})
-        log("Using own MPI '${MPI}': Setting MPI_HOME=${MPI_HOME}" DEBUG)
-    else()
-        # Educated guesses are used to look for an MPI implementation
-        # This bit of logic is covered inside the FindMPI module where MPI is consumed
-        log("Looking for '${MPI}' MPI on local system..")
-    endif()
-    # This call either only looks at MPI_HOME if no system lookup is allowed or searches at system locations
+
+    # Set MPI_HOME to the install location - its not set outside anyways (see first if case at top)
+    # Important: Do not unset(MPI_HOME) afterwards - this needs to get passed to all external projects the same way
+    # it has been after building MPI in the first place.
+    set(MPI_HOME "${OWN_MPI_INSTALL_DIR}")
     find_package(MPI QUIET)
+    if (MPI_FOUND)
+        log("Using own '${MPI}' MPI: ${OWN_MPI_INSTALL_DIR}")
+    endif()
 endif()
 
 #####################################################################
@@ -142,7 +152,7 @@ endif()
 # If we get here without having found an MPI implementation, we need to build it.
 # But we will always have the MPI mnemonic set if we reach here.
 if (NOT MPI_FOUND)
-    log("No system MPI found or not allowed: SYSTEM_MPI=${SYSTEM_MPI}" DEBUG)
+    
     # This is supported yet only on Unix systems
     if (UNIX)
         # No shared libs!
