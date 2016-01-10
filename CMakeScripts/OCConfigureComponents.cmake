@@ -52,7 +52,7 @@ if(OC_USE_ZLIB OR OC_USE_ZINC OR OC_DEPENDENCIES_ONLY)
             SCOTCH PTSCOTCH 
             MUMPS LIBXML2 HDF5 FIELDML-API
             IRON CSIM LLVM CELLML PNG
-            TIFF GDCM)
+            TIFF GDCM-ABI)
         addAndConfigureLocalComponent(ZLIB)
     endif()
 endif()
@@ -83,7 +83,7 @@ endif()
 if(OC_USE_BZIP2 OR OC_USE_ZINC OR OC_DEPENDENCIES_ONLY)
     find_package(BZIP2 ${BZIP2_VERSION} QUIET)
     if(NOT BZIP2_FOUND)
-        SET(BZIP2_FWD_DEPS SCOTCH PTSCOTCH GDCM IMAGEMAGICK)
+        SET(BZIP2_FWD_DEPS SCOTCH PTSCOTCH GDCM-ABI IMAGEMAGICK)
         addAndConfigureLocalComponent(BZIP2)
     endif()
 endif()
@@ -405,7 +405,7 @@ if (OC_USE_ZINC OR (OPENGL_FOUND AND OC_DEPENDENCIES_ONLY))
     if(OC_USE_JPEG)
         find_package(JPEG ${JPEG_VERSION} QUIET)
         if(NOT JPEG_FOUND)
-            set(JPEG_FWD_DEPS ZINC TIFF GDCM IMAGEMAGICK)
+            set(JPEG_FWD_DEPS ZINC TIFF GDCM-ABI IMAGEMAGICK)
             addAndConfigureLocalComponent(JPEG
                 JPEG_BUILD_CJPEG=OFF
                 JPEG_BUILD_DJPEG=OFF
@@ -496,14 +496,14 @@ if (OC_USE_ZINC OR (OPENGL_FOUND AND OC_DEPENDENCIES_ONLY))
     endif()
     
     # gdcm
-    if (OC_USE_GDCM)
-        find_package(GDCM ${GDCM_VERSION} QUIET)
-        if (NOT GDCM_FOUND)
-            set(GDCM_FWD_DEPS ZINC ITK IMAGEMAGICK)
+    if (OC_USE_GDCM-ABI)
+        find_package(GDCM-ABI ${GDCM-ABI_VERSION} QUIET)
+        if (NOT GDCM-ABI_FOUND)
+            set(GDCM-ABI_FWD_DEPS ZINC ITK IMAGEMAGICK)
             # Make EXPAT and UUID platform dependent?
-            addAndConfigureLocalComponent(GDCM
-                GDCM_USE_SYSTEM_ZLIB=ON
-                GDCM_USE_SYSTEM_EXPAT=ON
+            addAndConfigureLocalComponent(GDCM-ABI
+                GDCM-ABI_USE_SYSTEM_ZLIB=ON
+                GDCM-ABI_USE_SYSTEM_EXPAT=ON
             )
         endif()
     endif()
@@ -516,7 +516,7 @@ if (OC_USE_ZINC OR (OPENGL_FOUND AND OC_DEPENDENCIES_ONLY))
                 ZLIB_VERSION=${ZLIB_VERSION}
                 LIBXML2_VERSION=${LIBXML2_VERSION}
                 BZIP2_VERSION=${BZIP2_VERSION}
-                GDCM_VERSION=${GDCM_VERSION}
+                GDCM-ABI_VERSION=${GDCM-ABI_VERSION}
                 TIFF_VERSION=${TIFF_VERSION}
                 JPEG_VERSION=${JPEG_VERSION}
             )
@@ -534,7 +534,7 @@ if (OC_USE_ZINC OR (OPENGL_FOUND AND OC_DEPENDENCIES_ONLY))
                 ITK_USE_SYSTEM_TIFF=ON
                 ITK_USE_SYSTEM_LIBXML2=ON
                 ITK_USE_SYSTEM_ZLIB=ON
-                ITK_USE_SYSTEM_GDCM=OFF
+                ITK_USE_SYSTEM_GDCM-ABI=OFF
                 ITK_USE_KWSTYLE=OFF
                 ZLIB_VERSION=${ZLIB_VERSION}
                 PNG_VERSION=${PNG_VERSION}

@@ -1,8 +1,9 @@
-# This file sets all the targets any (external/3rd party) component provides
-SET(PACKAGES_WITH_TARGETS BLAS HYPRE LAPACK METIS
-    MUMPS PARMETIS PASTIX PETSC PLAPACK PTSCOTCH SCALAPACK
-    SCOTCH SOWING SUITESPARSE SUNDIALS SUPERLU SUPERLU_DIST ZLIB SZIP HDF5
-    BZIP2 LIBXML2 JPEG OPTPP NETGEN GLEW PNG FTGL FREETYPE TIFF)
+# Create the list of all components we'll need FindXXX wrappers for.
+# Those components are all but those we maintain ourselves.
+set(PACKAGES_WITH_TARGETS ${OPENCMISS_COMPONENTS})
+list(REMOVE_ITEM PACKAGES_WITH_TARGETS
+    LIBCELLML CELLML FIELDML-API ZINC IRON
+)
     
 # Some shipped find-package modules have a different case-sensitive spelling - need to stay consistent with that
 SET(LIBXML2_CASENAME LibXml2)
