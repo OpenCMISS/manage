@@ -7,3 +7,6 @@
    :language: cmake
 .. role:: var(code)
    :language: cmake 
+   
+.. Links
+.. _OpenCMISS: http://www.opencmiss.org
