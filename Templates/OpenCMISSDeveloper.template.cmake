@@ -1,64 +1,136 @@
-# Uncomment if you dont want to use architecture paths.
-#set(OC_USE_ARCHITECTURE_PATH NO)
+# This is the main configuration file for OpenCMISS developers.
+#
+# See http://www.opencmiss.org/documentation/cmake/docs/config/developer for more details
+# or see the subsequent comments.
 
+##
+# OC_PROFILING
+# ------------
+#
 # Set this to YES to build with the -p profiling flags.
+#
+# .. default:: NO
 set(OC_PROFILING NO)
 
+##
+# OC_DEVEL_ALL
+# ------------
+#
 # Override any local variable and have CMake download/checkout the "devel" branch of any components repository
-#set(OC_DEVEL_ALL YES)
+#
+# See also: `<COMP>_DEVEL`_
+#
+# .. default:: NO
+set(OC_DEVEL_ALL NO)
 
+##
+# OC_CLEAN_REBUILDS_COMPONENTS
+# ----------------------------
+#
 # If you issue "make clean" from the manage build folder, normally the external projects (i.e. dependencies) wont completely re-build.
-# Set this to true to have the build system remove the CMakeCache.txt of each dependency, which triggers a complete re-build. 
+# Set this to true to have the build system remove the CMakeCache.txt of each dependency, which triggers a complete re-build.
+# 
+# .. default:: YES 
 set(OC_CLEAN_REBUILDS_COMPONENTS YES)
 
-# The default for developers is to directly print the build output to the standard output/terminal.
-# This way developers directly see any errors instead of having to open log files.
-set(OC_CREATE_LOGS NO)
-
-# If you want more verbose output during builds, uncomment this line.
-#set(CMAKE_VERBOSE_MAKEFILE ON)
-
-# The levels of log entries written to the config build log.
-# This is the same as for normal users but also contains the DEBUG entries
-# More values are: VERBOSE
-set(OC_CONFIG_LOG_LEVELS SCREEN WARNING ERROR DEBUG)
-
-# For developers, all non SCREEN-level logs are also printed on the console by default.
-#set(OC_CONFIG_LOG_TO_SCREEN YES)
-
-##############################################################################################
-############################################### Maintainer setup
+##
+# OC_INSTALL_SUPPORT_EMAIL
+# ------------------------
+# 
 # Please set this to your email address, especially if you plan to provide several architecture installations and
 # expect people to use your installation
-#set(OC_INSTALL_SUPPORT_EMAIL "admin@institu.te")
+#
+# .. default:: OC_BUILD_SUPPORT_EMAIL
+set(OC_INSTALL_SUPPORT_EMAIL ${OC_BUILD_SUPPORT_EMAIL})
 
-# When installing OpenCMISS, the opencmiss-config file defines a default MPI version.
-# If unspecified, this will always be set to the version used for the latest build
-#set(OC_DEFAULT_MPI "mpich|openmpi|...")
-
+##
+# OC_DEFAULT_MPI_BUILD_TYPE
+#
 # When installing OpenCMISS, the opencmiss-config file defines a default MPI build type version.
 # If unspecified, this will always be set to the version used for the latest build
-#set(OC_DEFAULT_MPI_BUILD_TYPE "RELEASE|DEBUG|...")
+#
+# .. default:: RELEASE
+set(OC_DEFAULT_MPI_BUILD_TYPE "RELEASE")
 
-##############################################################################################
-############################################### Git
-# Disable use of Git to obtain sources.
-# The build systems automatically looks for Git and uses that to clone the respective source repositories
-# If Git is not found, a the build system falls back to download .zip files of the source.
-# To enforce that behaviour (e.g. for nightly tests), set this to YES
+##
+# GITHUB_USERNAME
+# ---------------
+#
+# If you set a github username, cmake will automatically try and locate all the
+# components as repositories under that github account.
+# Currently applies to **all** repositories.
+#
+# .. default:: <empty>
+set(GITHUB_USERNAME )
+
+##
+# GITHUB_USE_SSL
+# --------------
+#
+# If enabled, ssl connections like git@github.com/username are used instead of https access.
+# Requires public key registration with github but wont require to enter the password (for push) every time.
+# 
+# .. default:: NO
+set(GITHUB_USE_SSL NO)
+
+##
+# <COMP>_DEVEL
+# ------------
+#
+# At first, a flag :var:`<COMPNAME>_DEVEL` must be set in order to notify the setup that
+# this component (Iron, Zinc, any dependency) should be under development.
+#
+# See also: OC_DEVEL_ALL_.
+#
+# .. default:: NO
+
+#set(IRON_DEVEL YES)
+
+##
+# <COMP>_REPO
+# ---------------
+#
+# Set this variable for any component to have the build system checkout the sources from that repository. Applies to own builds only.
+#
+# If this variable is not specified, the build system setup chooses the default
+# public locations at the respective GitHub organizations (OpenCMISS, OpenCMISS-Dependencies etc).
+# 
+# .. caution::
+# 
+#    Those adoptions *must* currently be made before the first build is started - once a repository is
+#    created there is no logic on changing the repository location (has at least not been tested).
+#
+# Use in conjunction with `<COMP>_BRANCH`_ if necessary.
+
+#set(IRON_DEVEL git@github.com:mygithub/iron)
+
+##
+# .. _`component_branches`:
+#
+# <COMP>_BRANCH
+# -------------
+#
+# Manually set the target branch to checkout for the specified component. Applies to own builds only.
+# If this variable is not set, the build system automatically derives the branch name
+# from the :var:`<COMP>_VERSION` variable (pattern :cmake:`v<COMP>_VERSION`).
+#
+# See also: `<COMP>_REPO`_ :ref:`comp_version`
+
+#set(IRON_BRANCH myironbranch)
+
+
+# The following variables simply define different default values as those set in
+# the default configuration. Refer to the documentation for more details. 
+set(OC_CREATE_LOGS NO)
+set(OC_CONFIG_LOG_LEVELS SCREEN WARNING ERROR DEBUG)
+
+# Here are some pre-written variables that you might want to use some day:
+#set(OC_USE_ARCHITECTURE_PATH NO) 
+#set(CMAKE_VERBOSE_MAKEFILE ON)
+#set(OC_CONFIG_LOG_TO_SCREEN YES)
+#set(OC_DEFAULT_MPI "openmpi")
 #set(DISABLE_GIT YES)
 
-# If you set a github username, cmake will automatically try and locate all the components as repositories under that github account.
-#set(GITHUB_USERNAME )
 
-# If enabled, ssl connections like git@github.com/username are used instead of https access.
-# Requires public key registration with github but wont require to enter the password (for push) every time. 
-#set(GITHUB_USE_SSL YES)
-
-# To specify your own repository locations on a per-component basis, use
-#set(<COMPONENT_NAME>_REPO https://github.com/myacc/defunct)
-
-# Unless you want to checkout the default branch, set this to use your own
-#set(<COMPONENT_NAME>_BRANCH mybranch)
 
 

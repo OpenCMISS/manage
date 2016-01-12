@@ -1,3 +1,7 @@
+##
+# OPENCMISS_COMPONENTS
+# --------------------
+# 
 # List of all OpenCMISS components (used in default config)
 set(OPENCMISS_COMPONENTS BLAS LAPACK PLAPACK SCALAPACK PARMETIS
     SUITESPARSE MUMPS SUPERLU SUPERLU_DIST
@@ -56,3 +60,5 @@ set(OC_BUILD_SUPPORT_EMAIL "users@opencmiss.org")
 # This needs to be set in either LocalConfig or Developer (better) in order to be useful.
 # If not set, a warning will be issued!
 set(OC_INSTALL_SUPPORT_EMAIL FALSE)
+
+set(OC_EP_PREFIX "OC_") # The prefix for opencmiss dependencies external projects

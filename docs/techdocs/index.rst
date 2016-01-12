@@ -1,11 +1,13 @@
-:Date: 2016-01-11
-:Author: Daniel Wirtz
-
-.. include:: definitions.rst
+.. _`techdocs`:
 
 ====================================
 Techdocs for build system developers
 ====================================
+
+The (planned) GitHub repository structure `can be found here`_,
+and this document explains the layout of the different components and the overall build process.
+
+.. _`can be found here`: https://docs.google.com/document/d/1_HCyBMDRsyIEPLOUVVXSP0b4uDRsdCmbJuezVgySdbg
 
 File System Layout
 ==================
@@ -93,7 +95,7 @@ structure (mounted on :path:`OPENCMISS_ROOT/manage/`):
 
 Examples structure
 ==================
-Similar to the old build system, the examples available for OpenCMISS_ are kept separate. 
+Similar to the old build system, the examples available for OpenCMISS are kept separate. 
 Ultimately, all the available examples will be hosted in their own GIT repository,
 and a central examples repository will collect all working examples for any OpenCMISS release.
 In the process of conversion, however, there still only exists one global
@@ -104,3 +106,6 @@ The current global project can generate the :path:`CMakeLists.txt` files automat
 (not very clever though) for each example.
 The detection is done simply via looking if the according folder contains a :path:`Makefile` file.
 This is far from ideal, but a quick way to see what’s working and what not.
+
+.. This adds in the buildlog documentation
+.. cmake-source:: ../../CMakeScripts/OCMiscFunctionsMacros.cmake

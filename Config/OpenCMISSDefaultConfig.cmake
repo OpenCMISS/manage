@@ -1,33 +1,395 @@
-# ==============================
-# Build configuration
-# ==============================
-# See your OpenCMISSLocalConfig file for details on the possible options and values.
+##
+#
+# The default configuration file is located at :path:`<manage>/Config/OpenCMISSDefaultConfig.cmake`
+# In order to change any of the subsequently listed variables, specify your values in the :ref:`local config file <localconf>`.
+#
+
+##
+# OPENCMISS_INSTALL_ROOT
+# ----------------------
+#
+# The root directory where all libraries, include files and cmake config files for *ALL* architectures will be installed.
+# For details on the architecture path used within :cmake:`OPENCMISS_INSTALL_ROOT`, see :ref:`multiarchbuilds`.
+#
+# .. default:: `"${OPENCMISS_ROOT}/install"`
 set(OPENCMISS_INSTALL_ROOT "${OPENCMISS_ROOT}/install")
+
+##
+# BUILD_PRECISION
+# ---------------
+# The flags :cmake:`sdcz` are available to be set in the :cmake:BUILD_PRECISIONS variable.
+# It is initialized as cache variable wherever suitable.
+# 
+# .. note::
+#    Currently LAPACK/BLAS is always built using dz minimum, as suitesparse has test
+#    code that only compiles against both versions (very integrated code).
+#    SCALAPACK is always built with s minimum.
+# 
+# Valid choices are s,d,c,z and any combinations:
+#     :s: Single / float precision
+#     :d: Double precision
+#     :c: Complex / float precision
+#     :z: Complex / double precision
+#
+# .. default:: sd
 set(BUILD_PRECISION sd CACHE STRING "Build precisions for OpenCMISS components. Choose any of [sdcz]")
+
+##
+# INT_TYPE
+# --------
+#
+# Some packages allow int64 or longint as integer types - this has not been tested for anything but int32
+# Used only by PASTIX yet
+#
+# .. default:: int32
 set(INT_TYPE int32 CACHE STRING "OpenCMISS integer type (only used by PASTIX yet)")
+
+##
+# CMAKE_DEBUG_POSTFIX
+# -------------------
+#
+# Specifies a postfix for all libraries when build in :cmake:`CMAKE_BUILD_TYPE=DEBUG` 
+#
+# .. cmake-var:: CMAKE_DEBUG_POSTFIX
+# .. default:: d
 set(CMAKE_DEBUG_POSTFIX d CACHE STRING "Debug postfix for library names of DEBUG-builds") # Debug postfix
 
+##
+# BUILD_TESTS
+# -----------
+#
+# Most OpenCMISS components come with their own test cases and suites. This flag enables all component tests
+# to be build along with the components.
+#
+# This does not mean they're run (which you should do, see :ref:`build targets`)
+#
+# .. default:: ON
 option(BUILD_TESTS "Build OpenCMISS(-components) tests" ON)
+
+##
+# PARALLEL_BUILDS
+# ---------------
+# 
+# Enable this flag to have the build system automatically use multithreaded builds
+#
+# .. default:: ON
 option(PARALLEL_BUILDS "Use multithreading (-jN etc) for builds" ON)
+
+##
+# CMAKE_BUILD_TYPE
+# ----------------
+#
+# For different build types, use this variable.
+# Possible values are (in general)
+#
+#     :RELEASE: Optimised build
+#     :DEBUG: Build including debug information
+#     :MINSIZEREL: Optimised build for minimal library/binary size
+#     :RELWITHDEBINFO: Optimised build with debug information
+#
+# .. cmake-var:: CMAKE_BUILD_TYPE
+# .. default:: RELEASE
+if (NOT DEFINED CMAKE_BUILD_TYPE)
+    set(CMAKE_BUILD_TYPE RELEASE) 
+endif()
+
+##
+# MPI_BUILD_TYPE
+# --------------
+#
+# For different MPI build types, use this variable.
+# Possible values are (in general)
+#
+#     :RELEASE: Optimised build
+#     :DEBUG: Build including debug information
+#     :MINSIZEREL: Optimised build for minimal library/binary size
+#     :RELWITHDEBINFO: Optimised build with debug information
+#
+# .. default:: RELEASE
+if (NOT DEFINED MPI_BUILD_TYPE)
+    set(MPI_BUILD_TYPE RELEASE)
+endif()
+
+##
+# BUILD_SHARED_LIBS
+# -----------------
+#
+# Enable this flag to build all the components libraries as shared object files (\*.so / \*.dll).
+# The default behaviour is to build all the dependencies' libraries as static and only the main components Iron and Zinc
+# as shared libraries. 
+#
+# See also: <COMP>_SHARED_ IRON_SHARED_ ZINC_SHARED_
+# 
+# .. cmake-var:: BUILD_SHARED_LIBS
+# .. default:: NO
 option(BUILD_SHARED_LIBS "Build shared libraries within/for every component" NO)
+
+##
+# IRON_SHARED
+# -----------
+#
+# Determines if Iron is build as static or shared library. We recommend shared builds.
+# See also BUILD_SHARED_LIBS_ ZINC_SHARED_ <COMP>_SHARED_
+#
+# .. default:: YES
+option(IRON_SHARED "Build Iron as shared library" YES)
+
+##
+# ZINC_SHARED
+# -----------
+#
+# Determines if Zinc is build as static or shared library. We recommend shared builds.
+# See also BUILD_SHARED_LIBS_ IRON_SHARED_ <COMP>_SHARED_
+#
+# .. default:: YES
+option(ZINC_SHARED "Build Zinc as shared library" YES)
+
+##
+# OC_CREATE_LOGS
+# --------------
+#
+# Have the build system wrap the builds of component into log files.
+# Selecting :cmake:`NO` will directly print the build process to the standard output.
+#
+# .. default:: YES
 option(OC_CREATE_LOGS "Create logfiles instead of direct output to screen" YES)
+
+##
+# OC_WARN_ALL
+# -----------
+#
+# Enable to have maximum compiler warnings. Debug builds only.
+#
+# .. default:: YES
 option(OC_WARN_ALL "Compiler flags choices - all warnings on" YES)
+
+##
+# OC_CHECK_ALL
+# ------------
+#
+# Enable to have maximum compiler checks. Debug builds only.
+#
+# .. default:: YES
 option(OC_CHECK_ALL "Compiler flags choices - all checks on" YES)
+
+##
+# OC_MULTITHREADING
+# -----------------
+#
+# The build environment uses this to control if “local” multithreading should be enabled/used.
+# Thus far only OpenMP is implemented in the build system (and not for every component),
+# so this controls the :cmake:`WITH_OPENMP` flag being passed to any dependencies that can make use of it.
+# If used, the architecture path will also contain an extra segment “mt” between MPI and toolchain parts.
+#
+# .. default:: NO
 option(OC_MULTITHREADING "Use multithreading in OpenCMISS (where applicable)" NO)
+
+##
+# CMAKE_VERBOSE_MAKEFILE
+# ----------------------
+#
+# .. cmake-var:: CMAKE_VERBOSE_MAKEFILE
+# .. default:: NO
 option(CMAKE_VERBOSE_MAKEFILE "Generate verbose makefiles/projects for builds" NO)
+
+##
+# OC_USE_ARCHITECTURE_PATH
+# ------------------------
+#
+# Controls use of architecture paths. If you will only ever build everything with one toolchain/mpi config,
+# set this to :cmake:`NO`.
+#
+# .. default:: YES
 option(OC_USE_ARCHITECTURE_PATH "Use an architecture path for build and install trees" YES)
+
+##
+# GITHUB_USE_SSL
+# --------------
+#
+# Use SSL connection to (default) GitHub repositories
+#
+# .. default:: NO
 option(GITHUB_USE_SSL "Use SSL connection to (default) GitHub repositories" NO)
+
+##
+# DISABLE_GIT
+# -----------
+#
+# Disable use of Git to obtain sources.
+# The build systems automatically looks for Git and uses that to clone the respective source repositories
+# If Git is not found, a the build system falls back to download :code:`.zip` files of the source.
+# To enforce that behaviour (e.g. for nightly tests), set this to :cmake:`YES`.
+#
+# .. default:: NO
+option(DISABLE_GIT "Do not use Git to obtain and manage sources" NO)
+
+##
+# OC_DEPENDENCIES_ONLY
+# --------------------
+# 
+# If you want to compile the dependencies for iron/zinc only, enable this setting.
+# This flag is useful for setting up remote installations or continuous integration builds.
+#
+# .. caution::
+#     You can also disable building Iron or Zinc using the component variables, e.g. OC_USE_IRON=NO.
+#     However, this is considered a special top-level flag, which also causes any components that are
+#     exclusively required by e.g. Iron will not be build. 
+#
+# See also OC_USE_<COMP>_ 
+#
+# .. default:: NO
 option(OC_DEPENDENCIES_ONLY "Build dependencies only (no Iron or Zinc)" NO)
+
+##
+# OC_CONFIG_LOG_TO_SCREEN
+# -----------------------
+# 
+# Have all non SCREEN-level logs are also printed on the console (helps debugging).
+# See also OC_CONFIG_LOG_LEVELS_.
+# .. default:: NO
 option(OC_CONFIG_LOG_TO_SCREEN "Also print the created log file entries to console output" NO)
 
-# Those "options" have non-boolean values and its not clear yet what is better to use.. just leave it as that
-# for the time being
+##
+# OC_COMPONENTS_SYSTEM
+# --------------------
+#
+# Global setting to control use of system components. Possible values:
+# 
+#     :DEFAULT: Holds only for the components specified in OPENCMISS_COMPONENTS_SYSTEM_BY_DEFAULT (Config/Variables.cmake)
+#     :NONE: The OpenCMISS build system exclusively builds components from its own repositories
+#     :ALL: Enable search for any component on the system 
+#
+# .. default:: DEFAULT
 set(OC_COMPONENTS_SYSTEM DEFAULT)
-set(OC_EP_PREFIX "OC_") # The prefix for opencmiss dependencies external projects
-# The default implementation to use in all last-resort/unimplemented cases
-set(OPENCMISS_MPI_DEFAULT mpich)
-set(OC_CONFIG_LOG_LEVELS SCREEN WARNING ERROR) #VERBOSE DEBUG
 
+##
+# OC_DEFAULT_MPI
+# --------------
+#
+# The default implementation to use in all last-resort/unimplemented cases.
+# This is intended for system administrators only.
+#
+# .. default:: mpich
+set(OC_DEFAULT_MPI mpich)
+
+##
+# .. _`loglevels`:
+#
+# OC_CONFIG_LOG_LEVELS
+# --------------------
+#
+# This variable controls the messages generated and written to the configure log files during the CMake configuration phase.
+# It is intended for developers and anyone trying to debug the CMake scripts. Possible values are:
+#
+#    :SCREEN: Also print the log text to the console.
+#    :WARNING: Equivalent to issuing :command:`message(WARNING ...)`.
+#        However, the warning text will also be put into the log file.
+#    :ERROR: Equivalent to issuing :command:`message(FATAL_ERROR ...)`.
+#        However, the error text will also be put into the log file.
+#    :DEBUG: Any output not intended for production use, but thought useful for debugging purposes.
+#    :VERBOSE: Verbose output, thought of as the *maximum verbosity* level.
+#
+# The build log files are put into the :path:`<CMAKE_CURRENT_BINARY_DIR>/support` folder into a file with the pattern
+# :path:`configure_builds_YYYY-MM-DD_hh-mm.log`. The function to write log entries is called :command:`log()`.
+#
+# .. default:: SCREEN WARNING ERROR
+set(OC_CONFIG_LOG_LEVELS SCREEN WARNING ERROR)
+
+##
+# .. _`remote_install_dir_var`:
+#
+# OPENCMISS_REMOTE_INSTALL_DIR
+# ----------------------------
+#
+# If you have a remote installation of opencmiss components, (e.g. you are using OpenCMISS in a shared network environment)
+# specify the installation directory here.
+# This will have the build environment search for opencmiss components at that location.
+#
+# .. note::
+#
+#    There are alternate ways to specify the remote install directory.
+#        - Set OPENCMISS_REMOTE_INSTALL_DIR in your system environment to have the
+#          build system use that automatically.
+#        - Specify :sh:`-DOPENCMISS_REMOTE_INSTALL_DIR` at the main build,
+#          it will cache the variable and insert it into this file automatically.
+# 
+# ..caution::
+#
+#     You do NOT have to specify the full architecture-path dependend installation directory.
+#     OpenCMISS will try to find a matching subpath for your local compiler and mpi settings and issue a warning
+#     if no matching installation can be found.
+#
+# .. default:: <empty>
+set(OPENCMISS_REMOTE_INSTALL_DIR )
+
+##
+# .. _`remote_install_dir_force_var`:
+#
+# OPENCMISS_REMOTE_INSTALL_DIR_FORCE
+# ----------------------------------
+#
+# If using OPENCMISS_REMOTE_INSTALL_DIR_ fails and you are sure that the remote installation is compatible, you can
+# also directly specify the remote directory containing the "context.cmake" file in this variable.
+# 
+# .. default:: <empty>
+set(OPENCMISS_REMOTE_INSTALL_DIR_FORCE )
+
+##
+# BLA_VENDOR
+# ----------
+#
+# Define a BLAS library vendor. This variable is consumed by the FindBLAS/FindLAPACK modules.
+# Not specifying anything will perform a generic search. If you have the Intel MKL library, use e.g. *Intel10_64lp*.
+#
+# .. cmake-var:: BLA_VENDOR
+# .. default:: <empty>
+set(BLA_VENDOR )
+
+##
+# OC_USE_<COMP>
+# -------------
+#
+# For every OpenCMISS component, this flag determines if the respective component is to be used by the build environment.
+# This means it's searched for at configuration stage and build if not found.
+#
+# The list of possible components can be found in the :cmake:`OPENCMISS_COMPONENTS` variable in :path:`<manage>/Config/Variables.cmake`.
+#
+# .. caution::
+#    There is no advanced logic implemented to check if a custom selection of components breaks the overall build - e.g.
+#    if you disable OC_USE_LIBXML2 and there is no LibXML2 installed on your system, other components requiring LIBXML2 will
+#    not build correctly.
+#
+# See also OC_SYSTEM_<COMP>_ and the :cmake:`OPENCMISS_COMPONENTS_DISABLED_BY_DEFAULT` variable in :path:`<manage>/Config/Variables.cmake`.
+#
+# OC_SYSTEM_<COMP>
+# ----------------
+#
+# Many libraries are also available via the default operating system package managers or
+# downloadable as precompiled binaries.
+# This flag determines if the respective component may be searched for on the local machine, i.e. the local environment.
+#
+# As there are frequent incompatibilities with pre-installed packages due to mismatching versions, these flags can be set 
+# to favor own component builds over consumption of local packages.
+#
+# .. note::
+#
+#   The search scripts for local packages (CMake: :cmake:`find_package` command and :path:`Find<COMP>.cmake` scripts)
+#   are partially unreliable; CMake is improving them continuously and we also try to keep our own written ones
+#   up-to-date and working on many platforms. This is another reason why the default policy is to
+#   rather build our own packages than tediously looking for binaries that might not even have the
+#   right version and/or components.
+#
+# See also: OC_COMPONENTS_SYSTEM_ and the :cmake:`OPENCMISS_COMPONENTS_SYSTEM_BY_DEFAULT` variable in :path:`<manage>/Config/Variables.cmake`.
+# 
+# .. default:: OPENCMISS_COMPONENTS_SYSTEM_BY_DEFAULT
+#
+# <COMP>_SHARED
+# -------------
+#
+# This flag determines if the specified component should be build as shared library rather than a static library.
+# The default is :cmake:`NO` for all components except Iron and Zinc. See also IRON_SHARED_, ZINC_SHARED_.
+#
+# .. default:: NO
 foreach(COMPONENT ${OPENCMISS_COMPONENTS})
     set(_VALUE ON)
     if (${COMPONENT} IN_LIST OPENCMISS_COMPONENTS_DISABLED_BY_DEFAULT)
@@ -45,6 +407,33 @@ foreach(COMPONENT ${OPENCMISS_COMPONENTS})
     # Initialize the default: static build for all components
     option(${COMPONENT}_SHARED "Build all libraries of ${COMPONENT} as shared" NO)
 endforeach()
+
+##
+# .. _`comp_version`:
+# 
+# <COMP>_VERSION
+# --------------
+#
+# These variables are the essential part of the build systems package version management.
+# 
+# For each OpenCMISS component, this variable contains the current required (minimum) version for that component - 
+# OpenCMISS uses Git in conjunction with version-number named branches to maintain 
+# consistency and interoperability throughout all components.
+# The Git repository default branches are constructed by a "v" prefix to the version: :code:`v${<COMP>_VERSION}`
+#
+# Those quantities are not intended to be changed by api-users, but might be subject to changes for development tests.
+# Assuming the existence of the respective branches on GitHub, all that needs to be done to 
+# change a package version is to set the version number accordingly.
+# The setup will then checkout the specified version and attempt to build and link with it.
+#
+# .. caution::
+#
+#     Having a consistent set of interoperable packages (especially dependencies) is a nontrivial
+#     task considering the amount of components, so be aware that hasty changes will most likely break the build!
+#
+# Moreover, those variables are also defined for all MPI implementations that can be build by the OpenCMISS build environment.
+#
+# See also: :ref:`component_branches`
 
 # Component versions
 set(BLAS_VERSION 3.5.0)
@@ -90,54 +479,121 @@ set(ITK_VERSION 3.20.0)
 set(OPENMPI_VERSION 1.8.4) #1.8.4, 1.10.0 (unstable, does fail on e.g. ASES/Stuttgart)
 set(MPICH_VERSION 3.1.3)
 set(MVAPICH2_VERSION 2.1)
-# Cellml
+
+# Own components
 set(CELLML_VERSION 1.0) # any will do, not used
 set(CSIM_VERSION 1.0)
-
 set(IRON_VERSION 0.5.0)
-set(IRON_SHARED YES)
-
 set(ZINC_VERSION 3.0.2)
-set(ZINC_SHARED YES)
-
 set(EXAMPLES_VERSION 1.0)
 
-# ==========================================================================================
-# Single module configuration
+##
+# Inter-component configuration
+# -----------------------------
 #
-# These flags only apply if the corresponding package is build
-# by the OpenCMISS Dependencies system. The packages themselves will then search for the
-# appropriate consumed packages. No checks are performed on whether the consumed packages
-# will also be build by us or not, as they might be provided externally.
+# Some OpenCMISS components depend on or can use each other. Therefore, the build system
+# provides flags of the type :cmake:`A_USE_B` or :cmake:`A_WITH_B` to control component connectivity. 
 #
-# To be safe: E.g. if you wanted to use MUMPS with SCOTCH, also set OC_USE_SCOTCH=YES so that
-# the build system ensures that SCOTCH will be available.
-# ==========================================================================================
+# ..note::
+#     These flags only apply if the corresponding package is build by the OpenCMISS Dependencies system.
+#     The packages themselves will then search for the appropriate consumed packages.
+#     No checks are performed on whether the consumed packages
+#     will also be build by us or not, as they might be provided externally.
+#
+# .. caution:: 
+#    Take care to also enable the appropriate OC_USE_<COMP>_ flags.
+#    For example, if you wanted to use MUMPS with SCOTCH, also set OC_USE_SCOTCH=YES so that
+#    the build system ensures that SCOTCH will be available.
+#
+# The full list of available inter-component connection flags is as follows (defaults added):
+#
+#    MUMPS_WITH_SCOTCH : NO
+#        Have MUMPS use Scotch.
+#    MUMPS_WITH_PTSCOTCH : YES
+#        Have MUMPS use PT-Scotch.
+#    MUMPS_WITH_METIS : NO
+#        Have MUMPS use Metis.
+#    MUMPS_WITH_PARMETIS
+#        Have MUMPS use Parmetis.
 option(MUMPS_WITH_SCOTCH "Have MUMPS use Scotch" NO)
 option(MUMPS_WITH_PTSCOTCH "Have MUMPS use PT-Scotch" YES)
 option(MUMPS_WITH_METIS "Have MUMPS use Metis" NO)
 option(MUMPS_WITH_PARMETIS "Have MUMPS use Parmetis" YES)
 
+##
+#    SUNDIALS_WITH_LAPACK : YES
+#        Have Sundials use LAPACK
 option(SUNDIALS_WITH_LAPACK "Have Sundials use LAPACK" YES)
 
+##
+#    SCOTCH_USE_THREADS : YES
+#        Enable use of threading for Scotch/PT-Scotch
+#    SCOTCH_WITH_ZLIB : YES
+#        Have Scotch/PT-Scotch use zlib
+#    SCOTCH_WITH_BZIP2 : YES
+#        Have Scotch/PT-Scotch use bzip2
 option(SCOTCH_USE_THREADS "Enable use of threading for Scotch/PT-Scotch" YES)
 option(SCOTCH_WITH_ZLIB "Have Scotch/PT-Scotch use zlib" YES)
 option(SCOTCH_WITH_BZIP2 "Have Scotch/PT-Scotch use bzip2" YES)
 
+##
+#    SUPERLU_DIST_WITH_PARMETIS : YES
+#        Enable Parmetis support for SuperLU-Dist
 option(SUPERLU_DIST_WITH_PARMETIS "Enable Parmetis support for SuperLU-Dist" YES)
 
+##
+#    PASTIX_USE_THREADS : YES
+#        Have Sundials use LAPACK
+#    PASTIX_USE_METIS : YES
+#        Have PASTIX use Metis
+#    PASTIX_USE_PTSCOTCH : YES
+#        Have PASTIX use PT-Scotch
 option(PASTIX_USE_THREADS "Enable use of threading for PASTIX" YES)
 option(PASTIX_USE_METIS "Have PASTIX use Metis" YES)
 option(PASTIX_USE_PTSCOTCH "Have PASTIX use PT-Scotch" YES)
 
+##
+#    HDF5_WITH_MPI : YES
+#        Build HDF5 with MPI support
+#    HDF5_WITH_SZIP : YES
+#        Have HDF5 use szip
+#    HDF5_WITH_ZLIB : YES
+#        Have HDF5 use zlib
 option(HDF5_WITH_MPI "Build HDF5 with MPI support" NO)
 option(HDF5_WITH_SZIP "Have HDF5 use szip" YES)
 option(HDF5_WITH_ZLIB "Have HDF5 use zlib" YES)
 
+##
+#    FIELDML-API_WITH_HDF5 : NO
+#        Enable FieldML HDF5 support
+#    FIELDML-API_WITH_JAVA_BINDINGS : NO
+#        Build Java bindings for FieldML
+#    FIELDML-API_WITH_FORTRAN_BINDINGS : YES
+#        Build Fortran bindings for FieldML
 option(FIELDML-API_WITH_HDF5 "Enable FieldML HDF5 support" NO)
 option(FIELDML-API_WITH_JAVA_BINDINGS "Build Java bindings for FieldML" NO)
 option(FIELDML-API_WITH_FORTRAN_BINDINGS "Build Fortran bindings for FieldML" YES)
 
+##
+#    IRON_WITH_CELLML : YES
+#        Have Iron use CellML
+#    IRON_WITH_FIELDML : YES
+#        Have Iron use FieldML
+#    IRON_WITH_HYPRE : YES
+#        Have Iron use Hypre
+#    IRON_WITH_SUNDIALS : YES
+#        Have Iron use Sundials
+#    IRON_WITH_MUMPS : YES
+#        Have Sundials use LAPACK
+#    IRON_WITH_SCALAPACK : YES
+#        Have Iron use ScaLAPACK
+#    IRON_WITH_PETSC : YES
+#        Have Iron use PetSC
+#    IRON_WITH_C_BINDINGS : YES
+#        Build Iron-C bindings
+#    IRON_WITH_Python_BINDINGS : YES
+#        Build Iron-Python bindings. This setting is automatically enabled if the build system
+#        finds a local Python installation. 
 option(IRON_WITH_CELLML "Have Iron use CellML" YES)
 option(IRON_WITH_FIELDML "Have Iron use FieldML" YES)
 option(IRON_WITH_HYPRE "Have Iron use Hypre" YES)
@@ -146,6 +602,8 @@ option(IRON_WITH_MUMPS "Have Iron use MUMPS" YES)
 option(IRON_WITH_SCALAPACK "Have Iron use ScaLAPACK" YES)
 option(IRON_WITH_PETSC "Have Iron use PetSC" YES)
 option(IRON_WITH_C_BINDINGS "Build Iron-C bindings" YES)
-# IRON_WITH_Python_BINDINGS is automatically set if python is found
 
-option(LIBXML2_WITH_ZLIB "Have Iron use CellML"  YES)
+##
+#    LIBXML2_WITH_ZLIB : YES
+#        Build LibXML2 with zLib compression support
+option(LIBXML2_WITH_ZLIB "Build LibXML2 with zLib compression support"  YES)
