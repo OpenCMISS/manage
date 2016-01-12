@@ -3,6 +3,8 @@ include(Variables)
 
 # Load default configuration
 include(OpenCMISSDefaultConfig)
+# This file is separate for documentation structural reasons (sphinx / rst)
+include(OpenCMISSInterComponentConfig)
 
 # Load local configuration to allow overrides
 # First try at a given path, then local

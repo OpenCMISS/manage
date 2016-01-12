@@ -443,7 +443,7 @@ def sh_role(role, rawtext, text, lineno, inliner,
     return [node], []
 
 def setup(app):
-    app.add_config_value('cmake_min_version', '3.0', 'html')
+    app.add_config_value('cmake_min_version', '3.3', 'html')
     app.add_role('path', path_role)
     app.add_role('cmake', cmake_role)
     app.add_role('var', var_role)

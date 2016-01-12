@@ -22,7 +22,7 @@ sets up build trees and according installation directories.
 .. toctree::
    :maxdepth: 2
    
-   build
+   build.rst
    config/index
    config/multiarch
    config/remote

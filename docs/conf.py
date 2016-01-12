@@ -12,7 +12,7 @@ sys.path.insert(0, os.path.abspath('.'))
 
 # -- General configuration ------------------------------------------------
 
-cmake_min_version = '3.3'
+#cmake_min_version = '3.3'
 
 #exclude_patterns = []
 #source_suffix = '.rst'

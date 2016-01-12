@@ -4,74 +4,18 @@
 # or see the subsequent comments.
 
 ##
-# OC_PROFILING
-# ------------
+# .. _`component_branches`:
 #
-# Set this to YES to build with the -p profiling flags.
+# <COMP>_BRANCH
+# -------------
 #
-# .. default:: NO
-set(OC_PROFILING NO)
+# Manually set the target branch to checkout for the specified component. Applies to own builds only.
+# If this variable is not set, the build system automatically derives the branch name
+# from the :var:`<COMP>_VERSION` variable (pattern :cmake:`v<COMP>_VERSION`).
+#
+# See also: `<COMP>_REPO`_ :ref:`comp_version`
 
-##
-# OC_DEVEL_ALL
-# ------------
-#
-# Override any local variable and have CMake download/checkout the "devel" branch of any components repository
-#
-# See also: `<COMP>_DEVEL`_
-#
-# .. default:: NO
-set(OC_DEVEL_ALL NO)
-
-##
-# OC_CLEAN_REBUILDS_COMPONENTS
-# ----------------------------
-#
-# If you issue "make clean" from the manage build folder, normally the external projects (i.e. dependencies) wont completely re-build.
-# Set this to true to have the build system remove the CMakeCache.txt of each dependency, which triggers a complete re-build.
-# 
-# .. default:: YES 
-set(OC_CLEAN_REBUILDS_COMPONENTS YES)
-
-##
-# OC_INSTALL_SUPPORT_EMAIL
-# ------------------------
-# 
-# Please set this to your email address, especially if you plan to provide several architecture installations and
-# expect people to use your installation
-#
-# .. default:: OC_BUILD_SUPPORT_EMAIL
-set(OC_INSTALL_SUPPORT_EMAIL ${OC_BUILD_SUPPORT_EMAIL})
-
-##
-# OC_DEFAULT_MPI_BUILD_TYPE
-#
-# When installing OpenCMISS, the opencmiss-config file defines a default MPI build type version.
-# If unspecified, this will always be set to the version used for the latest build
-#
-# .. default:: RELEASE
-set(OC_DEFAULT_MPI_BUILD_TYPE "RELEASE")
-
-##
-# GITHUB_USERNAME
-# ---------------
-#
-# If you set a github username, cmake will automatically try and locate all the
-# components as repositories under that github account.
-# Currently applies to **all** repositories.
-#
-# .. default:: <empty>
-set(GITHUB_USERNAME )
-
-##
-# GITHUB_USE_SSL
-# --------------
-#
-# If enabled, ssl connections like git@github.com/username are used instead of https access.
-# Requires public key registration with github but wont require to enter the password (for push) every time.
-# 
-# .. default:: NO
-set(GITHUB_USE_SSL NO)
+#set(IRON_BRANCH myironbranch)
 
 ##
 # <COMP>_DEVEL
@@ -105,20 +49,76 @@ set(GITHUB_USE_SSL NO)
 #set(IRON_DEVEL git@github.com:mygithub/iron)
 
 ##
-# .. _`component_branches`:
+# GITHUB_USERNAME
+# ---------------
 #
-# <COMP>_BRANCH
-# -------------
+# If you set a github username, cmake will automatically try and locate all the
+# components as repositories under that github account.
+# Currently applies to **all** repositories.
 #
-# Manually set the target branch to checkout for the specified component. Applies to own builds only.
-# If this variable is not set, the build system automatically derives the branch name
-# from the :var:`<COMP>_VERSION` variable (pattern :cmake:`v<COMP>_VERSION`).
+# .. default:: <empty>
+set(GITHUB_USERNAME )
+
+##
+# GITHUB_USE_SSL
+# --------------
 #
-# See also: `<COMP>_REPO`_ :ref:`comp_version`
+# If enabled, ssl connections like git@github.com/username are used instead of https access.
+# Requires public key registration with github but wont require to enter the password (for push) every time.
+# 
+# .. default:: NO
+set(GITHUB_USE_SSL NO)
 
-#set(IRON_BRANCH myironbranch)
+##
+# OC_CLEAN_REBUILDS_COMPONENTS
+# ----------------------------
+#
+# If you issue "make clean" from the manage build folder, normally the external projects (i.e. dependencies) wont completely re-build.
+# Set this to true to have the build system remove the CMakeCache.txt of each dependency, which triggers a complete re-build.
+# 
+# .. default:: YES 
+set(OC_CLEAN_REBUILDS_COMPONENTS YES)
 
+##
+# OC_DEFAULT_MPI_BUILD_TYPE
+#
+# When installing OpenCMISS, the opencmiss-config file defines a default MPI build type version.
+# If unspecified, this will always be set to the version used for the latest build
+#
+# .. default:: RELEASE
+set(OC_DEFAULT_MPI_BUILD_TYPE "RELEASE")
 
+##
+# OC_DEVEL_ALL
+# ------------
+#
+# Override any local variable and have CMake download/checkout the "devel" branch of any components repository
+#
+# See also: `<COMP>_DEVEL`_
+#
+# .. default:: NO
+set(OC_DEVEL_ALL NO)
+
+##
+# OC_INSTALL_SUPPORT_EMAIL
+# ------------------------
+# 
+# Please set this to your email address, especially if you plan to provide several architecture installations and
+# expect people to use your installation
+#
+# .. default:: OC_BUILD_SUPPORT_EMAIL
+set(OC_INSTALL_SUPPORT_EMAIL ${OC_BUILD_SUPPORT_EMAIL})
+
+##
+# OC_PROFILING
+# ------------
+#
+# Set this to YES to build with the -p profiling flags.
+#
+# .. default:: NO
+set(OC_PROFILING NO)
+
+# ######################################################################################################
 # The following variables simply define different default values as those set in
 # the default configuration. Refer to the documentation for more details. 
 set(OC_CREATE_LOGS NO)
