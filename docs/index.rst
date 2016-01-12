@@ -22,7 +22,8 @@ sets up build trees and according installation directories.
 .. toctree::
    :maxdepth: 2
    
-   build.rst
+   build/index
+   build/examples
    config/index
    config/multiarch
    config/remote
@@ -36,7 +37,7 @@ Getting help
 .. toctree::
    :maxdepth: 1
    
-   support
+   build/support
 
 =======================   
 Technical documentation

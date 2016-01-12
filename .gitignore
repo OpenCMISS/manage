@@ -1,5 +1,4 @@
-build/
-build*
+/build*
 default/
 CMakeFindModuleWrappers/
 OpenCMISSDeveloper.cmake

@@ -13,7 +13,8 @@ Please see the `old cm repository`_ for instructions using the old (Unix Makefil
 Installation
 ------------
 
-.. toctree::
-   :maxdepth: 1
-   
-   docs/index
+.. Inserting a toctree or including a file does not seem to work on GitHub - hence a good old text here.
+
+Please follow the `build instructions`__.
+
+.. __: http://www.opencmiss.org/documentation/cmake/docs/index.html 
