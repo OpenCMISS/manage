@@ -11,10 +11,6 @@ Building existing PMR examples
 ==============================
 Building examples obtained from the PMR_ (Physiome Model Repository) is very simple.
 
-.. note:: 
-   
-   Not all models found there are CMake-based. Please refer to the model's own documentation in each case.
-
    1. Download/clone the examples source code to a location of your choice
    2. Create a :path:`build` folder inside and enter it
    3. Invoke :sh:`cmake -DOPENCMISS_INSTALL_DIR=<OPENCMISS_INSTALL_ROOT> ..`
@@ -22,10 +18,14 @@ Building examples obtained from the PMR_ (Physiome Model Repository) is very sim
    
 Now you should have a binary :path:`./run` in your example source that can be executed.
 
+For convenience, you can also define the :cmake:`OPENCMISS_INSTALL_DIR` variable in your local environment.
+The examples will use that if found, simplifying the build process even more!
+   
 .. caution::
 
-   Many examples using Iron need to be executed using your MPI binary in order to run in parallel.
-   Please refer to the examples documentation for instructions on running it.
+   Not all models found at the PMR there are CMake-based. 
+   Moreoever, many examples using Iron need to be executed using your MPI binary in order to run in parallel.
+   Please refer to the model's own documentation in each case.
 
 .. _PMR: https://models.physiomeproject.org
 
@@ -62,4 +62,8 @@ The config file provides the following CMake link targets:
    
 .. __: https://cmake.org/cmake/help/v3.3/command/add_library.html?highlight=add_library#interface-libraries   
   
-   
+.. note::
+
+   The :cmake:`OPENCMISS_INSTALL_DIR` variable used for the PMR examples does nothing but set the :cmake:`CMAKE_PREFIX_PATH`
+   variable. For unexperienced users this is more intuitive and it also allows to specify the environment variable of the 
+   same name (using CMAKE_PREFIX_PATH in the environment has wider consequences!)
