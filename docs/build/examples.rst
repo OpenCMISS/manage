@@ -4,28 +4,62 @@
 Building OpenCMISS examples (Unix/terminal)
 -------------------------------------------
 With the new CMake-based build system, building OpenCMISS applications and examples has become much easier.
-Any installed OpenCMISS suite has a :var:`OPENCMISS_INSTALL_ROOT`
-Any (CMake-built) application using OpenCMISS libraries just need to add the OpenCMISS installation directory
-to their :cmake:`CMAKE_PREFIX_PATH` and prefix pathspecify the
+Any installed OpenCMISS suite has a :var:`OPENCMISS_INSTALL_ROOT` directory, which contains all the information needed
+to build and link applications against the installed libraries.
 
-Essentially, all that is required is to specify the :var:`OPENCMISS_INSTALL_DIR` variable: 
+Building existing PMR examples
+==============================
+Building examples obtained from the PMR_ (Physiome Model Repository) is very simple.
 
-The instructions here are for building a single example.
+.. note:: 
+   
+   Not all models found there are CMake-based. Please refer to the model's own documentation in each case.
 
-
-Building an example requires some effort in order to have compatible settings to your OpenCMISS installation.
-Luckily, the OpenCMISS build system can manage that for you.
-But this, in turn, means that a local OpenCMISS manage repository
-is always required, even if you want to use a remote installation and only build examples yourself.
-So, make sure you have that first, as it will look for (and possibly build) at least a local MPI implementation.
-
-
-
-   1. Download the desired example from PMR or GitHub.
-      (*Transition phase only*: Clone the https://github.com/OpenCMISS-Examples/examples repository
-      and navigate to the folder of your desired example)
-   2. Create a build folder within the example source, e.g. :path:`build` and change to it
-   3. Invoke :sh:`cmake -DOPENCMISS_INSTALL_DIR=<OPENCMISS_ROOT>/install ..`
+   1. Download/clone the examples source code to a location of your choice
+   2. Create a :path:`build` folder inside and enter it
+   3. Invoke :sh:`cmake -DOPENCMISS_INSTALL_DIR=<OPENCMISS_INSTALL_ROOT> ..`
    4. Invoke :sh:`make install`
    
 Now you should have a binary :path:`./run` in your example source that can be executed.
+
+.. caution::
+
+   Many examples using Iron need to be executed using your MPI binary in order to run in parallel.
+   Please refer to the examples documentation for instructions on running it.
+
+.. _PMR: https://models.physiomeproject.org
+
+Building all examples
+---------------------
+
+.. caution::
+
+   This feature is for the transition phase from the SVN global examples repo to separate PMR examples only
+   
+Among the :ref:`build system targets <build targets>` is also a :cmake:`examples` target.
+Invoke that to have the build system create a folder :path:`<OPENCMISS_ROOT>/examples` for you, which contains
+all the examples from the `GitHub main examples`_ repository.
+All of them will be attempted to build.
+
+Also see the :ref:`troubleshooting` section for common issues.
+
+.. _`GitHub main examples`: https://github.com/OpenCMISS-Examples/examples
+
+
+Creating new OpenCMISS applications
+===================================
+With the new CMake-based build system, building OpenCMISS applications and examples has become much easier.
+Any installed OpenCMISS suite has a :var:`OPENCMISS_INSTALL_ROOT` directory, which also contains a CMake package config file.
+
+Hence, any (CMake-powered) application using OpenCMISS just need to add the OpenCMISS installation directory
+to their :cmake:`CMAKE_PREFIX_PATH` and can import OpenCMISS build targets via :cmake:`find_package(OpenCMISS)`.
+The config file provides the following CMake link targets:
+
+   :opencmiss: An `interface target`__ to add as link library to any example library or executable.
+      Wraps the :cmake:iron and :cmake:zinc build targets (if installed).
+   :iron: The iron library. Only available if :var:`OC_USE_IRON` is set.
+   :zinc: The zinc library. Only available if :var:`OC_USE_ZINC` is set.
+   
+.. __: https://cmake.org/cmake/help/v3.3/command/add_library.html?highlight=add_library#interface-libraries   
+  
+   

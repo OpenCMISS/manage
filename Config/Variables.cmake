@@ -36,6 +36,9 @@ set(OPENCMISS_COMPONENTS_SYSTEM_BY_DEFAULT BLAS LAPACK LLVM LIBXML2 JPEG FREETYP
 # local ZLIB PNG wont work (too new) with e.g. Imagemagick
 # TIFF: older versions wont do with ITK
 
+# Those components are initialized to be build as shared libraries
+set(OPENCMISS_COMPONENTS_SHARED_BY_DEFAULT IRON ZINC)
+
 # Disabled components - added but not compiling
 # SCOTCH is disabled as PTSCOTCH is usually used.
 set(OPENCMISS_COMPONENTS_DISABLED_BY_DEFAULT CSIM LLVM SCOTCH)

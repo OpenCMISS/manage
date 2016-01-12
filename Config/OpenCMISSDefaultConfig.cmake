@@ -43,7 +43,7 @@ set(BUILD_PRECISION sd CACHE STRING "Build precisions for OpenCMISS components. 
 # The default behaviour is to build all the dependencies' libraries as static and only the main components Iron and Zinc
 # as shared libraries. 
 #
-# See also: <COMP>_SHARED_ IRON_SHARED_ ZINC_SHARED_
+# See also: <COMP>_SHARED_
 # 
 # .. cmake-var:: BUILD_SHARED_LIBS
 # .. default:: NO
@@ -102,12 +102,15 @@ option(CMAKE_VERBOSE_MAKEFILE "Generate verbose makefiles/projects for builds" N
 # -------------
 #
 # This flag determines if the specified component should be build as shared library rather than a static library.
-# The default is :cmake:`NO` for all components except Iron and Zinc. See also IRON_SHARED_, ZINC_SHARED_.
+# The default is :cmake:`NO` for all components except Iron and Zinc.
 #
 # .. default:: NO
 foreach(COMPONENT ${OPENCMISS_COMPONENTS})
-    # Initialize the default: static build for all components
-    option(${COMPONENT}_SHARED "Build all libraries of ${COMPONENT} as shared" NO)
+    set(_VALUE OFF)
+    if (${COMPONENT} IN_LIST OPENCMISS_COMPONENTS_SHARED_BY_DEFAULT)
+        set(_VALUE ON)
+    endif()
+    option(${COMPONENT}_SHARED "Build all libraries of ${COMPONENT} as shared" ${_VALUE})
 endforeach()
 
 ##
@@ -218,16 +221,6 @@ option(GITHUB_USE_SSL "Use SSL connection to (default) GitHub repositories" NO)
 set(INT_TYPE int32 CACHE STRING "OpenCMISS integer type (only used by PASTIX yet)")
 
 ##
-# IRON_SHARED
-# -----------
-#
-# Determines if Iron is build as static or shared library. We recommend shared builds.
-# See also BUILD_SHARED_LIBS_ ZINC_SHARED_ `<COMP>_SHARED`_
-#
-# .. default:: YES
-option(IRON_SHARED "Build Iron as shared library" YES)
-
-##
 # MPI_BUILD_TYPE
 # --------------
 #
@@ -307,16 +300,6 @@ option(OC_CONFIG_LOG_TO_SCREEN "Also print the created log file entries to conso
 #
 # .. default:: YES
 option(OC_CREATE_LOGS "Create logfiles instead of direct output to screen" YES)
-
-##
-# OC_DEFAULT_MPI
-# --------------
-#
-# The default implementation to use in all last-resort/unimplemented cases.
-# This is intended for system administrators only.
-#
-# .. default:: mpich
-set(OC_DEFAULT_MPI mpich)
 
 ##
 # OC_DEPENDENCIES_ONLY
@@ -478,13 +461,3 @@ set(OPENCMISS_REMOTE_INSTALL_DIR_FORCE )
 #
 # .. default:: ON
 option(PARALLEL_BUILDS "Use multithreading (-jN etc) for builds" ON)
-
-##
-# ZINC_SHARED
-# -----------
-#
-# Determines if Zinc is build as static or shared library. We recommend shared builds.
-# See also BUILD_SHARED_LIBS_ IRON_SHARED_ `<COMP>_SHARED`_
-#
-# .. default:: YES
-option(ZINC_SHARED "Build Zinc as shared library" YES)

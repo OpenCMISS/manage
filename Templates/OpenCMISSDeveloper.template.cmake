@@ -80,13 +80,26 @@ set(GITHUB_USE_SSL NO)
 set(OC_CLEAN_REBUILDS_COMPONENTS YES)
 
 ##
+# OC_DEFAULT_MPI
+# --------------
+#
+# When installing OpenCMISS, the opencmiss-config file defines a default MPI version.
+#
+# If unspecified, this will always be set to the version used for the latest build.
+#
+# .. default:: <empty>
+set(OC_DEFAULT_MPI )
+
+##
 # OC_DEFAULT_MPI_BUILD_TYPE
+# -------------------------
 #
-# When installing OpenCMISS, the opencmiss-config file defines a default MPI build type version.
-# If unspecified, this will always be set to the version used for the latest build
+# When installing OpenCMISS, the opencmiss-config file defines a default MPI build type.
 #
-# .. default:: RELEASE
-set(OC_DEFAULT_MPI_BUILD_TYPE "RELEASE")
+# If unspecified, this will always be set to the build type used for the latest build.
+#
+# .. default:: <empty>
+set(OC_DEFAULT_MPI_BUILD_TYPE )
 
 ##
 # OC_DEVEL_ALL

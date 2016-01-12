@@ -171,6 +171,7 @@ Therefore, the build system’s main target is called :sh:`opencmiss` and should
    :test: Run all the tests for all current components. Lengthy!
    :examples: Convenience target to download & build all the examples registered
       as submodule of the :path:`OpenCMISS-Examples/examples` repository.
+      **This is intended for the transition phase from SVN global examples repo to PMR only and will disappear in due time!**
    :examples-test: Uses CTest to simply execute all the examples (if successfully built).
       Currently they’re invoked without arguments which may break some of them due to that.
    :reset: Removes everything from the current build root but the :ref:`OpenCMISSLocalConfig <localconf>` file.

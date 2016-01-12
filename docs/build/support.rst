@@ -32,6 +32,8 @@ they need to be stored at different paths using different include directories.
 
 See the :ref:`remote installations` section.
 
+.. _`troubleshooting`:
+
 ---------------
 Troubleshooting
 ---------------
@@ -64,3 +66,10 @@ Two scenarios commonly happen here:
 Then, your example / application can use that to find your opencmiss installation.
 As the :sh:`install` target is a part of the :sh:`opencmiss` target, we recommend building :sh:`opencmiss`
 from the start as described in :ref:`build opencmiss`.
+
+   Running the :cmake:`examples` target stops with errors.
+   
+At the current stage, the examples repo contains *all* the examples from the SVN opencmiss examples repository.
+We are currently working on updating/repairing/removing all of them.
+ 
+*Solution*: Invoke your build with flags to ignore intermediate errors. For :sh:`make` this is achieved using the :sh:`-k` flag.
