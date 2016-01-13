@@ -11,6 +11,14 @@
 # Define a BLAS library vendor. This variable is consumed by the FindBLAS/FindLAPACK modules.
 # Not specifying anything will perform a generic search. If you have the Intel MKL library, use e.g. *Intel10_64lp*.
 #
+# .. caution::
+#     
+#     If you change the BLAS implementation after a previous build has finished, the binaries for the old BLAS version will
+#     be overwritten by the ones using the specified BLAS implementation.
+#     This could be avoided if the BLAS implementation type was somehow reflected in the :ref:`architecture path <archpaths>`,
+#     however, having installations for the same toolchain and compiler but different BLAS libraries is not expected
+#     to be necessary. This might change in future versions.
+#
 # .. cmake-var:: BLA_VENDOR
 # .. default:: <empty>
 set(BLA_VENDOR )
@@ -433,13 +441,13 @@ set(OPENCMISS_INSTALL_ROOT "${OPENCMISS_ROOT}/install")
 #
 # .. note::
 #
-#    There are alternate ways to specify the remote install directory.
-#        - Set OPENCMISS_REMOTE_INSTALL_DIR in your system environment to have the
-#          build system use that automatically.
-#        - Specify :sh:`-DOPENCMISS_REMOTE_INSTALL_DIR` at the main build,
-#          it will cache the variable and insert it into this file automatically.
+#     There are alternate ways to specify the remote install directory.
+#         - Set OPENCMISS_REMOTE_INSTALL_DIR in your system environment to have the
+#           build system use that automatically.
+#         - Specify :sh:`-DOPENCMISS_REMOTE_INSTALL_DIR` at the main build,
+#           it will cache the variable and insert it into this file automatically.
 # 
-# ..caution::
+# .. caution::
 #
 #     You do NOT have to specify the full architecture-path dependend installation directory.
 #     OpenCMISS will try to find a matching subpath for your local compiler and mpi settings and issue a warning
@@ -456,6 +464,9 @@ set(OPENCMISS_REMOTE_INSTALL_DIR )
 #
 # If using OPENCMISS_REMOTE_INSTALL_DIR_ fails and you are sure that the remote installation is compatible, you can
 # also directly specify the remote directory containing the "context.cmake" file in this variable.
+#
+# For example, this could be useful if you wanted to compile an example using a different toolchain than that used to compile
+# the OpenCMISS libraries. *This is intended for developers only and has not been thoroughly tested*.  
 # 
 # .. default:: <empty>
 set(OPENCMISS_REMOTE_INSTALL_DIR_FORCE )
