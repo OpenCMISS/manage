@@ -6,17 +6,19 @@ Building for multiple architectures/configurations
 --------------------------------------------------
 If you want to compile OpenCMISS using different compilers, MPI implementations etc.,
 the build environment is aware of most common “architecture” choices and automatically
-places builds in appropriate architecture paths.
+places builds in appropriate `architecture paths`_.
 Most importantly:
 
    * All architecture choices **except** toolchain and MPI configuration can be made
-     inside the :ref:OpenCMISSLocalConfig. Toolchain and MPI setup are explained below.
-     See also the main :path:`CMakeLists.txt` file.
+     inside the :ref:`local config files <localconf>` (and :ref:`developer config files <develconf>`).
+     Toolchain and MPI setup are explained below. See also the main :path:`CMakeLists.txt` file.
    * You need a different base binary directory for each intended toolchain/mpi combination!
      The build instructions above are laid out by default for only one (=the default) toolchain and mpi choice.
+     
      The name and place of the different binary directories are up to you, however, we recommend 
      to put them inside the :path:`<OPENCMISS_ROOT>/manage` directory to get simple :sh:`cmake ..`-style
      invocations without lengthy relative source directory paths.
+     
      If you decide to put them somewhere else (e.g. :path:`<OPENCMISS_ROOT>/build/my_toolchain_mpi_combo`),
      you will need to invoke cmake at that location and pass an absolute or relative
      path to :path:`<OPENCMISS_ROOT>/manage` as argument.
@@ -36,6 +38,13 @@ Example directory layout and cmake invocation::
    For example, you cannot have the current release version of IRON within a build using
    Intel MPI and the devel version of IRON with OpenMPI.
    To solve this, you need two different OpenCMISS root installations.
+
+.. _`archpaths`:
+.. _`architecture paths`:
+   
+Architecture paths
+==================
+.. cmake-source:: ../../CMakeScripts/OCArchitecturePath.cmake
 
 Toolchain/compiler choice
 =========================
@@ -65,8 +74,10 @@ If you want a specific MPI version, there are several ways to achieve that:
      and let the build system download and compile the specified implementation.
      
      .. note::
-      Note that this is only possible for selected implementations and environments that use
-      GNU makefiles, as most MPI implementations are not “cmakeified” yet.
+     
+         Note that this is only possible for selected implementations and environments that use
+         GNU makefiles, as most MPI implementations are not “cmakeified” yet.
+         
    - Set the :var:`MPI_HOME` variable to the root folder of your MPI installation.
      CMake will then exclusively look there and try to figure the rest by itself.
    - Specify the compiler wrappers directly by providing :cmake:`MPI_<LANG>_COMPILER`,

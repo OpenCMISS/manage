@@ -409,9 +409,16 @@ option(OC_WARN_ALL "Compiler flags choices - all warnings on" YES)
 # ----------------------
 #
 # The root directory where all libraries, include files and cmake config files for *ALL* architectures will be installed.
-# For details on the architecture path used within :cmake:`OPENCMISS_INSTALL_ROOT`, see :ref:`multiarchbuilds`.
+# For details on the architecture path used within :cmake:`OPENCMISS_INSTALL_ROOT`, see :ref:`archpaths`.
 #
-# .. default:: `"${OPENCMISS_ROOT}/install"`
+# .. caution::
+#
+#    *Developers only* Take care whether you specify this variable in the :ref:`local configuration <localconf>` or the 
+#    :ref:`developer configuration <develconf>` file. With local configuration, you can specify *different* install roots for
+#    each architecture (if desired). Placing it in the developer config takes precedence over all local configurations and
+#    hence determines a global installation root for all build configurations.  
+#
+# .. default:: `"<OPENCMISS_ROOT>/install"`
 set(OPENCMISS_INSTALL_ROOT "${OPENCMISS_ROOT}/install")
 
 ##

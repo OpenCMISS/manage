@@ -49,12 +49,14 @@ In order to build OpenCMISS or any part of it, you need:
 Building on Linux
 =================
 
+.. _`linux steps`:
+
 Default steps for Users (terminal/command line)
 -----------------------------------------------
 
    1. Create the :cmake:`OPENCMISS_ROOT` folder somewhere and enter it
    2. Clone the setup git repo into that folder via :sh:`git clone https://github.com/OpenCMISS/manage`.
-      Alternatively, if you don't have Git, download and unzip https://github.com/OpenCMISS/manage/archive/v1.1.zip
+      Alternatively, if you don't have Git, go to `GitHub and download a zip file`_ 
    3. Enter the :path:`OPENCMISS_ROOT/manage/build` folder
    4. Type :sh:`cmake ..`
    5. *optional* Make changes to the configuration, see  by changing the :ref:`OpenCMISSLocalConfig <localconf>` file
@@ -63,6 +65,8 @@ Default steps for Users (terminal/command line)
       Multithreading is used automatically, no :sh:`-j4` or so needed.
    7. Have a coffee.
    8. Coming back from the coffee and something failed? Checkout the :ref:`support section`.
+      
+.. _`GitHub and download a zip file`: https://github.com/OpenCMISS/manage      
       
 This will compile everything using the default compiler and default mpi.
 Basic warnings will be in place for all known erroneous system configurations.
@@ -86,37 +90,37 @@ The default steps are the same as for users, but with two changes:
 Building on Windows (64bit) (experimental!)
 ===========================================
 
-   - Get CMake >= 3.3.1! An issue has been fixed upon request that messed up the FortranInterface verification.
-     This is included as of 3.3.1.
-   - Get MSYS2!
+   1. Get CMake. Minimum version: 3.3.1
+   #. Get MSYS2:
    
-     - Get installer from http://sourceforge.net/projects/msys2/
-     - Install (assume here: :path:`C:\MSYS2_64`), dont use spaces in the installation folder!
-     - Follow the instructions in Section III to update your version http://sourceforge.net/p/msys2/wiki/MSYS2%20installation 
-   - Get MinGW 64!
+      a. Get installer from http://sourceforge.net/projects/msys2/
+      #. Install (assume here: :path:`C:\MSYS2_64`), dont use spaces in the installation folder!
+      #. Follow the instructions in Section III to update your version http://sourceforge.net/p/msys2/wiki/MSYS2%20installation
+   #. Get MinGW 64:
    
-     - Get installer from http://sourceforge.net/projects/mingw-w64/
-     - Choose you GCC version and threading model (use posix); the installer automatically suggests a suitable subfolder for your selection so you can have multiple versions in parallel.
-     - Install, (assume here: C:\mingw-w64\...)
-     - Create a directory junction to include the mingw64-folder into the msys directory tree
-   - Open a windows command prompt **IN ADMINISTRATOR MODE**
+      a. Get installer from http://sourceforge.net/projects/mingw-w64/
+      #. Choose you GCC version and threading model (use posix); the installer automatically suggests a suitable subfolder for your selection so you can have multiple versions in parallel.
+      #. Install, (assume here: C:\mingw-w64\...)
+      #. Create a directory junction to include the mingw64-folder into the msys directory tree     
+   #. Open a windows command prompt **IN ADMINISTRATOR MODE**
    
-      - Go into C:\MSYS2_64
-      - Remove the old :path:`mingw64`-folder (it should only contain an :path:`/etc` folder)
-      - Type :sh:`mklink /J mingw64 C:\mingw-w64\<your selection>\mingw64`
-      - Windows will confirm e.g. :sh:`Junction created for mingw64 <<===>> C:\mingw-w64\x86_64-4.9.2-posix-seh-rt_v4-rev2\mingw64`
-      - If you want to switch to another toolchain version/model later, install mingw-w64 with that
-        config and repeat the symlink steps.
-   - Get an MPI implementation!
+      a. Go into C:\MSYS2_64
+      #. Remove the old :path:`mingw64`-folder (it should only contain an :path:`/etc` folder)
+      #. Type :sh:`mklink /J mingw64 C:\mingw-w64\<your selection>\mingw64`
+      #. Windows will confirm e.g. :sh:`Junction created for mingw64 <<===>> C:\mingw-w64\x86_64-4.9.2-posix-seh-rt_v4-rev2\mingw64`
+      #. If you want to switch to another toolchain version/model later, install mingw-w64 with that
+         config and repeat the symlink steps.
+   #. Get an MPI implementation!
    
-     - http://www.mpich.org/downloads for MPICH2
-       (unofficial binary packages section, we used 64bit version http://www.mpich.org/static/tarballs/1.4.1p1/mpich2-1.4.1p1-win-x86-64.msi)
-     - https://msdn.microsoft.com/en-us/library/bb524831%28v=vs.85%29.aspx for MS MPI
-     - Install to a location WITHOUT spaces!
-   - Use the :sh:`C:\MSYS2_64\mingw64_shell.bat` to open an mingw64-pathed msys2 console/command
-     (all that does is adding mingw64/bin to the path)
-   - Install necessary packages: :sh:`pacman -S git make flex bison` (flex/bison for ptscotch builds)
-   - Follow the build instructions for linux, with the only change of invoking :sh:`cmake -G “MSYS Makefiles” <args> ..`
+      a. http://www.mpich.org/downloads for MPICH2
+         (unofficial binary packages section, we used 64bit version http://www.mpich.org/static/tarballs/1.4.1p1/mpich2-1.4.1p1-win-x86-64.msi)
+      #. https://msdn.microsoft.com/en-us/library/bb524831%28v=vs.85%29.aspx for MS MPI
+      #. Install to a location WITHOUT spaces!
+      
+   #. Use the :sh:`C:\MSYS2_64\mingw64_shell.bat` to open an mingw64-pathed msys2 console/command
+      (all that does is adding mingw64/bin to the path)
+   #. Install necessary packages: :sh:`pacman -S git make flex bison` (flex/bison for ptscotch builds)
+   #. Follow the build instructions for linux, with the only change of invoking :sh:`cmake -G “MSYS Makefiles” <args> ..`
  
 .. note::
       * Most likely you will need to specify :var:`MPI_HOME` when running the main build configuration.
@@ -142,13 +146,16 @@ Its basically the same as for 64 bit, but obviously using the :sh:`msys2` 32bit 
 
 Building on OS X 10.10
 ======================
-For building OpenCMISS-Iron on OS X install the following prerequisites
-   * CMake >= version 3.2.0
-   * From CMake GUI install for command line use in the Tools menu 
-   * XCode from the AppStore
-   * From XCode install the command line utilities
-   * Install Homebrew
-   * Using :sh:`brew install gfortran` with openmp support using the :sh:`--without-mutlilib` flag
+For building OpenCMISS-Iron on OS X install the following prerequisites:
+
+   1. CMake >= version 3.3.1
+   #. From CMake GUI install for command line use in the Tools menu 
+   #. XCode from the AppStore
+   #. From XCode install the command line utilities
+   #. Install Homebrew
+   #. Using :sh:`brew install gfortran` with openmp support using the :sh:`--without-mutlilib` flag
+
+Then, the procedure follows along the lines of the :ref:`linux steps`.
 
 .. _`build targets`:
 

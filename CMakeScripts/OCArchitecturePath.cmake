@@ -1,6 +1,42 @@
-# This function assembles the architecture path
-# We have [ARCH][COMPILER][MT][MPI|no_mpi][STATIC|SHARED]
+##
+# In order to allow simultaneous installation of builds for various configuration and choices,
+# OpenCMISS uses an *architecture path* to store produced files, libraries and headers into separate
+# directories.
 #
+# The architecture path is composed of the following elements (in that order)
+#
+#    :architecture: The system architecture, e.g. :literal:`x86_64_linux` 
+#    :toolchain: The toolchain info for the build.
+#        This path is composed following the pattern :path:`/<mnemonic>-<version>-F<fortran_version>`,
+#        where *mnemonic* stands for one of the items below, *version* the version of the C compiler and
+#        *fortran_version* the version of the Fortran compiler.
+# 
+#        All the short mnemonics are:
+#        
+#            :borland: The Borland compilers
+#            :clang: The CLang toolchain (commonly Mac OS)
+#            :cygwin: The CygWin toolchain for Windows environments
+#            :gnu: The GNU toolchain
+#            :intel: The Intel toolchain
+#            :mingw: The MinGW toolchain for Windows environments
+#            :msvc: MS Visual Studio compilers
+#            :watcom: The Watcom toolchain
+#    
+#    :multithreading: If :var:`OC_USE_MULTITHREADING` is enabled, this segment is :path:`/mt`.
+#        Otherwise, the path element is skipped.
+#    :mpi: Denotes the used MPI implementation along with the mpi build type.
+#        The path element is composed as :path:`/<mnemonic>_<mpi-build-type>`, where *mnemonic*/*mpi-build-type* contains the 
+#        lower-case value of the :var:`MPI`/:var:`MPI_BUILD_TYPE` variable, respectively.
+#
+#        Moreover, a path element :path:`no_mpi` is used for any component that does not use MPI at all.  
+#    :buildtype: Path element for the current overall build type determined by :var:`CMAKE_BUILD_TYPE`.
+#
+# For example, a typical architecture path looks like::
+#
+#     x86_64_linux/gnu-4.6-F4.6/openmpi_release/release
+#
+# See also: :var:`OC_USE_ARCHITECTURE_PATH`
+
 # This function returns two architecture paths, the first for mpi-unaware applications (VARNAME)
 # and the second for applications that link against an mpi implementation (VARNAME_MPI)
 #
