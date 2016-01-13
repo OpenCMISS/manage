@@ -23,6 +23,12 @@
 #            * Iron and CellML are build, see :var:`OC_USE_<COMP>`.
 #            * Iron with CellML is enabled, see :ref:`IRON_WITH_CELLML <intercomponent>`.
 #
+#    Classical field static advection diffusion with FieldML - Fortran
+#        This feature test is build whenever
+#
+#            * Iron and FieldML-API are build, see :var:`OC_USE_<COMP>`.
+#            * Iron with FieldML is enabled, see :ref:`IRON_WITH_FIELDML <intercomponent>`.
+#
 # See also: :ref:`build targets`.
 #
 # .. _`OpenCMISS-Examples`: https://www.github.com/OpenCMISS-Examples
@@ -42,6 +48,9 @@ if (NOT OC_DEPENDENCIES_ONLY)
         endif()
         if (OC_USE_CELLML AND IRON_WITH_CELLML)
             list(APPEND FEATURE_TEST_EXAMPLES bioelectrics_monodomain_fortran)
+        endif()
+        if (OC_USE_FIELDML-API AND IRON_WITH_FIELDML)
+            list(APPEND FEATURE_TEST_EXAMPLES classicalfield_advectiondiffusion_staticadvectiondiffusion_fieldml)
         endif()
         # Collect any arguments
         # n98.xml is the only currently working xml file
