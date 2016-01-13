@@ -1,3 +1,33 @@
+##
+# In order to verify the overall functionality of an OpenCMISS build, we use *feature tests*
+# to quickly check core functionality *every time after build and installation*.
+#
+# The feature tests are a selected set of OpenCMISS examples from the GitHub `OpenCMISS-Examples`_ organisation,
+# which are build along with the main components and added as CTest test cases. 
+#
+# Depending on the effective configuration, a suitable selection of the following examples is build and run:
+#
+#    Classical field - Fortran
+#        This feature test is build whenever Iron is build. See :var:`OC_USE_<COMP>`.
+#
+#    Classical field - C
+#        This example is only build when the C bindings for Iron are build.
+#        See the :ref:`IRON_WITH_C_BINDINGS <intercomponent>` variable.
+#
+#    Finite elasticity cantilever - Fortran
+#        This feature test is build whenever Iron is build. See :var:`OC_USE_<COMP>`.
+#
+#    Bioelectrics Monodomain - Fortran
+#        This feature test is build whenever
+#
+#            * Iron and CellML are build, see :var:`OC_USE_<COMP>`.
+#            * Iron with CellML is enabled, see :ref:`IRON_WITH_CELLML <intercomponent>`.
+#
+# See also: :ref:`build targets`.
+#
+# .. _`OpenCMISS-Examples`: https://www.github.com/OpenCMISS-Examples
+#
+
 # Only run the feature tests if we build more than the dependencies
 if (NOT OC_DEPENDENCIES_ONLY)
     set(FEATURE_TEST_PREFIX opencmiss_feature_)
@@ -22,14 +52,14 @@ if (NOT OC_DEPENDENCIES_ONLY)
         #TODO
     endif()
     
-    set(BIN_DIR_ROOT ${OPENCMISS_COMPONENTS_BINARY_DIR_MPI}/featuretests)
-    set(SRC_DIR_ROOT ${OPENCMISS_ROOT}/src/featuretests)
+    set(FEATURETESTS_BINARY_DIR ${OPENCMISS_COMPONENTS_BINARY_DIR_MPI}/featuretests)
+    set(FEATURETESTS_SRC_DIR ${OPENCMISS_ROOT}/src/featuretests)
     set(GITHUB_ORGANIZATION OpenCMISS-Examples)
     set(_FT_EX_EP )
     foreach(example_name ${FEATURE_TEST_EXAMPLES})
         list(APPEND _FT_EX_EP "${OC_EP_PREFIX}${example_name}")
-        set(BIN_DIR "${BIN_DIR_ROOT}/${example_name}")
-        set(SRC_DIR "${SRC_DIR_ROOT}/${example_name}")
+        set(BIN_DIR "${FEATURETESTS_BINARY_DIR}/${example_name}")
+        set(SRC_DIR "${FEATURETESTS_SRC_DIR}/${example_name}")
         # Set correct paths
         set(DEFS 
             -DOPENCMISS_INSTALL_DIR=${OPENCMISS_INSTALL_ROOT}
@@ -67,12 +97,6 @@ if (NOT OC_DEPENDENCIES_ONLY)
         DEPENDS ${_FT_EX_EP} # Triggers the build
         COMMAND ${CMAKE_CTEST_COMMAND} -R ${FEATURE_TEST_PREFIX}*
         COMMENT "Running OpenCMISS feature tests"
-    )
-    # Also provide means to clean all feature tests
-    add_custom_target(reset_featuretests
-        COMMAND ${CMAKE_COMMAND} -E remove_directory "${BIN_DIR_ROOT}"
-        COMMAND ${CMAKE_COMMAND} -E remove_directory "${SRC_DIR_ROOT}" # Also just remove the sources for now, they're not big
-        COMMENT "Cleaning up feature test builds"
     )
 else()
     # Add a top level target that runs only the feature tests

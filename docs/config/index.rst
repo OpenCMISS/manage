@@ -44,6 +44,8 @@ These are the options available within the :path:`OpenCMISSLocalConfig.cmake` fi
    
    config
 
+.. _`intercomponent`:
+
 OpenCMISS inter-component configuration
 ---------------------------------------
 .. cmake-source:: ../../Config/OpenCMISSInterComponentConfig.cmake

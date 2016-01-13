@@ -274,7 +274,7 @@ include(OCFeatureTests)
 
 ########################################################################
 # Misc targets for convenience
-include(OCCustomTargets)
+include(OCMainTargets)
 
 # Print a neat summary
 message(STATUS "@@@@@@@@@@@@@@@@@@@ SUMMARY @@@@@@@@@@@@@@@@@@@")

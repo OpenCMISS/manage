@@ -161,42 +161,10 @@ Then, the procedure follows along the lines of the :ref:`linux steps`.
 
 Available build targets
 =======================
-Just building :sh:`all` is not enough for OpenCMISS, as the install step is
-important to create the information about the OpenCMISS build that is needed by any examples or applications.
-Therefore, the build system’s main target is called :sh:`opencmiss` and should be invoked for any build.
 
-   :opencmiss: Main build target. Comprises :sh:`all, install, featuretests`
-   :update: Goes through all OpenCMISS components that are locally build and fetches
-      the newest commit on the configured version branches.
-   :support: See the :ref:`support section`.
-   :gitstatus: This target is intended for developers, who would like a quick way of
-      obtaining the current status of all components that are build locally.
-      Only available if Git_ is found.
-   :featuretests: Builds and runs the featuretests. These are selected OpenCMISS examples that cover the parts of
-      OpenCMISS that are used most frequently but are yet fast to run. These tests are run after every build in order
-      to provide a fast first test suite to assess overall health.
-   :test: Run all the tests for all current components. Lengthy!
-   :examples: Convenience target to download & build all the examples registered
-      as submodule of the :path:`OpenCMISS-Examples/examples` repository.
-      **This is intended for the transition phase from SVN global examples repo to PMR only and will disappear in due time!**
-   :examples-test: Uses CTest to simply execute all the examples (if successfully built).
-      Currently they’re invoked without arguments which may break some of them due to that.
-   :reset: Removes everything from the current build root but the :ref:`OpenCMISSLocalConfig <localconf>` file.
-      Also invokes the following (independently usable) targets:
-   :reset_featuretests: Triggers a re-build of the feature tests
-   :reset_mpionly: Blows away all the build and install data of components with MPI capabilities. 
-   :utter_destruction: Removes the complete build/ and install/ root directories created by any architecture build.
+.. cmake-source:: ../../CMakeScripts/OCMainTargets.cmake
 
 Component-level build targets
 -----------------------------
-Besides the top-level targets, each OpenCMISS component also provides targets
-for direct invocation. In the following, *<compname>* stands for any OpenCMISS component (lowercase).
 
-   :<compname>: Trigger the build for the specified component, e.g. :sh:`make iron`
-   :<compname>-clean: Invoke the classical :sh:`clean` target for the specified component and
-      triggers a re-run of CMake for that component.
-   :<compname>-update: Update the sources for the specified component.
-      Please note that you should ALWAYS use the top level :sh:`make update` command to ensure
-      fetching a compatible set of components - single component updates are for experienced users only.
-   :<compname>-gitstatus: Get a current git status report. Only available if Git_ is used.
-   :<compname>-test: Run any tests provided by the component.
+.. cmake-source:: ../../CMakeScripts/OCFunctionComponentTargets.cmake
