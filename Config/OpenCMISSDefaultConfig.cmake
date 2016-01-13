@@ -348,14 +348,21 @@ option(OC_MULTITHREADING "Use multithreading in OpenCMISS (where applicable)" NO
 #
 # As there are frequent incompatibilities with pre-installed packages due to mismatching versions, these flags can be set 
 # to favor own component builds over consumption of local packages.
+# 
+# The search scripts for local packages (CMake: :cmake:`find_package` command and :path:`Find<COMP>.cmake` scripts)
+# are partially unreliable; CMake is improving them continuously and we also try to keep our own written ones
+# up-to-date and working on many platforms. This is another reason why the default policy is to
+# rather build our own packages than tediously looking for binaries that might not even have the
+# right version and/or components.
 #
-# .. note::
+# .. caution::
+#     
+#    *Applies to setting in OpenCMISSLocalConfig only*: If you decide to enable one of those variables
+#    at some stage and later want to disable it, just *commenting* out like :cmake:`#set(OC_SYSTEM_MUMPS YES)` will
+#    **not** set its value to :cmake:`NO`, as it is registered as an CMake `option`__. You need to explicitly set the value
+#    to :cmake:`NO` to have the desired effect.
 #
-#   The search scripts for local packages (CMake: :cmake:`find_package` command and :path:`Find<COMP>.cmake` scripts)
-#   are partially unreliable; CMake is improving them continuously and we also try to keep our own written ones
-#   up-to-date and working on many platforms. This is another reason why the default policy is to
-#   rather build our own packages than tediously looking for binaries that might not even have the
-#   right version and/or components.
+# .. __: https://cmake.org/cmake/help/v3.3/command/option.html   
 #
 # See also: OC_COMPONENTS_SYSTEM_ and the :cmake:`OPENCMISS_COMPONENTS_SYSTEM_BY_DEFAULT` variable in :path:`<manage>/Config/Variables.cmake`.
 # 
