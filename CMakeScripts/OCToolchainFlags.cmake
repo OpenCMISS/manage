@@ -1,5 +1,7 @@
 # Macro for adding a compile flag for a certain language (and optionally build type)
 # Also performs a check if the current compiler supports the flag
+#
+# This needs to be included AFTER the MPIConfig as the used MPI mnemonic is used here, too!
 macro(addFlag VALUE LANGUAGE)
     getFlagCheckVariableName(${VALUE} ${LANGUAGE} CHK_VAR)
     if (${LANGUAGE} STREQUAL C)
@@ -121,10 +123,6 @@ elseif (CMAKE_C_COMPILER_ID STREQUAL "Intel" OR CMAKE_CXX_COMPILER_ID STREQUAL "
         addFlag("-fpe-all=0" Fortran DEBUG)
         addFlag("-ftrapuv" Fortran DEBUG)
     endif()
-    
-    if(MPI STREQUAL intel)
-	    addFlagAll("-DMPICH_IGNORE_CXX_SEEK")
-    endif()
 
 elseif(CMAKE_C_COMPILER_ID STREQUAL "XL" OR CMAKE_CXX_COMPILER_ID STREQUAL "XL") # IBM case
     if (OC_MULTITHREADING)
@@ -155,6 +153,16 @@ endif()
 # Thus far all compilers seem to use the -p flag for profiling
 if (OC_PROFILING)
     addFlagAll("-p" )
+endif()
+
+#######################
+# MPI - dependent flags
+
+# For gnu/intel we need to add the skip flags to avoid SEEK_GET/SEEK_END definition errors
+# See https://software.intel.com/en-us/articles/intel-cluster-toolkit-for-linux-error-when-compiling-c-aps-using-intel-mpi-library-compilation-driver-mpiicpc
+# or google @#error "SEEK_SET is #defined but must not be for the C++ binding of MPI. Include mpi.h before stdio.h"@ 
+if(CMAKE_COMPILER_IS_GNUC AND MPI STREQUAL intel)
+    addFlagAll("-DMPICH_IGNORE_CXX_SEEK") # -DMPICH_SKIP_MPICXX
 endif()
 
 # Some verbose output for summary

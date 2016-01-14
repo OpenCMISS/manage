@@ -117,10 +117,6 @@ include(OpenCMISSConfig)
 string(TIMESTAMP NOW "%Y-%m-%d, %H:%M")
 log("Starting configuration in ${CMAKE_CURRENT_BINARY_DIR} at ${NOW}")
 
-# Need to set the compiler flags after any project call - this ensures the cmake platform values
-# are used, too.
-include(OCToolchainFlags)
-
 if ((NOT WIN32 OR MINGW) AND CMAKE_BUILD_TYPE STREQUAL "")
     SET(CMAKE_BUILD_TYPE RELEASE)
     message(STATUS "No CMAKE_BUILD_TYPE has been defined. Using RELEASE.")
@@ -170,12 +166,16 @@ if(OC_MULTITHREADING)
     find_package(OpenMP REQUIRED)
 endif()
 
-########################################################################
 # MPI
 # Unless we said to not have MPI, see that it's available.
 if(NOT MPI STREQUAL none)
     include(OCMPIConfig)
 endif()
+
+# Toolchain flags
+#
+# Needs to be after MPI config as the mnemonic is used inside that script, too
+include(OCToolchainFlags)
 
 # Checks for known issues as good as possible
 # TODO: move this to the generator script?!
