@@ -18,6 +18,9 @@
 # This function is called from within OCComponentSetupMacros#addAndConfigureLocalComponent
 # and has been placed inside a separate file to ease documentation
 #
+# The <compname>-update target is defined in OCComponentSetupMacros#addSourceManagementTargets along with
+# the (purposely not documented) <compname>-download target. 
+#
 function(addConvenienceTargets COMPONENT_NAME BINARY_DIR SOURCE_DIR)
     # Add convenience direct-access clean target for component
     string(TOLOWER "${COMPONENT_NAME}" COMPONENT_NAME_LOWER)
@@ -26,14 +29,6 @@ function(addConvenienceTargets COMPONENT_NAME BINARY_DIR SOURCE_DIR)
         COMMAND ${CMAKE_COMMAND} -E touch ${BINARY_DIR}/CMakeCache.txt # force cmake re-run to make sure
         COMMAND ${CMAKE_COMMAND} --build ${BINARY_DIR} --target clean
         COMMENT "Cleaning ${COMPONENT_NAME}"
-    )
-    # Add convenience direct-access update target for component
-    # This removes the external project stamp for the last update and hence triggers execution of the update, e.g.
-    # a new source download or "git pull"
-    add_custom_target(${COMPONENT_NAME_LOWER}-update
-        COMMAND ${CMAKE_COMMAND} -E remove -f ${OPENCMISS_ROOT}/src/download/stamps/${COMPONENT_NAME}_SRC-update
-        COMMAND ${CMAKE_COMMAND} --build ${CMAKE_CURRENT_BINARY_DIR} --target ${COMPONENT_NAME}_SRC-update
-        COMMENT "Updating ${COMPONENT_NAME} sources"
     )
     
     # Rebuild does not only invoke the clean target but also completely removes the CMakeFiles folder and Cache,

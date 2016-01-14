@@ -206,6 +206,14 @@ set(EXAMPLES_VERSION 1.0)##
 # If Git is not found, a the build system falls back to download :code:`.zip` files of the source.
 # To enforce that behaviour (e.g. for nightly tests), set this to :cmake:`YES`.
 #
+# .. caution::
+#
+#     If you want to switch from not using Git back to using Git, the update/download targets wont work
+#     since the source folders are not empty and are also no Git repositories - the "git clone" command
+#     is senseful enough not to simply overwrite possibly existing files. In this case, simply delete the
+#     source directory :path:`<OPENCMISS_ROOT>/src` before switching. The next build will automatically
+#     clone the Git repositories then.
+#
 # .. default:: NO
 option(DISABLE_GIT "Do not use Git to obtain and manage sources" NO)
 

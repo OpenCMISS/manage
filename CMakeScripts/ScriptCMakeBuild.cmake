@@ -11,55 +11,13 @@ message(STATUS "Building CMake version ${OPENCMISS_CMAKE_MIN_VERSION} ..")
 # Use the cmake binary with which this script was invoked as default 
 set(MY_CMAKE_COMMAND ${CMAKE_COMMAND})
 
+include("${CMAKE_CURRENT_LIST_DIR}/OCFunctionDownloadAndExtract.cmake")
+
 macro(BUILD_CMAKE VERSION_TO_BUILD VERSION_TO_BUILD_MAJ BUILD_WITH_OPENSSL)
     
-    file(MAKE_DIRECTORY ${CMAKE_SRC_DIR})
+    set(_URL http://www.cmake.org/files/v${VERSION_TO_BUILD_MAJ}/${CMAKE_TARBALL})
     set(_TARBALL "${CMAKE_SRC_DIR}/${CMAKE_TARBALL}")
-    # Download
-    if(NOT EXISTS "${_TARBALL}")
-        set(CMAKE_SRC_TAR http://www.cmake.org/files/v${VERSION_TO_BUILD_MAJ}/${CMAKE_TARBALL})
-        message(STATUS "Attempting to download ${CMAKE_SRC_TAR}")
-        file(DOWNLOAD ${CMAKE_SRC_TAR} "${_TARBALL}"
-            STATUS DL_STATUS LOG DL_LOG)
-        list(GET DL_STATUS 0 DL_ERROR)
-        list(GET DL_STATUS 1 DL_ERROR_STR)
-        if (NOT DL_ERROR EQUAL 0)
-            message(STATUS "CMake-internal download failed with error #${DL_ERROR}: ${DL_ERROR_STR}")
-            # The download process seems to create a file which is deleted after some unknown time - 
-            # the next check for existence however still thinks there's a file and the script does
-            # not work correctly. Hence, we manually remove the file here before trying wget.
-            file(REMOVE "${_TARBALL}")
-            find_package(Wget QUIET)
-            if (WGET_FOUND)
-                message(STATUS "Trying WGet..")
-                execute_process(COMMAND ${WGET_EXECUTABLE} --no-check-certificate ${CMAKE_SRC_TAR}
-                    RESULT_VARIABLE DL_RES
-                    OUTPUT_VARIABLE DL_OUTPUT
-                    ERROR_VARIABLE DL_ERROR
-                    WORKING_DIRECTORY "${CMAKE_SRC_DIR}"
-                )
-                if (NOT DL_RES EQUAL 0)
-                    message(STATUS "Download using WGet failed.
-Output:
-${DL_OUTPUT}
-Error:
-${DL_ERROR}")
-                endif(NOT DL_RES EQUAL 0)
-            endif(WGET_FOUND)
-        endif(NOT DL_ERROR EQUAL 0)
-    endif(NOT EXISTS "${_TARBALL}")
-    
-    # If we dont have the file by now, its bad ...
-    if(NOT EXISTS "${_TARBALL}")
-        message(FATAL_ERROR "Could not download CMake ${VERSION_TO_BUILD} tarball.
-Please manually download ${CMAKE_SRC_TAR} to directory ${CMAKE_SRC_DIR} and re-build the \"cmake\" target. Sorry!")
-    endif(NOT EXISTS "${_TARBALL}")
-        
-    # Extract
-    message(STATUS "Extracting ${_TARBALL} [${CMAKE_COMMAND} -E tar xzvf ${CMAKE_TARBALL}]")
-    execute_process(COMMAND ${CMAKE_COMMAND} -E tar xzf ${CMAKE_TARBALL} .
-        WORKING_DIRECTORY ${CMAKE_SRC_DIR})
-    file(REMOVE ${CMAKE_SRC_DIR}/${CMAKE_TARBALL})
+    DownloadAndExtract(${_URL} "${_TARBALL}")
     
     # Add top-level folder to src dir (default for cmake.org downloads)
     set(CMAKE_SRC_DIR "${CMAKE_SRC_DIR}/cmake-${VERSION_TO_BUILD}")

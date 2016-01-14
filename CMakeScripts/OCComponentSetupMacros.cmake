@@ -112,12 +112,13 @@ function(addAndConfigureLocalComponent COMPONENT_NAME)
 endfunction()
 
 ########################################################################################################################
-function(getExtProjDownloadUpdateCommands COMPONENT_NAME TARGET_SOURCE_DIR DL_VAR UP_VAR)
+function(addSourceManagementTargets COMPONENT_NAME SOURCE_DIR)
     # Convention: github repo is the lowercase equivalent of the component name
-    string(TOLOWER ${COMPONENT_NAME} FOLDER_NAME)
+    string(TOLOWER ${COMPONENT_NAME} REPO_NAME)
     
     # Git clone mode
     if(GIT_FOUND)
+        # Construct the repository name 
         if (NOT ${COMPONENT_NAME}_REPO)
             if(GITHUB_USERNAME)
                 SET(_GITHUB_USERNAME ${GITHUB_USERNAME})
@@ -129,36 +130,60 @@ function(getExtProjDownloadUpdateCommands COMPONENT_NAME TARGET_SOURCE_DIR DL_VA
             else()
                 SET(GITHUB_PROTOCOL "https://github.com/")
             endif()
-            set(${COMPONENT_NAME}_REPO ${GITHUB_PROTOCOL}${_GITHUB_USERNAME}/${FOLDER_NAME})
+            set(${COMPONENT_NAME}_REPO ${GITHUB_PROTOCOL}${_GITHUB_USERNAME}/${REPO_NAME})
         endif()
-        set(${DL_VAR}
-            GIT_REPOSITORY ${${COMPONENT_NAME}_REPO}
-            GIT_TAG ${${COMPONENT_NAME}_BRANCH}
-            PARENT_SCOPE
+        
+        add_custom_target(${REPO_NAME}-download
+            COMMAND ${GIT_EXECUTABLE} clone ${${COMPONENT_NAME}_REPO} .
+            COMMAND ${GIT_EXECUTABLE} checkout ${${COMPONENT_NAME}_BRANCH}
+            COMMENT "Cloning ${COMPONENT_NAME} sources"
+            WORKING_DIRECTORY "${SOURCE_DIR}"
         )
-        set(${UP_VAR} 
-            UPDATE_COMMAND ${GIT_EXECUTABLE} pull
-            PARENT_SCOPE
+        
+        add_custom_target(${REPO_NAME}-update
+            COMMAND ${GIT_EXECUTABLE} pull
+            COMMAND ${GIT_EXECUTABLE} checkout ${${COMPONENT_NAME}_BRANCH}
+            COMMENT "Updating ${COMPONENT_NAME} sources"
+            WORKING_DIRECTORY "${SOURCE_DIR}"
         )
-        log("DOWNLOAD_CMDS=${DOWNLOAD_CMDS}" DEBUG)    
-    # Default: Download the current version branch as zip of no git clone flag is set
+            
+    # Fallback: Download the current version branch as zip
     else()
-        ################@TEMP@#################
-        # Temporary fix to also adhere to "custom" repository locations when in user mode.
-        # Should be removed in final version.
+        # Unless explicitly specified, use the GitHub repository location
         if (NOT ${COMPONENT_NAME}_REPO)
-            SET(${COMPONENT_NAME}_REPO https://github.com/${GITHUB_ORGANIZATION}/${FOLDER_NAME})
+            set(${COMPONENT_NAME}_REPO https://github.com/${GITHUB_ORGANIZATION}/${REPO_NAME})
         endif()
-        ################@TEMP@#################
-        set(${DL_VAR}
-            DOWNLOAD_DIR ${TARGET_SOURCE_DIR}/src-download
-            #URL https://github.com/${GITHUB_ORGANIZATION}/${FOLDER_NAME}/archive/${${COMPONENT_NAME}_BRANCH}.zip
-            ################@TEMP@#################
-            URL ${${COMPONENT_NAME}_REPO}/archive/${${COMPONENT_NAME}_BRANCH}.zip
-            ################@TEMP@#################
-            PARENT_SCOPE
+        
+        set(_FILENAME ${${COMPONENT_NAME}_BRANCH}.tar.gz)
+        add_custom_target(${REPO_NAME}-download
+            COMMAND ${CMAKE_COMMAND}
+                -DMODE=Download
+                -DURL=${${COMPONENT_NAME}_REPO}/archive/${_FILENAME}
+                -DTARGET="${SOURCE_DIR}/${_FILENAME}"
+                -P ${OPENCMISS_MANAGE_DIR}/CMakeScripts/ScriptSourceManager.cmake
+            COMMENT "Downloading ${COMPONENT_NAME} sources"
         )
+        
+        # For tarballs, update is the same as download!
+        add_custom_target(${REPO_NAME}-update
+            DEPENDS ${REPO_NAME}-download
+            COMMENT "Updating ${COMPONENT_NAME} sources"
+        )
+         
     endif()
+    
+    # Add extra target that makes sure the source files are being present
+    # Triggers buildof ${REPO_NAME}-download if the directory does not exist or 
+    # no CMakeLists.txt is found in the target source directory.
+    add_custom_target(${COMPONENT_NAME}-sources
+        COMMAND ${CMAKE_COMMAND}
+            -DMODE=Check
+            -DCOMPONENT=${REPO_NAME}
+            -DSRC_DIR=${SOURCE_DIR}
+            -DBIN_DIR=${CMAKE_CURRENT_BINARY_DIR}
+            -P ${OPENCMISS_MANAGE_DIR}/CMakeScripts/ScriptSourceManager.cmake
+        COMMENT "Checking ${COMPONENT_NAME} sources are present"
+    )
 endfunction()
 
 ########################################################################################################################
@@ -180,50 +205,18 @@ function(createExternalProjects COMPONENT_NAME SOURCE_DIR BINARY_DIR DEFS)
     #    set(INSTALL_COMMAND INSTALL_COMMAND ${INSTALL_COMMAND})
     endif()
         
-    getExtProjDownloadUpdateCommands(${COMPONENT_NAME} ${SOURCE_DIR} DOWNLOAD_COMMANDS UPDATE_COMMANDS)
+    addSourceManagementTargets(${COMPONENT_NAME} ${SOURCE_DIR})
     
     # Log settings
     if (OC_CREATE_LOGS)
         set(_LOGFLAG 1)
     else()
         set(_LOGFLAG 0)
-    endif()
-    
-    # Add source download/update project
-    #
-    # This is separate from the actual build project for the component, as we want to use the same
-    # source for different builds/architecture paths (shared/static, different MPI)
-    ExternalProject_Add(${COMPONENT_NAME}_SRC
-        PREFIX ${OPENCMISS_ROOT}/src/download/
-        EXCLUDE_FROM_ALL 1
-        TMP_DIR ${OPENCMISS_ROOT}/src/download/tmp
-        STAMP_DIR ${OPENCMISS_ROOT}/src/download/stamps
-        #--Download step--------------
-        ${DOWNLOAD_COMMANDS}
-        SOURCE_DIR ${SOURCE_DIR}
-        ${UPDATE_COMMANDS}
-        CONFIGURE_COMMAND ""
-        BUILD_COMMAND ""
-        INSTALL_COMMAND ""
-        STEP_TARGETS download update
-        LOG_DOWNLOAD ${_LOGFLAG}
-    )
-    
-    # Add extra target that makes sure the source files are being present
-    # Triggers build of ${COMPONENT_NAME}_SRC if no CMakeLists.txt is found in the target source directory.
-    add_custom_target(CHECK_${COMPONENT_NAME}_SOURCES 
-        COMMAND ${CMAKE_COMMAND}
-                -DCOMPONENT=${COMPONENT_NAME}
-                -DFOLDER=${SOURCE_DIR}
-                -DBINDIR=${CMAKE_CURRENT_BINARY_DIR}
-                -DSTAMP_DIR=${OPENCMISS_ROOT}/src/download/stamps
-                -P ${OPENCMISS_MANAGE_DIR}/CMakeScripts/ScriptCheckSourceExists.cmake
-            COMMENT "Checking ${COMPONENT_NAME} sources are present"
-    )  
+    endif()  
     
     log("Adding ${COMPONENT_NAME} with DEPS=${${COMPONENT_NAME}_DEPS}" VERBOSE)
     ExternalProject_Add(${OC_EP_PREFIX}${COMPONENT_NAME}
-        DEPENDS ${${COMPONENT_NAME}_DEPS} CHECK_${COMPONENT_NAME}_SOURCES
+        DEPENDS ${${COMPONENT_NAME}_DEPS} ${COMPONENT_NAME}-sources
         PREFIX ${BINARY_DIR}
         LIST_SEPARATOR ${OC_LIST_SEPARATOR}
         TMP_DIR ${BINARY_DIR}/ep_tmp
