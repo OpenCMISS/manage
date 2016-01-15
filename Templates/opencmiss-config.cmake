@@ -154,12 +154,6 @@ else()
 endif()
 messageo("Verifying installation settings ... success")
 
-###########################################################################
-# This calls the FindMPI in the OpenCMISSExtraFindPackages folder, which
-# respects the MPI settings exported in the OpenCMISS context
-# OPENCMISS_MPI_VERSION is set in the OPENCMISS_CONTEXT file
-find_package(MPI ${OPENCMISS_MPI_VERSION} REQUIRED)
-
 # Add the prefix path so the config files can be found
 toAbsolutePaths(OPENCMISS_PREFIX_PATH_IMPORT)
 list(APPEND CMAKE_PREFIX_PATH ${OPENCMISS_PREFIX_PATH_IMPORT})
@@ -176,36 +170,58 @@ set(CMAKE_INSTALL_RPATH ${OPENCMISS_LIBRARY_PATH_IMPORT})
 set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 
 ###########################################################################
+# Convenience targets
+#
 # Add the opencmiss library (INTERFACE type is new since 3.0)
 add_library(opencmiss INTERFACE)
 
-# Add top level libraries of OpenCMISS framework if configured
-if (OC_USE_IRON)
-    find_package(IRON ${IRON_VERSION} REQUIRED)
-    target_link_libraries(opencmiss INTERFACE iron)
-    # Add the C bindings target if built
-    if (TARGET iron_c)
-        target_link_libraries(opencmiss INTERFACE iron_c)
+# Avoid cases where people write Iron/iron/IRON 
+set(_TMP)
+foreach(_ENTRY ${OpenCMISS_FIND_COMPONENTS})
+    string(TOLOWER ${_ENTRY} _ENTRY)
+    list(APPEND _TMP ${_ENTRY})
+endforeach()
+set(OpenCMISS_FIND_COMPONENTS ${_TMP})
+unset(_TMP)
+unset(_ENTRY)
+
+if(iron IN_LIST OpenCMISS_FIND_COMPONENTS)
+    # Add top level libraries of OpenCMISS framework if configured
+    message(STATUS "Looking for OpenCMISS-Iron ...")
+    find_package(IRON ${IRON_VERSION} QUIET)
+    if (IRON_FOUND)
+        target_link_libraries(opencmiss INTERFACE iron)
+        
+        # Add the C bindings target if built
+        if (TARGET iron_c)
+            target_link_libraries(opencmiss INTERFACE iron_c)
+        endif()
+        
+        ###########################################################################
+        # This calls the FindMPI in the OpenCMISSExtraFindPackages folder, which
+        # respects the MPI settings exported in the OpenCMISS context
+        # OPENCMISS_MPI_VERSION is set in the OPENCMISS_CONTEXT file
+        find_package(MPI ${OPENCMISS_MPI_VERSION} REQUIRED)
+        # Convenience: linking against opencmiss will automatically import the correct MPI settings here.
+        # See FindMPI.cmake for declaration of 'mpi' target
+        target_link_libraries(opencmiss INTERFACE mpi)
+        
+        message(STATUS "Looking for OpenCMISS-Iron ... Success")
+        
+    else()
+        message(FATAL_ERROR "OpenCMISS installation at ${_OPENCMISS_IMPORT_PREFIX} does not contain Iron")
     endif()
 endif()
-if (OC_USE_ZINC)
-    find_package(ZINC ${ZINC_VERSION} REQUIRED)
-    target_link_libraries(opencmiss INTERFACE zinc)
-endif()
 
-# Add MPI stuff to the top-level interface library (only if iron is build)
-if (OC_USE_IRON)
-    foreach(lang C CXX Fortran)
-        if (MPI_${lang}_INCLUDE_PATH)
-            target_include_directories(opencmiss INTERFACE ${MPI_${lang}_INCLUDE_PATH})
-        endif()
-        if (MPI_${lang}_INCLUDE_PATH)
-            target_link_libraries(opencmiss INTERFACE ${MPI_${lang}_LIBRARIES})
-        endif()
-        if (MPI_${lang}_COMPILE_FLAGS)
-            set(CMAKE_${lang}_FLAGS "${CMAKE_${lang}_FLAGS} ${MPI_${lang}_COMPILE_FLAGS}")
-        endif()
-    endforeach()
+if(zinc IN_LIST OpenCMISS_FIND_COMPONENTS)
+    message(STATUS "Looking for OpenCMISS-Zinc ...")
+    find_package(ZINC ${ZINC_VERSION} QUIET)
+    if (ZINC_FOUND)
+        target_link_libraries(opencmiss INTERFACE zinc)
+        message(STATUS "Looking for OpenCMISS-Zinc ... Success")
+    else()
+        message(FATAL_ERROR "OpenCMISS installation at ${_OPENCMISS_IMPORT_PREFIX} does not contain Zinc")
+    endif()
 endif()
 
 #get_target_property(ocd opencmiss INTERFACE_COMPILE_DEFINITIONS)
