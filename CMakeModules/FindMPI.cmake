@@ -20,6 +20,13 @@
 # of them have somewhat different include paths, libraries to link
 # against, etc., and this module tries to smooth out those differences.
 #
+# === Targets ===
+#
+# To comply with 'modern' CMake target philosophy, the script creates
+# an INTERFACE target called "mpi" to include as link_library.
+# it has all the necessary include directories, libraries and compile flags
+# pre-set (for all languages).
+#
 # === Variables ===
 #
 # This module will set the following variables per language in your
@@ -79,7 +86,7 @@
 # ::
 #
 #    ${MPIEXEC} ${MPIEXEC_NUMPROC_FLAG} PROCS
-#      ${MPIEXEC_PREFLAGS} EXECUTABLE ${MPIEXEC_POSTFLAGS} ARGS
+#    ${MPIEXEC_PREFLAGS} EXECUTABLE ${MPIEXEC_POSTFLAGS} ARGS
 #
 # where PROCS is the number of processors on which to execute the
 # program, EXECUTABLE is the MPI program, and ARGS are the arguments to
@@ -807,6 +814,12 @@ function(unset_mpi lang)
     unset(MPI_${lang}_FOUND CACHE)
 endfunction()
 
+function(add_mpi_interface_data lang)
+    target_link_libraries(mpi INTERFACE ${MPI_${lang}_LIBRARIES})
+    target_include_directories(mpi INTERFACE ${MPI_${lang}_INCLUDE_PATH})
+    target_compile_definitions(mpi INTERFACE "${MPI_${lang}_COMPILE_FLAGS} MPI_${lang}_LINK_FLAGS")
+endfunction()
+
 function(check_mpi_type lang)
     foreach(IDX RANGE 5)
         list(GET _MNEMONICS ${IDX} MNEMONIC)
@@ -941,6 +954,7 @@ foreach (lang C CXX)
 endforeach()
 #=============================================================================
 
+add_library(mpi INTERFACE)
 
 # This loop finds the compilers and sends them off for interrogation.
 set(_MPI_DETECTED_MNEMONICS )
@@ -1036,6 +1050,8 @@ foreach (lang C CXX Fortran)
         else()
           find_package_handle_standard_args(MPI_${lang} DEFAULT_MSG MPI_${lang}_LIBRARIES MPI_${lang}_INCLUDE_PATH)
         endif()
+        
+        add_mpi_interface_data(${lang})
       endif()
   endif()
 endforeach()
