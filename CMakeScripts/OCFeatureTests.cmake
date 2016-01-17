@@ -47,7 +47,10 @@ if (NOT OC_DEPENDENCIES_ONLY)
             list(APPEND FEATURE_TEST_EXAMPLES classicalfield_laplace_laplace_c)
         endif()
         if (OC_USE_CELLML AND IRON_WITH_CELLML)
-            list(APPEND FEATURE_TEST_EXAMPLES bioelectrics_monodomain_fortran)
+            list(APPEND FEATURE_TEST_EXAMPLES 
+                bioelectrics_monodomain_fortran
+                cellml_model-integration_fortran
+            )
         endif()
         if (OC_USE_FIELDML-API AND IRON_WITH_FIELDML)
             list(APPEND FEATURE_TEST_EXAMPLES classicalfield_advectiondiffusion_staticadvectiondiffusion_fieldml)
@@ -55,6 +58,8 @@ if (NOT OC_DEPENDENCIES_ONLY)
         # Collect any arguments
         # n98.xml is the only currently working xml file
         set(bioelectrics_monodomain_fortran_ARGS 0.005 0.1001 70 n98.xml)
+        # Only file: n98.xml
+        set(cellml_model-integration_fortran_ARGS n98.xml)
     endif()
     # Iron-related feature tests
     if (OC_USE_ZINC)
