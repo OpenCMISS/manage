@@ -22,10 +22,13 @@
 #
 # === Targets ===
 #
-# To comply with 'modern' CMake target philosophy, the script creates
-# an INTERFACE target called "mpi" to include as link_library.
-# it has all the necessary include directories, libraries and compile flags
-# pre-set (for all languages).
+# For each found language, a target 'mpi-<lang>' is created which can
+# be linked against.
+#
+# Moreover, the script creates an INTERFACE target called "mpi" which comprises
+# all found language targets.
+# Those targets have all the necessary include directories, libraries, compile- and linker flags
+# pre-set.
 #
 # === Variables ===
 #
@@ -814,12 +817,6 @@ function(unset_mpi lang)
     unset(MPI_${lang}_FOUND CACHE)
 endfunction()
 
-function(add_mpi_interface_data lang)
-    target_link_libraries(mpi INTERFACE ${MPI_${lang}_LIBRARIES})
-    target_include_directories(mpi INTERFACE ${MPI_${lang}_INCLUDE_PATH})
-    target_compile_definitions(mpi INTERFACE "${MPI_${lang}_COMPILE_FLAGS} MPI_${lang}_LINK_FLAGS")
-endfunction()
-
 function(check_mpi_type lang)
     foreach(IDX RANGE 5)
         list(GET _MNEMONICS ${IDX} MNEMONIC)
@@ -954,10 +951,6 @@ foreach (lang C CXX)
 endforeach()
 #=============================================================================
 
-if (NOT TARGET mpi)
-    add_library(mpi INTERFACE)
-endif()
-
 # This loop finds the compilers and sends them off for interrogation.
 set(_MPI_DETECTED_MNEMONICS )
 foreach (lang C CXX Fortran)
@@ -1052,8 +1045,6 @@ foreach (lang C CXX Fortran)
         else()
           find_package_handle_standard_args(MPI_${lang} DEFAULT_MSG MPI_${lang}_LIBRARIES MPI_${lang}_INCLUDE_PATH)
         endif()
-        
-        add_mpi_interface_data(${lang})
       endif()
   endif()
 endforeach()
@@ -1074,6 +1065,43 @@ if (NOT DEFINED MPI)
         set(MPI_DETECTED ${MPI_TYPE_UNKNOWN})
     endif()
 endif()
+
+#=============================================================================
+# Convenience link targets
+#
+# This function creates imported targets mpi-$lang and an interface target mpi
+# to be linked against if no compiler wrappers are already used as project compilers   
+function(create_mpi_target lang)
+    if (NOT TARGET mpi)
+        add_library(mpi INTERFACE)
+    endif()
+    string(TOLOWER ${lang} _lang)
+    set(target mpi-${_lang})
+    if (NOT TARGET ${target})
+        add_library(${target} UNKNOWN IMPORTED)
+        # Get first library as "main" imported lib 
+        list(GET MPI_${lang}_LIBRARIES 0 FIRSTLIB)
+        list(REMOVE_AT MPI_${lang}_LIBRARIES 0)
+        
+        set_target_properties(${target} PROPERTIES
+          IMPORTED_LOCATION "${FIRSTLIB}"
+          INTERFACE_INCLUDE_DIRECTORIES "${MPI_${lang}_INCLUDE_PATH}"
+          INTERFACE_LINK_LIBRARIES "${MPI_${lang}_LIBRARIES}"
+          INTERFACE_COMPILE_DEFINITIONS "${MPI_${lang}_COMPILE_FLAGS}"
+          LINK_FLAGS "${MPI_${lang}_LINK_FLAGS}"
+          IMPORTED_LINK_INTERFACE_LANGUAGES "${lang}"
+        )
+    endif()
+    target_link_libraries(mpi INTERFACE ${target})
+endfunction()
+# Do the actual target creation.
+# It is IMPORTANT that the order is with Fortran at first, as the include
+# path is different from the one of the other languages (although it contains parts of the others)
+# This is a problem of order whenever GNU/Intel compilers and MPI are mixed, as the gfortran mpi.mod file is located
+# within the fortran include path.
+foreach (lang Fortran C CXX)
+    create_mpi_target(${lang})
+endforeach()
 
 #=============================================================================
 # More backward compatibility stuff

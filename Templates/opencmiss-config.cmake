@@ -200,14 +200,13 @@ if(iron IN_LIST OpenCMISS_FIND_COMPONENTS)
         ###########################################################################
         # This calls the FindMPI in the OpenCMISSExtraFindPackages folder, which
         # respects the MPI settings exported in the OpenCMISS context
-        # OPENCMISS_MPI_VERSION is set in the OPENCMISS_CONTEXT file
+        # OPENCMISS_MPI_VERSION is set there, too
         find_package(MPI ${OPENCMISS_MPI_VERSION} REQUIRED)
         # Convenience: linking against opencmiss will automatically import the correct MPI settings here.
         # See FindMPI.cmake for declaration of 'mpi' target
         target_link_libraries(opencmiss INTERFACE mpi)
         
         message(STATUS "Looking for OpenCMISS-Iron ... Success")
-        
     else()
         message(FATAL_ERROR "OpenCMISS installation at ${_OPENCMISS_IMPORT_PREFIX} does not contain Iron")
     endif()
@@ -223,11 +222,6 @@ if(zinc IN_LIST OpenCMISS_FIND_COMPONENTS)
         message(FATAL_ERROR "OpenCMISS installation at ${_OPENCMISS_IMPORT_PREFIX} does not contain Zinc")
     endif()
 endif()
-
-#get_target_property(ocd opencmiss INTERFACE_COMPILE_DEFINITIONS)
-#get_target_property(oid opencmiss INTERFACE_INCLUDE_DIRECTORIES)
-#get_target_property(oil opencmiss INTERFACE_LINK_LIBRARIES)
-#message(STATUS "opencmiss target config:\nINTERFACE_COMPILE_DEFINITIONS=${ocd}\nINTERFACE_INCLUDE_DIRECTORIES=${oid}\nINTERFACE_LINK_LIBRARIES=${oil}")
 
 # Be a tidy kiwi
 unset(_INSTALL_PATH)
