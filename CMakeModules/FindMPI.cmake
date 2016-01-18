@@ -954,7 +954,9 @@ foreach (lang C CXX)
 endforeach()
 #=============================================================================
 
-add_library(mpi INTERFACE)
+if (NOT TARGET mpi)
+    add_library(mpi INTERFACE)
+endif()
 
 # This loop finds the compilers and sends them off for interrogation.
 set(_MPI_DETECTED_MNEMONICS )
@@ -1072,7 +1074,6 @@ if (NOT DEFINED MPI)
         set(MPI_DETECTED ${MPI_TYPE_UNKNOWN})
     endif()
 endif()
-
 
 #=============================================================================
 # More backward compatibility stuff
