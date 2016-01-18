@@ -102,7 +102,7 @@ add_custom_target(reset_mpionly
 #    :update: Goes through all OpenCMISS components that are locally build and fetches
 #        the newest commit on the configured version branches.
 add_custom_target(update
-    DEPENDS ${_OC_SOURCE_UPDATE_TARGETS}
+    DEPENDS ${_OC_SOURCE_UPDATE_TARGETS} ${_FEATURETESTS_UPDATE_TARGETS}
 )
 
 ## 

@@ -34,6 +34,8 @@
 # .. _`OpenCMISS-Examples`: https://www.github.com/OpenCMISS-Examples
 #
 
+set(_FEATURETESTS_UPDATE_TARGETS )
+
 # Only run the feature tests if we build more than the dependencies
 if (NOT OC_DEPENDENCIES_ONLY)
     set(FEATURE_TEST_PREFIX opencmiss_feature_)
@@ -72,6 +74,7 @@ if (NOT OC_DEPENDENCIES_ONLY)
     set(_FT_EX_EP )
     foreach(example_name ${FEATURE_TEST_EXAMPLES})
         list(APPEND _FT_EX_EP "${OC_EP_PREFIX}${example_name}")
+        list(APPEND _FEATURETESTS_UPDATE_TARGETS "${example_name}-update")
         set(BIN_DIR "${FEATURETESTS_BINARY_DIR}/${example_name}")
         set(SRC_DIR "${FEATURETESTS_SRC_DIR}/${example_name}")
         # Set correct paths

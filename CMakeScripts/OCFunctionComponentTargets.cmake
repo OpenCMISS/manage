@@ -6,20 +6,23 @@
 #    :<compname>: Trigger the build for the specified component, e.g. :sh:`make iron`
 #    :<compname>-clean: Invoke the classical :sh:`clean` target for the specified component and
 #        triggers a re-run of CMake for that component.
+#    :<compname>-gitstatus: Get a current git status report. Only available if Git_ is used.
+#    :<compname>-rebuild: Extends the *<compname>-clean* by also removing the CMakeFiles folder, CMake Cache 
+#        and finally triggers the build of the external project main target.
+#    :<compname>-test: Run any tests provided by the component.
 #    :<compname>-update: Update the sources for the specified component.
 #        Please note that you should ALWAYS use the top level :sh:`make update` command to ensure
 #        fetching a compatible set of components - single component updates are for experienced users only.
-#    :<compname>-gitstatus: Get a current git status report. Only available if Git_ is used.
-#    :<compname>-test: Run any tests provided by the component.
-#    :<compname>-rebuild: Extends the *<compname>-clean* by also removing the CMakeFiles folder, CMake Cache 
-#        and finally triggers the build of the external project main target. 
- 
+#    :<compname>-update-force: Remove any existing sources and download the sources from the currently configured location.
+#        **Use with care!** This is a "hard" delete operation. If the existing source is a Git repository, any uncommited changes will be lost!  
+
 #  
 # This function is called from within OCComponentSetupMacros#addAndConfigureLocalComponent
 # and has been placed inside a separate file to ease documentation
 #
-# The <compname>-update target is defined in OCComponentSetupMacros#addSourceManagementTargets along with
-# the (purposely not documented) <compname>-download target. 
+# Note:
+# The <compname>-update[-force] targets are defined in OCComponentSetupMacros#addSourceManagementTargets along with
+# the (purposely not documented) <compname>-[download|source] targets. 
 #
 function(addConvenienceTargets COMPONENT_NAME BINARY_DIR SOURCE_DIR)
     # Add convenience direct-access clean target for component

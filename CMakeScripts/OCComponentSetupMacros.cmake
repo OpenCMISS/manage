@@ -184,6 +184,13 @@ function(addSourceManagementTargets COMPONENT_NAME SOURCE_DIR)
             -P ${OPENCMISS_MANAGE_DIR}/CMakeScripts/ScriptSourceManager.cmake
         COMMENT "Checking ${COMPONENT_NAME} sources are present"
     )
+    add_custom_target(${REPO_NAME}-update-force
+        COMMAND ${CMAKE_COMMAND} -E remove_directory "${SOURCE_DIR}"
+        COMMAND ${CMAKE_COMMAND} -E make_directory "${SOURCE_DIR}"
+        COMMAND ${CMAKE_COMMAND} --build ${PROJECT_BINARY_DIR} --target ${REPO_NAME}-download
+        COMMENT "Forced update of ${COMPONENT_NAME} - removing and downloading"
+    )
+    
 endfunction()
 
 ########################################################################################################################

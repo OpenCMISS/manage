@@ -277,7 +277,7 @@ include(OCFeatureTests)
 include(OCMainTargets)
 
 # Print a neat summary
-message(STATUS "@@@@@@@@@@@@@@@@@@@ SUMMARY @@@@@@@@@@@@@@@@@@@")
+message(STATUS "@@@@@@@@@@@@@@@@@@@ SUMMARY @@@@@@@@@@@@@@@@@@@@@@@@@")
 message(STATUS "@")
 message(STATUS "@ OPENCMISS_ROOT: ${OPENCMISS_ROOT}")
 if (OPENCMISS_REMOTE_INSTALL_DIR)
