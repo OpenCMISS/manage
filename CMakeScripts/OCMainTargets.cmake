@@ -101,8 +101,14 @@ add_custom_target(reset_mpionly
 ##
 #    :update: Goes through all OpenCMISS components that are locally build and fetches
 #        the newest commit on the configured version branches.
+#        
+#        .. note::
+#        
+#            This will *not* update the main manage repository. Make sure you update the sources
+#            via :sh:`git pull` or re-download of the manage zip file.
 add_custom_target(update
     DEPENDS ${_OC_SOURCE_UPDATE_TARGETS} ${_FEATURETESTS_UPDATE_TARGETS}
+    COMMAND ${CMAKE_COMMAND} -E echo "Successfully updated OpenCMISS sources. Attention! This does *NOT* update the manage repository. Make sure you obtain the newest sources."
 )
 
 ## 
