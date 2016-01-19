@@ -1077,9 +1077,9 @@ function(create_mpi_target lang)
     endif()
     string(TOLOWER ${lang} _lang)
     set(target mpi-${_lang})
-    if (NOT TARGET ${target})
+    if (MPI_${lang}_LIBRARIES AND NOT TARGET ${target})
         add_library(${target} UNKNOWN IMPORTED)
-        # Get first library as "main" imported lib 
+        # Get first library as "main" imported lib
         list(GET MPI_${lang}_LIBRARIES 0 FIRSTLIB)
         list(REMOVE_AT MPI_${lang}_LIBRARIES 0)
         
@@ -1091,8 +1091,8 @@ function(create_mpi_target lang)
           LINK_FLAGS "${MPI_${lang}_LINK_FLAGS}"
           IMPORTED_LINK_INTERFACE_LANGUAGES "${lang}"
         )
+        target_link_libraries(mpi INTERFACE ${target})
     endif()
-    target_link_libraries(mpi INTERFACE ${target})
 endfunction()
 # Do the actual target creation.
 # It is IMPORTANT that the order is with Fortran at first, as the include
