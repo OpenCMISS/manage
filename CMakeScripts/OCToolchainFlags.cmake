@@ -158,10 +158,10 @@ endif()
 #######################
 # MPI - dependent flags
 
-# For gnu/intel we need to add the skip flags to avoid SEEK_GET/SEEK_END definition errors
+# For intel MPI we need to add the skip flags to avoid SEEK_GET/SEEK_END definition errors
 # See https://software.intel.com/en-us/articles/intel-cluster-toolkit-for-linux-error-when-compiling-c-aps-using-intel-mpi-library-compilation-driver-mpiicpc
 # or google @#error "SEEK_SET is #defined but must not be for the C++ binding of MPI. Include mpi.h before stdio.h"@ 
-if(CMAKE_COMPILER_IS_GNUC AND MPI STREQUAL intel)
+if(MPI STREQUAL intel)
     addFlagAll("-DMPICH_IGNORE_CXX_SEEK") # -DMPICH_SKIP_MPICXX
 endif()
 

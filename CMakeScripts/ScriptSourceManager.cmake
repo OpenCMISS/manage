@@ -9,7 +9,12 @@ if (MODE STREQUAL "Check")
     if (NOT EXISTS "${SRC_DIR}/CMakeLists.txt")
         execute_process(
             COMMAND ${CMAKE_COMMAND} --build "${BIN_DIR}" --target ${COMPONENT}-download
+            RESULT_VARIABLE RES
+            ERROR_VARIABLE ERR
         )
+        if (NOT RES EQUAL 0)
+            message(FATAL_ERROR "Error downloading ${COMPONENT}: ${ERR}")
+        endif()
     endif()
 elseif (MODE STREQUAL "Download")
     # Passed variables are: TARGET, URL
