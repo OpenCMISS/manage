@@ -888,8 +888,8 @@ function(verify_mpi_toolchain_compatibility lang)
                 ERROR_VARIABLE _ERR
                 RESULT_VARIABLE _RES
                 WORKING_DIRECTORY ${base})
-            if (_RES)
-                message(FATAL_ERROR "MPI verification script failed:\n${ERROR_VARIABLE}\n\n Please contact the program distributor.")
+            if (NOT _RES EQUAL 0)
+                message(FATAL_ERROR "MPI verification script failed:\n${_ERR}\n\n Please contact the program distributor.")
             endif()
             include(${base}/compiler_info.cmake)
             messagev("CMAKE_${lang}_COMPILER_ID=${CMAKE_${lang}_COMPILER_ID}, CMAKE_${lang}_COMPILER_VERSION=${CMAKE_${lang}_COMPILER_VERSION}")
