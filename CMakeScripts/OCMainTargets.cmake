@@ -54,7 +54,7 @@ add_custom_target(opencmiss
 #    :reset: Removes everything from the current build root but the :ref:`OpenCMISSLocalConfig <localconf>` file.
 #        Also invokes the following (independently usable) targets:
 add_custom_target(reset
-    DEPENDS reset_mpionly reset_featuretests
+    DEPENDS reset-mpionly reset-featuretests
     COMMAND ${CMAKE_COMMAND} -E remove_directory "${OPENCMISS_COMPONENTS_INSTALL_PREFIX_NO_BUILD_TYPE}"
     COMMAND ${CMAKE_COMMAND} -E remove_directory "${OPENCMISS_COMPONENTS_BINARY_DIR}"
     COMMAND ${CMAKE_COMMAND} -E remove "${OC_BUILDLOG}"
@@ -68,18 +68,23 @@ add_custom_target(reset
 )
 
 ##
-#    :reset_featuretests: Triggers a re-build of the feature tests
+#    :reset-featuretests: Triggers a re-build of the feature tests
 #        For more information see the techical documentation on :ref:`featuretests`.
 if (FEATURETESTS_SRC_DIR) # only add if feature tests are build. existence of the source dir is a sufficient criteria.
-    add_custom_target(reset_featuretests
+    add_custom_target(reset-featuretests
         COMMAND ${CMAKE_COMMAND} -E remove_directory "${FEATURETESTS_BINARY_DIR}"
         COMMENT "Cleaning up feature test builds"
+    )
+    
+    add_custom_target(update-featuretests
+        DEPENDS ${_FEATURETESTS_UPDATE_TARGETS}
+        COMMENT "Updating OpenCMISS feature tests"
     )
 endif()
 
 ##
-#    :reset_mpionly: Blows away all the build and install data of components with MPI capabilities.
-add_custom_target(reset_mpionly
+#    :reset-mpionly: Blows away all the build and install data of components with MPI capabilities.
+add_custom_target(reset-mpionly
     COMMAND ${CMAKE_COMMAND} -E remove_directory "${OPENCMISS_COMPONENTS_INSTALL_PREFIX_MPI_NO_BUILD_TYPE}"
     COMMAND ${CMAKE_COMMAND} -E remove_directory "${OPENCMISS_COMPONENTS_BINARY_DIR_MPI}"
     COMMENT "Removing directories:
@@ -109,6 +114,10 @@ add_custom_target(update
     DEPENDS ${_OC_SOURCE_UPDATE_TARGETS} ${_FEATURETESTS_UPDATE_TARGETS}
     COMMAND ${CMAKE_COMMAND} -E echo "Successfully updated OpenCMISS sources. Attention! This does *NOT* update the manage repository. Make sure you obtain the newest sources."
 )
+
+##
+#    :update-featuretests: Updates the sources of the feature tests only.
+#        For more information see the techical documentation on :ref:`featuretests`.
 
 ## 
 #    :utter_destruction: Removes the complete build/ and install/ root directories created by any architecture build.

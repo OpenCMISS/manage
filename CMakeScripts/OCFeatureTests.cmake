@@ -77,10 +77,11 @@ if (NOT OC_DEPENDENCIES_ONLY)
         list(APPEND _FEATURETESTS_UPDATE_TARGETS "${example_name}-update")
         set(BIN_DIR "${FEATURETESTS_BINARY_DIR}/${example_name}")
         set(SRC_DIR "${FEATURETESTS_SRC_DIR}/${example_name}")
+        set(INSTALL_DIR ${BIN_DIR}/install)
         # Set correct paths
         set(DEFS 
             -DOPENCMISS_INSTALL_DIR=${OPENCMISS_INSTALL_ROOT}
-            -DCMAKE_INSTALL_PREFIX=${SRC_DIR}
+            -DCMAKE_INSTALL_PREFIX=${INSTALL_DIR}
             -DMPI=${MPI}
         )
         # Instead of passing the (mpi-)compilers, we should imitate
@@ -91,12 +92,14 @@ if (NOT OC_DEPENDENCIES_ONLY)
         endif()
         set(${example_name}_BRANCH ${OC_FEATURETESTS_BRANCH})
         createExternalProjects(${example_name} "${SRC_DIR}" "${BIN_DIR}" "${DEFS}")
+        addConvenienceTargets(${example_name} "${BIN_DIR}" "${SRC_DIR}")
+    
         # Dont build with the main build, as installation of OpenCMISS has not been done by then.
         set_target_properties(${OC_EP_PREFIX}${example_name} PROPERTIES EXCLUDE_FROM_ALL YES)
         
         add_test(NAME ${FEATURE_TEST_PREFIX}${example_name}
             COMMAND run ${${example_name}_ARGS}
-            WORKING_DIRECTORY ${SRC_DIR}     
+            WORKING_DIRECTORY ${INSTALL_DIR}
         )
     endforeach()
     # Add a top level target that runs only the feature tests

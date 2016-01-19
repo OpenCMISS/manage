@@ -141,6 +141,7 @@ function(addSourceManagementTargets COMPONENT_NAME SOURCE_DIR)
         )
         
         add_custom_target(${REPO_NAME}-update
+            DEPENDS ${REPO_NAME}-clean
             COMMAND ${GIT_EXECUTABLE} pull
             COMMAND ${GIT_EXECUTABLE} checkout ${${COMPONENT_NAME}_BRANCH}
             COMMENT "Updating ${COMPONENT_NAME} sources"
