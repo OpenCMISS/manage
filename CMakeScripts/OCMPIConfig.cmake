@@ -18,12 +18,12 @@
 # MPI_HOME specified - use that and fail if there's no MPI
 # We also infer the MPI mnemonic from the installation at MPI_HOME
 if (DEFINED MPI_HOME AND NOT MPI_HOME STREQUAL "")
-    log("Attempting to find an MPI implementation at MPI_HOME=${MPI_HOME}")
-    # We ignore any set value of MPI if MPI_HOME is given - it's inferred in this case
-    unset(MPI )
+    log("Using MPI implementation at MPI_HOME=${MPI_HOME}")
     find_package(MPI REQUIRED)
-    # MPI_DETECTED is set by FindMPI.cmake to one of the mnemonics or unknown (MPI_TYPE_UNKNOWN in FindMPI.cmake)
-    set(MPI ${MPI_DETECTED} CACHE STRING "Detected MPI implementation" FORCE)
+    if (NOT DEFINED MPI)
+        # MPI_DETECTED is set by FindMPI.cmake to one of the mnemonics or unknown (MPI_TYPE_UNKNOWN in FindMPI.cmake)
+        set(MPI ${MPI_DETECTED} CACHE STRING "Detected MPI implementation" FORCE)
+    endif()
     if (NOT DEFINED MPI_BUILD_TYPE)
         set(MPI_BUILD_TYPE USER_MPIHOME)
         log("Using MPI via MPI_HOME variable.

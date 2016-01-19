@@ -836,13 +836,24 @@ function(check_mpi_type lang)
             # Pattern does not match but we have a matching desired MPI type - set to not found!
             if (MPI STREQUAL ${MNEMONIC})
                 if (MPI_FIND_REQUIRED)
-                    message(STATUS "The found MPI_${lang} compiler '${MPI_${lang}_COMPILER}' does not match the requested MPI implementation '${MNEMONIC}'.")
-                    message(STATUS "Check your include paths (suffixes '${_BIN_SUFFIX}' each):
-    1. CMAKE_PREFIX_PATH ${CMAKE_PREFIX_PATH}
-    2. Build system guess ${_MPI_PREFIX_PATH}
-    3. CMAKE_SYSTEM_PREFIX_PATH ${CMAKE_SYSTEM_PREFIX_PATH}
-    Searched compiler names: ${_MPI_${lang}_COMPILER_NAMES}
-    Alternatively, specify MPI_HOME or set a full path to MPI_${lang}_COMPILER")
+                    # Issue an error message appropriate for the current setting
+                    if (MPI_HOME)
+                        message(FATAL_ERROR "The found MPI implementation at MPI_HOME=${MPI_HOME} does not match the requested MPI implementation '${MNEMONIC}'.
+Check your MPI_HOME variable or do not define the MPI mnemonic.")
+                    else()
+                        if(MPI_${lang}_COMPILER)
+                            set(_ERRMSG "MPI_${lang} compiler '${MPI_${lang}_COMPILER}'")
+                        else()
+                            set(_ERRMSG "MPI implementation at MPI_${lang}_INCLUDE_PATH=${MPI_${lang}_INCLUDE_PATH}")
+                        endif()
+                        message(STATUS "The found ${_ERRMSG} does not match the requested MPI implementation '${MNEMONIC}'.")
+                        message(STATUS "Check your include paths (suffixes '${_BIN_SUFFIX}' each):
+1. CMAKE_PREFIX_PATH ${CMAKE_PREFIX_PATH}
+2. Build system guess ${_MPI_PREFIX_PATH}
+3. CMAKE_SYSTEM_PREFIX_PATH ${CMAKE_SYSTEM_PREFIX_PATH}
+Searched compiler names: ${_MPI_${lang}_COMPILER_NAMES}
+Alternatively, specify MPI_HOME or set a full path to MPI_${lang}_COMPILER")
+                    endif()
     		        message(FATAL_ERROR "MPI detection mismatch. Aborting.")
     		    else()
     		        messagev("MPI detection mismatch. MPI find not required, so returning FOUND=FALSE")

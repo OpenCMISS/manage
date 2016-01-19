@@ -33,7 +33,7 @@ endfunction()
 
 #############################################################################
 # Initialize defaults - currently taken from latest OpenCMISS build (this file is replaced for each arch)
-if (DEFINED MPI)
+if (MPI)
     string(TOLOWER ${MPI} MPI)
 else()
     set(MPI @OC_DEFAULT_MPI@)
