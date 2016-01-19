@@ -73,7 +73,6 @@ add_custom_target(reset
 if (FEATURETESTS_SRC_DIR) # only add if feature tests are build. existence of the source dir is a sufficient criteria.
     add_custom_target(reset_featuretests
         COMMAND ${CMAKE_COMMAND} -E remove_directory "${FEATURETESTS_BINARY_DIR}"
-        COMMAND ${CMAKE_COMMAND} -E remove_directory "${FEATURETESTS_SRC_DIR}" # Also just remove the sources for now, they're not big
         COMMENT "Cleaning up feature test builds"
     )
 endif()

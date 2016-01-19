@@ -81,24 +81,14 @@ if (NOT OC_DEPENDENCIES_ONLY)
         set(DEFS 
             -DOPENCMISS_INSTALL_DIR=${OPENCMISS_INSTALL_ROOT}
             -DCMAKE_INSTALL_PREFIX=${SRC_DIR}
+            -DMPI=${MPI}
         )
-        # Use same compilers
-        foreach(lang C CXX Fortran)
-            if(MPI_${lang}_COMPILER)
-                list(APPEND DEFS
-                    # Directly specify the compiler wrapper as compiler!
-                    # That is a perfect workaround for the "finding MPI after compilers have been initialized" problem
-                    # that occurs when building a component directly. 
-                    -DCMAKE_${lang}_COMPILER=${MPI_${lang}_COMPILER}
-                    # Also specify the MPI_ versions so that FindMPI is faster (checks them directly)
-                    -DMPI_${lang}_COMPILER=${MPI_${lang}_COMPILER}
-                )
-            else()
-                list(APPEND DEFS
-                    -DCMAKE_${lang}_COMPILER=${CMAKE_${lang}_COMPILER}
-                )
-            endif()
-        endforeach()
+        # Instead of passing the (mpi-)compilers, we should imitate
+        # the behaviour thats in place for anyone building an example
+        # - they only use TOOLCHAIN and MPI mnemonics
+        if (TOOLCHAIN)
+            list(APPEND DEFS -DTOOLCHAIN=${TOOLCHAIN})  
+        endif()
         set(${example_name}_BRANCH ${OC_FEATURETESTS_BRANCH})
         createExternalProjects(${example_name} "${SRC_DIR}" "${BIN_DIR}" "${DEFS}")
         # Dont build with the main build, as installation of OpenCMISS has not been done by then.
