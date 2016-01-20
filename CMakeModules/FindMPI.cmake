@@ -208,24 +208,6 @@ endforeach()
 
 # Names to try for MPI exec
 set(_MPI_EXEC_NAMES mpiexec mpirun lamexec srun)
-
-# For systems with "alternatives" management: prepend the mnemonic name to the executable names
-# (they match, by coincidence/same idea, but hey, they match at least for mpich2/openmpi).
-if(MPI)
-    foreach (lang C CXX Fortran)
-        if (lang IN_LIST ENABLED_LANGUAGES)
-            foreach(compname ${_MPI_${lang}_COMPILER_NAMES})
-                # Insert to have it looked up first
-                LIST(INSERT _MPI_${lang}_COMPILER_NAMES 0 ${compname}.${MPI})
-            endforeach()
-        endif()
-    endforeach()
-    foreach(exename ${_MPI_EXEC_NAMES})
-        # Insert to have it looked up first
-        LIST(INSERT _MPI_EXEC_NAMES 0 ${exename}.${MPI})
-    endforeach()
-    messagev("Looking for MPIEXEC_NAMES=${_MPI_EXEC_NAMES}")
-endif()                                           
        
 ############################################################
 # Compile the search path for MPI
