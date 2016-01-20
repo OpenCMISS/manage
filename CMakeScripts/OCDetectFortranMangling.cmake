@@ -1,5 +1,5 @@
 # Fortran mangling - only detect if not already set manually.
-if (NOT FORTRAN_MANGLING)
+if (CMAKE_Fortran_COMPILER_WORKS AND NOT FORTRAN_MANGLING)
     include(FortranCInterface)
     log("Detected Fortran mangling: Suffix '${FortranCInterface_GLOBAL_SUFFIX}', Case '${FortranCInterface_GLOBAL_CASE}'")
     FortranCInterface_VERIFY()

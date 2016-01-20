@@ -20,7 +20,7 @@
 if (OC_USE_GTEST AND BUILD_TESTS)
     find_package(GTEST ${GTEST_VERSION} QUIET)
     if(NOT GTEST_FOUND)
-        set(GTEST_FWD_DEPS LLVM CSIM)
+        set(GTEST_FWD_DEPS LLVM CSIM ZINC)
         set(SUBGROUP_PATH utilities)
         set(GITHUB_ORGANIZATION OpenCMISS-Utilities)
         addAndConfigureLocalComponent(GTEST)
@@ -110,6 +110,7 @@ if(OC_USE_HDF5)
             SZIP_VERSION=${SZIP_VERSION}
             WITH_ZLIB=${HDF5_WITH_ZLIB}
             ZLIB_VERSION=${ZLIB_VERSION}
+            HDF5_BUILD_FORTRAN=${HDF5_BUILD_FORTRAN}
         )
     endif()
 endif()

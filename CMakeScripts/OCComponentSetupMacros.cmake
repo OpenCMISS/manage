@@ -31,7 +31,7 @@ function(addAndConfigureLocalComponent COMPONENT_NAME)
     # Verifications
     if(COMPONENT_NAME IN_LIST OPENCMISS_COMPONENTS_WITH_F90 AND NOT CMAKE_Fortran_COMPILER_SUPPORTS_F90)
         log("Your Fortran compiler ${CMAKE_Fortran_COMPILER} does not support the Fortran 90 standard,
-            which is required to build the OpenCMISS component ${COMPONENT}" ERROR)
+            which is required to build the OpenCMISS component ${COMPONENT_NAME}" ERROR)
     endif()
     
     

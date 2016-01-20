@@ -103,7 +103,8 @@ include(OCToolchainCompilers)
 
 ########################################################################
 # Ready to start the "build project"
-project(OpenCMISS VERSION 1.2 LANGUAGES C CXX Fortran)
+project(OpenCMISS VERSION 1.2 LANGUAGES C CXX)
+enable_language(Fortran OPTIONAL)
 
 include(OCMiscFunctionsMacros)
 

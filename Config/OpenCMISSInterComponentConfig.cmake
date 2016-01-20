@@ -35,9 +35,12 @@ option(FIELDML-API_WITH_FORTRAN_BINDINGS "Build Fortran bindings for FieldML" YE
 #        Have HDF5 use szip
 #    HDF5_WITH_ZLIB : YES
 #        Have HDF5 use zlib
+#    HDF5_BUILD_FORTRAN : NO
+#        Build Fortran interface for HDF5
 option(HDF5_WITH_MPI "Build HDF5 with MPI support" NO)
 option(HDF5_WITH_SZIP "Have HDF5 use szip" YES)
 option(HDF5_WITH_ZLIB "Have HDF5 use zlib" YES)
+option(HDF5_BUILD_FORTRAN "Build Fortran interface for HDF5" NO)
 
 ##
 #    IRON_WITH_CELLML : YES
