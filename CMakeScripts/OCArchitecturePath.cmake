@@ -124,12 +124,16 @@ function(getCompilerPathElem VARNAME)
 	set(_COMPILER_VERSION_REGEX "^[0-9]+\.[0-9]+")
 	string(REGEX MATCH ${_COMPILER_VERSION_REGEX}
        _C_COMPILER_VERSION_MM "${CMAKE_C_COMPILER_VERSION}")
-    # Also for the fortran compiler
-    string(REGEX MATCH ${_COMPILER_VERSION_REGEX}
-       _Fortran_COMPILER_VERSION_MM "${CMAKE_Fortran_COMPILER_VERSION}")
+    # Also for the fortran compiler (if exists)
+    set(_FORTRAN_PART "")
+    if (CMAKE_Fortran_COMPILER)
+        string(REGEX MATCH ${_COMPILER_VERSION_REGEX}
+           _Fortran_COMPILER_VERSION_MM "${CMAKE_Fortran_COMPILER_VERSION}")
+        set(_FORTRAN_PART "-F${_Fortran_COMPILER_VERSION_MM}")
+    endif()
     
     # Combine into e.g. gnu-4.8-F4.5
-	set(${VARNAME} "${_COMP}-${_C_COMPILER_VERSION_MM}-F${_Fortran_COMPILER_VERSION_MM}" PARENT_SCOPE)
+	set(${VARNAME} "${_COMP}-${_C_COMPILER_VERSION_MM}${_FORTRAN_PART}" PARENT_SCOPE)
 endfunction()
 
 function(getBuildTypePathElem VARNAME)
