@@ -6,14 +6,16 @@ list(REMOVE_ITEM PACKAGES_WITH_TARGETS
 )
     
 # Some shipped find-package modules have a different case-sensitive spelling - need to stay consistent with that
-SET(LIBXML2_CASENAME LibXml2)
-SET(BZIP2_CASENAME BZip2)
-SET(FREETYPE_CASENAME Freetype)
+set(LIBXML2_CASENAME LibXml2)
+set(BZIP2_CASENAME BZip2)
+set(FREETYPE_CASENAME Freetype)
+set(IMAGEMAGICK_CASENAME ImageMagick)
 # Some packages naturally have their exported target names differ from those of the package - this is convenience but
 # enables us to stay more consistent (e.g. we have "libbz2.a" on system installations instead of "libbzip2.a")
-SET(LIBXML2_TARGETNAME xml2)
-SET(BZIP2_TARGETNAME bz2)
-SET(NETGEN_TARGETNAME nglib)
+set(LIBXML2_TARGETNAME xml2)
+set(BZIP2_TARGETNAME bz2)
+set(NETGEN_TARGETNAME nglib)
+set(IMAGEMAGICK_TARGETNAME MagickCore)
     
 # Generate the wrappers (if not existing)
 SET(OPENCMISS_FINDMODULE_WRAPPER_DIR ${OPENCMISS_INSTALL_ROOT}/cmake/OpenCMISSFindModuleWrappers)
