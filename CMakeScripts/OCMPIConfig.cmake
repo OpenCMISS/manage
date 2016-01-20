@@ -124,7 +124,11 @@ endif()
 
 # Last check before building - there might be an own already built MPI implementation
 if (NOT MPI_FOUND)
-    log("No (matching) system MPI found or not allowed: SYSTEM_MPI=${SYSTEM_MPI}. Checking if own build exists." DEBUG)
+    if (SYSTEM_MPI)
+        log("No (matching) system MPI found.")    
+    endif()
+    log("Checking if own build already exists.")
+    
     # Construct installation path
     # For MPI we use a slightly different architecture path - we dont need to re-build MPI for static/shared builds nor do we need the actual
     # MPI mnemonic in the path. Instead, we use "mpi" as common top folder to collect all local MPI builds.

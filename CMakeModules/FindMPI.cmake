@@ -208,24 +208,6 @@ endforeach()
 
 # Names to try for MPI exec
 set(_MPI_EXEC_NAMES mpiexec mpirun lamexec srun)
-
-# For systems with "alternatives" management: prepend the mnemonic name to the executable names
-# (they match, by coincidence/same idea, but hey, they match at least for mpich2/openmpi).
-if(MPI)
-    foreach (lang C CXX Fortran)
-        if (lang IN_LIST ENABLED_LANGUAGES)
-            foreach(compname ${_MPI_${lang}_COMPILER_NAMES})
-                # Insert to have it looked up first
-                LIST(INSERT _MPI_${lang}_COMPILER_NAMES 0 ${compname}.${MPI})
-            endforeach()
-        endif()
-    endforeach()
-    foreach(exename ${_MPI_EXEC_NAMES})
-        # Insert to have it looked up first
-        LIST(INSERT _MPI_EXEC_NAMES 0 ${exename}.${MPI})
-    endforeach()
-    messagev("Looking for MPIEXEC_NAMES=${_MPI_EXEC_NAMES}")
-endif()                                           
        
 ############################################################
 # Compile the search path for MPI
@@ -888,8 +870,8 @@ function(verify_mpi_toolchain_compatibility lang)
                 ERROR_VARIABLE _ERR
                 RESULT_VARIABLE _RES
                 WORKING_DIRECTORY ${base})
-            if (_RES)
-                message(FATAL_ERROR "MPI verification script failed:\n${ERROR_VARIABLE}\n\n Please contact the program distributor.")
+            if (NOT _RES EQUAL 0)
+                message(FATAL_ERROR "MPI verification script failed:\n${_ERR}\n\n Please contact the program distributor.")
             endif()
             include(${base}/compiler_info.cmake)
             messagev("CMAKE_${lang}_COMPILER_ID=${CMAKE_${lang}_COMPILER_ID}, CMAKE_${lang}_COMPILER_VERSION=${CMAKE_${lang}_COMPILER_VERSION}")
@@ -1094,14 +1076,24 @@ function(create_mpi_target lang)
         list(GET MPI_${lang}_LIBRARIES 0 FIRSTLIB)
         list(REMOVE_AT MPI_${lang}_LIBRARIES 0)
         
+        separate_arguments(MPI_${lang}_COMPILE_FLAGS)
+        separate_arguments(MPI_${lang}_LINK_FLAGS)
         set_target_properties(${target} PROPERTIES
           IMPORTED_LOCATION "${FIRSTLIB}"
           INTERFACE_INCLUDE_DIRECTORIES "${MPI_${lang}_INCLUDE_PATH}"
           INTERFACE_LINK_LIBRARIES "${MPI_${lang}_LIBRARIES}"
-          INTERFACE_COMPILE_DEFINITIONS "${MPI_${lang}_COMPILE_FLAGS}"
+          INTERFACE_COMPILE_OPTIONS "${MPI_${lang}_COMPILE_FLAGS}"
           LINK_FLAGS "${MPI_${lang}_LINK_FLAGS}"
           IMPORTED_LINK_INTERFACE_LANGUAGES "${lang}"
         )
+        messagev("Creating imported target '${target}' with properties
+          IMPORTED_LOCATION \"${FIRSTLIB}\"
+          INTERFACE_INCLUDE_DIRECTORIES \"${MPI_${lang}_INCLUDE_PATH}\"
+          INTERFACE_LINK_LIBRARIES \"${MPI_${lang}_LIBRARIES}\"
+          INTERFACE_COMPILE_OPTIONS \"${MPI_${lang}_COMPILE_FLAGS}\"
+          LINK_FLAGS \"${MPI_${lang}_LINK_FLAGS}\"
+          IMPORTED_LINK_INTERFACE_LANGUAGES \"${lang}\"
+        )")
         target_link_libraries(mpi INTERFACE ${target})
     endif()
 endfunction()
