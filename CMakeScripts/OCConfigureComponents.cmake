@@ -574,6 +574,7 @@ if (OC_USE_ZINC OR (OPENGL_FOUND AND OC_DEPENDENCIES_ONLY))
         addAndConfigureLocalComponent(ZINC
             ZINC_MODULE_PATH=${CMAKE_MODULE_PATH_ESC}
             ZINC_DEPENDENCIES_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX}
+            GTEST_VERSION=${GTEST_VERSION}
         )
     endif()
 endif()

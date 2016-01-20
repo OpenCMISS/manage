@@ -10,12 +10,16 @@ set(LIBXML2_CASENAME LibXml2)
 set(BZIP2_CASENAME BZip2)
 set(FREETYPE_CASENAME Freetype)
 set(IMAGEMAGICK_CASENAME ImageMagick)
+set(GTEST_CASENAME GTest)
 # Some packages naturally have their exported target names differ from those of the package - this is convenience but
 # enables us to stay more consistent (e.g. we have "libbz2.a" on system installations instead of "libbzip2.a")
 set(LIBXML2_TARGETNAME xml2)
 set(BZIP2_TARGETNAME bz2)
 set(NETGEN_TARGETNAME nglib)
 set(IMAGEMAGICK_TARGETNAME MagickCore)
+set(GTEST_TARGETNAME gtest_main) # This will bite us some day.
+# There's also a logical 'gtest' target. But here we can only define one (in general for ALL possible
+# packages to cover with this kind of wrapper)
     
 # Generate the wrappers (if not existing)
 SET(OPENCMISS_FINDMODULE_WRAPPER_DIR ${OPENCMISS_INSTALL_ROOT}/cmake/OpenCMISSFindModuleWrappers)
