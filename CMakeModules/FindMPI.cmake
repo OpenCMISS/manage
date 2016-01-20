@@ -1094,14 +1094,24 @@ function(create_mpi_target lang)
         list(GET MPI_${lang}_LIBRARIES 0 FIRSTLIB)
         list(REMOVE_AT MPI_${lang}_LIBRARIES 0)
         
+        separate_arguments(MPI_${lang}_COMPILE_FLAGS)
+        separate_arguments(MPI_${lang}_LINK_FLAGS)
         set_target_properties(${target} PROPERTIES
           IMPORTED_LOCATION "${FIRSTLIB}"
           INTERFACE_INCLUDE_DIRECTORIES "${MPI_${lang}_INCLUDE_PATH}"
           INTERFACE_LINK_LIBRARIES "${MPI_${lang}_LIBRARIES}"
-          INTERFACE_COMPILE_DEFINITIONS "${MPI_${lang}_COMPILE_FLAGS}"
+          INTERFACE_COMPILE_OPTIONS "${MPI_${lang}_COMPILE_FLAGS}"
           LINK_FLAGS "${MPI_${lang}_LINK_FLAGS}"
           IMPORTED_LINK_INTERFACE_LANGUAGES "${lang}"
         )
+        messagev("Creating imported target '${target}' with properties
+          IMPORTED_LOCATION \"${FIRSTLIB}\"
+          INTERFACE_INCLUDE_DIRECTORIES \"${MPI_${lang}_INCLUDE_PATH}\"
+          INTERFACE_LINK_LIBRARIES \"${MPI_${lang}_LIBRARIES}\"
+          INTERFACE_COMPILE_OPTIONS \"${MPI_${lang}_COMPILE_FLAGS}\"
+          LINK_FLAGS \"${MPI_${lang}_LINK_FLAGS}\"
+          IMPORTED_LINK_INTERFACE_LANGUAGES \"${lang}\"
+        )")
         target_link_libraries(mpi INTERFACE ${target})
     endif()
 endfunction()
