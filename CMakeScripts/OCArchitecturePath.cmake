@@ -30,6 +30,8 @@
 #
 #        Moreover, a path element :path:`no_mpi` is used for any component that does not use MPI at all.  
 #    :buildtype: Path element for the current overall build type determined by :var:`CMAKE_BUILD_TYPE`.
+#        This is for single-configuration platforms only - multiconfiguration environments like Visual Studio have their
+#        own way of dealing with build types. 
 #
 # For example, a typical architecture path looks like::
 #
@@ -136,15 +138,15 @@ function(getCompilerPathElem VARNAME)
 	set(${VARNAME} "${_COMP}-${_C_COMPILER_VERSION_MM}${_FORTRAN_PART}" PARENT_SCOPE)
 endfunction()
 
+# Returns the build type arch path element.
+# useful only for single-configuration builds, '.' otherwise.
 function(getBuildTypePathElem VARNAME)
     # Build type
-    if (CMAKE_BUILD_TYPE)
+    if (NOT CMAKE_HAVE_MULTICONFIG_ENV)
         STRING(TOLOWER ${CMAKE_BUILD_TYPE} buildtype)
         SET(BUILDTYPEEXTRA ${buildtype})
-    elseif (NOT CMAKE_CFG_INTDIR STREQUAL .)
-        SET(BUILDTYPEEXTRA ) #${CMAKE_CFG_INTDIR}
     else()
-        SET(BUILDTYPEEXTRA noconfig)
+        SET(BUILDTYPEEXTRA .)
     endif()
     SET(${VARNAME} ${BUILDTYPEEXTRA} PARENT_SCOPE)
 endfunction()

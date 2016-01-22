@@ -25,12 +25,18 @@
 # the (purposely not documented) <compname>-[download|source] targets. 
 #
 function(addConvenienceTargets COMPONENT_NAME BINARY_DIR SOURCE_DIR)
+
+    set(CONFIG_ARGS )
+    if (CMAKE_HAVE_MULTICONFIG_ENV)
+        set(CONFIG_ARGS --config $<CONFIG>)
+    endif()
+
     # Add convenience direct-access clean target for component
     string(TOLOWER "${COMPONENT_NAME}" COMPONENT_NAME_LOWER)
     add_custom_target(${COMPONENT_NAME_LOWER}-clean
         COMMAND ${CMAKE_COMMAND} -E remove -f ${BINARY_DIR}/ep_stamps/*-configure
         COMMAND ${CMAKE_COMMAND} -E touch ${BINARY_DIR}/CMakeCache.txt # force cmake re-run to make sure
-        COMMAND ${CMAKE_COMMAND} --build ${BINARY_DIR} --target clean
+        COMMAND ${CMAKE_COMMAND} --build ${BINARY_DIR} --target clean ${CONFIG_ARGS}
         COMMENT "Cleaning ${COMPONENT_NAME}"
     )
     
@@ -40,7 +46,7 @@ function(addConvenienceTargets COMPONENT_NAME BINARY_DIR SOURCE_DIR)
         DEPENDS ${COMPONENT_NAME_LOWER}-clean
         COMMAND ${CMAKE_COMMAND} -E remove_directory ${BINARY_DIR}/CMakeFiles
         COMMAND ${CMAKE_COMMAND} -E remove -f ${BINARY_DIR}/CMakeCache.txt
-        COMMAND ${CMAKE_COMMAND} --build ${CMAKE_CURRENT_BINARY_DIR} --target ${OC_EP_PREFIX}${COMPONENT_NAME}
+        COMMAND ${CMAKE_COMMAND} --build ${CMAKE_CURRENT_BINARY_DIR} --target ${OC_EP_PREFIX}${COMPONENT_NAME} ${CONFIG_ARGS}
         COMMENT "Rebuilding ${COMPONENT_NAME}"
     )
     
@@ -61,9 +67,9 @@ function(addConvenienceTargets COMPONENT_NAME BINARY_DIR SOURCE_DIR)
     if (BUILD_TESTS)
         # Add convenience direct-access test target for component
         add_custom_target(${COMPONENT_NAME_LOWER}-test
-            COMMAND ${CMAKE_COMMAND} --build ${BINARY_DIR} --target test
+            COMMAND ${CMAKE_COMMAND} --build ${BINARY_DIR} --target test ${CONFIG_ARGS}
         )
         # Add a global test to run the external project's tests
-        add_test(${COMPONENT_NAME_LOWER}-test ${CMAKE_COMMAND} --build ${BINARY_DIR} --target test)
+        add_test(${COMPONENT_NAME_LOWER}-test ${CMAKE_COMMAND} --build ${BINARY_DIR} --target test ${CONFIG_ARGS})
     endif()
 endfunction()   
