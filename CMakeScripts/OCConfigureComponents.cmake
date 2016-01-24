@@ -416,7 +416,11 @@ if (OC_USE_IRON OR OC_DEPENDENCIES_ONLY)
             WITH_PROFILING=${OC_PROFILING}
             WITH_C_BINDINGS=${IRON_WITH_C_BINDINGS}
             WITH_Python_BINDINGS=${IRON_WITH_Python_BINDINGS}
+            VIRTUALENV_LOCATION=${PYTHON_VIRTUALENV_DIR}
         )
+        if (TARGET python_virtualenv)
+            add_dependencies(${OC_EP_PREFIX}IRON python_virtualenv)
+        endif()
     endif()
 endif()
 
@@ -573,10 +577,15 @@ if (OC_USE_ZINC OR (OPENGL_FOUND AND OC_DEPENDENCIES_ONLY))
         set(SUBGROUP_PATH .)
         set(GITHUB_ORGANIZATION OpenCMISS)
         addAndConfigureLocalComponent(ZINC
+            ZINC_BUILD_PYTHON_BINDINGS=${ZINC_WITH_Python_BINDINGS}
             ZINC_MODULE_PATH=${CMAKE_MODULE_PATH_ESC}
             ZINC_DEPENDENCIES_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX}
             GTEST_VERSION=${GTEST_VERSION}
+            VIRTUALENV_LOCATION=${PYTHON_VIRTUALENV_DIR}
         )
+        if (TARGET python_virtualenv)
+            add_dependencies(${OC_EP_PREFIX}IRON python_virtualenv)
+        endif()
     endif()
 endif()
 

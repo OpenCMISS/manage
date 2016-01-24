@@ -59,9 +59,9 @@ option(HDF5_BUILD_FORTRAN "Build Fortran interface for HDF5" NO)
 #        Have Iron use PetSC
 #    IRON_WITH_C_BINDINGS : YES
 #        Build Iron-C bindings
-#    IRON_WITH_Python_BINDINGS : YES
+#    IRON_WITH_Python_BINDINGS : YES if Python bindings prerequisites are given, NO otherwise
 #        Build Iron-Python bindings. This setting is automatically enabled if the build system
-#        finds a local Python installation. 
+#        finds local Python(-libraries) and Swig. 
 option(IRON_WITH_CELLML "Have Iron use CellML" YES)
 option(IRON_WITH_FIELDML "Have Iron use FieldML" YES)
 option(IRON_WITH_HYPRE "Have Iron use Hypre" YES)
@@ -70,6 +70,7 @@ option(IRON_WITH_MUMPS "Have Iron use MUMPS" YES)
 option(IRON_WITH_SCALAPACK "Have Iron use ScaLAPACK" YES)
 option(IRON_WITH_PETSC "Have Iron use PetSC" YES)
 option(IRON_WITH_C_BINDINGS "Build Iron-C bindings" YES)
+option(IRON_WITH_Python_BINDINGS "Build Iron-Python bindings" ${OC_PYTHON_PREREQ_FOUND})
 
 ##
 #    LIBXML2_WITH_ZLIB : YES
@@ -153,3 +154,9 @@ option(SUNDIALS_WITH_LAPACK "Have Sundials use LAPACK" YES)
 #    SUPERLU_DIST_WITH_PARMETIS : YES
 #        Enable Parmetis support for SuperLU-Dist
 option(SUPERLU_DIST_WITH_PARMETIS "Enable Parmetis support for SuperLU-Dist" YES)
+
+##
+#    ZINC_WITH_Python_BINDINGS : YES if Python bindings prerequisites are given, NO otherwise
+#        Build Python bindings for ZINC. This setting is automatically enabled if the build system
+#        finds local Python(-libraries) and Swig
+option(ZINC_WITH_Python_BINDINGS "Build Python bindings for ZINC" ${OC_PYTHON_PREREQ_FOUND})
