@@ -69,7 +69,7 @@ if (NOT OC_DEPENDENCIES_ONLY)
         # Implemented for virtualenv case only thus far
         if (IRON_WITH_Python_BINDINGS AND PYTHON_VIRTUALENV_DIR)
             add_test(NAME ${FEATURE_TEST_PREFIX}iron_python_bindings
-                COMMAND ${CMAKE_CTEST_COMMAND} -R python_bindings_import
+                COMMAND ${CMAKE_CTEST_COMMAND} -R python_bindings_import --output-on-failure
                 WORKING_DIRECTORY "${IRON_BINARY_DIR}"
             )
         endif()
@@ -80,7 +80,7 @@ if (NOT OC_DEPENDENCIES_ONLY)
         # Implemented for virtualenv case only thus far
         if (ZINC_WITH_Python_BINDINGS AND PYTHON_VIRTUALENV_DIR)
             add_test(NAME ${FEATURE_TEST_PREFIX}zinc_python_bindings
-                COMMAND ${CMAKE_CTEST_COMMAND} -R python_bindings_import
+                COMMAND ${CMAKE_CTEST_COMMAND} -R python_bindings_import --output-on-failure
                 WORKING_DIRECTORY "${ZINC_BINARY_DIR}"
             )
         endif()
@@ -123,7 +123,7 @@ if (NOT OC_DEPENDENCIES_ONLY)
     # Add a top level target that runs only the feature tests
     add_custom_target(featuretests
         DEPENDS ${_FT_EX_EP} # Triggers the build
-        COMMAND ${CMAKE_CTEST_COMMAND} -R ${FEATURE_TEST_PREFIX}*
+        COMMAND ${CMAKE_CTEST_COMMAND} -R ${FEATURE_TEST_PREFIX}* -O ${OC_SUPPORT_DIR}/featuretests.log --output-on-failure
         COMMENT "Running OpenCMISS feature tests"
     )
 else()
