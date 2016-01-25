@@ -38,7 +38,9 @@ set(_FEATURETESTS_UPDATE_TARGETS )
 
 # Only run the feature tests if we build more than the dependencies
 if (NOT OC_DEPENDENCIES_ONLY)
+    # Prefix for any tests that belongs to the OpenCMISS key tests
     set(FEATURE_TEST_PREFIX opencmiss_feature_)
+    
     # Iron-related feature tests
     if (OC_USE_IRON)
         set(FEATURE_TEST_EXAMPLES 
@@ -62,10 +64,26 @@ if (NOT OC_DEPENDENCIES_ONLY)
         set(bioelectrics_monodomain_fortran_ARGS 0.005 0.1001 70 n98.xml)
         # Only file: n98.xml
         set(cellml_model-integration_fortran_ARGS n98.xml)
+        
+        # If we generate bindings, we also add key tests that verify their functionality.
+        # Implemented for virtualenv case only thus far
+        if (IRON_WITH_Python_BINDINGS AND PYTHON_VIRTUALENV_DIR)
+            add_test(NAME ${FEATURE_TEST_PREFIX}iron_python_bindings
+                COMMAND ${CMAKE_CTEST_COMMAND} -R python_bindings_import
+                WORKING_DIRECTORY "${IRON_BINARY_DIR}"
+            )
+        endif()
     endif()
-    # Iron-related feature tests
+    # Zinc-related feature tests
     if (OC_USE_ZINC)
-        #TODO
+        # If we generate bindings, we also add key tests that verify their functionality.
+        # Implemented for virtualenv case only thus far
+        if (ZINC_WITH_Python_BINDINGS AND PYTHON_VIRTUALENV_DIR)
+            add_test(NAME ${FEATURE_TEST_PREFIX}zinc_python_bindings
+                COMMAND ${CMAKE_CTEST_COMMAND} -R python_bindings_import
+                WORKING_DIRECTORY "${ZINC_BINARY_DIR}"
+            )
+        endif()
     endif()
     
     set(FEATURETESTS_BINARY_DIR ${OPENCMISS_COMPONENTS_BINARY_DIR_MPI}/featuretests)

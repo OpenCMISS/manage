@@ -59,9 +59,11 @@ set(OC_MANDATORY_COMPONENTS FIELDML-API LIBXML2)
 
 # This is the support email for general enquiries and support about building opencmiss using the new CMake system.
 set(OC_BUILD_SUPPORT_EMAIL "users@opencmiss.org")
+
 # This is an email address being displayed for issues regarding (remote) installations.
 # This needs to be set in either LocalConfig or Developer (better) in order to be useful.
 # If not set, a warning will be issued!
 set(OC_INSTALL_SUPPORT_EMAIL FALSE)
 
-set(OC_EP_PREFIX "OC_") # The prefix for opencmiss dependencies external projects
+# The prefix for opencmiss dependencies external projects
+set(OC_EP_PREFIX "OC_")

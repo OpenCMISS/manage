@@ -26,6 +26,8 @@ function(addAndConfigureLocalComponent COMPONENT_NAME)
     # Complete build dir with debug/release AFTER everything else (consistent with windows)
     getBuildTypePathElem(BUILDTYPEEXTRA)
     set(COMPONENT_BUILD_DIR ${BUILD_DIR_BASE}/${SUBGROUP_PATH}/${FOLDER_NAME}/${BUILDTYPEEXTRA})
+    # Expose the current build directory outside the function - used only for Iron and Zinc yet 
+    set(${COMPONENT_NAME}_BINARY_DIR ${COMPONENT_BUILD_DIR} PARENT_SCOPE)
     
     ##############################################################
     # Verifications
