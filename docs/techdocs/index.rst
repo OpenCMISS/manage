@@ -110,9 +110,9 @@ This is far from ideal, but a quick way to see what’s working and what not.
 .. This adds in the buildlog documentation
 .. cmake-source:: ../../CMakeScripts/OCMiscFunctionsMacros.cmake
 
-.. _`featuretests`:
+.. _`keytests`:
 
-Feature tests
-=============
+Key tests
+=========
 
-.. cmake-source:: ../../CMakeScripts/OCFeatureTests.cmake
+.. cmake-source:: ../../CMakeScripts/OCKeyTests.cmake

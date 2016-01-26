@@ -14,23 +14,23 @@ endforeach()
 # important to create the information about the OpenCMISS build that is needed by any examples or applications.
 # Therefore, the build system’s main target is called :sh:`opencmiss` and should be invoked for any build.
 #
-# Moreover, certain *feature tests* are automatically build using the :code:`opencmiss` target.
+# Moreover, certain *key tests* are automatically build using the :code:`opencmiss` target.
 # It is important to have those tests as they are intended to test the core functionality of the current build
-# and configuration. For more information see :ref:`featuretests`.
+# and configuration. For more information see :ref:`keytests`.
 # 
 #    :examples: Convenience target to download & build all the examples registered
 #        as submodule of the :path:`OpenCMISS-Examples/examples` repository.
 #        **This is intended for the transition phase from SVN global examples repo to PMR only and will disappear in due time!**
 #    :examples-test: Uses CTest to simply execute all the examples (if successfully built).
 #        Currently they’re invoked without arguments which may break some of them due to that.
-#    :featuretests: Builds and runs the featuretests. These are selected OpenCMISS examples that cover the parts of
+#    :keytests: Builds and runs the keytests. These are selected OpenCMISS examples that cover the parts of
 #        OpenCMISS that are used most frequently but are yet fast to run. These tests are run after every build in order
 #        to provide a fast first test suite to assess overall health.
 
 # The above are dummy entries for documentation.
 #
-# The 'examples'/'examples-test' targets are defined in OCAddExamplesProject, 'featuretests' is added
-# in OCFeatureTests.
+# The 'examples'/'examples-test' targets are defined in OCAddExamplesProject, 'keytests' is added
+# in OCKeyTests.
 
 ##
 #    :gitstatus: This target is intended for developers, who would like a quick way of
@@ -43,18 +43,18 @@ if (GIT_FOUND)
 endif()
 
 ##
-#    :opencmiss: Main build target. Comprises :sh:`all, install, featuretests`
+#    :opencmiss: Main build target. Comprises :sh:`all, install, keytests`
 add_custom_target(opencmiss
     COMMAND ${CMAKE_COMMAND} --build ${PROJECT_BINARY_DIR}
     COMMAND ${CMAKE_COMMAND} --build ${PROJECT_BINARY_DIR} --target install
-    COMMAND ${CMAKE_COMMAND} --build ${PROJECT_BINARY_DIR} --target featuretests
+    COMMAND ${CMAKE_COMMAND} --build ${PROJECT_BINARY_DIR} --target keytests
 )
 
 ##
 #    :reset: Removes everything from the current build root but the :ref:`OpenCMISSLocalConfig <localconf>` file.
 #        Also invokes the following (independently usable) targets:
 add_custom_target(reset
-    DEPENDS reset-mpionly reset-featuretests
+    DEPENDS reset-mpionly reset-keytests
     COMMAND ${CMAKE_COMMAND} -E remove_directory "${OPENCMISS_COMPONENTS_INSTALL_PREFIX_NO_BUILD_TYPE}"
     COMMAND ${CMAKE_COMMAND} -E remove_directory "${OPENCMISS_COMPONENTS_BINARY_DIR}"
     COMMAND ${CMAKE_COMMAND} -E remove "${OC_BUILDLOG}"
@@ -68,17 +68,17 @@ add_custom_target(reset
 )
 
 ##
-#    :reset-featuretests: Triggers a re-build of the feature tests
-#        For more information see the techical documentation on :ref:`featuretests`.
-if (FEATURETESTS_SRC_DIR) # only add if feature tests are build. existence of the source dir is a sufficient criteria.
-    add_custom_target(reset-featuretests
-        COMMAND ${CMAKE_COMMAND} -E remove_directory "${FEATURETESTS_BINARY_DIR}"
-        COMMENT "Cleaning up feature test builds"
+#    :reset-keytests: Triggers a re-build of the key tests
+#        For more information see the techical documentation on :ref:`keytests`.
+if (KEYTESTS_SRC_DIR) # only add if key tests are build. existence of the source dir is a sufficient criteria.
+    add_custom_target(reset-keytests
+        COMMAND ${CMAKE_COMMAND} -E remove_directory "${KEYTESTS_BINARY_DIR}"
+        COMMENT "Cleaning up key test builds"
     )
     
-    add_custom_target(update-featuretests
-        DEPENDS ${_FEATURETESTS_UPDATE_TARGETS}
-        COMMENT "Updating OpenCMISS feature tests"
+    add_custom_target(update-keytests
+        DEPENDS ${_KEYTESTS_UPDATE_TARGETS}
+        COMMENT "Updating OpenCMISS key tests"
     )
 endif()
 
@@ -111,13 +111,13 @@ add_custom_target(reset-mpionly
 #            This will *not* update the main manage repository. Make sure you update the sources
 #            via :sh:`git pull` or re-download of the manage zip file.
 add_custom_target(update
-    DEPENDS ${_OC_SOURCE_UPDATE_TARGETS} ${_FEATURETESTS_UPDATE_TARGETS}
+    DEPENDS ${_OC_SOURCE_UPDATE_TARGETS} ${_KEYTESTS_UPDATE_TARGETS}
     COMMAND ${CMAKE_COMMAND} -E echo "Successfully updated OpenCMISS sources. Attention! This does *NOT* update the manage repository. Make sure you obtain the newest sources."
 )
 
 ##
-#    :update-featuretests: Updates the sources of the feature tests only.
-#        For more information see the techical documentation on :ref:`featuretests`.
+#    :update-keytests: Updates the sources of the key tests only.
+#        For more information see the techical documentation on :ref:`keytests`.
 
 ## 
 #    :utter_destruction: Removes the complete build/ and install/ root directories created by any architecture build.

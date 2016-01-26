@@ -1,30 +1,30 @@
 ##
-# In order to verify the overall functionality of an OpenCMISS build, we use *feature tests*
+# In order to verify the overall functionality of an OpenCMISS build, we use *key tests*
 # to quickly check core functionality *every time after build and installation*.
 #
-# The feature tests are a selected set of OpenCMISS examples from the GitHub `OpenCMISS-Examples`_ organisation,
+# The key tests are a selected set of OpenCMISS examples from the GitHub `OpenCMISS-Examples`_ organisation,
 # which are build along with the main components and added as CTest test cases. 
 #
 # Depending on the effective configuration, a suitable selection of the following examples is build and run:
 #
 #    Classical field - Fortran
-#        This feature test is build whenever Iron is build. See :var:`OC_USE_<COMP>`.
+#        This key test is build whenever Iron is build. See :var:`OC_USE_<COMP>`.
 #
 #    Classical field - C
 #        This example is only build when the C bindings for Iron are build.
 #        See the :ref:`IRON_WITH_C_BINDINGS <intercomponent>` variable.
 #
 #    Finite elasticity cantilever - Fortran
-#        This feature test is build whenever Iron is build. See :var:`OC_USE_<COMP>`.
+#        This key test is build whenever Iron is build. See :var:`OC_USE_<COMP>`.
 #
 #    Bioelectrics Monodomain - Fortran
-#        This feature test is build whenever
+#        This key test is build whenever
 #
 #            * Iron and CellML are build, see :var:`OC_USE_<COMP>`.
 #            * Iron with CellML is enabled, see :ref:`IRON_WITH_CELLML <intercomponent>`.
 #
 #    Classical field static advection diffusion with FieldML - Fortran
-#        This feature test is build whenever
+#        This key test is build whenever
 #
 #            * Iron and FieldML-API are build, see :var:`OC_USE_<COMP>`.
 #            * Iron with FieldML is enabled, see :ref:`IRON_WITH_FIELDML <intercomponent>`.
@@ -34,30 +34,30 @@
 # .. _`OpenCMISS-Examples`: https://www.github.com/OpenCMISS-Examples
 #
 
-set(_FEATURETESTS_UPDATE_TARGETS )
+set(_KEYTESTS_UPDATE_TARGETS )
 
-# Only run the feature tests if we build more than the dependencies
+# Only run the key tests if we build more than the dependencies
 if (NOT OC_DEPENDENCIES_ONLY)
     # Prefix for any tests that belongs to the OpenCMISS key tests
-    set(FEATURE_TEST_PREFIX opencmiss_feature_)
+    set(KEY_TEST_PREFIX opencmiss_key_)
     
-    # Iron-related feature tests
+    # Iron-related key tests
     if (OC_USE_IRON)
-        set(FEATURE_TEST_EXAMPLES 
+        set(KEY_TEST_EXAMPLES 
             classicalfield_laplace_laplace_fortran
             finiteelasticity_cantilever_fortran
         )
         if (IRON_WITH_C_BINDINGS)
-            list(APPEND FEATURE_TEST_EXAMPLES classicalfield_laplace_laplace_c)
+            list(APPEND KEY_TEST_EXAMPLES classicalfield_laplace_laplace_c)
         endif()
         if (OC_USE_CELLML AND IRON_WITH_CELLML)
-            list(APPEND FEATURE_TEST_EXAMPLES 
+            list(APPEND KEY_TEST_EXAMPLES 
                 bioelectrics_monodomain_fortran
                 cellml_model-integration_fortran
             )
         endif()
         if (OC_USE_FIELDML-API AND IRON_WITH_FIELDML)
-            list(APPEND FEATURE_TEST_EXAMPLES classicalfield_advectiondiffusion_staticadvectiondiffusion_fieldml)
+            list(APPEND KEY_TEST_EXAMPLES classicalfield_advectiondiffusion_staticadvectiondiffusion_fieldml)
         endif()
         # Collect any arguments
         # n98.xml is the only currently working xml file
@@ -68,33 +68,33 @@ if (NOT OC_DEPENDENCIES_ONLY)
         # If we generate bindings, we also add key tests that verify their functionality.
         # Implemented for virtualenv case only thus far
         if (IRON_WITH_Python_BINDINGS AND PYTHON_VIRTUALENV_DIR)
-            add_test(NAME ${FEATURE_TEST_PREFIX}iron_python_bindings
+            add_test(NAME ${KEY_TEST_PREFIX}iron_python_bindings
                 COMMAND ${CMAKE_CTEST_COMMAND} -R python_bindings_import --output-on-failure
                 WORKING_DIRECTORY "${IRON_BINARY_DIR}"
             )
         endif()
     endif()
-    # Zinc-related feature tests
+    # Zinc-related key tests
     if (OC_USE_ZINC)
         # If we generate bindings, we also add key tests that verify their functionality.
         # Implemented for virtualenv case only thus far
         if (ZINC_WITH_Python_BINDINGS AND PYTHON_VIRTUALENV_DIR)
-            add_test(NAME ${FEATURE_TEST_PREFIX}zinc_python_bindings
+            add_test(NAME ${KEY_TEST_PREFIX}zinc_python_bindings
                 COMMAND ${CMAKE_CTEST_COMMAND} -R python_bindings_import --output-on-failure
                 WORKING_DIRECTORY "${ZINC_BINARY_DIR}"
             )
         endif()
     endif()
     
-    set(FEATURETESTS_BINARY_DIR ${OPENCMISS_COMPONENTS_BINARY_DIR_MPI}/featuretests)
-    set(FEATURETESTS_SRC_DIR ${OPENCMISS_ROOT}/src/featuretests)
+    set(KEYTESTS_BINARY_DIR ${OPENCMISS_COMPONENTS_BINARY_DIR_MPI}/keytests)
+    set(KEYTESTS_SRC_DIR ${OPENCMISS_ROOT}/src/keytests)
     set(GITHUB_ORGANIZATION OpenCMISS-Examples)
     set(_FT_EX_EP )
-    foreach(example_name ${FEATURE_TEST_EXAMPLES})
+    foreach(example_name ${KEY_TEST_EXAMPLES})
         list(APPEND _FT_EX_EP "${OC_EP_PREFIX}${example_name}")
-        list(APPEND _FEATURETESTS_UPDATE_TARGETS "${example_name}-update")
-        set(BIN_DIR "${FEATURETESTS_BINARY_DIR}/${example_name}")
-        set(SRC_DIR "${FEATURETESTS_SRC_DIR}/${example_name}")
+        list(APPEND _KEYTESTS_UPDATE_TARGETS "${example_name}-update")
+        set(BIN_DIR "${KEYTESTS_BINARY_DIR}/${example_name}")
+        set(SRC_DIR "${KEYTESTS_SRC_DIR}/${example_name}")
         set(INSTALL_DIR ${BIN_DIR}/install)
         # Set correct paths
         set(DEFS 
@@ -108,27 +108,27 @@ if (NOT OC_DEPENDENCIES_ONLY)
         if (TOOLCHAIN)
             list(APPEND DEFS -DTOOLCHAIN=${TOOLCHAIN})  
         endif()
-        set(${example_name}_BRANCH ${OC_FEATURETESTS_BRANCH})
+        set(${example_name}_BRANCH ${OC_KEYTESTS_BRANCH})
         createExternalProjects(${example_name} "${SRC_DIR}" "${BIN_DIR}" "${DEFS}")
         addConvenienceTargets(${example_name} "${BIN_DIR}" "${SRC_DIR}")
     
         # Dont build with the main build, as installation of OpenCMISS has not been done by then.
         set_target_properties(${OC_EP_PREFIX}${example_name} PROPERTIES EXCLUDE_FROM_ALL YES)
         
-        add_test(NAME ${FEATURE_TEST_PREFIX}${example_name}
+        add_test(NAME ${KEY_TEST_PREFIX}${example_name}
             COMMAND run ${${example_name}_ARGS}
             WORKING_DIRECTORY ${INSTALL_DIR}
         )
     endforeach()
-    # Add a top level target that runs only the feature tests
-    add_custom_target(featuretests
+    # Add a top level target that runs only the key tests
+    add_custom_target(keytests
         DEPENDS ${_FT_EX_EP} # Triggers the build
-        COMMAND ${CMAKE_CTEST_COMMAND} -R ${FEATURE_TEST_PREFIX}* -O ${OC_SUPPORT_DIR}/featuretests.log --output-on-failure
-        COMMENT "Running OpenCMISS feature tests"
+        COMMAND ${CMAKE_CTEST_COMMAND} -R ${KEY_TEST_PREFIX}* -O ${OC_SUPPORT_DIR}/keytests.log --output-on-failure
+        COMMENT "Running OpenCMISS key tests"
     )
 else()
-    # Add a top level target that runs only the feature tests
-    add_custom_target(featuretests
-        COMMAND ${CMAKE_COMMAND} -E echo "No feature tests for dependency-only builds."
+    # Add a top level target that runs only the key tests
+    add_custom_target(keytests
+        COMMAND ${CMAKE_COMMAND} -E echo "No key tests for dependency-only builds."
     )
 endif()

@@ -278,7 +278,7 @@ include(OCInstall)
 # Testing
 # Need to enable testing in order for any add_test calls (see OCComponentSetupMacros) to work
 enable_testing()
-include(OCFeatureTests)
+include(OCKeyTests)
 
 ########################################################################
 # Misc targets for convenience
