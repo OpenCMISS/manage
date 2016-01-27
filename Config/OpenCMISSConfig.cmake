@@ -103,9 +103,9 @@ foreach(COMPONENT ${OPENCMISS_COMPONENTS})
 endforeach()
 if (OC_DEVEL_ALL)
     set(EXAMPLES_BRANCH devel)
-    set(OC_FEATURETESTS_BRANCH devel)
+    set(OC_KEYTESTS_BRANCH devel)
 else()
-    set(OC_FEATURETESTS_BRANCH v${OpenCMISS_VERSION})
+    set(OC_KEYTESTS_BRANCH v${OpenCMISS_VERSION})
 endif()
 
 # This variable checks if we have a multiconfig environment.

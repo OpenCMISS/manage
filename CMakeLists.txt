@@ -110,6 +110,16 @@ include(OCMiscFunctionsMacros)
 
 # Create a local config file if not exists
 include(OCCreateLocalConfig)
+
+# Pre-check for Python and Swig availability so that bindings will be built automatically (unless explicitly specified)
+find_package(PythonInterp ${PYTHON_VERSION} QUIET)
+find_package(PythonLibs QUIET)
+find_package(SWIG QUIET)
+if (PYTHONINTERP_FOUND AND PYTHONLIBS_FOUND AND SWIG_FOUND)
+    set(OC_PYTHON_PREREQ_FOUND YES)
+else()
+    set(OC_PYTHON_PREREQ_FOUND NO)
+endif()
     
 # This includes the configuration, both default and local
 include(OpenCMISSConfig)
@@ -143,13 +153,6 @@ find_package(OpenGL QUIET)
 if (NOT OPENGL_FOUND AND OC_USE_ZINC)
     set(OC_USE_ZINC NO)
     message(WARNING "OpenCMISS: No OpenGL found, cannot build Zinc. Disabling.")
-endif()
-
-# Pre-check for Python availability so that bindings will be built automatically (unless explicitly specified)
-# The FOUND flag is used (at least) at OCConfigureComponents/IRON
-find_package(PythonInterp ${PYTHON_VERSION} QUIET)
-if (NOT DEFINED IRON_WITH_Python_BINDINGS)
-    set(IRON_WITH_Python_BINDINGS ${PYTHONINTERP_FOUND})
 endif()
 
 # Git is used by default to clone source repositories, unless disabled
@@ -249,6 +252,10 @@ include(OCCollectComponentDefinitions)
 SET(_OC_SELECTED_COMPONENTS )
 
 ########################################################################
+# Python binding stuff
+include(OCPythonBindings)
+
+########################################################################
 # Support - get help!
 include(OCSupport)
 
@@ -271,7 +278,7 @@ include(OCInstall)
 # Testing
 # Need to enable testing in order for any add_test calls (see OCComponentSetupMacros) to work
 enable_testing()
-include(OCFeatureTests)
+include(OCKeyTests)
 
 ########################################################################
 # Misc targets for convenience

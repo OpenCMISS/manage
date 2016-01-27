@@ -29,22 +29,34 @@ In order to build OpenCMISS or any part of it, you need:
       If you want a different one, no one holds you back.
    3. [Optional] Git_ version control.
       This is recommended as cloning the repositories makes contributing back easier from the start!
-   4. CMake_ 3.3.1 or higher.
+   4. CMake_ 3.3.2 or higher.
    
       - If you are on Linux/Mac and already have an older version installed (higher than 2.6),
         the build procedure will automatically provide a target “cmake” to build the required CMake version and
         prompt you to re-start the configuration with the new binary.
-      - On Windows just download the current installer, e.g. http://www.cmake.org/files/v3.3/cmake-3.3.1-win32-x86.exe
+      - On Windows just download the current installer, e.g. http://www.cmake.org/files/v3.3/cmake-3.3.2-win32-x86.exe
       - Only for Linux/Mac without Git_: OpenSSL_.
         This is required to enable CMake to download files via the :code:`https` protocol from GitHub.
         OpenSSL_ will automatically be detected & built into CMake if the setup script triggers
         the build, for own/a-priori cmake builds please use the :cmake:`CMAKE_USE_OPENSSL=YES`
         flag at cmake build configuration time.
-        
+   5. [Optional] Python_ and various libraries. Only relevant if you want to build Python bindings.
+   
+      - Python itself (:code:`python`), minimum version 2.7.9.
+      - The SWIG_ interface generator 
+      - The Python libraries and development packages (:code:`libpython, python-dev`)
+      - [Iron only] The NumPy_ library (:code:`python-numpy`)
+      - [Optional] For :ref:`multi-architecture builds <multiarchbuilds>`,
+        the Python virtualenv_ mechanism allows to easily switch between different configurations.
+
 .. _OpenSSL: https://www.openssl.org/
 .. _Git: http://git-scm.com/downloads
 .. _GitHub: http://www.github.com
-.. _CMake: http://www.cmake.org  
+.. _CMake: http://www.cmake.org
+.. _Python: https://www.python.org/
+.. _NumPy: http://www.numpy.org/
+.. _virtualenv: https://virtualenv.readthedocs.org/en/latest/
+.. _SWIG: http://www.swig.org/
 
 Building on Linux
 =================

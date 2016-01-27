@@ -26,6 +26,8 @@ function(addAndConfigureLocalComponent COMPONENT_NAME)
     # Complete build dir with debug/release AFTER everything else (consistent with windows)
     getBuildTypePathElem(BUILDTYPEEXTRA)
     set(COMPONENT_BUILD_DIR ${BUILD_DIR_BASE}/${SUBGROUP_PATH}/${FOLDER_NAME}/${BUILDTYPEEXTRA})
+    # Expose the current build directory outside the function - used only for Iron and Zinc yet 
+    set(${COMPONENT_NAME}_BINARY_DIR ${COMPONENT_BUILD_DIR} PARENT_SCOPE)
     
     ##############################################################
     # Verifications
@@ -112,7 +114,7 @@ function(addAndConfigureLocalComponent COMPONENT_NAME)
 endfunction()
 
 ########################################################################################################################
-function(addSourceManagementTargets COMPONENT_NAME SOURCE_DIR)
+function(addSourceManagementTargets COMPONENT_NAME BINARY_DIR SOURCE_DIR)
     # Convention: github repo is the lowercase equivalent of the component name
     string(TOLOWER ${COMPONENT_NAME} REPO_NAME)
     
@@ -141,9 +143,9 @@ function(addSourceManagementTargets COMPONENT_NAME SOURCE_DIR)
         )
         
         add_custom_target(${REPO_NAME}-update
-            DEPENDS ${REPO_NAME}-clean
             COMMAND ${GIT_EXECUTABLE} pull
             COMMAND ${GIT_EXECUTABLE} checkout ${${COMPONENT_NAME}_BRANCH}
+            COMMAND ${CMAKE_COMMAND} -E remove -f ${BINARY_DIR}/ep_stamps/*-build
             COMMENT "Updating ${COMPONENT_NAME} sources"
             WORKING_DIRECTORY "${SOURCE_DIR}"
         )
@@ -168,6 +170,7 @@ function(addSourceManagementTargets COMPONENT_NAME SOURCE_DIR)
         # For tarballs, update is the same as download!
         add_custom_target(${REPO_NAME}-update
             DEPENDS ${REPO_NAME}-download
+            COMMAND ${CMAKE_COMMAND} -E remove -f ${BINARY_DIR}/ep_stamps/*-build
             COMMENT "Updating ${COMPONENT_NAME} sources"
         )
          
@@ -213,7 +216,7 @@ function(createExternalProjects COMPONENT_NAME SOURCE_DIR BINARY_DIR DEFS)
     #    set(INSTALL_COMMAND INSTALL_COMMAND ${INSTALL_COMMAND})
     endif()
         
-    addSourceManagementTargets(${COMPONENT_NAME} ${SOURCE_DIR})
+    addSourceManagementTargets(${COMPONENT_NAME} ${BINARY_DIR} ${SOURCE_DIR})
     
     # Log settings
     if (OC_CREATE_LOGS)
