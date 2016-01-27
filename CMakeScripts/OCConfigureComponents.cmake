@@ -327,6 +327,8 @@ if (OC_USE_IRON OR OC_DEPENDENCIES_ONLY)
                 SUPERLU_DIST_VERSION=${SUPERLU_DIST_VERSION}
                 USE_PARMETIS=${PETSC_WITH_PARMETIS}
                 PARMETIS_VERSION=${PARMETIS_VERSION}
+                BLAS_VERSION=${BLAS_VERSION}
+                LAPACK_VERSION=${LAPACK_VERSION}
             )
         endif()
     endif()

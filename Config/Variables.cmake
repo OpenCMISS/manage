@@ -47,6 +47,11 @@ if (MINGW)
     # On windows the gtest builds currently fail - not crucial
     list(APPEND OPENCMISS_COMPONENTS_DISABLED_BY_DEFAULT GTEST)
 endif()
+if (MSVC)
+    # Sowing builds with visual studio are painful - we just need the bfort
+    # executable for petsc anyways, which we included directly into the petsc component for msvc cases!
+    list(APPEND OPENCMISS_COMPONENTS_DISABLED_BY_DEFAULT SOWING)
+endif()
 
 # Platform pre-checks
 # Currently, there's also little point to build IRON in Visual Studio
