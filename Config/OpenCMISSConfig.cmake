@@ -107,3 +107,10 @@ if (OC_DEVEL_ALL)
 else()
     set(OC_KEYTESTS_BRANCH v${OpenCMISS_VERSION})
 endif()
+
+# This variable checks if we have a multiconfig environment.
+# Needs to be extended for other multiconf like MSVC as we go.
+set(CMAKE_HAVE_MULTICONFIG_ENV NO)
+if (MSVC)
+    set(CMAKE_HAVE_MULTICONFIG_ENV YES)
+endif()

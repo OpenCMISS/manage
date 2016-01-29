@@ -274,8 +274,12 @@ include(OCFunctionComponentTargets)
 
 function(getBuildCommands BUILD_CMD_VAR INSTALL_CMD_VAR DIR PARALLEL)
     
-    set( BUILD_CMD ${CMAKE_COMMAND} --build ${DIR})
-    set( INSTALL_CMD ${CMAKE_COMMAND} --build ${DIR} --target install)
+    set(BUILD_CMD ${CMAKE_COMMAND} --build "${DIR}")
+    set(INSTALL_CMD ${CMAKE_COMMAND} --build "${DIR}" --target install)
+    if (CMAKE_HAVE_MULTICONFIG_ENV)
+        list(APPEND BUILD_CMD --config $<CONFIG>)
+        list(APPEND INSTALL_CMD --config $<CONFIG>)
+    endif()
     
     if(PARALLEL_BUILDS AND PARALLEL)
         include(ProcessorCount)

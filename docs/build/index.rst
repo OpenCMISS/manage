@@ -43,11 +43,14 @@ In order to build OpenCMISS or any part of it, you need:
    5. [Optional] Python_ and various libraries. Only relevant if you want to build Python bindings.
    
       - Python itself (:code:`python`), minimum version 2.7.9.
-      - The SWIG_ interface generator 
+      - The SWIG_ interface generator (e.g. `Windows download`_)  
       - The Python libraries and development packages (:code:`libpython, python-dev`)
       - [Iron only] The NumPy_ library (:code:`python-numpy`)
       - [Optional] For :ref:`multi-architecture builds <multiarchbuilds>`,
         the Python virtualenv_ mechanism allows to easily switch between different configurations.
+        
+        - Linux/Mac: Install via your package management system (:code:`python-virtualenv`)
+        - Windows: See http://pymote.readthedocs.org/en/latest/install/windows_virtualenv.html
 
 .. _OpenSSL: https://www.openssl.org/
 .. _Git: http://git-scm.com/downloads
@@ -57,6 +60,7 @@ In order to build OpenCMISS or any part of it, you need:
 .. _NumPy: http://www.numpy.org/
 .. _virtualenv: https://virtualenv.readthedocs.org/en/latest/
 .. _SWIG: http://www.swig.org/
+.. _`Windows download`: http://prdownloads.sourceforge.net/swig/swigwin-3.0.8.zip
 
 Building on Linux
 =================

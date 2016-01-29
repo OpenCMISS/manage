@@ -23,7 +23,9 @@ if (OC_USE_GTEST AND BUILD_TESTS)
         set(GTEST_FWD_DEPS LLVM CSIM ZINC)
         set(SUBGROUP_PATH utilities)
         set(GITHUB_ORGANIZATION OpenCMISS-Utilities)
-        addAndConfigureLocalComponent(GTEST)
+        addAndConfigureLocalComponent(GTEST
+            gtest_force_shared_crt=YES
+        )
     endif()
 endif()
 
@@ -325,6 +327,8 @@ if (OC_USE_IRON OR OC_DEPENDENCIES_ONLY)
                 SUPERLU_DIST_VERSION=${SUPERLU_DIST_VERSION}
                 USE_PARMETIS=${PETSC_WITH_PARMETIS}
                 PARMETIS_VERSION=${PARMETIS_VERSION}
+                BLAS_VERSION=${BLAS_VERSION}
+                LAPACK_VERSION=${LAPACK_VERSION}
             )
         endif()
     endif()

@@ -5,10 +5,10 @@
 #
 #    :<compname>: Trigger the build for the specified component, e.g. :sh:`make iron`
 #    :<compname>-clean: Invoke the classical :sh:`clean` target for the specified component and
-#        triggers a re-run of CMake for that component.
+#        triggers a re-run of CMake for that component. Not available on VisualStudio (Use 'Clean' menu option on <compname> target).
 #    :<compname>-gitstatus: Get a current git status report. Only available if Git_ is used.
 #    :<compname>-rebuild: Extends the *<compname>-clean* by also removing the CMakeFiles folder, CMake Cache 
-#        and finally triggers the build of the external project main target.
+#        and finally triggers the build of the external project main target. Not available on VisualStudio (Use 'Rebuild' menu option on <compname> target).
 #    :<compname>-test: Run any tests provided by the component.
 #    :<compname>-update: Update the sources for the specified component.
 #        Please note that you should ALWAYS use the top level :sh:`make update` command to ensure
@@ -25,24 +25,32 @@
 # the (purposely not documented) <compname>-[download|source] targets. 
 #
 function(addConvenienceTargets COMPONENT_NAME BINARY_DIR SOURCE_DIR)
-    # Add convenience direct-access clean target for component
+
+    set(CONFIG_ARGS )
+    if (CMAKE_HAVE_MULTICONFIG_ENV)
+        set(CONFIG_ARGS --config $<CONFIG>)
+    endif()
+
     string(TOLOWER "${COMPONENT_NAME}" COMPONENT_NAME_LOWER)
-    add_custom_target(${COMPONENT_NAME_LOWER}-clean
-        COMMAND ${CMAKE_COMMAND} -E remove -f ${BINARY_DIR}/ep_stamps/*-configure
-        COMMAND ${CMAKE_COMMAND} -E touch ${BINARY_DIR}/CMakeCache.txt # force cmake re-run to make sure
-        COMMAND ${CMAKE_COMMAND} --build ${BINARY_DIR} --target clean
-        COMMENT "Cleaning ${COMPONENT_NAME}"
-    )
-    
-    # Rebuild does not only invoke the clean target but also completely removes the CMakeFiles folder and Cache,
-    # forcing a complete re-configuration of the component.
-    add_custom_target(${COMPONENT_NAME_LOWER}-rebuild
-        DEPENDS ${COMPONENT_NAME_LOWER}-clean
-        COMMAND ${CMAKE_COMMAND} -E remove_directory ${BINARY_DIR}/CMakeFiles
-        COMMAND ${CMAKE_COMMAND} -E remove -f ${BINARY_DIR}/CMakeCache.txt
-        COMMAND ${CMAKE_COMMAND} --build ${CMAKE_CURRENT_BINARY_DIR} --target ${OC_EP_PREFIX}${COMPONENT_NAME}
-        COMMENT "Rebuilding ${COMPONENT_NAME}"
-    )
+    if (NOT MSVC)
+        # Add convenience direct-access clean target for component
+        add_custom_target(${COMPONENT_NAME_LOWER}-clean
+            COMMAND ${CMAKE_COMMAND} -E remove -f ${BINARY_DIR}/ep_stamps/*-configure
+            COMMAND ${CMAKE_COMMAND} -E touch ${BINARY_DIR}/CMakeCache.txt # force cmake re-run to make sure
+            COMMAND ${CMAKE_COMMAND} --build ${BINARY_DIR} --target clean ${CONFIG_ARGS}
+            COMMENT "Cleaning ${COMPONENT_NAME}"
+        )
+        
+        # Rebuild does not only invoke the clean target but also completely removes the CMakeFiles folder and Cache,
+        # forcing a complete re-configuration of the component.
+        add_custom_target(${COMPONENT_NAME_LOWER}-rebuild
+            DEPENDS ${COMPONENT_NAME_LOWER}-clean
+            COMMAND ${CMAKE_COMMAND} -E remove_directory ${BINARY_DIR}/CMakeFiles
+            COMMAND ${CMAKE_COMMAND} -E remove -f ${BINARY_DIR}/CMakeCache.txt
+            COMMAND ${CMAKE_COMMAND} --build ${CMAKE_CURRENT_BINARY_DIR} --target ${OC_EP_PREFIX}${COMPONENT_NAME} ${CONFIG_ARGS}
+            COMMENT "Rebuilding ${COMPONENT_NAME}"
+        )
+    endif()
     
     if (GIT_FOUND)
         add_custom_target(${COMPONENT_NAME_LOWER}-gitstatus
@@ -61,9 +69,9 @@ function(addConvenienceTargets COMPONENT_NAME BINARY_DIR SOURCE_DIR)
     if (BUILD_TESTS)
         # Add convenience direct-access test target for component
         add_custom_target(${COMPONENT_NAME_LOWER}-test
-            COMMAND ${CMAKE_COMMAND} --build ${BINARY_DIR} --target test
+            COMMAND ${CMAKE_COMMAND} --build ${BINARY_DIR} --target test ${CONFIG_ARGS}
         )
         # Add a global test to run the external project's tests
-        add_test(${COMPONENT_NAME_LOWER}-test ${CMAKE_COMMAND} --build ${BINARY_DIR} --target test)
+        add_test(${COMPONENT_NAME_LOWER}-test ${CMAKE_COMMAND} --build ${BINARY_DIR} --target test ${CONFIG_ARGS})
     endif()
 endfunction()   

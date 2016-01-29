@@ -284,6 +284,10 @@ include(OCKeyTests)
 # Misc targets for convenience
 include(OCMainTargets)
 
+########################################################################
+# IDE Stuff
+source_group(CMake FILES CMakeLists.txt CMakeCache.txt)
+
 # Print a neat summary
 message(STATUS "@@@@@@@@@@@@@@@@@@@ SUMMARY @@@@@@@@@@@@@@@@@@@@@@@@@")
 message(STATUS "@")

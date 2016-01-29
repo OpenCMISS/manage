@@ -47,12 +47,10 @@ if (MINGW)
     # On windows the gtest builds currently fail - not crucial
     list(APPEND OPENCMISS_COMPONENTS_DISABLED_BY_DEFAULT GTEST)
 endif()
-
-# Platform pre-checks
-# Currently, there's also little point to build IRON in Visual Studio
 if (MSVC)
-    list(APPEND OPENCMISS_COMPONENTS_DISABLED_BY_DEFAULT IRON)
-    message("OpenCMISS: VisualStudio detected, not building IRON by default.")
+    # Sowing builds with visual studio are painful - we just need the bfort
+    # executable for petsc anyways, which we included directly into the petsc component for msvc cases!
+    list(APPEND OPENCMISS_COMPONENTS_DISABLED_BY_DEFAULT SOWING)
 endif()
 
 set(OC_MANDATORY_COMPONENTS FIELDML-API LIBXML2)

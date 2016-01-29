@@ -47,9 +47,13 @@ else()
 endif()
 set(BLA_VENDOR @BLA_VENDOR@)
 set(SUPPORT_EMAIL @OC_INSTALL_SUPPORT_EMAIL@)
+# See also CMAKE_HAVE_MULTICONFIG_ENV variable in OpenCMISSConfig.cmake
+if (MSVC)
+    set(CMAKE_HAVE_MULTICONFIG_ENV TRUE)
+endif()
 
-# Set the build type to OpenCMISS default if not explicitly given 
-if (CMAKE_BUILD_TYPE_INITIALIZED_TO_DEFAULT OR NOT CMAKE_BUILD_TYPE)
+# Set the build type to OpenCMISS default if not explicitly given (and single-config env)
+if (NOT CMAKE_HAVE_MULTICONFIG_ENV AND (CMAKE_BUILD_TYPE_INITIALIZED_TO_DEFAULT OR NOT CMAKE_BUILD_TYPE))
     set(CMAKE_BUILD_TYPE @CMAKE_BUILD_TYPE@)
     messageo("No build type specified. Using OpenCMISS default type @CMAKE_BUILD_TYPE@")
 endif()
@@ -75,8 +79,13 @@ endif()
 if (NOT OPENCMISS_BUILD_TYPE)
     messageo("No OpenCMISS build type specified. Trying to match ${CMAKE_BUILD_TYPE} first.")
 endif()
-set(_BUILDTYPES ${OPENCMISS_BUILD_TYPE} ${CMAKE_BUILD_TYPE} RELEASE DEBUG)
-list(REMOVE_DUPLICATES _BUILDTYPES) # Remove double entries
+# No build-type dependent installation subfolders for multiconfig installations
+if (CMAKE_HAVE_MULTICONFIG_ENV)
+    set(_BUILDTYPES .)
+else()
+    set(_BUILDTYPES ${OPENCMISS_BUILD_TYPE} ${CMAKE_BUILD_TYPE} RELEASE DEBUG)
+    list(REMOVE_DUPLICATES _BUILDTYPES) # Remove double entries
+endif()
 
 set(_SEARCHED_PATHS )
 set(_FOUND FALSE)
