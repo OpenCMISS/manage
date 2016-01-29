@@ -114,6 +114,12 @@ include(OCCreateLocalConfig)
 # Pre-check for Python and Swig availability so that bindings will be built automatically (unless explicitly specified)
 find_package(PythonInterp ${PYTHON_VERSION} QUIET)
 find_package(PythonLibs QUIET)
+#find_program(SWIG_EXECUTABLE NAMES swig3.0 swig2.0 swig swig.exe)
+#execute_process(COMMAND swig.exe -swiglib
+#    RESULT_VARIABLE RES
+#    OUTPUT_VARIABLE OUT
+#    ERROR_VARIABLE ERR)   
+#message(FATAL_ERROR "${SWIG_EXECUTABLE}")
 find_package(SWIG QUIET)
 if (PYTHONINTERP_FOUND AND PYTHONLIBS_FOUND AND SWIG_FOUND)
     set(OC_PYTHON_PREREQ_FOUND YES)
@@ -283,6 +289,10 @@ include(OCKeyTests)
 ########################################################################
 # Misc targets for convenience
 include(OCMainTargets)
+
+########################################################################
+# IDE Stuff
+source_group(CMake FILES CMakeLists.txt CMakeCache.txt)
 
 # Print a neat summary
 message(STATUS "@@@@@@@@@@@@@@@@@@@ SUMMARY @@@@@@@@@@@@@@@@@@@@@@@@@")
