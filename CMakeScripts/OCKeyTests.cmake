@@ -35,6 +35,7 @@
 #
 
 set(_KEYTESTS_UPDATE_TARGETS )
+set(OC_KEYTESTS )
 
 # Only run the key tests if we build more than the dependencies
 if (NOT OC_DEPENDENCIES_ONLY)
@@ -69,9 +70,10 @@ if (NOT OC_DEPENDENCIES_ONLY)
         # Implemented for virtualenv case only thus far
         if (IRON_WITH_Python_BINDINGS AND PYTHON_VIRTUALENV_DIR)
             add_test(NAME ${KEY_TEST_PREFIX}iron_python_bindings
-                COMMAND ${CMAKE_CTEST_COMMAND} -R python_bindings_import --output-on-failure
+                COMMAND ${CMAKE_CTEST_COMMAND} -R python_bindings_import --output-on-failure -C $<CONFIG>
                 WORKING_DIRECTORY "${IRON_BINARY_DIR}"
             )
+            list(APPEND OC_KEYTESTS ${KEY_TEST_PREFIX}iron_python_bindings)
         endif()
     endif()
     # Zinc-related key tests
@@ -80,9 +82,10 @@ if (NOT OC_DEPENDENCIES_ONLY)
         # Implemented for virtualenv case only thus far
         if (ZINC_WITH_Python_BINDINGS AND PYTHON_VIRTUALENV_DIR)
             add_test(NAME ${KEY_TEST_PREFIX}zinc_python_bindings
-                COMMAND ${CMAKE_CTEST_COMMAND} -R python_bindings_import --output-on-failure
+                COMMAND ${CMAKE_CTEST_COMMAND} -R python_bindings_import --output-on-failure -C $<CONFIG>
                 WORKING_DIRECTORY "${ZINC_BINARY_DIR}"
             )
+            list(APPEND OC_KEYTESTS ${KEY_TEST_PREFIX}zinc_python_bindings)
         endif()
     endif()
     
@@ -106,7 +109,7 @@ if (NOT OC_DEPENDENCIES_ONLY)
         # the behaviour thats in place for anyone building an example
         # - they only use TOOLCHAIN and MPI mnemonics
         if (TOOLCHAIN)
-            list(APPEND DEFS -DTOOLCHAIN=${TOOLCHAIN})  
+            list(APPEND DEFS -DTOOLCHAIN=${TOOLCHAIN})
         endif()
         set(${example_name}_BRANCH ${OC_KEYTESTS_BRANCH})
         createExternalProjects(${example_name} "${SRC_DIR}" "${BIN_DIR}" "${DEFS}")
@@ -119,11 +122,33 @@ if (NOT OC_DEPENDENCIES_ONLY)
             COMMAND run ${${example_name}_ARGS}
             WORKING_DIRECTORY ${INSTALL_DIR}
         )
+        list(APPEND OC_KEYTESTS ${KEY_TEST_PREFIX}${example_name})
     endforeach()
+    
+    # Set up the correct environment for the tests
+    # See https://cmake.org/pipermail/cmake/2009-May/029464.html
+    file(TO_NATIVE_PATH "${OPENCMISS_COMPONENTS_INSTALL_PREFIX_NO_BUILD_TYPE}/bin" PATH1)
+    file(TO_NATIVE_PATH "${OPENCMISS_COMPONENTS_INSTALL_PREFIX_NO_BUILD_TYPE}/lib" PATH2)
+    file(TO_NATIVE_PATH "${OPENCMISS_COMPONENTS_INSTALL_PREFIX_MPI}/bin" PATH3)
+    file(TO_NATIVE_PATH "${OPENCMISS_COMPONENTS_INSTALL_PREFIX_MPI}/lib" PATH4)
+    if (WIN32)
+       set(LD_VARNAME "PATH")
+       set(LD_PATH "${PATH1};${PATH2};${PATH3};${PATH4};$ENV{PATH}")
+       string(REPLACE ";" "\\;" LD_PATH "${LD_PATH}")
+    else()
+       set(LD_VARNAME "LD_LIBRARY_PATH")
+       set(LD_PATH "${PATH1}:${PATH2}:${PATH3}:${PATH4}:$ENV{LD_LIBRARY_PATH}")
+    endif()
+    foreach(KEYTEST ${OC_KEYTESTS})
+        set_tests_properties(${KEYTEST} PROPERTIES
+            TIMEOUT 30 
+            ENVIRONMENT "${LD_VARNAME}=${LD_PATH}")
+    endforeach()
+    
     # Add a top level target that runs only the key tests
     add_custom_target(keytests
         DEPENDS ${_FT_EX_EP} # Triggers the build
-        COMMAND ${CMAKE_CTEST_COMMAND} -R ${KEY_TEST_PREFIX}* -O ${OC_SUPPORT_DIR}/keytests.log --output-on-failure
+        COMMAND ${CMAKE_CTEST_COMMAND} -R ${KEY_TEST_PREFIX}* -O ${OC_SUPPORT_DIR}/keytests.log --output-on-failure -C $<CONFIG>
         COMMENT "Running OpenCMISS key tests"
     )
 else()

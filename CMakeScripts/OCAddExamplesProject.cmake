@@ -18,6 +18,6 @@ if (OC_USE_IRON)
     if (BUILD_TESTS)
         add_custom_target(examples-test
             DEPENDS ${OC_EP_PREFIX}EXAMPLES
-            COMMAND ${CMAKE_COMMAND} --build ${OPENCMISS_EXAMPLES_BUILD_DIR} --target test)
+            COMMAND ${CMAKE_COMMAND} --build ${OPENCMISS_EXAMPLES_BUILD_DIR} --target ${TEST_TARGET_NAME})
     endif()
 endif()
