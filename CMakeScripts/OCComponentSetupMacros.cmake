@@ -143,6 +143,7 @@ function(addSourceManagementTargets COMPONENT_NAME BINARY_DIR SOURCE_DIR)
         )
         
         add_custom_target(${REPO_NAME}-update
+            DEPENDS ${COMPONENT_NAME}-sources
             COMMAND ${GIT_EXECUTABLE} pull
             COMMAND ${GIT_EXECUTABLE} checkout ${${COMPONENT_NAME}_BRANCH}
             COMMAND ${CMAKE_COMMAND} -E remove -f ${BINARY_DIR}/ep_stamps/*-build
