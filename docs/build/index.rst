@@ -21,6 +21,8 @@ We have two major groups of people using OpenCMISS:
       
 Consequently, some parts of this documentation apply only to certain user groups.
 
+.. _`build_prerequisites`:
+
 Prerequisites
 =============
 In order to build OpenCMISS or any part of it, you need:
@@ -103,8 +105,28 @@ The default steps are the same as for users, but with two changes:
    to have the build system checkout the repos from your own location.
    You can still change repository locations later, however that might require a complete re-build.
    
-Building on Windows (64bit) (experimental!)
-===========================================
+Building on Windows
+===================
+
+Building on MS Windows is *not* recommended for anyone just running examples or building applications against the OpenCMISS Libraries.
+The documentation will be augmented to more specific instructions for various use cases later.
+
+Visual Studio
+-------------
+
+Prerequisites in addition to the :ref:`general prerequisites <build_prerequisites>`:
+
+   1. Visual Studio 2013. Other versions *might* work, they have not been tested yet.
+   2. A Fortran compiler that integrates with Visual Studio. We use the Intel Composer Framework (license costs!)
+   3. MPI: We use MPICH2_, MSMPI_ will be tested soon. **Install to a location without spaces!**
+   4. Make sure that any pre-installed programs (MPI, Git, ..) are available on the PATH (either User or System scope).
+      Path entries must be *without* quotation marks in order to have CMake pick them up correctly!
+   
+.. _MPICH2: http://www.mpich.org/static/tarballs/1.4.1p1/mpich2-1.4.1p1-win-x86-64.msi
+.. _MSMPI: https://msdn.microsoft.com/en-us/library/bb524831%28v=vs.85%29.aspx
+
+MinGW and MSYS (64bit)
+----------------------
 
    1. Get CMake. Minimum version: 3.3.1
    #. Get MSYS2:
@@ -150,8 +172,8 @@ Building on Windows (64bit) (experimental!)
         :path:`resource.h` header (followed source forge link) *or* comment out the line.
         Does not seem to matter (for compilation :-))   
    
-Building on Windows (32bit) (experimental!)
-===========================================
+MinGW and MSYS (32bit)
+----------------------
 Its basically the same as for 64 bit, but obviously using the :sh:`msys2` 32bit and :sh:`mingw32`-packages.
 
 .. note::
