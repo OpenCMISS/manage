@@ -45,9 +45,9 @@ endif()
 ##
 #    :opencmiss: Main build target. Comprises :sh:`all, install, keytests`
 add_custom_target(opencmiss
-    COMMAND ${CMAKE_COMMAND} --build ${PROJECT_BINARY_DIR}
-    COMMAND ${CMAKE_COMMAND} --build ${PROJECT_BINARY_DIR} --target install
-    COMMAND ${CMAKE_COMMAND} --build ${PROJECT_BINARY_DIR} --target keytests
+    #COMMAND ${CMAKE_COMMAND} --build ${PROJECT_BINARY_DIR} --config $<CONFIG>
+    COMMAND ${CMAKE_COMMAND} --build ${PROJECT_BINARY_DIR} --target install --config $<CONFIG>
+    COMMAND ${CMAKE_COMMAND} --build ${PROJECT_BINARY_DIR} --target keytests --config $<CONFIG>
 )
 
 ##
