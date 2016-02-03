@@ -420,10 +420,12 @@ if (OC_USE_IRON OR OC_DEPENDENCIES_ONLY)
             WITH_PROFILING=${OC_PROFILING}
             WITH_C_BINDINGS=${IRON_WITH_C_BINDINGS}
             WITH_Python_BINDINGS=${IRON_WITH_Python_BINDINGS}
-            VIRTUALENV_LOCATION=${PYTHON_VIRTUALENV_DIR}
+            PYTHON_BINDINGS_INSTALL_DIR=${PYTHON_BINDINGS_INSTALL_DIR}
+            PYTHON_BINDINGS_INSTALL_DIR_IS_VIRTUALENV=${OC_PYTHON_BINDINGS_USE_VIRTUALENV}
+            HAVE_MULTICONFIG_ENV=${CMAKE_HAVE_MULTICONFIG_ENV}
         )
-        if (TARGET python_virtualenv)
-            add_dependencies(${OC_EP_PREFIX}IRON python_virtualenv)
+        if (OC_PYTHON_BINDINGS_USE_VIRTUALENV)
+            add_dependencies(${OC_EP_PREFIX}IRON virtualenv_install)
         endif()
     endif()
 endif()
@@ -585,10 +587,12 @@ if (OC_USE_ZINC OR (OPENGL_FOUND AND OC_DEPENDENCIES_ONLY))
             ZINC_MODULE_PATH=${CMAKE_MODULE_PATH_ESC}
             ZINC_DEPENDENCIES_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX}
             GTEST_VERSION=${GTEST_VERSION}
-            VIRTUALENV_LOCATION=${PYTHON_VIRTUALENV_DIR}
+            PYTHON_BINDINGS_INSTALL_DIR=${PYTHON_BINDINGS_INSTALL_DIR}
+            PYTHON_BINDINGS_INSTALL_DIR_IS_VIRTUALENV=${OC_PYTHON_BINDINGS_USE_VIRTUALENV}
+            HAVE_MULTICONFIG_ENV=${CMAKE_HAVE_MULTICONFIG_ENV}
         )
-        if (TARGET python_virtualenv)
-            add_dependencies(${OC_EP_PREFIX}IRON python_virtualenv)
+        if (OC_PYTHON_BINDINGS_USE_VIRTUALENV)
+            add_dependencies(${OC_EP_PREFIX}ZINC virtualenv_install)
         endif()
     endif()
 endif()

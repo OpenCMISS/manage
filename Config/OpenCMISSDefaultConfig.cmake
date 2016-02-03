@@ -347,6 +347,19 @@ option(OC_DEPENDENCIES_ONLY "Build dependencies only (no Iron or Zinc)" NO)
 option(OC_MULTITHREADING "Use multithreading in OpenCMISS (where applicable)" NO)
 
 ##
+# OC_PYTHON_BINDINGS_USE_VIRTUALENV
+# ---------------------------------
+#
+# This option allows to use the Python virtual environments to conveniently switch between the different
+# bindings created for different compiler/mpi/build configurations.
+# 
+# The build system will issue an error if this option is turned on and the :sh:`virtualenv` executable can not be
+# found in the environment.
+#
+# .. default:: NO
+option(OC_PYTHON_BINDINGS_USE_VIRTUALENV "Use Python virtual environments to install Python bindings" NO)
+
+##
 # OC_SYSTEM_<COMP>
 # ----------------
 #
