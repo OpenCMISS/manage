@@ -73,3 +73,17 @@ At the current stage, the examples repo contains *all* the examples from the SVN
 We are currently working on updating/repairing/removing all of them.
  
 *Solution*: Invoke your build with flags to ignore intermediate errors. For :sh:`make` this is achieved using the :sh:`-k` flag.
+
+   My :sh:`opencmiss_key_iron_python_bindings` key test fails with :sh:`/bin/python: symbol lookup error: /usr/lib/openmpi/lib/openmpi/mca_paffinity_linux.so: undefined symbol: mca_base_param_reg_int`
+
+This is a known bug in OpenMPI implementations which have been build as shared libraries.
+See for example https://www.open-mpi.org/community/lists/devel/2005/09/0359.php or https://groups.google.com/forum/#!msg/hoomd-users/BBAQnzHCRhA/5RhrDddLHWEJ
+
+*Solution*: Update your system/openmpi installation and try again. Otherwise, you can
+   
+   - Install a statically build version of OpenMPI
+   - If you built OpenMPI yourself, rebuild with :sh:`--disable-dlopen`
+   - Use another MPI implementation: Specify e.g. :sh:`-DMPI=mpich` at configure stage (Remember to build :sh:`reset-mpionly` and clear the build folder *before*, see also :ref:`multiarchbuilds`)
+   - Have the build system build OpenMPI for you by specifying :sh:`-DSYSTEM_MPI=NO -DMPI=openmpi`; see also :ref:`multiarchbuilds`
+   - Modify your Python script: https://code.google.com/archive/p/distnumpy/issues/1
+    
