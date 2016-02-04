@@ -64,6 +64,7 @@ if (IRON_WITH_Python_BINDINGS OR ZINC_WITH_Python_BINDINGS)
             set(VENV_CREATION_COMMANDS COMMAND ${VIRTUALENV_EXECUTABLE} --system-site-packages "${PYTHON_BINDINGS_INSTALL_DIR}")
         endif()
     endif()
+    
     if (OC_PYTHON_BINDINGS_USE_VIRTUALENV)
         set(OC_VENV_STAMPFILE ${PYTHON_BINDINGS_INSTALL_DIR}/virtualenv.install)
         add_custom_command(OUTPUT ${OC_VENV_STAMPFILE}

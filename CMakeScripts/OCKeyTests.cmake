@@ -68,7 +68,7 @@ if (NOT OC_DEPENDENCIES_ONLY)
         
         # If we generate bindings, we also add key tests that verify their functionality.
         # Implemented for virtualenv case only thus far
-        if (IRON_WITH_Python_BINDINGS AND PYTHON_VIRTUALENV_DIR)
+        if (IRON_WITH_Python_BINDINGS)
             add_test(NAME ${KEY_TEST_PREFIX}iron_python_bindings
                 COMMAND ${CMAKE_CTEST_COMMAND} -R python_bindings_import --output-on-failure -C $<CONFIG>
                 WORKING_DIRECTORY "${IRON_BINARY_DIR}"
@@ -80,7 +80,7 @@ if (NOT OC_DEPENDENCIES_ONLY)
     if (OC_USE_ZINC)
         # If we generate bindings, we also add key tests that verify their functionality.
         # Implemented for virtualenv case only thus far
-        if (ZINC_WITH_Python_BINDINGS AND PYTHON_VIRTUALENV_DIR)
+        if (ZINC_WITH_Python_BINDINGS)
             add_test(NAME ${KEY_TEST_PREFIX}zinc_python_bindings
                 COMMAND ${CMAKE_CTEST_COMMAND} -R python_bindings_import --output-on-failure -C $<CONFIG>
                 WORKING_DIRECTORY "${ZINC_BINARY_DIR}"

@@ -47,7 +47,7 @@ In order to build OpenCMISS or any part of it, you need:
       - Python itself (:code:`python`), minimum version 2.7.9.
       - The SWIG_ interface generator (e.g. `Windows download`_)  
       - The Python libraries and development packages (:code:`libpython, python-dev`)
-      - [Iron only] The NumPy_ library (:code:`python-numpy`)
+      - [Iron only] The NumPy_ library (:code:`python-numpy`), see :ref:`SourceForge <numpy_dl_general>`
       - [Optional] For :ref:`multi-architecture builds <multiarchbuilds>`,
         the Python virtualenv_ mechanism allows to easily switch between different configurations.
         
@@ -60,6 +60,7 @@ In order to build OpenCMISS or any part of it, you need:
 .. _CMake: http://www.cmake.org
 .. _Python: https://www.python.org/
 .. _NumPy: http://www.numpy.org/
+.. _numpy_dl_general: http://sourceforge.net/projects/numpy/files/NumPy
 .. _virtualenv: https://virtualenv.readthedocs.org/en/latest/
 .. _SWIG: http://www.swig.org/
 .. _`Windows download`: http://prdownloads.sourceforge.net/swig/swigwin-3.0.8.zip
@@ -111,19 +112,52 @@ Building on Windows
 Building on MS Windows is *not* recommended for anyone just running examples or building applications against the OpenCMISS Libraries.
 The documentation will be augmented to more specific instructions for various use cases later.
 
-Visual Studio
+Prerequisites
 -------------
 
-Prerequisites in addition to the :ref:`general prerequisites <build_prerequisites>`:
+In addition to the :ref:`general prerequisites <build_prerequisites>`:
 
    1. Visual Studio 2013. Other versions *might* work, they have not been tested yet.
    2. A Fortran compiler that integrates with Visual Studio. We use the Intel Composer Framework (license costs!)
    3. MPI: We use MPICH2_, MSMPI_ will be tested soon. **Install to a location without spaces!**
    4. Make sure that any pre-installed programs (MPI, Git, ..) are available on the PATH (either User or System scope).
       Path entries must be *without* quotation marks in order to have CMake pick them up correctly!
-   
+
 .. _MPICH2: http://www.mpich.org/static/tarballs/1.4.1p1/mpich2-1.4.1p1-win-x86-64.msi
 .. _MSMPI: https://msdn.microsoft.com/en-us/library/bb524831%28v=vs.85%29.aspx
+
+Visual Studio (64bit)
+---------------------
+
+Python bindings
+'''''''''''''''
+Make sure you download a `64bit Python installer`_ (see e.g. general 2.7.11 `download page`_).
+
+Unfortunately, for NumPy_, there is **no** official support for 64bit Windows binaries!
+However, `this article`_ describes how to install unofficial `64bit Windows NumPy`_ builds, 
+created and maintained by `Christoph Gohlke`_. Woot!
+Essentially, you need to download the binary package and use an Administrator-Mode Windows Command Prompt to 
+install the package via :sh:`pip install <path-to-package.whl>`. 
+For the above Python 2.7.11 link, we use `this build`_.
+
+.. _`download page`: https://www.python.org/downloads/release/python-2711/
+.. _`64bit Python installer`: https://www.python.org/ftp/python/2.7.11/python-2.7.11.amd64.msi
+.. _`64bit Windows NumPy`: http://www.lfd.uci.edu/~gohlke/pythonlibs/#numpy
+.. _`Christoph Gohlke`: http://www.lfd.uci.edu/~gohlke/
+.. _`this build`: http://www.lfd.uci.edu/~gohlke/pythonlibs/bofhrmxk/numpy-1.10.4+mkl-cp27-none-win_amd64.whl
+
+Visual Studio (32bit)
+---------------------
+
+*THIS HAS NOT BEEN TESTED YET*
+The documentation here is just to collect information and needs to be completed and checked.
+
+Python bindings
+'''''''''''''''
+For NumPy_, there are 32bit Windows binaries available via :ref:`SourceForge <numpy_dl_general>`.
+For some reason newer releases don't come with the 'superpack' .msi installers, :ref:`Version 1.10.2 <numpy_dl>` currently does. 
+
+.. _numpy_dl: http://sourceforge.net/projects/numpy/files/NumPy/1.10.2/ 
 
 MinGW and MSYS (64bit)
 ----------------------
