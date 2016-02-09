@@ -92,6 +92,11 @@ option(MUMPS_WITH_METIS "Have MUMPS use Metis" NO)
 option(MUMPS_WITH_PARMETIS "Have MUMPS use Parmetis" YES)
 
 ##
+#    OPTPP_WITH_BLAS : NO
+#        Have Opt++ use external BLAS routines. Use only when system BLAS is available or you have a Fortran compiler and build your own BLAS/LAPACK.
+option(OPTPP_WITH_BLAS "Have Opt++ use external BLAS routines" NO)
+
+##
 #    PASTIX_USE_THREADS : YES
 #        Have Sundials use LAPACK
 #    PASTIX_USE_METIS : YES

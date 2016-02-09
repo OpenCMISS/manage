@@ -117,6 +117,8 @@ find_package(PythonLibs QUIET)
 find_package(SWIG QUIET)
 if (PYTHONINTERP_FOUND AND PYTHONLIBS_FOUND AND SWIG_FOUND)
     set(OC_PYTHON_PREREQ_FOUND YES)
+    # Already check for the virtualenv - this is the default way if found.
+    find_program(VIRTUALENV_EXECUTABLE virtualenv)
 else()
     set(OC_PYTHON_PREREQ_FOUND NO)
 endif()
