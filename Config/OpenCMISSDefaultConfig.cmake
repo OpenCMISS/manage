@@ -254,6 +254,16 @@ if (NOT DEFINED MPI_BUILD_TYPE)
 endif()
 
 ##
+# OC_BUILD_ZINC_TESTS
+# -------------------
+#
+# Allow users to build the tests for Zinc in isolation to other 
+# testing.
+#
+# .. default:: NO
+option(OC_BUILD_ZINC_TESTS "Build the Zinc tests in isolation" NO)
+
+##
 # OC_CHECK_ALL
 # ------------
 #
