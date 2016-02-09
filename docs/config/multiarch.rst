@@ -65,6 +65,10 @@ MPI
 MPI is a crucial dependency to OpenCMISS and is required by many components, especially Iron.
 By default, CMake looks and detects the system’s default MPI (if present) and configures the build system to use that.
 
+.. note::
+
+   If you only want to build Zinc, specify :cmake:`MPI=none` in order to deactivate the use of MPI. See also :ref:`selected components`
+
 If you want a specific MPI version, there are several ways to achieve that:
    - Use the :var:`MPI` variable and set it to one of the values :sh:`[mpich, mpich2, openmpi, intel, mvapich2, msmpi]`,
      e.g. :sh:`cmake -DMPI=mpich`.

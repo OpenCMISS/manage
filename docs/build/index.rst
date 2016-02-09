@@ -47,7 +47,7 @@ In order to build OpenCMISS or any part of it, you need:
       - Python itself (:code:`python`), minimum version 2.7.9.
       - The SWIG_ interface generator (e.g. `Windows download`_)  
       - The Python libraries and development packages (:code:`libpython, python-dev`)
-      - [Iron only] The NumPy_ library (:code:`python-numpy`), see :ref:`SourceForge <numpy_dl_general>`
+      - [Iron only] The NumPy_ library (:code:`python-numpy`), see `SourceForge <numpy_dl_general>`_
       - [Optional] For :ref:`multi-architecture builds <multiarchbuilds>`,
         the Python virtualenv_ mechanism allows to easily switch between different configurations.
         
@@ -60,7 +60,7 @@ In order to build OpenCMISS or any part of it, you need:
 .. _CMake: http://www.cmake.org
 .. _Python: https://www.python.org/
 .. _NumPy: http://www.numpy.org/
-.. _numpy_dl_general: http://sourceforge.net/projects/numpy/files/NumPy
+.. _`numpy_dl_general`: http://sourceforge.net/projects/numpy/files/NumPy 
 .. _virtualenv: https://virtualenv.readthedocs.org/en/latest/
 .. _SWIG: http://www.swig.org/
 .. _`Windows download`: http://prdownloads.sourceforge.net/swig/swigwin-3.0.8.zip
@@ -87,7 +87,8 @@ Default steps for Users (terminal/command line)
       
 .. _`GitHub and download a zip file`: https://github.com/OpenCMISS/manage      
       
-This will compile everything using the default compiler and default mpi.
+This will compile *everything* using the default compiler and default mpi - if you only want a certain component of OpenCMISS,
+please refer to :ref:`selected components`.
 Basic warnings will be in place for all known erroneous system configurations.
 The OpenCMISS-Examples are a competely different package/project and if you want to build them after you’ve
 finished building the OpenCMISS libraries please see :ref:`examples_build`.
@@ -140,6 +141,7 @@ Essentially, you need to download the binary package and use an Administrator-Mo
 install the package via :sh:`pip install <path-to-package.whl>`. 
 For the above Python 2.7.11 link, we use `this build`_.
 
+.. _`this article`: http://stackoverflow.com/questions/11200137/installing-numpy-on-64bit-windows-7-with-python-2-7-3
 .. _`download page`: https://www.python.org/downloads/release/python-2711/
 .. _`64bit Python installer`: https://www.python.org/ftp/python/2.7.11/python-2.7.11.amd64.msi
 .. _`64bit Windows NumPy`: http://www.lfd.uci.edu/~gohlke/pythonlibs/#numpy
@@ -154,8 +156,8 @@ The documentation here is just to collect information and needs to be completed 
 
 Python bindings
 '''''''''''''''
-For NumPy_, there are 32bit Windows binaries available via :ref:`SourceForge <numpy_dl_general>`.
-For some reason newer releases don't come with the 'superpack' .msi installers, :ref:`Version 1.10.2 <numpy_dl>` currently does. 
+For NumPy_, there are 32bit Windows binaries available via `SourceForge <numpy_dl_general>`_.
+For some reason newer releases don't come with the 'superpack' .msi installers, `Version 1.10.2 <numpy_dl>`_ currently does. 
 
 .. _numpy_dl: http://sourceforge.net/projects/numpy/files/NumPy/1.10.2/ 
 
@@ -195,6 +197,7 @@ MinGW and MSYS (64bit)
    #. Follow the build instructions for linux, with the only change of invoking :sh:`cmake -G “MSYS Makefiles” <args> ..`
  
 .. note::
+
       * Most likely you will need to specify :var:`MPI_HOME` when running the main build configuration.
       * Get SSH keys if you want to make a development checkout of sources
         (copy the existing id.pub etc into the :path:`~/.ssh` folder (absolute path :path:`C:\MSYS2_64\home\<windows-username>`),
@@ -211,6 +214,7 @@ MinGW and MSYS (32bit)
 Its basically the same as for 64 bit, but obviously using the :sh:`msys2` 32bit and :sh:`mingw32`-packages.
 
 .. note::
+   
    The most current version of mingw32 comes with a pthread package, but unfortunately
    there is a severe error (or here) on GNULib’s side:
    The struct “timespec” is also defined for mingw32 versions and conflicts whenever :path:`unistd.h` is also included.
