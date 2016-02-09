@@ -71,7 +71,9 @@ if(NOT LIBXML2_FOUND)
 endif()
 
 # LAPACK (includes BLAS)
-if (OC_USE_BLAS OR OC_USE_LAPACK)
+# Thus far only Iron really makes heavy use of BLAS/LAPACK, opt++ from zinc
+# dependencies is the only other dependency that can make use of (external) BLAS/LAPACK.
+if ((OC_USE_BLAS OR OC_USE_LAPACK) AND (OC_USE_IRON OR (OC_USE_OPTPP AND OPTPP_WITH_BLAS)))
     find_package(BLAS ${BLAS_VERSION} QUIET)
     find_package(LAPACK ${LAPACK_VERSION} QUIET)
     if(NOT (LAPACK_FOUND AND BLAS_FOUND))
@@ -496,7 +498,10 @@ if (OC_USE_ZINC OR (OPENGL_FOUND AND OC_DEPENDENCIES_ONLY))
     if (OC_USE_OPTPP)
         find_package(OPTPP ${OPTPP_VERSION} QUIET)
         if (NOT OPTPP_FOUND)
-            addAndConfigureLocalComponent(OPTPP)
+            addAndConfigureLocalComponent(OPTPP
+                USE_EXTERNAL_BLAS=${OPTPP_WITH_BLAS}
+                BLAS_VERSION=${BLAS_VERSION}
+                LAPACK_VERSION=${LAPACK_VERSION})
         endif()
     endif()
     
