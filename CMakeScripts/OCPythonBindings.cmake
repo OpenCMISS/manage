@@ -9,6 +9,8 @@ if (IRON_WITH_Python_BINDINGS OR ZINC_WITH_Python_BINDINGS)
     file(MAKE_DIRECTORY ${OPENCMISS_INSTALL_ROOT_PYTHON})
     
     if (OC_PYTHON_BINDINGS_USE_VIRTUALENV)
+        # This is already checked for earlier (in the main CMakeLists script before including OpenCMISSConfig)
+        # - however, we leave it here to be self-contained should the scripts be re-arranged some time
         find_program(VIRTUALENV_EXECUTABLE virtualenv)
         if (NOT VIRTUALENV_EXECUTABLE)
             log("Could not find virtualenv executable. Check your environment PATH settings or disable the OC_PYTHON_BINDINGS_USE_VIRTUALENV option." ERROR)

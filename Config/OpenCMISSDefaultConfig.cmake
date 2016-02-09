@@ -354,10 +354,15 @@ option(OC_MULTITHREADING "Use multithreading in OpenCMISS (where applicable)" NO
 # bindings created for different compiler/mpi/build configurations.
 # 
 # The build system will issue an error if this option is turned on and the :sh:`virtualenv` executable can not be
-# found in the environment.
+# located.
 #
-# .. default:: NO
-option(OC_PYTHON_BINDINGS_USE_VIRTUALENV "Use Python virtual environments to install Python bindings" NO)
+# .. default:: YES if prerequisites are found, NO else
+set(_DEF NO)
+if (OC_PYTHON_PREREQ_FOUND AND VIRTUALENV_EXECUTABLE)
+    set(_DEF YES)
+endif()
+option(OC_PYTHON_BINDINGS_USE_VIRTUALENV "Use Python virtual environments to install Python bindings" ${_DEF})
+unset(_DEF)
 
 ##
 # OC_SYSTEM_<COMP>
