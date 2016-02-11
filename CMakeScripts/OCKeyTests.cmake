@@ -34,126 +34,63 @@
 # .. _`OpenCMISS-Examples`: https://www.github.com/OpenCMISS-Examples
 #
 
-set(_KEYTESTS_UPDATE_TARGETS )
-set(OC_KEYTESTS )
+# Prefix for any tests that belongs to the OpenCMISS key tests
+set(KEY_TEST_PREFIX OpenCMISS_KeyTest)
 
-# Only run the key tests if we build more than the dependencies
 if (NOT OC_DEPENDENCIES_ONLY)
-    # Prefix for any tests that belongs to the OpenCMISS key tests
-    set(KEY_TEST_PREFIX opencmiss_key_)
-    
     # Iron-related key tests
     if (OC_USE_IRON)
-        set(KEY_TEST_EXAMPLES 
-            classicalfield_laplace_laplace_fortran
-            finiteelasticity_cantilever_fortran
+        set(KEY_TESTS_IRON 
+            ClassicalField_Laplace
+            ClassicalField_AnalyticLaplace
+            ClassicalField_AnalyticNonlinearPoisson
+            FiniteElasticity_Cantilever
+            LinearElasticity_Extension
         )
-        if (IRON_WITH_C_BINDINGS)
-            list(APPEND KEY_TEST_EXAMPLES classicalfield_laplace_laplace_c)
-        endif()
         if (OC_USE_CELLML AND IRON_WITH_CELLML)
-            list(APPEND KEY_TEST_EXAMPLES 
-                bioelectrics_monodomain_fortran
-                cellml_model-integration_fortran
-            )
+            list(APPEND KEY_TESTS_IRON CellML_ModelIntegration)
         endif()
         if (OC_USE_FIELDML-API AND IRON_WITH_FIELDML)
-            list(APPEND KEY_TEST_EXAMPLES classicalfield_advectiondiffusion_staticadvectiondiffusion_fieldml)
+            list(APPEND KEY_TESTS_IRON StaticAdvectionDiffusion_FieldML)
         endif()
-        # Collect any arguments
-        # n98.xml is the only currently working xml file
-        set(bioelectrics_monodomain_fortran_ARGS 0.005 0.1001 70 n98.xml)
-        # Only file: n98.xml
-        set(cellml_model-integration_fortran_ARGS n98.xml)
-        
-        # If we generate bindings, we also add key tests that verify their functionality.
-        # Implemented for virtualenv case only thus far
+        if (IRON_WITH_C_BINDINGS)
+            list(APPEND KEY_TESTS_IRON C_Bindings_ComplexMesh)
+        endif()
         if (IRON_WITH_Python_BINDINGS)
-            add_test(NAME ${KEY_TEST_PREFIX}iron_python_bindings
-                COMMAND ${CMAKE_CTEST_COMMAND} -R python_bindings_import --output-on-failure -C $<CONFIG>
+            list(APPEND KEY_TESTS_IRON Python_Bindings_Import Python_Bindings_Cantilever)
+        endif()
+        
+        # Add all the key tests as local test
+        foreach(_TEST ${KEY_TESTS_IRON})
+            add_test(NAME ${KEY_TEST_PREFIX}_Iron_${_TEST}
+                COMMAND ${CMAKE_CTEST_COMMAND} -R "^${_TEST}\$" --output-on-failure -C $<CONFIG>
                 WORKING_DIRECTORY "${IRON_BINARY_DIR}"
             )
-            list(APPEND OC_KEYTESTS ${KEY_TEST_PREFIX}iron_python_bindings)
-        endif()
+        endforeach()
     endif()
+    
     # Zinc-related key tests
     if (OC_USE_ZINC)
-        # If we generate bindings, we also add key tests that verify their functionality.
-        # Implemented for virtualenv case only thus far
+        set(KEY_TESTS_ZINC "APITest_.*")
+        
         if (ZINC_WITH_Python_BINDINGS)
-            add_test(NAME ${KEY_TEST_PREFIX}zinc_python_bindings
-                COMMAND ${CMAKE_CTEST_COMMAND} -R python_bindings_import --output-on-failure -C $<CONFIG>
+            list(APPEND KEY_TESTS_ZINC 
+                "Python_Bindings_.*"
+            )
+        endif()
+        
+        # Add all the key tests as local test
+        foreach(_TEST ${KEY_TESTS_ZINC})
+            add_test(NAME ${KEY_TEST_PREFIX}_Zinc_${_TEST}
+                COMMAND ${CMAKE_CTEST_COMMAND} -R "^${_TEST}\$" --output-on-failure -C $<CONFIG>
                 WORKING_DIRECTORY "${ZINC_BINARY_DIR}"
             )
-            list(APPEND OC_KEYTESTS ${KEY_TEST_PREFIX}zinc_python_bindings)
-        endif()
+        endforeach()
     endif()
-    
-    set(KEYTESTS_BINARY_DIR ${OPENCMISS_COMPONENTS_BINARY_DIR_MPI}/keytests)
-    set(KEYTESTS_SRC_DIR ${OPENCMISS_ROOT}/src/keytests)
-    set(GITHUB_ORGANIZATION OpenCMISS-Examples)
-    set(_FT_EX_EP )
-    foreach(example_name ${KEY_TEST_EXAMPLES})
-        list(APPEND _FT_EX_EP "${OC_EP_PREFIX}${example_name}")
-        list(APPEND _KEYTESTS_UPDATE_TARGETS "${example_name}-update")
-        set(BIN_DIR "${KEYTESTS_BINARY_DIR}/${example_name}")
-        set(SRC_DIR "${KEYTESTS_SRC_DIR}/${example_name}")
-        set(INSTALL_DIR ${BIN_DIR}/install)
-        # Set correct paths
-        set(DEFS 
-            -DOPENCMISS_INSTALL_DIR=${OPENCMISS_INSTALL_ROOT}
-            -DCMAKE_INSTALL_PREFIX=${INSTALL_DIR}
-            -DMPI=${MPI}
-        )
-        # Instead of passing the (mpi-)compilers, we should imitate
-        # the behaviour thats in place for anyone building an example
-        # - they only use TOOLCHAIN and MPI mnemonics
-        if (TOOLCHAIN)
-            list(APPEND DEFS -DTOOLCHAIN=${TOOLCHAIN})
-        endif()
-        set(${example_name}_BRANCH ${OC_KEYTESTS_BRANCH})
-        createExternalProjects(${example_name} "${SRC_DIR}" "${BIN_DIR}" "${DEFS}")
-        addConvenienceTargets(${example_name} "${BIN_DIR}" "${SRC_DIR}")
-    
-        # Dont build with the main build, as installation of OpenCMISS has not been done by then.
-        set_target_properties(${OC_EP_PREFIX}${example_name} PROPERTIES EXCLUDE_FROM_ALL YES)
-        
-        add_test(NAME ${KEY_TEST_PREFIX}${example_name}
-            COMMAND run ${${example_name}_ARGS}
-            WORKING_DIRECTORY ${INSTALL_DIR}
-        )
-        list(APPEND OC_KEYTESTS ${KEY_TEST_PREFIX}${example_name})
-    endforeach()
-    
-    # Set up the correct environment for the tests
-    # See https://cmake.org/pipermail/cmake/2009-May/029464.html
-    if (WIN32)
-       set(LD_VARNAME "PATH")
-       file(TO_NATIVE_PATH "${OPENCMISS_COMPONENTS_INSTALL_PREFIX_NO_BUILD_TYPE}/bin" PATH1)
-       file(TO_NATIVE_PATH "${OPENCMISS_COMPONENTS_INSTALL_PREFIX_MPI}/bin" PATH2)
-       set(LD_PATH "${PATH1};${PATH2};$ENV{PATH}")
-       string(REPLACE ";" "\\;" LD_PATH "${LD_PATH}")
-    else()
-       set(LD_VARNAME "LD_LIBRARY_PATH")
-       file(TO_NATIVE_PATH "${OPENCMISS_COMPONENTS_INSTALL_PREFIX_NO_BUILD_TYPE}/lib" PATH1)
-       file(TO_NATIVE_PATH "${OPENCMISS_COMPONENTS_INSTALL_PREFIX_MPI}/lib" PATH2)
-       set(LD_PATH "${PATH1}:${PATH2}:$ENV{LD_LIBRARY_PATH}")
-    endif()
-    foreach(KEYTEST ${OC_KEYTESTS})
-        set_tests_properties(${KEYTEST} PROPERTIES
-            TIMEOUT 30 
-            ENVIRONMENT "${LD_VARNAME}=${LD_PATH}")
-    endforeach()
-    
-    # Add a top level target that runs only the key tests
-    add_custom_target(keytests
-        DEPENDS ${_FT_EX_EP} # Triggers the build
-        COMMAND ${CMAKE_CTEST_COMMAND} -R ${KEY_TEST_PREFIX}* -O ${OC_SUPPORT_DIR}/keytests.log --output-on-failure -C $<CONFIG>
-        COMMENT "Running OpenCMISS key tests"
-    )
-else()
-    # Add a top level target that runs only the key tests
-    add_custom_target(keytests
-        COMMAND ${CMAKE_COMMAND} -E echo "No key tests for dependency-only builds."
-    )
 endif()
+
+# Add a top level target that runs only the key tests
+add_custom_target(keytests
+    COMMAND ${CMAKE_CTEST_COMMAND} -R "^${KEY_TEST_PREFIX}*" -O ${OC_SUPPORT_DIR}/keytests.log --output-on-failure -C $<CONFIG>
+    COMMENT "Running OpenCMISS key tests"
+)
