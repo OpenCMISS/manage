@@ -116,3 +116,41 @@ Key tests
 =========
 
 .. cmake-source:: ../../CMakeScripts/OCKeyTests.cmake
+
+Writing Iron IO routines
+========================
+
+For any routine that does not directly belong to the OpenCMISS-Iron API (:sh:`opencmiss_iron.f90`), extra declarations have to be made
+in order to have the according methods exported to Windows .dll files.
+
+Within the respective source, say :sh:`test_framework_routines.f90`, you need to include::
+
+   #include "dllexport.h"
+   
+to define the DLL export macro. Within each publicly visible routine, you then need to specify :code:`!DLLEXPORT(<routinename>)` as a comment inside
+the routine body, e.g::
+
+   SUBROUTINE TEST_FRAMEWORK_ASSERT_EQUALS_INTG(EXPECTED_VALUE,ACTUAL_VALUE,ERR)
+    !DLLEXPORT(TEST_FRAMEWORK_ASSERT_EQUALS_INTG)
+    
+    !Argument variables 
+    [...]
+ 
+
+Building applications
+=====================
+
+If you write Fortran code and use MPI, you need to use the following MPI directives::
+
+  #ifndef NOMPIMOD
+    USE MPI
+  #endif
+  [...]
+    IMPLICIT NONE
+  [...]
+  #ifdef NOMPIMOD
+    #include "mpif.h"
+  #endif
+
+Reasoning: In some cases like Windows/MPICH2 there sometimes is no mpi.mod file. In order to yet make
+the example work the build system adds the definition 'NOMPIMOD', which can be checked and acted to accordingly.
