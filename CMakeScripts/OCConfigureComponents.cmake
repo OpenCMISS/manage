@@ -383,20 +383,37 @@ if (OC_USE_IRON OR OC_DEPENDENCIES_ONLY)
         endif()
     endif()
 
-    if (OC_USE_LLVM)
-        find_package(LLVM ${LLVM_VERSION} QUIET)
-        if (NOT LLVM_FOUND)
-            SET(LLVM_FWD_DEPS CSIM)
-            addAndConfigureLocalComponent(LLVM
-                GTEST_VERSION=${GTEST_VERSION})
-        endif()
-    endif()
     if (OC_USE_CSIM)
         find_package(CSIM ${CSIM_VERSION} QUIET)
         if (NOT CSIM_FOUND)
             SET(CSIM_FWD_DEPS IRON)
             addAndConfigureLocalComponent(CSIM
-                GTEST_VERSION=${GTEST_VERSION})
+                LLVM_VERSION=${LLVM_VERSION}
+                CLANG_VERSION=${CLANG_VERSION}
+                GTEST_VERSION=${GTEST_VERSION}
+                CELLML_VERSION=${CELLML_VERSION}
+                LIBXML2_VERSION=${LIBXML2_VERSION}
+            )
+        endif()
+        
+        if (OC_USE_CLANG)
+            find_package(CLANG ${CLANG_VERSION} QUIET)
+            if (NOT CLANG_FOUND)
+                SET(CLANG_FWD_DEPS CSIM)
+                addAndConfigureLocalComponent(CLANG
+                    GTEST_VERSION=${GTEST_VERSION}
+                    LIBXML2_VERSION=${LIBXML2_VERSION})
+            endif()
+        endif()
+        
+        if (OC_USE_LLVM)
+            find_package(LLVM ${LLVM_VERSION} QUIET)
+            if (NOT LLVM_FOUND)
+                SET(LLVM_FWD_DEPS CSIM CLANG)
+                addAndConfigureLocalComponent(LLVM
+                    GTEST_VERSION=${GTEST_VERSION}
+                )
+            endif()
         endif()
     endif()
 
