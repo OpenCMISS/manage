@@ -11,6 +11,7 @@ set(BZIP2_CASENAME BZip2)
 set(FREETYPE_CASENAME Freetype)
 set(IMAGEMAGICK_CASENAME ImageMagick)
 set(GTEST_CASENAME GTest)
+set(CLANG_CASENAME Clang)
 # Some packages naturally have their exported target names differ from those of the package - this is convenience but
 # enables us to stay more consistent (e.g. we have "libbz2.a" on system installations instead of "libbzip2.a")
 set(LIBXML2_TARGETNAME xml2)

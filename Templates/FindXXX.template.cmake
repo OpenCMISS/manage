@@ -16,7 +16,7 @@ function(append_link_library TARGET LIB)
 endfunction()
 
 function(messageo MSG)
-    message(STATUS "Find@PACKAGE_NAME@ wrapper: ${MSG}")
+    message(STATUS "Find@PACKAGE_CASENAME@ wrapper: ${MSG}")
 endfunction()
 function(messaged MSG)
     #message(STATUS "DEBUG Find@PACKAGE_NAME@ wrapper: ${MSG}")

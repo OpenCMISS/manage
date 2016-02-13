@@ -379,21 +379,22 @@ if (OC_USE_IRON OR OC_DEPENDENCIES_ONLY)
         if (NOT CELLML_FOUND)
             SET(CELLML_FWD_DEPS IRON)
             addAndConfigureLocalComponent(CELLML
-                LIBXML2_VERSION=${LIBXML2_VERSION})
+                LIBXML2_VERSION=${LIBXML2_VERSION}
+                CSIM_VERSION=${CSIM_VERSION}
+                LIBCELLML_VERSION=${LIBCELLML_VERSION}
+                CELLML_USE_CSIM=${CELLML_WITH_CSIM})
         endif()
     endif()
 
     if (OC_USE_CSIM)
-        find_package(CSIM ${CSIM_VERSION} QUIET)
-        if (NOT CSIM_FOUND)
-            SET(CSIM_FWD_DEPS IRON)
-            addAndConfigureLocalComponent(CSIM
-                LLVM_VERSION=${LLVM_VERSION}
-                CLANG_VERSION=${CLANG_VERSION}
-                GTEST_VERSION=${GTEST_VERSION}
-                CELLML_VERSION=${CELLML_VERSION}
-                LIBXML2_VERSION=${LIBXML2_VERSION}
-            )
+        if (OC_USE_LLVM)
+            find_package(LLVM ${LLVM_VERSION} QUIET)
+            if (NOT LLVM_FOUND)
+                SET(LLVM_FWD_DEPS CSIM CLANG)
+                addAndConfigureLocalComponent(LLVM
+                    GTEST_VERSION=${GTEST_VERSION}
+                )
+            endif()
         endif()
         
         if (OC_USE_CLANG)
@@ -406,14 +407,17 @@ if (OC_USE_IRON OR OC_DEPENDENCIES_ONLY)
             endif()
         endif()
         
-        if (OC_USE_LLVM)
-            find_package(LLVM ${LLVM_VERSION} QUIET)
-            if (NOT LLVM_FOUND)
-                SET(LLVM_FWD_DEPS CSIM CLANG)
-                addAndConfigureLocalComponent(LLVM
-                    GTEST_VERSION=${GTEST_VERSION}
-                )
-            endif()
+        find_package(CSIM ${CSIM_VERSION} QUIET)
+        if (NOT CSIM_FOUND)
+            SET(CSIM_FWD_DEPS IRON)
+            addAndConfigureLocalComponent(CSIM
+                LLVM_VERSION=${LLVM_VERSION}
+                CLANG_VERSION=${CLANG_VERSION}
+                GTEST_VERSION=${GTEST_VERSION}
+                LIBCELLML_VERSION=${LIBCELLML_VERSION}
+                LIBXML2_VERSION=${LIBXML2_VERSION}
+                ZLIB_VERSION=${ZLIB_VERSION}
+            )
         endif()
     endif()
 

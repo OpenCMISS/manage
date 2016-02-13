@@ -61,6 +61,8 @@ ${OC_USE_FLAGS}
 #######################
 # COMPONENT INTERACTION
 #######################
+#set(CELLML_USE_CSIM YES)
+
 #set(MUMPS_WITH_SCOTCH YES)
 #set(MUMPS_WITH_PTSCOTCH NO)
 #set(MUMPS_WITH_METIS YES)
