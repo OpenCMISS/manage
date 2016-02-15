@@ -30,7 +30,7 @@ they need to be stored at different paths using different include directories.
 
 *How do i use precompiled dependencies like in the old build system?*
 
-See the :ref:`remote installations` section.
+See the :ref:`sdk installations` section.
 
 .. _`troubleshooting`:
 
@@ -59,7 +59,7 @@ and there is a mpigcc wrapper within the intel MPI path, but the mpich gcc wrapp
 
 Two scenarios commonly happen here:
 
-   1. For remote installations: You specified an incorrect remote directory - see :ref:`remote installations`.
+   1. For sdk installations: You specified an incorrect remote directory - see :ref:`sdk installations`.
    2. The :sh:`install` target was not run. This most commonly occurs if you did not build the :sh:`opencmiss` target.
    
 *Solution*: Run the :sh:`install` target, which installs the :path:`opencmiss-config.cmake` files.

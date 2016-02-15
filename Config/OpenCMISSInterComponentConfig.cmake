@@ -18,6 +18,11 @@
 # The full list of available inter-component connection flags is as follows (defaults added):
 
 ##
+#    CELLML_WITH_CSIM : NO
+#        Load CellML models through CSim
+option(CELLML_WITH_CSIM "Enable FieldML HDF5 support" NO)
+
+##
 #    FIELDML-API_WITH_HDF5 : NO
 #        Enable FieldML HDF5 support
 #    FIELDML-API_WITH_JAVA_BINDINGS : NO

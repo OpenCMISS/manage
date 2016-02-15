@@ -15,10 +15,10 @@
 # be the opposite of the default values, if applicable.
 
 ######################
-# REMOTE INSTALLATIONS
+# SDK INSTALLATIONS
 ######################
-#set(OPENCMISS_REMOTE_INSTALL_DIR ~/software/opencmiss/install)
-#set(OPENCMISS_REMOTE_INSTALL_DIR_FORCE ~/software/opencmiss/install/x86_64_linux/gnu-4.8.4/openmpi_release/static/release)
+#set(OPENCMISS_SDK_INSTALL_DIR ~/software/opencmiss/install)
+#set(OPENCMISS_SDK_INSTALL_DIR_FORCE ~/software/opencmiss/install/x86_64_linux/gnu-4.8.4/openmpi_release/static/release)
 
 ##################
 # GENERAL SETTINGS
@@ -61,6 +61,8 @@ ${OC_USE_FLAGS}
 #######################
 # COMPONENT INTERACTION
 #######################
+#set(CELLML_USE_CSIM YES)
+
 #set(MUMPS_WITH_SCOTCH YES)
 #set(MUMPS_WITH_PTSCOTCH NO)
 #set(MUMPS_WITH_METIS YES)

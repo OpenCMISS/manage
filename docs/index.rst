@@ -26,7 +26,7 @@ sets up build trees and according installation directories.
    build/examples
    config/index
    config/multiarch
-   config/remote
+   config/central
    
 .. _`OpenCMISS manage project`: https://github.com/OpenCMISS/manage
 
