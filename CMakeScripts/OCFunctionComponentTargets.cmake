@@ -72,7 +72,7 @@ function(addConvenienceTargets COMPONENT_NAME BINARY_DIR SOURCE_DIR)
     if (BUILD_TESTS)
         # Add convenience direct-access test target for component
         add_custom_target(${COMPONENT_NAME_LOWER}-test
-            COMMAND ${CMAKE_COMMAND} --build ${BINARY_DIR} --target ${TEST_TARGET_NAME} ${CONFIG_ARGS}
+            COMMAND ${CMAKE_COMMAND} --build ${BINARY_DIR} --target ${TEST_TARGET_NAME} ${CONFIG_ARGS} -- --output-on-failure
         )
         set_target_properties(${COMPONENT_NAME_LOWER}-test PROPERTIES FOLDER "${COMPONENT_NAME_LOWER}")
         # Add a global test to run the external project's tests
