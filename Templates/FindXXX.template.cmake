@@ -15,14 +15,16 @@ function(append_link_library TARGET LIB)
         INTERFACE_LINK_LIBRARIES "${CURRENT_ILL};${LIB}")
 endfunction()
 
-function(messageo MSG)
+# Need to have function name templates to have the correct package info at call time!
+# Took some time to figure this quiet function re-definition stuff out..
+function(@MESSAGE@ MSG)
     message(STATUS "Find@PACKAGE_CASENAME@ wrapper: ${MSG}")
 endfunction()
-function(messaged MSG)
+function(@DEBUG_MESSAGE@ MSG)
     #message(STATUS "DEBUG Find@PACKAGE_NAME@ wrapper: ${MSG}")
 endfunction()
 
-messaged("Entering script. CMAKE_PREFIX_PATH: ${CMAKE_PREFIX_PATH}")
+@DEBUG_MESSAGE@("Entering script. CMAKE_PREFIX_PATH: ${CMAKE_PREFIX_PATH}, _IMPORT_PREFIX=${_IMPORT_PREFIX}")
 
 # Default: Not found
 SET(@PACKAGE_CASENAME@_FOUND NO)
@@ -37,12 +39,12 @@ if (NOT OC_SYSTEM_@PACKAGE_NAME@)
         NO_DEFAULT_PATH)
     if (@PACKAGE_CASENAME@_FOUND)
         set(@PACKAGE_NAME@_FOUND YES)
-        messageo("Found version ${@PACKAGE_CASENAME@_FIND_VERSION} at ${@PACKAGE_CASENAME@_DIR} in CONFIG mode")
+        @MESSAGE@("Found version ${@PACKAGE_CASENAME@_FIND_VERSION} at ${@PACKAGE_CASENAME@_DIR} in CONFIG mode")
     endif()
 else()
     # If local lookup is enabled, try to look for packages in old-fashioned module mode and then config modes 
     
-    messageo("System search enabled")
+    @MESSAGE@("System search enabled")
     
     # Remove all paths resolving to this one here so that recursive calls wont search here again
     set(_ORIGINAL_CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH})
@@ -58,8 +60,8 @@ else()
     unset(_ENTRY_ABSOLUTE)
     
     # Make "native" call to find_package in MODULE mode first
-    messageo("Trying to find version ${@PACKAGE_CASENAME@_FIND_VERSION} on system in MODULE mode")
-    messaged("CMAKE_MODULE_PATH: ${CMAKE_MODULE_PATH}\nCMAKE_SYSTEM_PREFIX_PATH=${CMAKE_SYSTEM_PREFIX_PATH}\nPATH=$ENV{PATH}\nLD_LIBRARY_PATH=$ENV{LD_LIBRARY_PATH}")
+    @MESSAGE@("Trying to find version ${@PACKAGE_CASENAME@_FIND_VERSION} on system in MODULE mode")
+    @DEBUG_MESSAGE@("CMAKE_MODULE_PATH: ${CMAKE_MODULE_PATH}\nCMAKE_SYSTEM_PREFIX_PATH=${CMAKE_SYSTEM_PREFIX_PATH}\nPATH=$ENV{PATH}\nLD_LIBRARY_PATH=$ENV{LD_LIBRARY_PATH}")
     
     # Temporarily disable the required flag (if set from outside)
     SET(_PKG_REQ_OLD ${@PACKAGE_CASENAME@_FIND_REQUIRED})
@@ -102,7 +104,7 @@ else()
         set(@PACKAGE_CASENAME@_FOUND YES)
         if (NOT TARGET @PACKAGE_TARGET@)
             set(LIBS ${@PACKAGE_NAME@_LIBRARIES})
-            messageo("Found: ${LIBS}")
+            @MESSAGE@("Found: ${LIBS}")
             
             SET(INCS )
             foreach(DIRSUFF _INCLUDE_DIRS _INCLUDES _INCLUDE_PATH _INCLUDE_DIR)
@@ -110,9 +112,9 @@ else()
                     LIST(APPEND INCS ${@PACKAGE_NAME@${DIRSUFF}})
                 endif()
             endforeach()
-            messaged("Include directories: ${INCS}")
+            @DEBUG_MESSAGE@("Include directories: ${INCS}")
             
-            messaged("Converting found module to imported targets")
+            @DEBUG_MESSAGE@("Converting found module to imported targets")
             if (NOT CMAKE_CFG_INTDIR STREQUAL .)
                 STRING(TOUPPER ${CMAKE_CFG_INTDIR} CURRENT_BUILD_TYPE)
             elseif(CMAKE_BUILD_TYPE)
@@ -120,7 +122,7 @@ else()
             else()
                 SET(CURRENT_BUILD_TYPE NOCONFIG)
             endif()
-            messaged("Current build type: CMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE} -- CURRENT_BUILD_TYPE=${CURRENT_BUILD_TYPE}")
+            @DEBUG_MESSAGE@("Current build type: CMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE} -- CURRENT_BUILD_TYPE=${CURRENT_BUILD_TYPE}")
             
             list(GET LIBS 0 _FIRST_LIB)
             add_library(@PACKAGE_TARGET@ UNKNOWN IMPORTED)
@@ -140,25 +142,25 @@ else()
             list(REMOVE_AT LIBS 0)
             # Add non-matched libraries as link libraries so nothing gets forgotten
             foreach(LIB ${LIBS})
-                messaged("Adding extra library ${LIB} to link interface")
+                @DEBUG_MESSAGE@("Adding extra library ${LIB} to link interface")
                 append_link_library(@PACKAGE_TARGET@ ${LIB})
             endforeach()
         else()
-            messageo("Avoiding double import of target '@PACKAGE_TARGET@'")
+            @MESSAGE@("Avoiding double import of target '@PACKAGE_TARGET@'")
         endif()
     else()
-        messageo("Trying to find version ${@PACKAGE_CASENAME@_FIND_VERSION} on system in CONFIG mode")
+        @MESSAGE@("Trying to find version ${@PACKAGE_CASENAME@_FIND_VERSION} on system in CONFIG mode")
         
         # First look outside the prefix path
-        messaged("Calling find_package(@PACKAGE_CASENAME@ ${@PACKAGE_NAME@_FIND_VERSION} CONFIG QUIET NO_CMAKE_PATH)")
+        @DEBUG_MESSAGE@("Calling find_package(@PACKAGE_CASENAME@ ${@PACKAGE_NAME@_FIND_VERSION} CONFIG QUIET NO_CMAKE_PATH)")
         find_package(@PACKAGE_CASENAME@ ${@PACKAGE_NAME@_FIND_VERSION} CONFIG QUIET NO_CMAKE_PATH)
         
         # If not found, look also at the prefix path
         if (@PACKAGE_CASENAME@_FOUND)
             set(@PACKAGE_NAME@_FOUND ${@PACKAGE_CASENAME@_FOUND})
-            messageo("Found at ${@PACKAGE_CASENAME@_DIR} in CONFIG mode")
+            @MESSAGE@("Found at ${@PACKAGE_CASENAME@_DIR} in CONFIG mode")
         else()
-            messageo("No system package found/available.")
+            @MESSAGE@("No system package found/available.")
             find_package(@PACKAGE_CASENAME@ ${@PACKAGE_CASENAME@_FIND_VERSION} CONFIG
                 QUIET
                 PATHS ${CMAKE_PREFIX_PATH}
@@ -171,7 +173,7 @@ else()
             )
             if (@PACKAGE_CASENAME@_FOUND)
                 set(@PACKAGE_NAME@_FOUND ${@PACKAGE_CASENAME@_FOUND})
-                messageo("Found at ${@PACKAGE_CASENAME@_DIR} in CONFIG mode")
+                @MESSAGE@("Found at ${@PACKAGE_CASENAME@_DIR} in CONFIG mode")
             endif()
         endif()
     endif()
