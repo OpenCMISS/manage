@@ -35,13 +35,13 @@ if (NOT EXISTS ${OPENCMISS_LOCALCONFIG})
     unset(OC_USE_SYSTEM_FLAGS)
     unset(OC_USE_FLAGS)
     
-    if (OPENCMISS_REMOTE_INSTALL_DIR)
-        get_filename_component(OPENCMISS_REMOTE_INSTALL_DIR "${OPENCMISS_REMOTE_INSTALL_DIR}" ABSOLUTE)
-        if (EXISTS "${OPENCMISS_REMOTE_INSTALL_DIR}")
-            file(APPEND "${OPENCMISS_LOCALCONFIG}" "set(OPENCMISS_REMOTE_INSTALL_DIR \"${OPENCMISS_REMOTE_INSTALL_DIR}\")${_NL}"
+    if (OPENCMISS_SDK_INSTALL_DIR)
+        get_filename_component(OPENCMISS_SDK_INSTALL_DIR "${OPENCMISS_SDK_INSTALL_DIR}" ABSOLUTE)
+        if (EXISTS "${OPENCMISS_SDK_INSTALL_DIR}")
+            file(APPEND "${OPENCMISS_LOCALCONFIG}" "set(OPENCMISS_SDK_INSTALL_DIR \"${OPENCMISS_SDK_INSTALL_DIR}\")${_NL}"
             )
         else()
-            log("Remote installation directory not found: ${OPENCMISS_REMOTE_INSTALL_DIR}" ERROR)
+            log("Remote installation directory not found: ${OPENCMISS_SDK_INSTALL_DIR}" ERROR)
         endif()
     endif()
     
