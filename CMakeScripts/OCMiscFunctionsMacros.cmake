@@ -1,3 +1,5 @@
+set_property(GLOBAL PROPERTY USE_FOLDERS ON)
+
 set(OC_SUPPORT_DIR ${OpenCMISS_BINARY_DIR}/support)
 string(TIMESTAMP NOW "%Y-%m-%d_%H-%M")
 ##

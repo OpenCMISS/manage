@@ -173,8 +173,9 @@ function(addSourceManagementTargets COMPONENT_NAME BINARY_DIR SOURCE_DIR)
             COMMAND ${CMAKE_COMMAND} -E remove -f ${BINARY_DIR}/ep_stamps/*-build
             COMMENT "Updating ${COMPONENT_NAME} sources"
         )
-         
     endif()
+    set_target_properties(${REPO_NAME}-download PROPERTIES FOLDER "${REPO_NAME}")
+    set_target_properties(${REPO_NAME}-update PROPERTIES FOLDER "${REPO_NAME}")
     
     # Add extra target that makes sure the source files are being present
     # Triggers buildof ${REPO_NAME}-download if the directory does not exist or 
@@ -188,12 +189,15 @@ function(addSourceManagementTargets COMPONENT_NAME BINARY_DIR SOURCE_DIR)
             -P ${OPENCMISS_MANAGE_DIR}/CMakeScripts/ScriptSourceManager.cmake
         COMMENT "Checking ${COMPONENT_NAME} sources are present"
     )
+    set_target_properties(${COMPONENT_NAME}-sources PROPERTIES FOLDER "${REPO_NAME}")
+    
     add_custom_target(${REPO_NAME}-update-force
         COMMAND ${CMAKE_COMMAND} -E remove_directory "${SOURCE_DIR}"
         COMMAND ${CMAKE_COMMAND} -E make_directory "${SOURCE_DIR}"
         COMMAND ${CMAKE_COMMAND} --build ${PROJECT_BINARY_DIR} --target ${REPO_NAME}-download
         COMMENT "Forced update of ${COMPONENT_NAME} - removing and downloading"
     )
+    set_target_properties(${REPO_NAME}-update-force PROPERTIES FOLDER "${REPO_NAME}")
     
 endfunction()
 
@@ -260,6 +264,7 @@ function(createExternalProjects COMPONENT_NAME SOURCE_DIR BINARY_DIR DEFS)
         LOG_BUILD ${_LOGFLAG}
         LOG_INSTALL ${_LOGFLAG}
     )
+    set_target_properties(${OC_EP_PREFIX}${COMPONENT_NAME} PROPERTIES FOLDER "Internal")
         
     # See OpenCMISSDeveloper.cmake
     if (OC_CLEAN_REBUILDS_COMPONENTS)
@@ -370,4 +375,5 @@ Configure definitions:
             -P ${OPENCMISS_MANAGE_DIR}/CMakeScripts/OCSupport.cmake
         WORKING_DIRECTORY "${OC_SUPPORT_DIR}")
     add_dependencies(${OC_EP_PREFIX}${NAME} ${OC_EP_PREFIX}${NAME}_buildlog)
+    set_target_properties(${OC_EP_PREFIX}${NAME}_buildlog PROPERTIES FOLDER "Internal")
 endfunction()

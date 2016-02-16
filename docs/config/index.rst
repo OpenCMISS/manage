@@ -30,6 +30,18 @@ For example, in the default setting this file is located at
 The local config file will be automatically read by CMake upon configuration stage. Any subsequent changes to that
 file trigger an automatic re-run of :sh:`cmake` to propagate the changes to the current build.
 
+.. _`selected components`:
+
+Building only Iron or Zinc
+==========================
+
+In many cases you might only want to build Iron or Zinc. You can easily
+achieve that by setting the following variables in your
+:ref:`OpenCMISSLocalConfig <localconf>` (terminal) or CMake GUI environment:
+
+   - Building only Iron: Set :cmake:`OC_USE_ZINC` to :cmake:`NO`
+   - Building only Zinc: Set :cmake:`OC_USE_IRON` to :cmake:`NO`, set :cmake:`MPI` to :cmake:`none`
+
 .. _`local config file`:
 .. _`localconf`:
 .. _`defaultconfig`:

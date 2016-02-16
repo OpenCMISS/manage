@@ -379,24 +379,45 @@ if (OC_USE_IRON OR OC_DEPENDENCIES_ONLY)
         if (NOT CELLML_FOUND)
             SET(CELLML_FWD_DEPS IRON)
             addAndConfigureLocalComponent(CELLML
-                LIBXML2_VERSION=${LIBXML2_VERSION})
+                LIBXML2_VERSION=${LIBXML2_VERSION}
+                CSIM_VERSION=${CSIM_VERSION}
+                LIBCELLML_VERSION=${LIBCELLML_VERSION}
+                CELLML_USE_CSIM=${CELLML_WITH_CSIM})
         endif()
     endif()
 
-    if (OC_USE_LLVM)
-        find_package(LLVM ${LLVM_VERSION} QUIET)
-        if (NOT LLVM_FOUND)
-            SET(LLVM_FWD_DEPS CSIM)
-            addAndConfigureLocalComponent(LLVM
-                GTEST_VERSION=${GTEST_VERSION})
-        endif()
-    endif()
     if (OC_USE_CSIM)
+        if (OC_USE_LLVM)
+            find_package(LLVM ${LLVM_VERSION} QUIET)
+            if (NOT LLVM_FOUND)
+                SET(LLVM_FWD_DEPS CSIM CLANG)
+                addAndConfigureLocalComponent(LLVM
+                    GTEST_VERSION=${GTEST_VERSION}
+                )
+            endif()
+        endif()
+        
+        if (OC_USE_CLANG)
+            find_package(CLANG ${CLANG_VERSION} QUIET)
+            if (NOT CLANG_FOUND)
+                SET(CLANG_FWD_DEPS CSIM)
+                addAndConfigureLocalComponent(CLANG
+                    GTEST_VERSION=${GTEST_VERSION}
+                    LIBXML2_VERSION=${LIBXML2_VERSION})
+            endif()
+        endif()
+        
         find_package(CSIM ${CSIM_VERSION} QUIET)
         if (NOT CSIM_FOUND)
             SET(CSIM_FWD_DEPS IRON)
             addAndConfigureLocalComponent(CSIM
-                GTEST_VERSION=${GTEST_VERSION})
+                LLVM_VERSION=${LLVM_VERSION}
+                CLANG_VERSION=${CLANG_VERSION}
+                GTEST_VERSION=${GTEST_VERSION}
+                LIBCELLML_VERSION=${LIBCELLML_VERSION}
+                LIBXML2_VERSION=${LIBXML2_VERSION}
+                ZLIB_VERSION=${ZLIB_VERSION}
+            )
         endif()
     endif()
 
@@ -422,8 +443,7 @@ if (OC_USE_IRON OR OC_DEPENDENCIES_ONLY)
             WITH_PROFILING=${OC_PROFILING}
             WITH_C_BINDINGS=${IRON_WITH_C_BINDINGS}
             WITH_Python_BINDINGS=${IRON_WITH_Python_BINDINGS}
-            PYTHON_BINDINGS_INSTALL_DIR=${PYTHON_BINDINGS_INSTALL_DIR}
-            PYTHON_BINDINGS_INSTALL_DIR_IS_VIRTUALENV=${OC_PYTHON_BINDINGS_USE_VIRTUALENV}
+            INSTALL_TO_VIRTUALENV=${OC_TARGET_VIRTUALENV}
         )
         if (OC_PYTHON_BINDINGS_USE_VIRTUALENV)
             add_dependencies(${OC_EP_PREFIX}IRON virtualenv_install)
@@ -596,8 +616,7 @@ if (OC_USE_ZINC OR (OPENGL_FOUND AND OC_DEPENDENCIES_ONLY))
             ZINC_MODULE_PATH=${CMAKE_MODULE_PATH_ESC}
             ZINC_DEPENDENCIES_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX}
             GTEST_VERSION=${GTEST_VERSION}
-            PYTHON_BINDINGS_INSTALL_DIR=${PYTHON_BINDINGS_INSTALL_DIR}
-            PYTHON_BINDINGS_INSTALL_DIR_IS_VIRTUALENV=${OC_PYTHON_BINDINGS_USE_VIRTUALENV}
+            INSTALL_TO_VIRTUALENV=${OC_TARGET_VIRTUALENV}
         )
         if (OC_PYTHON_BINDINGS_USE_VIRTUALENV)
             add_dependencies(${OC_EP_PREFIX}ZINC virtualenv_install)

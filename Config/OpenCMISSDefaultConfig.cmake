@@ -170,7 +170,8 @@ set(ZLIB_VERSION 1.2.3)
 set(BZIP2_VERSION 1.0.6) # Alternatives: 1.0.5
 set(FIELDML-API_VERSION 0.5.0)
 set(LIBXML2_VERSION 2.7.6) # Alternatives: 2.9.2
-set(LLVM_VERSION 3.4)
+set(LLVM_VERSION 3.7.1)
+set(CLANG_VERSION 3.7.1)
 set(GTEST_VERSION 1.7.0)
 set(SZIP_VERSION 2.1)
 set(HDF5_VERSION 1.8.14)
@@ -332,7 +333,7 @@ option(OC_CREATE_LOGS "Create logfiles instead of direct output to screen" YES)
 # --------------------
 # 
 # If you want to compile the dependencies for iron/zinc only, enable this setting.
-# This flag is useful for setting up remote installations or continuous integration builds.
+# This flag is useful for setting up sdk installations or continuous integration builds.
 #
 # .. caution::
 #     You can also disable building Iron or Zinc using the component variables, e.g. OC_USE_IRON=NO.
@@ -473,9 +474,9 @@ option(OC_WARN_ALL "Compiler flags choices - all warnings on" YES)
 set(OPENCMISS_INSTALL_ROOT "${OPENCMISS_ROOT}/install")
 
 ##
-# .. _`remote_install_dir_var`:
+# .. _`sdk_install_dir_var`:
 #
-# OPENCMISS_REMOTE_INSTALL_DIR
+# OPENCMISS_SDK_INSTALL_DIR
 # ----------------------------
 #
 # If you have a remote installation of opencmiss components, (e.g. you are using OpenCMISS in a shared network environment)
@@ -485,9 +486,9 @@ set(OPENCMISS_INSTALL_ROOT "${OPENCMISS_ROOT}/install")
 # .. note::
 #
 #     There are alternate ways to specify the remote install directory.
-#         - Set OPENCMISS_REMOTE_INSTALL_DIR in your system environment to have the
+#         - Set OPENCMISS_SDK_INSTALL_DIR in your system environment to have the
 #           build system use that automatically.
-#         - Specify :sh:`-DOPENCMISS_REMOTE_INSTALL_DIR` at the main build,
+#         - Specify :sh:`-DOPENCMISS_SDK_INSTALL_DIR` at the main build,
 #           it will cache the variable and insert it into this file automatically.
 # 
 # .. caution::
@@ -497,22 +498,22 @@ set(OPENCMISS_INSTALL_ROOT "${OPENCMISS_ROOT}/install")
 #     if no matching installation can be found.
 #
 # .. default:: <empty>
-set(OPENCMISS_REMOTE_INSTALL_DIR )
+set(OPENCMISS_SDK_INSTALL_DIR )
 
 ##
-# .. _`remote_install_dir_force_var`:
+# .. _`sdk_install_dir_force_var`:
 #
-# OPENCMISS_REMOTE_INSTALL_DIR_FORCE
+# OPENCMISS_SDK_INSTALL_DIR_FORCE
 # ----------------------------------
 #
-# If using OPENCMISS_REMOTE_INSTALL_DIR_ fails and you are sure that the remote installation is compatible, you can
+# If using OPENCMISS_SDK_INSTALL_DIR_ fails and you are sure that the remote installation is compatible, you can
 # also directly specify the remote directory containing the "context.cmake" file in this variable.
 #
 # For example, this could be useful if you wanted to compile an example using a different toolchain than that used to compile
 # the OpenCMISS libraries. *This is intended for developers only and has not been thoroughly tested*.  
 # 
 # .. default:: <empty>
-set(OPENCMISS_REMOTE_INSTALL_DIR_FORCE )
+set(OPENCMISS_SDK_INSTALL_DIR_FORCE )
 
 ##
 # PARALLEL_BUILDS

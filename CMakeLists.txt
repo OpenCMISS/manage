@@ -238,11 +238,11 @@ if (MPI_HOME)
 endif()
 
 ######################
-# Checks if conditions for a remote installation of opencmiss are given and augments the prefix path
+# Checks if conditions for a sdk/central installation of opencmiss are given and augments the prefix path
 # by a matching remote one
 # If the according remote directory does not exist or any package is not build there, it will be built
 # locally.
-include(OCCheckRemoteInstallation)
+include(OCCheckSDKInstallation)
 
 ###################### 
 # Collect the common arguments for any package/component
@@ -273,6 +273,7 @@ endif()
 ########################################################################
 # Installation and support
 include(OCInstall)
+include(OCPackaging)
 
 ########################################################################
 # Testing
@@ -292,8 +293,8 @@ source_group(CMake FILES CMakeLists.txt CMakeCache.txt)
 message(STATUS "@@@@@@@@@@@@@@@@@@@ SUMMARY @@@@@@@@@@@@@@@@@@@@@@@@@")
 message(STATUS "@")
 message(STATUS "@ OPENCMISS_ROOT: ${OPENCMISS_ROOT}")
-if (OPENCMISS_REMOTE_INSTALL_DIR)
-    message(STATUS "@ OPENCMISS_REMOTE_INSTALL_DIR: ${OPENCMISS_REMOTE_INSTALL_DIR}")
+if (OPENCMISS_SDK_INSTALL_DIR)
+    message(STATUS "@ OPENCMISS_SDK_INSTALL_DIR: ${OPENCMISS_SDK_INSTALL_DIR}")
 endif()
 message(STATUS "@ MPI implementation: ${MPI}")
 if (MPI_HOME)
