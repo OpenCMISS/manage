@@ -36,7 +36,6 @@ function(addAndConfigureLocalComponent COMPONENT_NAME)
             which is required to build the OpenCMISS component ${COMPONENT_NAME}" ERROR)
     endif()
     
-    
     ##############################################################
     # Collect component definitions
     SET(COMPONENT_DEFS
