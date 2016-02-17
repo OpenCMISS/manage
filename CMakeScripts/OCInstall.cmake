@@ -131,7 +131,7 @@ install(
 # Copy the FindModule files so that the installation folder is self-contained
 install(DIRECTORY ${OPENCMISS_MANAGE_DIR}/CMakeModules/
     DESTINATION cmake/OpenCMISSExtraFindModules
-    COMPONENT Development
+    COMPONENT DevelopmentSDK
     PATTERN "FindOpenCMISS*.cmake" EXCLUDE) 
 install(FILES ${OPENCMISS_MANAGE_DIR}/CMakeScripts/OCArchitecturePath.cmake
     ${OPENCMISS_MANAGE_DIR}/CMakeScripts/OCToolchainCompilers.cmake
