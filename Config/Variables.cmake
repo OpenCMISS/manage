@@ -51,7 +51,8 @@ endif()
 if (MSVC)
     # Sowing builds with visual studio are painful - we just need the bfort
     # executable for petsc anyways, which we included directly into the petsc component for msvc cases!
-    list(APPEND OPENCMISS_COMPONENTS_DISABLED_BY_DEFAULT SOWING)
+    # Pastix is currently beyond rescue..
+    list(APPEND OPENCMISS_COMPONENTS_DISABLED_BY_DEFAULT SOWING PASTIX)
 endif()
 
 set(OC_MANDATORY_COMPONENTS FIELDML-API LIBXML2)
