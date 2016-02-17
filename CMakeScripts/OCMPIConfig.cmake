@@ -67,6 +67,7 @@ else()
         if (MPI_FOUND)
             # MPI_DETECTED is set by FindMPI.cmake to one of the mnemonics or unknown (MPI_TYPE_UNKNOWN in FindMPI.cmake)
             set(MPI ${MPI_DETECTED} CACHE STRING "Detected MPI implementation" FORCE)
+            log("Found '${MPI}'")
         else()
             # No MPI found - Prescribe a reasonable system default choice and go with that
             if (UNIX AND NOT APPLE)
