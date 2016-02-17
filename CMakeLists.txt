@@ -103,12 +103,25 @@ include(OCToolchainCompilers)
 
 ########################################################################
 # Ready to start the "build project"
-project(OpenCMISS VERSION 1.1 LANGUAGES C CXX Fortran)
+project(OpenCMISS VERSION 1.2 LANGUAGES C CXX)
+enable_language(Fortran OPTIONAL)
 
 include(OCMiscFunctionsMacros)
 
 # Create a local config file if not exists
 include(OCCreateLocalConfig)
+
+# Pre-check for Python and Swig availability so that bindings will be built automatically (unless explicitly specified)
+find_package(PythonInterp ${PYTHON_VERSION} QUIET)
+find_package(PythonLibs QUIET)
+find_package(SWIG QUIET)
+if (PYTHONINTERP_FOUND AND PYTHONLIBS_FOUND AND SWIG_FOUND)
+    set(OC_PYTHON_PREREQ_FOUND YES)
+    # Already check for the virtualenv - this is the default way if found.
+    find_program(VIRTUALENV_EXECUTABLE virtualenv)
+else()
+    set(OC_PYTHON_PREREQ_FOUND NO)
+endif()
     
 # This includes the configuration, both default and local
 include(OpenCMISSConfig)
@@ -116,10 +129,6 @@ include(OpenCMISSConfig)
 # Start log file for config run
 string(TIMESTAMP NOW "%Y-%m-%d, %H:%M")
 log("Starting configuration in ${CMAKE_CURRENT_BINARY_DIR} at ${NOW}")
-
-# Need to set the compiler flags after any project call - this ensures the cmake platform values
-# are used, too.
-include(OCToolchainFlags)
 
 if ((NOT WIN32 OR MINGW) AND CMAKE_BUILD_TYPE STREQUAL "")
     SET(CMAKE_BUILD_TYPE RELEASE)
@@ -148,13 +157,6 @@ if (NOT OPENGL_FOUND AND OC_USE_ZINC)
     message(WARNING "OpenCMISS: No OpenGL found, cannot build Zinc. Disabling.")
 endif()
 
-# Pre-check for Python availability so that bindings will be built automatically (unless explicitly specified)
-# The FOUND flag is used (at least) at OCConfigureComponents/IRON
-find_package(PythonInterp ${PYTHON_VERSION} QUIET)
-if (NOT DEFINED IRON_WITH_Python_BINDINGS)
-    set(IRON_WITH_Python_BINDINGS ${PYTHONINTERP_FOUND})
-endif()
-
 # Git is used by default to clone source repositories, unless disabled
 if (NOT DISABLE_GIT)
     find_package(Git)
@@ -170,12 +172,16 @@ if(OC_MULTITHREADING)
     find_package(OpenMP REQUIRED)
 endif()
 
-########################################################################
 # MPI
 # Unless we said to not have MPI, see that it's available.
 if(NOT MPI STREQUAL none)
     include(OCMPIConfig)
 endif()
+
+# Toolchain flags
+#
+# Needs to be after MPI config as the mnemonic is used inside that script, too
+include(OCToolchainFlags)
 
 # Checks for known issues as good as possible
 # TODO: move this to the generator script?!
@@ -221,8 +227,6 @@ set(OPENCMISS_PREFIX_PATH
     "${OPENCMISS_COMPONENTS_INSTALL_PREFIX}/${COMMON_PACKAGE_CONFIG_DIR}" 
     "${OPENCMISS_COMPONENTS_INSTALL_PREFIX_MPI}/${COMMON_PACKAGE_CONFIG_DIR}"
 )
-# Also add
-#list(APPEND CMAKE_PREFIX_PATH ${OPENCMISS_PREFIX_PATH})
 # This is where the libraries will be put.
 set(OPENCMISS_LIBRARY_PATH
     "${OPENCMISS_COMPONENTS_INSTALL_PREFIX}/lib"
@@ -234,11 +238,11 @@ if (MPI_HOME)
 endif()
 
 ######################
-# Checks if conditions for a remote installation of opencmiss are given and augments the prefix path
+# Checks if conditions for a sdk/central installation of opencmiss are given and augments the prefix path
 # by a matching remote one
 # If the according remote directory does not exist or any package is not build there, it will be built
 # locally.
-include(OCCheckRemoteInstallation)
+include(OCCheckSDKInstallation)
 
 ###################### 
 # Collect the common arguments for any package/component
@@ -246,6 +250,10 @@ include(OCCollectComponentDefinitions)
 
 # Those list variables will be filled by the build macros
 SET(_OC_SELECTED_COMPONENTS )
+
+########################################################################
+# Python binding stuff
+include(OCPythonBindings)
 
 ########################################################################
 # Support - get help!
@@ -265,23 +273,28 @@ endif()
 ########################################################################
 # Installation and support
 include(OCInstall)
+include(OCPackaging)
 
 ########################################################################
 # Testing
 # Need to enable testing in order for any add_test calls (see OCComponentSetupMacros) to work
 enable_testing()
-include(OCFeatureTests)
+include(OCKeyTests)
 
 ########################################################################
 # Misc targets for convenience
-include(OCCustomTargets)
+include(OCMainTargets)
+
+########################################################################
+# IDE Stuff
+source_group(CMake FILES CMakeLists.txt CMakeCache.txt)
 
 # Print a neat summary
-message(STATUS "@@@@@@@@@@@@@@@@@@@ SUMMARY @@@@@@@@@@@@@@@@@@@")
+message(STATUS "@@@@@@@@@@@@@@@@@@@ SUMMARY @@@@@@@@@@@@@@@@@@@@@@@@@")
 message(STATUS "@")
 message(STATUS "@ OPENCMISS_ROOT: ${OPENCMISS_ROOT}")
-if (OPENCMISS_REMOTE_INSTALL_DIR)
-    message(STATUS "@ OPENCMISS_REMOTE_INSTALL_DIR: ${OPENCMISS_REMOTE_INSTALL_DIR}")
+if (OPENCMISS_SDK_INSTALL_DIR)
+    message(STATUS "@ OPENCMISS_SDK_INSTALL_DIR: ${OPENCMISS_SDK_INSTALL_DIR}")
 endif()
 message(STATUS "@ MPI implementation: ${MPI}")
 if (MPI_HOME)

@@ -8,10 +8,13 @@ The management project also takes care of proper dependency checking and buildin
 This is the first beta-release of the new CMake-based build system.
 Please see the `old cm repository`_ for instructions using the old (Unix Makefiles) build system.
 
+.. _old cm repository: https://github.com/OpenCMISS/cm
+
 Installation
 ------------
 
-For instructions on how to build the OpenCMISS suite, see the `OpenCMISS build environment`_.
+.. Inserting a toctree or including a file does not seem to work on GitHub - hence a good old text here.
 
-.. _OpenCMISS build environment: https://github.com/OpenCMISS/manage/raw/v1.0/OpenCMISSBuildEnvironment.docx.pdf
-.. _old cm repository: https://github.com/OpenCMISS/cm
+Please follow the `build instructions`__.
+
+.. __: http://www.opencmiss.org/documentation/cmake/docs/index.html 

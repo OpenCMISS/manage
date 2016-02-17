@@ -1,6 +1,44 @@
-# This function assembles the architecture path
-# We have [ARCH][COMPILER][MT][MPI|no_mpi][STATIC|SHARED]
+##
+# In order to allow simultaneous installation of builds for various configuration and choices,
+# OpenCMISS uses an *architecture path* to store produced files, libraries and headers into separate
+# directories.
 #
+# The architecture path is composed of the following elements (in that order)
+#
+#    :architecture: The system architecture, e.g. :literal:`x86_64_linux` 
+#    :toolchain: The toolchain info for the build.
+#        This path is composed following the pattern :path:`/<mnemonic>-<version>-F<fortran_version>`,
+#        where *mnemonic* stands for one of the items below, *version* the version of the C compiler and
+#        *fortran_version* the version of the Fortran compiler.
+# 
+#        All the short mnemonics are:
+#        
+#            :borland: The Borland compilers
+#            :clang: The CLang toolchain (commonly Mac OS)
+#            :cygwin: The CygWin toolchain for Windows environments
+#            :gnu: The GNU toolchain
+#            :intel: The Intel toolchain
+#            :mingw: The MinGW toolchain for Windows environments
+#            :msvc: MS Visual Studio compilers
+#            :watcom: The Watcom toolchain
+#    
+#    :multithreading: If :var:`OC_USE_MULTITHREADING` is enabled, this segment is :path:`/mt`.
+#        Otherwise, the path element is skipped.
+#    :mpi: Denotes the used MPI implementation along with the mpi build type.
+#        The path element is composed as :path:`/<mnemonic>_<mpi-build-type>`, where *mnemonic*/*mpi-build-type* contains the 
+#        lower-case value of the :var:`MPI`/:var:`MPI_BUILD_TYPE` variable, respectively.
+#
+#        Moreover, a path element :path:`no_mpi` is used for any component that does not use MPI at all.  
+#    :buildtype: Path element for the current overall build type determined by :var:`CMAKE_BUILD_TYPE`.
+#        This is for single-configuration platforms only - multiconfiguration environments like Visual Studio have their
+#        own way of dealing with build types. 
+#
+# For example, a typical architecture path looks like::
+#
+#     x86_64_linux/gnu-4.6-F4.6/openmpi_release/release
+#
+# See also: :var:`OC_USE_ARCHITECTURE_PATH`
+
 # This function returns two architecture paths, the first for mpi-unaware applications (VARNAME)
 # and the second for applications that link against an mpi implementation (VARNAME_MPI)
 #
@@ -88,23 +126,27 @@ function(getCompilerPathElem VARNAME)
 	set(_COMPILER_VERSION_REGEX "^[0-9]+\.[0-9]+")
 	string(REGEX MATCH ${_COMPILER_VERSION_REGEX}
        _C_COMPILER_VERSION_MM "${CMAKE_C_COMPILER_VERSION}")
-    # Also for the fortran compiler
-    string(REGEX MATCH ${_COMPILER_VERSION_REGEX}
-       _Fortran_COMPILER_VERSION_MM "${CMAKE_Fortran_COMPILER_VERSION}")
+    # Also for the fortran compiler (if exists)
+    set(_FORTRAN_PART "")
+    if (CMAKE_Fortran_COMPILER)
+        string(REGEX MATCH ${_COMPILER_VERSION_REGEX}
+           _Fortran_COMPILER_VERSION_MM "${CMAKE_Fortran_COMPILER_VERSION}")
+        set(_FORTRAN_PART "-F${_Fortran_COMPILER_VERSION_MM}")
+    endif()
     
     # Combine into e.g. gnu-4.8-F4.5
-	set(${VARNAME} "${_COMP}-${_C_COMPILER_VERSION_MM}-F${_Fortran_COMPILER_VERSION_MM}" PARENT_SCOPE)
+	set(${VARNAME} "${_COMP}-${_C_COMPILER_VERSION_MM}${_FORTRAN_PART}" PARENT_SCOPE)
 endfunction()
 
+# Returns the build type arch path element.
+# useful only for single-configuration builds, '.' otherwise.
 function(getBuildTypePathElem VARNAME)
     # Build type
-    if (CMAKE_BUILD_TYPE)
+    if (NOT CMAKE_HAVE_MULTICONFIG_ENV)
         STRING(TOLOWER ${CMAKE_BUILD_TYPE} buildtype)
         SET(BUILDTYPEEXTRA ${buildtype})
-    elseif (NOT CMAKE_CFG_INTDIR STREQUAL .)
-        SET(BUILDTYPEEXTRA ) #${CMAKE_CFG_INTDIR}
     else()
-        SET(BUILDTYPEEXTRA noconfig)
+        SET(BUILDTYPEEXTRA .)
     endif()
     SET(${VARNAME} ${BUILDTYPEEXTRA} PARENT_SCOPE)
 endfunction()

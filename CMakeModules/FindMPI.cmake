@@ -20,6 +20,16 @@
 # of them have somewhat different include paths, libraries to link
 # against, etc., and this module tries to smooth out those differences.
 #
+# === Targets ===
+#
+# For each found language, a target 'mpi-<lang>' is created which can
+# be linked against.
+#
+# Moreover, the script creates an INTERFACE target called "mpi" which comprises
+# all found language targets.
+# Those targets have all the necessary include directories, libraries, compile- and linker flags
+# pre-set.
+#
 # === Variables ===
 #
 # This module will set the following variables per language in your
@@ -79,7 +89,7 @@
 # ::
 #
 #    ${MPIEXEC} ${MPIEXEC_NUMPROC_FLAG} PROCS
-#      ${MPIEXEC_PREFLAGS} EXECUTABLE ${MPIEXEC_POSTFLAGS} ARGS
+#    ${MPIEXEC_PREFLAGS} EXECUTABLE ${MPIEXEC_POSTFLAGS} ARGS
 #
 # where PROCS is the number of processors on which to execute the
 # program, EXECUTABLE is the MPI program, and ARGS are the arguments to
@@ -198,24 +208,6 @@ endforeach()
 
 # Names to try for MPI exec
 set(_MPI_EXEC_NAMES mpiexec mpirun lamexec srun)
-
-# For systems with "alternatives" management: prepend the mnemonic name to the executable names
-# (they match, by coincidence/same idea, but hey, they match at least for mpich2/openmpi).
-if(MPI)
-    foreach (lang C CXX Fortran)
-        if (lang IN_LIST ENABLED_LANGUAGES)
-            foreach(compname ${_MPI_${lang}_COMPILER_NAMES})
-                # Insert to have it looked up first
-                LIST(INSERT _MPI_${lang}_COMPILER_NAMES 0 ${compname}.${MPI})
-            endforeach()
-        endif()
-    endforeach()
-    foreach(exename ${_MPI_EXEC_NAMES})
-        # Insert to have it looked up first
-        LIST(INSERT _MPI_EXEC_NAMES 0 ${exename}.${MPI})
-    endforeach()
-    messagev("Looking for MPIEXEC_NAMES=${_MPI_EXEC_NAMES}")
-endif()                                           
        
 ############################################################
 # Compile the search path for MPI
@@ -573,7 +565,17 @@ function (interrogate_mpi_compiler lang try_libs)
       endif()
 
     elseif(try_libs)
-      #messagev("Falling back to classic library search as no MPI_${lang}_COMPILER is set")
+      messagev("Falling back to classic library search as no MPI_${lang}_COMPILER is set")
+      
+      # Decide between 32-bit and 64-bit libraries for Microsoft's MPI
+      if("${CMAKE_SIZEOF_VOID_P}" EQUAL 8)
+        set(MS_MPI_ARCH_DIR x64)
+        set(MS_MPI_ARCH_DIR2 amd64)
+      else()
+        set(MS_MPI_ARCH_DIR x86)
+        set(MS_MPI_ARCH_DIR2 i386)
+      endif()
+      
       # If we didn't have an MPI compiler script to interrogate, attempt to find everything
       # with plain old find functions.  This is nasty because MPI implementations have LOTS of
       # different library names, so this section isn't going to be very generic.  We need to
@@ -583,15 +585,6 @@ function (interrogate_mpi_compiler lang try_libs)
         HINTS ${_MPI_BASE_DIR} ${_MPI_PREFIX_PATH}
         PATH_SUFFIXES include Inc)
       set(MPI_INCLUDE_PATH_WORK ${MPI_HEADER_PATH})
-
-      # Decide between 32-bit and 64-bit libraries for Microsoft's MPI
-      if("${CMAKE_SIZEOF_VOID_P}" EQUAL 8)
-        set(MS_MPI_ARCH_DIR x64)
-        set(MS_MPI_ARCH_DIR2 amd64)
-      else()
-        set(MS_MPI_ARCH_DIR x86)
-        set(MS_MPI_ARCH_DIR2 i386)
-      endif()
 
       set(MPI_LIB "MPI_LIB-NOTFOUND" CACHE FILEPATH "Cleared" FORCE)
       find_library(MPI_LIB
@@ -632,6 +625,26 @@ function (interrogate_mpi_compiler lang try_libs)
           PATH_SUFFIXES lib)
         if (MPI_LIBRARIES_WORK AND MPI_LIB)
           list(APPEND MPI_LIBRARIES_WORK ${MPI_LIB})
+        endif()
+        
+        if (WIN32)
+            # MSMPI case: When using fortran mpif.h, it also needs an bit-dependent file
+            # mpifptr.h, which is located inside the Include/(x86|x64) folders, respectively.
+            find_path(MPI_HEADER_PATH_FORTRAN mpifptr.h
+                HINTS ${_MPI_BASE_DIR} ${_MPI_PREFIX_PATH}
+                PATH_SUFFIXES include/${MS_MPI_ARCH_DIR} Inc/${MS_MPI_ARCH_DIR})
+            if (MPI_HEADER_PATH_FORTRAN)
+                list(APPEND MPI_INCLUDE_PATH_WORK "${MPI_HEADER_PATH_FORTRAN}")
+            endif()
+            
+            # MSMPI: We also need additional fortran libraries!
+            find_library(MSMPI_EXTRA_FORTRAN_LIBRARY
+              NAMES         msmpifmc msmpifec
+              HINTS         ${_MPI_BASE_DIR} ${_MPI_PREFIX_PATH}
+              PATH_SUFFIXES lib/${MS_MPI_ARCH_DIR})
+            if (MPI_LIBRARIES_WORK AND MSMPI_EXTRA_FORTRAN_LIBRARY)
+              list(APPEND MPI_LIBRARIES_WORK ${MSMPI_EXTRA_FORTRAN_LIBRARY})
+            endif()
         endif()
       endif()
 
@@ -802,17 +815,28 @@ function(unset_mpi lang)
     set(MPI_${lang}_INCLUDE_PATH "MPI_${lang}_INCLUDE_PATH-NOTFOUND" CACHE PATH "Cleared" FORCE)
     set(MPI_${lang}_LIBRARIES "MPI_${lang}_LIBRARIES-NOTFOUND" CACHE STRING "Cleared" FORCE)
     set(MPI_${lang}_COMPILER "MPI_${lang}_COMPILER-NOTFOUND" CACHE FILEPATH "Cleared" FORCE)
+    set(MPI_${lang}_LINK_FLAGS "" CACHE STRING "Cleared" FORCE)
     unset(MPIEXEC CACHE)
     unset(MPI_${lang}_FOUND CACHE)
 endfunction()
 
 function(check_mpi_type lang)
+    # Case insensitive match not possible with cmake regex :-(
+    string(TOLOWER "${MPI_${lang}_INCLUDE_PATH}" INC_PATH)
+    string(TOLOWER "${MPI_${lang}_LIBRARIES}" LIB_PATH)
+    if (MPI_HOME)
+        string(TOLOWER "${MPI_HOME}" MPI_HOME_LOWER)
+        string(FIND "${INC_PATH}" "${MPI_HOME_LOWER}" MPI_HOME_POS)
+        if (MPI_HOME_POS EQUAL -1)
+            unset_mpi(${lang})
+            set(MPI_${lang}_FOUND FALSE PARENT_SCOPE)
+            message(WARNING "The current MPI-${lang} include path '${MPI_${lang}_INCLUDE_PATH}' does not contain the given MPI_HOME '${MPI_HOME}'. Previous MPI Cache entries have been removed. Please configure again.")
+            return()
+        endif()
+    endif()
     foreach(IDX RANGE 5)
         list(GET _MNEMONICS ${IDX} MNEMONIC)
         list(GET _PATTERNS ${IDX} PATTERN)
-        # Case insensitive match not possible with cmake regex :-(
-        string(TOLOWER "${MPI_${lang}_INCLUDE_PATH}" INC_PATH)
-        string(TOLOWER "${MPI_${lang}_LIBRARIES}" LIB_PATH)
         messagev("Checking '${INC_PATH} MATCHES ${PATTERN} OR ${LIB_PATH} MATCHES ${PATTERN}'")
         if (INC_PATH MATCHES ${PATTERN} OR LIB_PATH MATCHES ${PATTERN})
             # Pattern matches and we dont have a desired MPI type - detect! 
@@ -825,13 +849,24 @@ function(check_mpi_type lang)
             # Pattern does not match but we have a matching desired MPI type - set to not found!
             if (MPI STREQUAL ${MNEMONIC})
                 if (MPI_FIND_REQUIRED)
-                    message(STATUS "The found MPI_${lang} compiler '${MPI_${lang}_COMPILER}' does not match the requested MPI implementation '${MNEMONIC}'.")
-                    message(STATUS "Check your include paths (suffixes '${_BIN_SUFFIX}' each):
-    1. CMAKE_PREFIX_PATH ${CMAKE_PREFIX_PATH}
-    2. Build system guess ${_MPI_PREFIX_PATH}
-    3. CMAKE_SYSTEM_PREFIX_PATH ${CMAKE_SYSTEM_PREFIX_PATH}
-    Searched compiler names: ${_MPI_${lang}_COMPILER_NAMES}
-    Alternatively, specify MPI_HOME or set a full path to MPI_${lang}_COMPILER")
+                    # Issue an error message appropriate for the current setting
+                    if (MPI_HOME)
+                        message(FATAL_ERROR "The found MPI implementation at MPI_HOME=${MPI_HOME} does not match the requested MPI implementation '${MNEMONIC}'.
+Check your MPI_HOME variable or do not define the MPI mnemonic.")
+                    else()
+                        if(MPI_${lang}_COMPILER)
+                            set(_ERRMSG "MPI_${lang} compiler '${MPI_${lang}_COMPILER}'")
+                        else()
+                            set(_ERRMSG "MPI implementation at MPI_${lang}_INCLUDE_PATH=${MPI_${lang}_INCLUDE_PATH}")
+                        endif()
+                        message(STATUS "The found ${_ERRMSG} does not match the requested MPI implementation '${MNEMONIC}'.")
+                        message(STATUS "Check your include paths (suffixes '${_BIN_SUFFIX}' each):
+1. CMAKE_PREFIX_PATH ${CMAKE_PREFIX_PATH}
+2. Build system guess ${_MPI_PREFIX_PATH}
+3. CMAKE_SYSTEM_PREFIX_PATH ${CMAKE_SYSTEM_PREFIX_PATH}
+Searched compiler names: ${_MPI_${lang}_COMPILER_NAMES}
+Alternatively, specify MPI_HOME or set a full path to MPI_${lang}_COMPILER")
+                    endif()
     		        message(FATAL_ERROR "MPI detection mismatch. Aborting.")
     		    else()
     		        messagev("MPI detection mismatch. MPI find not required, so returning FOUND=FALSE")
@@ -866,8 +901,8 @@ function(verify_mpi_toolchain_compatibility lang)
                 ERROR_VARIABLE _ERR
                 RESULT_VARIABLE _RES
                 WORKING_DIRECTORY ${base})
-            if (_RES)
-                message(FATAL_ERROR "MPI verification script failed:\n${ERROR_VARIABLE}\n\n Please contact the program distributor.")
+            if (NOT _RES EQUAL 0)
+                message(FATAL_ERROR "MPI verification script failed:\n${_ERR}\n\n Please contact the program distributor.")
             endif()
             include(${base}/compiler_info.cmake)
             messagev("CMAKE_${lang}_COMPILER_ID=${CMAKE_${lang}_COMPILER_ID}, CMAKE_${lang}_COMPILER_VERSION=${CMAKE_${lang}_COMPILER_VERSION}")
@@ -939,7 +974,6 @@ foreach (lang C CXX)
     endif()
 endforeach()
 #=============================================================================
-
 
 # This loop finds the compilers and sends them off for interrogation.
 set(_MPI_DETECTED_MNEMONICS )
@@ -1056,6 +1090,54 @@ if (NOT DEFINED MPI)
     endif()
 endif()
 
+#=============================================================================
+# Convenience link targets
+#
+# This function creates imported targets mpi-$lang and an interface target mpi
+# to be linked against if no compiler wrappers are already used as project compilers   
+function(create_mpi_target lang)
+    if (NOT TARGET mpi)
+        add_library(mpi INTERFACE)
+    endif()
+    string(TOLOWER ${lang} _lang)
+    set(target mpi-${_lang})
+    if (MPI_${lang}_LIBRARIES AND NOT TARGET ${target})
+        add_library(${target} UNKNOWN IMPORTED)
+        # Get first library as "main" imported lib
+        list(GET MPI_${lang}_LIBRARIES 0 FIRSTLIB)
+        list(REMOVE_AT MPI_${lang}_LIBRARIES 0)
+        
+        separate_arguments(MPI_${lang}_COMPILE_FLAGS)
+        separate_arguments(MPI_${lang}_LINK_FLAGS)
+        set_target_properties(${target} PROPERTIES
+          IMPORTED_LOCATION "${FIRSTLIB}"
+          INTERFACE_INCLUDE_DIRECTORIES "${MPI_${lang}_INCLUDE_PATH}"
+          INTERFACE_LINK_LIBRARIES "${MPI_${lang}_LIBRARIES}"
+          INTERFACE_COMPILE_OPTIONS "${MPI_${lang}_COMPILE_FLAGS}"
+          LINK_FLAGS "${MPI_${lang}_LINK_FLAGS}"
+          IMPORTED_LINK_INTERFACE_LANGUAGES "${lang}"
+        )
+        messagev("Creating imported target '${target}' with properties
+          IMPORTED_LOCATION \"${FIRSTLIB}\"
+          INTERFACE_INCLUDE_DIRECTORIES \"${MPI_${lang}_INCLUDE_PATH}\"
+          INTERFACE_LINK_LIBRARIES \"${MPI_${lang}_LIBRARIES}\"
+          INTERFACE_COMPILE_OPTIONS \"${MPI_${lang}_COMPILE_FLAGS}\"
+          LINK_FLAGS \"${MPI_${lang}_LINK_FLAGS}\"
+          IMPORTED_LINK_INTERFACE_LANGUAGES \"${lang}\"
+        )")
+        target_link_libraries(mpi INTERFACE ${target})
+    endif()
+endfunction()
+# Do the actual target creation.
+# It is IMPORTANT that the order is with Fortran at first, as the include
+# path is different from the one of the other languages (although it contains parts of the others)
+# This is a problem of order whenever GNU/Intel compilers and MPI are mixed, as the gfortran mpi.mod file is located
+# within the fortran include path.
+foreach (lang Fortran C CXX)
+    if (lang IN_LIST ENABLED_LANGUAGES)
+        create_mpi_target(${lang})
+    endif()
+endforeach()
 
 #=============================================================================
 # More backward compatibility stuff

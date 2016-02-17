@@ -3,6 +3,8 @@ include(Variables)
 
 # Load default configuration
 include(OpenCMISSDefaultConfig)
+# This file is separate for documentation structural reasons (sphinx / rst)
+include(OpenCMISSInterComponentConfig)
 
 # Load local configuration to allow overrides
 # First try at a given path, then local
@@ -53,10 +55,16 @@ endif()
 ######################################################################
 # Postprocessing
 
+# Add HDF5 to fortran projects if enabled
+if(HDF5_BUILD_FORTRAN)
+  list(APPEND OPENCMISS_COMPONENTS_WITH_Fortran HDF5)
+  list(APPEND OPENCMISS_COMPONENTS_WITH_F90 HDF5)
+endif()
+
 # Disable iron/zinc if only dependencies should be built
 if (OC_DEPENDENCIES_ONLY)
-    set(OC_USE_IRON NO)
-    set(OC_USE_ZINC NO)
+    set(OC_USE_IRON OFF)
+    set(OC_USE_ZINC OFF)
 endif()
 foreach(COMPONENT ${OPENCMISS_COMPONENTS})
     # Set default version number branch unless e.g. IRON_BRANCH is specified
@@ -71,9 +79,9 @@ foreach(COMPONENT ${OPENCMISS_COMPONENTS})
     
     # All local enabled? Set to local search.
     if (OC_COMPONENTS_SYSTEM STREQUAL NONE)
-        set(OC_SYSTEM_${COMPONENT} NO)
+        set(OC_SYSTEM_${COMPONENT} OFF)
     elseif(OC_COMPONENTS_SYSTEM STREQUAL ALL)
-        set(OC_SYSTEM_${COMPONENT} YES)
+        set(OC_SYSTEM_${COMPONENT} ON)
     endif()
     # Force "devel" branches for each component of DEVEL_ALL is set
     if (OC_DEVEL_ALL)
@@ -95,7 +103,16 @@ foreach(COMPONENT ${OPENCMISS_COMPONENTS})
 endforeach()
 if (OC_DEVEL_ALL)
     set(EXAMPLES_BRANCH devel)
-    set(OC_FEATURETESTS_BRANCH devel)
+    set(OC_KEYTESTS_BRANCH devel)
 else()
-    set(OC_FEATURETESTS_BRANCH v${OpenCMISS_VERSION})
+    set(OC_KEYTESTS_BRANCH v${OpenCMISS_VERSION})
+endif()
+
+# This variable checks if we have a multiconfig environment.
+# Needs to be extended for other multiconf like MSVC as we go.
+set(CMAKE_HAVE_MULTICONFIG_ENV NO)
+set(TEST_TARGET_NAME test)
+if (MSVC)
+    set(CMAKE_HAVE_MULTICONFIG_ENV YES)
+    set(TEST_TARGET_NAME RUN_TESTS)
 endif()

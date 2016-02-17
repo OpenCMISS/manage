@@ -6,27 +6,32 @@
 # handle it.
 #
 # 1. MPI_HOME specified - Look exclusively at that location for binaries/libraries
-#  a. MPI FOUND - ok, detect type and forward that
+#  a. MPI FOUND - ok, detect type and use that
 #  b. MPI NOT FOUND - Error and abort
 # 2. Nothing specified - Call FindMPI and let it come up with whatever is found on the default path
 #  a. SYSTEM_MPI = NO AND/OR No MPI found - Prescribe a reasonable system default choice and go with that
 #  b. SYSTEM_MPI = YES AND MPI found - Use the MPI implementation found on PATH/environment 
 # 3. MPI mnemonic/variable specified
-#  Just forward that to the generated script
+#  b. SYSTEM_MPI = YES Try to find the specific version on the system
+#  a. SYSTEM_MPI = NO Build your own (unix only)
 
 # MPI_HOME specified - use that and fail if there's no MPI
 # We also infer the MPI mnemonic from the installation at MPI_HOME
 if (DEFINED MPI_HOME AND NOT MPI_HOME STREQUAL "")
-    log("Attempting to find an MPI implementation at MPI_HOME=${MPI_HOME}")
-    # We ignore any set value of MPI if MPI_HOME is given - it's inferred in this case
-    unset(MPI )
-    find_package(MPI REQUIRED)
-    # MPI_DETECTED is set by FindMPI.cmake to one of the mnemonics or unknown (MPI_TYPE_UNKNOWN in FindMPI.cmake)
-    set(MPI ${MPI_DETECTED} CACHE STRING "Detected MPI implementation" FORCE)
+    log("Using MPI implementation at MPI_HOME=${MPI_HOME}")
+    find_package(MPI QUIET)
+    if (NOT MPI_FOUND)
+        log("No MPI implementation found at MPI_HOME. Please check." ERROR)
+    endif()
+    if (NOT DEFINED MPI)
+        # MPI_DETECTED is set by FindMPI.cmake to one of the mnemonics or unknown (MPI_TYPE_UNKNOWN in FindMPI.cmake)
+        set(MPI ${MPI_DETECTED} CACHE STRING "Detected MPI implementation" FORCE)
+    endif()
     if (NOT DEFINED MPI_BUILD_TYPE)
+        set(MPI_BUILD_TYPE USER_MPIHOME)
         log("Using MPI via MPI_HOME variable.
 If you want to use different build types for the same MPI implementation, please
-you have to specify MPI_BUILD_TYPE
+you have to specify MPI_BUILD_TYPE. Using '${MPI_BUILD_TYPE}'.
 https://github.com/OpenCMISS/manage/issues/28        
         " WARNING)
     endif()
@@ -54,7 +59,7 @@ else()
     if(NOT DEFINED MPI)
         # No MPI or MPI_HOME - let cmake look and find the default MPI.
         if(SYSTEM_MPI)
-            log("Looking for system MPI...")
+            log("Looking for default system MPI...")
             find_package(MPI QUIET)
         endif()
         
@@ -89,14 +94,16 @@ else()
                 if (SUGGESTED_MPI)
                     log("No MPI preferences given. We suggest '${SUGGESTED_MPI}' on Linux/${LINUX_DISTRIBUTION}")
                 else()
-                    log("Unknown distribution '${LINUX_DISTRIBUTION}': No default MPI recommendation implemented. Using '${OPENCMISS_MPI_DEFAULT}'" WARNING)
-                    SET(SUGGESTED_MPI ${OPENCMISS_MPI_DEFAULT})
+                    log("Unknown distribution '${LINUX_DISTRIBUTION}': No default MPI recommendation implemented. Using '${OC_DEFAULT_MPI}'" WARNING)
+                    SET(SUGGESTED_MPI ${OC_DEFAULT_MPI})
                 endif()
             elseif(APPLE)
                 set(SUGGESTED_MPI openmpi)
+            elseif(WIN32)
+                set(SUGGESTED_MPI msmpi)
             else()
-                log("No default MPI suggestion implemented for your platform. Using '${OPENCMISS_MPI_DEFAULT}'" WARNING)
-                SET(SUGGESTED_MPI ${OPENCMISS_MPI_DEFAULT})
+                log("No default MPI suggestion implemented for your platform. Using '${OC_DEFAULT_MPI}'" WARNING)
+                SET(SUGGESTED_MPI ${OC_DEFAULT_MPI})
             endif()
             set(MPI ${SUGGESTED_MPI} CACHE STRING "Auto-suggested MPI implementation" FORCE)
             unset(SUGGESTED_MPI)
@@ -107,12 +114,26 @@ endif()
 ####################################################################################################
 # Find local MPI (own build dir or system-wide)
 ####################################################################################################
-# As of here we always have an MPI mnemonic set.
+# As of here we always have an MPI mnemonic set, either by manual definition or detection
+# of default MPI type. In the latter case we already have MPI_FOUND=TRUE.
 
 # This variable is also used in the main CMakeLists file at path computations!
 string(TOLOWER "${MPI_BUILD_TYPE}" MPI_BUILD_TYPE_LOWER)
 
+if (NOT MPI_FOUND AND SYSTEM_MPI) 
+    # Educated guesses are used to look for an MPI implementation
+    # This bit of logic is covered inside the FindMPI module where MPI is consumed
+    log("Looking for '${MPI}' MPI on local system..")
+    find_package(MPI QUIET)
+endif()
+
+# Last check before building - there might be an own already built MPI implementation
 if (NOT MPI_FOUND)
+    if (SYSTEM_MPI)
+        log("No (matching) system MPI found.")    
+    endif()
+    log("Checking if own build already exists.")
+    
     # Construct installation path
     # For MPI we use a slightly different architecture path - we dont need to re-build MPI for static/shared builds nor do we need the actual
     # MPI mnemonic in the path. Instead, we use "mpi" as common top folder to collect all local MPI builds.
@@ -124,18 +145,15 @@ if (NOT MPI_FOUND)
     endif()
     # This is where our own build of MPI will reside if compilation is needed    
     set(OWN_MPI_INSTALL_DIR ${OPENCMISS_ROOT}/install/${SHORT_ARCH_PATH}/mpi/${MPI}/${MPI_BUILD_TYPE_LOWER})
-    
-    # If no system MPI is allowed, search ONLY at MPI_HOME, which is our own bake
-    if(NOT SYSTEM_MPI)
-        set(MPI_HOME ${OWN_MPI_INSTALL_DIR})
-        log("Using own MPI '${MPI}': Setting MPI_HOME=${MPI_HOME}" DEBUG)
-    else()
-        # Educated guesses are used to look for an MPI implementation
-        # This bit of logic is covered inside the FindMPI module where MPI is consumed
-        log("Looking for '${MPI}' MPI on local system..")
-    endif()
-    # This call either only looks at MPI_HOME if no system lookup is allowed or searches at system locations
+
+    # Set MPI_HOME to the install location - its not set outside anyways (see first if case at top)
+    # Important: Do not unset(MPI_HOME) afterwards - this needs to get passed to all external projects the same way
+    # it has been after building MPI in the first place.
+    set(MPI_HOME "${OWN_MPI_INSTALL_DIR}" CACHE STRING "Installation directory of own/local MPI build" FORCE)
     find_package(MPI QUIET)
+    if (MPI_FOUND)
+        log("Using own '${MPI}' MPI: ${OWN_MPI_INSTALL_DIR}")
+    endif()
 endif()
 
 #####################################################################
@@ -144,7 +162,7 @@ endif()
 # If we get here without having found an MPI implementation, we need to build it.
 # But we will always have the MPI mnemonic set if we reach here.
 if (NOT MPI_FOUND)
-    log("No system MPI found or not allowed: SYSTEM_MPI=${SYSTEM_MPI}" DEBUG)
+    
     # This is supported yet only on Unix systems
     if (UNIX)
         # No shared libs!
@@ -198,7 +216,7 @@ if (NOT MPI_FOUND)
     	    log("Own build of MPI - ${MPI} not yet implemented" ERROR)
         endif()
         
-        set(MPI_HOME ${OWN_MPI_INSTALL_DIR})
+        set(MPI_HOME ${OWN_MPI_INSTALL_DIR} CACHE STRING "Installation directory of own/local MPI build" FORCE)
         set(_MPI_SOURCE_DIR ${OPENCMISS_ROOT}/src/dependencies/${MPI})
         set(_MPI_BINARY_DIR ${OPENCMISS_ROOT}/build/${SHORT_ARCH_PATH}/mpi/${MPI}/${MPI_BUILD_TYPE_LOWER})
         set(_MPI_BRANCH v${_MPI_VERSION})
@@ -224,6 +242,13 @@ if (NOT MPI_FOUND)
             set(NUM_PROCESSORS 1)
         #else()
         #    MATH(EXPR NUM_PROCESSORS ${NUM_PROCESSORS}+4)
+        endif()
+        
+        # Log settings
+        if (OC_CREATE_LOGS)
+            set(_LOGFLAG 1)
+        else()
+            set(_LOGFLAG 0)
         endif()
         
         ExternalProject_Add(${OC_EP_PREFIX}MPI
@@ -255,17 +280,20 @@ if (NOT MPI_FOUND)
     		#INSTALL_DIR ${OPENMPI_INSTALL_DIR}
     		INSTALL_COMMAND make install #${INSTALL_COMMAND}
     		
-    		#LOG_CONFIGURE 1
-    		#LOG_BUILD 1
-    		#LOG_INSTALL 1
+    		# Logging
+            LOG_CONFIGURE ${_LOGFLAG}
+            LOG_BUILD ${_LOGFLAG}
+            LOG_INSTALL ${_LOGFLAG}
     		STEP_TARGETS install
     	)
     	# Set the forward dependencies of MPI to have it build before the consuming components
         set(MPI_FWD_DEPS ${OPENCMISS_COMPONENTS_WITHMPI})
         addDownstreamDependencies(MPI FALSE)
     else()
+        unset(MPI_HOME CACHE)
+        unset(MPI_HOME)
         log("MPI (${MPI}) installation support not yet implemented for this platform." ERROR)
     endif()
 else()
-    log("Found MPI: ${MPI_C_INCLUDE_DIRECTORY} / ${MPI_C_LIBRARIES}" DEBUG)    
+    log("Found MPI: ${MPI_C_INCLUDE_DIRECTORY} / ${MPI_C_LIBRARIES}" DEBUG)
 endif()

@@ -1,0 +1,1 @@
+.. cmake-source:: ../../../Templates/OpenCMISSDeveloper.template.cmake

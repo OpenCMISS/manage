@@ -4,6 +4,8 @@
 # The build tree uses the folder manage/CMakeModules directly, but the
 # installed OpenCMISS wont necessarily have the manage folder and needs to
 # be self-contained
+set(CMAKE_INSTALL_PREFIX "${OPENCMISS_INSTALL_ROOT}")
+file(RELATIVE_PATH INSTALL_PATH_MPI "${OPENCMISS_INSTALL_ROOT}" "${OPENCMISS_COMPONENTS_INSTALL_PREFIX_MPI}")
 
 function(messaged MSG)
     #message(STATUS "OCInstall: ${MSG}")
@@ -59,6 +61,7 @@ set(EXPORT_VARS
     OPENCMISS_MPI
     OPENCMISS_MPI_HOME
     MPI_VERSION
+    BLA_VENDOR
     #FORTRAN_MANGLING
 )
 
@@ -82,7 +85,8 @@ do_export(${OPENCMISS_CONTEXT} "${EXPORT_VARS}")
 # Install it
 install(
     FILES ${OPENCMISS_CONTEXT}
-    DESTINATION ${OPENCMISS_COMPONENTS_INSTALL_PREFIX_MPI}
+    DESTINATION ${INSTALL_PATH_MPI}
+    COMPONENT Development
 )
 unset(EXPORT_VARS)
 
@@ -120,22 +124,26 @@ WRITE_BASIC_PACKAGE_VERSION_FILE(
 install(
     FILES ${CMAKE_CURRENT_BINARY_DIR}/export/opencmiss-config.cmake
         ${CMAKE_CURRENT_BINARY_DIR}/export/opencmiss-config-version.cmake
-    DESTINATION ${OPENCMISS_INSTALL_ROOT}
+    DESTINATION .
+    COMPONENT Development
 )
 
 # Copy the FindModule files so that the installation folder is self-contained
 install(DIRECTORY ${OPENCMISS_MANAGE_DIR}/CMakeModules/
-    DESTINATION ${OPENCMISS_INSTALL_ROOT}/cmake/OpenCMISSExtraFindModules
+    DESTINATION cmake/OpenCMISSExtraFindModules
+    COMPONENT Development
     PATTERN "FindOpenCMISS*.cmake" EXCLUDE) 
 install(FILES ${OPENCMISS_MANAGE_DIR}/CMakeScripts/OCArchitecturePath.cmake
     ${OPENCMISS_MANAGE_DIR}/CMakeScripts/OCToolchainCompilers.cmake
-    DESTINATION ${OPENCMISS_INSTALL_ROOT}/cmake)
+    DESTINATION cmake
+    COMPONENT Development)
     
 # Install mingw libraries if we built with mingw
 if (MINGW AND WIN32)
     get_filename_component(COMPILER_BIN_DIR ${CMAKE_C_COMPILER} PATH)
     file(GLOB MINGW_DLLS "${COMPILER_BIN_DIR}/*.dll")
     install(FILES ${MINGW_DLLS}
-        DESTINATION ${OPENCMISS_COMPONENTS_INSTALL_PREFIX_MPI}/lib)
+        DESTINATION ${INSTALL_PATH_MPI}/bin
+        COMPONENT Runtime)
 endif()
-    
+   

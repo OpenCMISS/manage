@@ -1,18 +1,27 @@
-# This file sets all the targets any (external/3rd party) component provides
-SET(PACKAGES_WITH_TARGETS BLAS HYPRE LAPACK METIS
-    MUMPS PARMETIS PASTIX PETSC PLAPACK PTSCOTCH SCALAPACK
-    SCOTCH SOWING SUITESPARSE SUNDIALS SUPERLU SUPERLU_DIST ZLIB SZIP HDF5
-    BZIP2 LIBXML2 JPEG OPTPP NETGEN GLEW PNG FTGL FREETYPE TIFF)
+# Create the list of all components we'll need FindXXX wrappers for.
+# Those components are all but those we maintain ourselves.
+set(PACKAGES_WITH_TARGETS ${OPENCMISS_COMPONENTS})
+list(REMOVE_ITEM PACKAGES_WITH_TARGETS
+    LIBCELLML CELLML FIELDML-API ZINC IRON
+)
     
 # Some shipped find-package modules have a different case-sensitive spelling - need to stay consistent with that
-SET(LIBXML2_CASENAME LibXml2)
-SET(BZIP2_CASENAME BZip2)
-SET(FREETYPE_CASENAME Freetype)
+set(LIBXML2_CASENAME LibXml2)
+set(BZIP2_CASENAME BZip2)
+set(FREETYPE_CASENAME Freetype)
+set(IMAGEMAGICK_CASENAME ImageMagick)
+set(GTEST_CASENAME GTest)
+set(CLANG_CASENAME Clang)
+set(CSIM_CASENAME CSim)
 # Some packages naturally have their exported target names differ from those of the package - this is convenience but
 # enables us to stay more consistent (e.g. we have "libbz2.a" on system installations instead of "libbzip2.a")
-SET(LIBXML2_TARGETNAME xml2)
-SET(BZIP2_TARGETNAME bz2)
-SET(NETGEN_TARGETNAME nglib)
+set(LIBXML2_TARGETNAME xml2)
+set(BZIP2_TARGETNAME bz2)
+set(NETGEN_TARGETNAME nglib)
+set(IMAGEMAGICK_TARGETNAME MagickCore)
+set(GTEST_TARGETNAME gtest_main) # This will bite us some day.
+# There's also a logical 'gtest' target. But here we can only define one (in general for ALL possible
+# packages to cover with this kind of wrapper)
     
 # Generate the wrappers (if not existing)
 SET(OPENCMISS_FINDMODULE_WRAPPER_DIR ${OPENCMISS_INSTALL_ROOT}/cmake/OpenCMISSFindModuleWrappers)
@@ -23,7 +32,7 @@ foreach(PACKAGE_NAME ${PACKAGES_WITH_TARGETS})
     else()
         SET(PACKAGE_CASENAME ${PACKAGE_NAME})
     endif()
-    SET(FILE ${OPENCMISS_FINDMODULE_WRAPPER_DIR}/Find${PACKAGE_CASENAME}.cmake)
+    set(FILE ${OPENCMISS_FINDMODULE_WRAPPER_DIR}/Find${PACKAGE_CASENAME}.cmake)
     #if(NOT EXISTS ${FILE})
         # Some packages have different target names than their package name
         if (${PACKAGE_NAME}_TARGETNAME)
@@ -31,6 +40,11 @@ foreach(PACKAGE_NAME ${PACKAGES_WITH_TARGETS})
         else()
             string(TOLOWER ${PACKAGE_NAME} PACKAGE_TARGET)    
         endif()
+        # Define custom function names so that the correct functions are called
+        # using the same name would (silently) overload the functions, causing misleading outputs
+        string(REPLACE "-" "_" _HLP ${PACKAGE_TARGET})
+        set(MESSAGE "my_stupid_package_dependent_message_function_${_HLP}")
+        set(DEBUG_MESSAGE "my_stupid_package_dependent_message_function_debug_${_HLP}")
         configure_file("${OPENCMISS_MANAGE_DIR}/Templates/FindXXX.template.cmake" "${FILE}" @ONLY)
     #endif()
 endforeach()

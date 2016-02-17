@@ -1,7 +1,20 @@
+set_property(GLOBAL PROPERTY USE_FOLDERS ON)
+
 set(OC_SUPPORT_DIR ${OpenCMISS_BINARY_DIR}/support)
 string(TIMESTAMP NOW "%Y-%m-%d_%H-%M")
+##
+# CMake logging
+# -------------
+#
+# The build system creates a build log in order to ease the support process.
 set(OC_BUILDLOG ${OC_SUPPORT_DIR}/configure_builds_${NOW}.log)
 
+##
+# The function :command:`log()` can be used to produce screen output as well as write messages to the build log::
+#
+#     log(MESSAGE [LOGLEVEL])
+#
+# See also: :ref:`loglevels`
 function(log msg)
     #message(STATUS "@@@@@ log(\"${msg}\")")
     if (ARGC GREATER 1)
@@ -58,7 +71,7 @@ function(printnextsteps)
     message(STATUS "@")
     message(STATUS "@ Having trouble? Follow the galaxy hitchhiker's advice:")
     message(STATUS "@ DONT PANIC ... and:")
-    message(STATUS "@ - Refer to ${OPENCMISS_MANAGE_DIR}/OpenCMISSBuildEnvironment.docx.pdf for customization instructions")
+    message(STATUS "@ - Refer to http://staging.opencmiss.org/documentation/cmake/docs/config/index.html for customization instructions")
     message(STATUS "@ - Build the 'support' target to get help! (e.g. '${CMAKE_MAKE_PROGRAM} support')")
     message(STATUS "@")
     message(STATUS "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@")

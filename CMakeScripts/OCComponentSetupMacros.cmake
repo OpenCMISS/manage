@@ -26,14 +26,15 @@ function(addAndConfigureLocalComponent COMPONENT_NAME)
     # Complete build dir with debug/release AFTER everything else (consistent with windows)
     getBuildTypePathElem(BUILDTYPEEXTRA)
     set(COMPONENT_BUILD_DIR ${BUILD_DIR_BASE}/${SUBGROUP_PATH}/${FOLDER_NAME}/${BUILDTYPEEXTRA})
+    # Expose the current build directory outside the function - used only for Iron and Zinc yet 
+    set(${COMPONENT_NAME}_BINARY_DIR ${COMPONENT_BUILD_DIR} PARENT_SCOPE)
     
     ##############################################################
     # Verifications
     if(COMPONENT_NAME IN_LIST OPENCMISS_COMPONENTS_WITH_F90 AND NOT CMAKE_Fortran_COMPILER_SUPPORTS_F90)
         log("Your Fortran compiler ${CMAKE_Fortran_COMPILER} does not support the Fortran 90 standard,
-            which is required to build the OpenCMISS component ${COMPONENT}" ERROR)
+            which is required to build the OpenCMISS component ${COMPONENT_NAME}" ERROR)
     endif()
-    
     
     ##############################################################
     # Collect component definitions
@@ -112,12 +113,13 @@ function(addAndConfigureLocalComponent COMPONENT_NAME)
 endfunction()
 
 ########################################################################################################################
-function(getExtProjDownloadUpdateCommands COMPONENT_NAME TARGET_SOURCE_DIR DL_VAR UP_VAR)
+function(addSourceManagementTargets COMPONENT_NAME BINARY_DIR SOURCE_DIR)
     # Convention: github repo is the lowercase equivalent of the component name
-    string(TOLOWER ${COMPONENT_NAME} FOLDER_NAME)
+    string(TOLOWER ${COMPONENT_NAME} REPO_NAME)
     
     # Git clone mode
     if(GIT_FOUND)
+        # Construct the repository name 
         if (NOT ${COMPONENT_NAME}_REPO)
             if(GITHUB_USERNAME)
                 SET(_GITHUB_USERNAME ${GITHUB_USERNAME})
@@ -129,36 +131,74 @@ function(getExtProjDownloadUpdateCommands COMPONENT_NAME TARGET_SOURCE_DIR DL_VA
             else()
                 SET(GITHUB_PROTOCOL "https://github.com/")
             endif()
-            set(${COMPONENT_NAME}_REPO ${GITHUB_PROTOCOL}${_GITHUB_USERNAME}/${FOLDER_NAME})
+            set(${COMPONENT_NAME}_REPO ${GITHUB_PROTOCOL}${_GITHUB_USERNAME}/${REPO_NAME})
         endif()
-        set(${DL_VAR}
-            GIT_REPOSITORY ${${COMPONENT_NAME}_REPO}
-            GIT_TAG ${${COMPONENT_NAME}_BRANCH}
-            PARENT_SCOPE
+        
+        add_custom_target(${REPO_NAME}-download
+            COMMAND ${GIT_EXECUTABLE} clone ${${COMPONENT_NAME}_REPO} .
+            COMMAND ${GIT_EXECUTABLE} checkout ${${COMPONENT_NAME}_BRANCH}
+            COMMENT "Cloning ${COMPONENT_NAME} sources"
+            WORKING_DIRECTORY "${SOURCE_DIR}"
         )
-        set(${UP_VAR} 
-            UPDATE_COMMAND ${GIT_EXECUTABLE} pull
-            PARENT_SCOPE
+        
+        add_custom_target(${REPO_NAME}-update
+            DEPENDS ${COMPONENT_NAME}-sources
+            COMMAND ${GIT_EXECUTABLE} pull
+            COMMAND ${GIT_EXECUTABLE} checkout ${${COMPONENT_NAME}_BRANCH}
+            COMMAND ${CMAKE_COMMAND} -E remove -f ${BINARY_DIR}/ep_stamps/*-build
+            COMMENT "Updating ${COMPONENT_NAME} sources"
+            WORKING_DIRECTORY "${SOURCE_DIR}"
         )
-        log("DOWNLOAD_CMDS=${DOWNLOAD_CMDS}" DEBUG)    
-    # Default: Download the current version branch as zip of no git clone flag is set
+            
+    # Fallback: Download the current version branch as zip
     else()
-        ################@TEMP@#################
-        # Temporary fix to also adhere to "custom" repository locations when in user mode.
-        # Should be removed in final version.
+        # Unless explicitly specified, use the GitHub repository location
         if (NOT ${COMPONENT_NAME}_REPO)
-            SET(${COMPONENT_NAME}_REPO https://github.com/${GITHUB_ORGANIZATION}/${FOLDER_NAME})
+            set(${COMPONENT_NAME}_REPO https://github.com/${GITHUB_ORGANIZATION}/${REPO_NAME})
         endif()
-        ################@TEMP@#################
-        set(${DL_VAR}
-            DOWNLOAD_DIR ${TARGET_SOURCE_DIR}/src-download
-            #URL https://github.com/${GITHUB_ORGANIZATION}/${FOLDER_NAME}/archive/${${COMPONENT_NAME}_BRANCH}.zip
-            ################@TEMP@#################
-            URL ${${COMPONENT_NAME}_REPO}/archive/${${COMPONENT_NAME}_BRANCH}.zip
-            ################@TEMP@#################
-            PARENT_SCOPE
+        
+        set(_FILENAME ${${COMPONENT_NAME}_BRANCH}.tar.gz)
+        add_custom_target(${REPO_NAME}-download
+            COMMAND ${CMAKE_COMMAND}
+                -DMODE=Download
+                -DURL=${${COMPONENT_NAME}_REPO}/archive/${_FILENAME}
+                -DTARGET="${SOURCE_DIR}/${_FILENAME}"
+                -P ${OPENCMISS_MANAGE_DIR}/CMakeScripts/ScriptSourceManager.cmake
+            COMMENT "Downloading ${COMPONENT_NAME} sources"
+        )
+        
+        # For tarballs, update is the same as download!
+        add_custom_target(${REPO_NAME}-update
+            DEPENDS ${REPO_NAME}-download
+            COMMAND ${CMAKE_COMMAND} -E remove -f ${BINARY_DIR}/ep_stamps/*-build
+            COMMENT "Updating ${COMPONENT_NAME} sources"
         )
     endif()
+    set_target_properties(${REPO_NAME}-download PROPERTIES FOLDER "${REPO_NAME}")
+    set_target_properties(${REPO_NAME}-update PROPERTIES FOLDER "${REPO_NAME}")
+    
+    # Add extra target that makes sure the source files are being present
+    # Triggers buildof ${REPO_NAME}-download if the directory does not exist or 
+    # no CMakeLists.txt is found in the target source directory.
+    add_custom_target(${COMPONENT_NAME}-sources
+        COMMAND ${CMAKE_COMMAND}
+            -DMODE=Check
+            -DCOMPONENT=${REPO_NAME}
+            -DSRC_DIR=${SOURCE_DIR}
+            -DBIN_DIR=${CMAKE_CURRENT_BINARY_DIR}
+            -P ${OPENCMISS_MANAGE_DIR}/CMakeScripts/ScriptSourceManager.cmake
+        COMMENT "Checking ${COMPONENT_NAME} sources are present"
+    )
+    set_target_properties(${COMPONENT_NAME}-sources PROPERTIES FOLDER "${REPO_NAME}")
+    
+    add_custom_target(${REPO_NAME}-update-force
+        COMMAND ${CMAKE_COMMAND} -E remove_directory "${SOURCE_DIR}"
+        COMMAND ${CMAKE_COMMAND} -E make_directory "${SOURCE_DIR}"
+        COMMAND ${CMAKE_COMMAND} --build ${PROJECT_BINARY_DIR} --target ${REPO_NAME}-download
+        COMMENT "Forced update of ${COMPONENT_NAME} - removing and downloading"
+    )
+    set_target_properties(${REPO_NAME}-update-force PROPERTIES FOLDER "${REPO_NAME}")
+    
 endfunction()
 
 ########################################################################################################################
@@ -180,50 +220,18 @@ function(createExternalProjects COMPONENT_NAME SOURCE_DIR BINARY_DIR DEFS)
     #    set(INSTALL_COMMAND INSTALL_COMMAND ${INSTALL_COMMAND})
     endif()
         
-    getExtProjDownloadUpdateCommands(${COMPONENT_NAME} ${SOURCE_DIR} DOWNLOAD_COMMANDS UPDATE_COMMANDS)
+    addSourceManagementTargets(${COMPONENT_NAME} ${BINARY_DIR} ${SOURCE_DIR})
     
     # Log settings
     if (OC_CREATE_LOGS)
         set(_LOGFLAG 1)
     else()
         set(_LOGFLAG 0)
-    endif()
-    
-    # Add source download/update project
-    #
-    # This is separate from the actual build project for the component, as we want to use the same
-    # source for different builds/architecture paths (shared/static, different MPI)
-    ExternalProject_Add(${COMPONENT_NAME}_SRC
-        PREFIX ${OPENCMISS_ROOT}/src/download/
-        EXCLUDE_FROM_ALL 1
-        TMP_DIR ${OPENCMISS_ROOT}/src/download/tmp
-        STAMP_DIR ${OPENCMISS_ROOT}/src/download/stamps
-        #--Download step--------------
-        ${DOWNLOAD_COMMANDS}
-        SOURCE_DIR ${SOURCE_DIR}
-        ${UPDATE_COMMANDS}
-        CONFIGURE_COMMAND ""
-        BUILD_COMMAND ""
-        INSTALL_COMMAND ""
-        STEP_TARGETS download update
-        LOG_DOWNLOAD ${_LOGFLAG}
-    )
-    
-    # Add extra target that makes sure the source files are being present
-    # Triggers build of ${COMPONENT_NAME}_SRC if no CMakeLists.txt is found in the target source directory.
-    add_custom_target(CHECK_${COMPONENT_NAME}_SOURCES 
-        COMMAND ${CMAKE_COMMAND}
-                -DCOMPONENT=${COMPONENT_NAME}
-                -DFOLDER=${SOURCE_DIR}
-                -DBINDIR=${CMAKE_CURRENT_BINARY_DIR}
-                -DSTAMP_DIR=${OPENCMISS_ROOT}/src/download/stamps
-                -P ${OPENCMISS_MANAGE_DIR}/CMakeScripts/ScriptCheckSourceExists.cmake
-            COMMENT "Checking ${COMPONENT_NAME} sources are present"
-    )  
+    endif()  
     
     log("Adding ${COMPONENT_NAME} with DEPS=${${COMPONENT_NAME}_DEPS}" VERBOSE)
     ExternalProject_Add(${OC_EP_PREFIX}${COMPONENT_NAME}
-        DEPENDS ${${COMPONENT_NAME}_DEPS} CHECK_${COMPONENT_NAME}_SOURCES
+        DEPENDS ${${COMPONENT_NAME}_DEPS} ${COMPONENT_NAME}-sources
         PREFIX ${BINARY_DIR}
         LIST_SEPARATOR ${OC_LIST_SEPARATOR}
         TMP_DIR ${BINARY_DIR}/ep_tmp
@@ -256,6 +264,7 @@ function(createExternalProjects COMPONENT_NAME SOURCE_DIR BINARY_DIR DEFS)
         LOG_BUILD ${_LOGFLAG}
         LOG_INSTALL ${_LOGFLAG}
     )
+    set_target_properties(${OC_EP_PREFIX}${COMPONENT_NAME} PROPERTIES FOLDER "Internal")
         
     # See OpenCMISSDeveloper.cmake
     if (OC_CLEAN_REBUILDS_COMPONENTS)
@@ -266,54 +275,16 @@ function(createExternalProjects COMPONENT_NAME SOURCE_DIR BINARY_DIR DEFS)
     
 endfunction()
 
-function(addConvenienceTargets COMPONENT_NAME BINARY_DIR SOURCE_DIR)
-    # Add convenience direct-access clean target for component
-    string(TOLOWER "${COMPONENT_NAME}" COMPONENT_NAME_LOWER)
-    add_custom_target(${COMPONENT_NAME_LOWER}-clean
-        COMMAND ${CMAKE_COMMAND} -E remove -f ${BINARY_DIR}/ep_stamps/*-configure
-        COMMAND ${CMAKE_COMMAND} -E touch ${BINARY_DIR}/CMakeCache.txt # force cmake re-run to make sure
-        COMMAND ${CMAKE_COMMAND} --build ${BINARY_DIR} --target clean
-        COMMENT "Cleaning ${COMPONENT_NAME}"
-    )
-    # Add convenience direct-access update target for component
-    # This removes the external project stamp for the last update and hence triggers execution of the update, e.g.
-    # a new source download or "git pull"
-    add_custom_target(${COMPONENT_NAME_LOWER}-update
-        COMMAND ${CMAKE_COMMAND} -E remove -f ${OPENCMISS_ROOT}/src/download/stamps/${COMPONENT_NAME}_SRC-update
-        COMMAND ${CMAKE_COMMAND} --build ${CMAKE_CURRENT_BINARY_DIR} --target ${COMPONENT_NAME}_SRC-update
-        COMMENT "Updating ${COMPONENT_NAME} sources"
-    )
-    
-    if (GIT_FOUND)
-        add_custom_target(${COMPONENT_NAME_LOWER}-gitstatus
-            COMMAND ${GIT_EXECUTABLE} status
-            COMMAND ${CMAKE_COMMAND} -E echo "Branches for ${COMPONENT_NAME_LOWER} repository"
-            COMMAND ${GIT_EXECUTABLE} branch -av -v 
-            WORKING_DIRECTORY ${SOURCE_DIR}
-            COMMENT "Git status report for ${COMPONENT_NAME_LOWER} at ${SOURCE_DIR}"
-        )
-    endif()
-    
-    # Add convenience direct-access forced build target for component
-    getBuildCommands(_DUMMY INSTALL_COMMAND ${BINARY_DIR} TRUE)
-    add_custom_target(${COMPONENT_NAME_LOWER}
-        COMMAND ${CMAKE_COMMAND} -E remove -f ${BINARY_DIR}/ep_stamps/*-build 
-        COMMAND ${INSTALL_COMMAND}
-    )
-    if (BUILD_TESTS)
-        # Add convenience direct-access test target for component
-        add_custom_target(${COMPONENT_NAME_LOWER}-test
-            COMMAND ${CMAKE_COMMAND} --build ${BINARY_DIR} --target test
-        )
-        # Add a global test to run the external project's tests
-        add_test(${COMPONENT_NAME_LOWER}-test ${CMAKE_COMMAND} --build ${BINARY_DIR} --target test)
-    endif()
-endfunction()
+include(OCFunctionComponentTargets)
 
 function(getBuildCommands BUILD_CMD_VAR INSTALL_CMD_VAR DIR PARALLEL)
     
-    set( BUILD_CMD ${CMAKE_COMMAND} --build ${DIR})
-    set( INSTALL_CMD ${CMAKE_COMMAND} --build ${DIR} --target install)
+    set(BUILD_CMD ${CMAKE_COMMAND} --build "${DIR}")
+    set(INSTALL_CMD ${CMAKE_COMMAND} --build "${DIR}" --target install)
+    if (CMAKE_HAVE_MULTICONFIG_ENV)
+        list(APPEND BUILD_CMD --config $<CONFIG>)
+        list(APPEND INSTALL_CMD --config $<CONFIG>)
+    endif()
     
     if(PARALLEL_BUILDS AND PARALLEL)
         include(ProcessorCount)
@@ -404,4 +375,5 @@ Configure definitions:
             -P ${OPENCMISS_MANAGE_DIR}/CMakeScripts/OCSupport.cmake
         WORKING_DIRECTORY "${OC_SUPPORT_DIR}")
     add_dependencies(${OC_EP_PREFIX}${NAME} ${OC_EP_PREFIX}${NAME}_buildlog)
+    set_target_properties(${OC_EP_PREFIX}${NAME}_buildlog PROPERTIES FOLDER "Internal")
 endfunction()
