@@ -100,6 +100,7 @@ foreach(BUILDTYPE_SUFFIX ${_BUILDTYPES})
     set(OPENCMISS_CONTEXT ${_INSTALL_PATH}/context.cmake)
     if (EXISTS "${OPENCMISS_CONTEXT}")
         messageo("Looking for ${BUILDTYPE_SUFFIX} installation - ${OPENCMISS_CONTEXT} ... success")
+        set(OPENCMISS_INSTALL_DIR_ARCHPATH "${_INSTALL_PATH}")
         set(_FOUND TRUE)
         break()
     else()
@@ -238,3 +239,54 @@ unset(_BUILDTYPES)
 unset(_OPENCMISS_IMPORT_PREFIX)
 unset(_SEARCHED)
 unset(BUILDTYPE_SUFFIX)
+
+#################################################################################
+# Extra functions to use within CMake-enabled OpenCMISS applications and examples
+
+if (WIN32)
+    set(_LD_VARNAME "PATH")
+elseif(APPLE)
+    set(_LD_VARNAME "DYLD_LIBRARY_PATH")
+elseif(UNIX)
+    set(_LD_VARNAME "LD_LIBRARY_PATH")
+else()
+    message(WARNING "Adding OpenCMISS environment not implemented for '${CMAKE_HOST_SYSTEM}'")
+endif()
+
+# Composes a native PATH-compatible variable to use for DLL/SO finding.
+# Each extra argument is assumed a path to add. Added in the order specified.
+function(get_library_path OUTPUT_VARIABLE)
+    if (WIN32)
+       set(LD_PATH "$ENV{${_LD_VARNAME}}")
+       foreach(_PATH ${ARGN})
+           file(TO_NATIVE_PATH "${_PATH}" _PATH)
+           set(LD_PATH "${_PATH};${LD_PATH}")
+       endforeach()
+       string(REPLACE ";" "\\;" LD_PATH "${LD_PATH}")
+    else()
+       set(LD_PATH "$ENV{${_LD_VARNAME}}")
+       foreach(_PATH ${ARGN})
+           file(TO_NATIVE_PATH "${_PATH}" _PATH)
+           set(LD_PATH "${_PATH}:${LD_PATH}")
+       endforeach()
+    endif()
+    set(${OUTPUT_VARIABLE} "${LD_PATH}" PARENT_SCOPE)
+endfunction()
+
+# Convenience function to add the currently found OpenCMISS runtime environment to any
+# test using OpenCMISS libraries
+# Intended use is the OpenCMISS User SDK.
+function(add_opencmiss_environment TESTNAME)
+    get_library_path(LD_PATH "${OPENCMISS_INSTALL_DIR_ARCHPATH}/bin")
+    messaged("Setting environment for test ${TESTNAME}: ${LD_VARNAME}=${LD_PATH}")
+    # Set up the correct environment for the test
+    # See https://cmake.org/pipermail/cmake/2009-May/029464.html
+    get_test_property(${TESTNAME} ENVIRONMENT EXISTING_TEST_ENV)
+    if (EXISTING_TEST_ENV)
+        set_tests_properties(${TESTNAME} PROPERTIES
+            ENVIRONMENT "${EXISTING_TEST_ENV};${_LD_VARNAME}=${LD_PATH}")
+    else()
+        set_tests_properties(${TESTNAME} PROPERTIES
+            ENVIRONMENT "${_LD_VARNAME}=${LD_PATH}")
+    endif()
+endfunction()

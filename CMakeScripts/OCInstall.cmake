@@ -86,6 +86,7 @@ do_export(${OPENCMISS_CONTEXT} "${EXPORT_VARS}")
 install(
     FILES ${OPENCMISS_CONTEXT}
     DESTINATION ${INSTALL_PATH_MPI}
+    COMPONENT Development
 )
 unset(EXPORT_VARS)
 
@@ -124,21 +125,25 @@ install(
     FILES ${CMAKE_CURRENT_BINARY_DIR}/export/opencmiss-config.cmake
         ${CMAKE_CURRENT_BINARY_DIR}/export/opencmiss-config-version.cmake
     DESTINATION .
+    COMPONENT Development
 )
 
 # Copy the FindModule files so that the installation folder is self-contained
 install(DIRECTORY ${OPENCMISS_MANAGE_DIR}/CMakeModules/
     DESTINATION cmake/OpenCMISSExtraFindModules
+    COMPONENT Development
     PATTERN "FindOpenCMISS*.cmake" EXCLUDE) 
 install(FILES ${OPENCMISS_MANAGE_DIR}/CMakeScripts/OCArchitecturePath.cmake
     ${OPENCMISS_MANAGE_DIR}/CMakeScripts/OCToolchainCompilers.cmake
-    DESTINATION cmake)
+    DESTINATION cmake
+    COMPONENT Development)
     
 # Install mingw libraries if we built with mingw
 if (MINGW AND WIN32)
     get_filename_component(COMPILER_BIN_DIR ${CMAKE_C_COMPILER} PATH)
     file(GLOB MINGW_DLLS "${COMPILER_BIN_DIR}/*.dll")
     install(FILES ${MINGW_DLLS}
-        DESTINATION ${INSTALL_PATH_MPI}/bin)
+        DESTINATION ${INSTALL_PATH_MPI}/bin
+        COMPONENT Runtime)
 endif()
    

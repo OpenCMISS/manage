@@ -54,26 +54,34 @@ endmacro()
 
 set(PACKAGE_NAME "OpenCMISS")
 set(PACKAGE_TYPE "opencmiss")
+#set(PACKAGE_REGISTRY_KEY "OpenCMISS")
 set(PACKAGE_NAME_BASE "OpenCMISS_${OpenCMISS_VERSION}")
 set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "OpenCMISS Summary")
 set(INSTALL_QUADS 
-    "${IRON_BINARY_DIR}" "Iron Runtime" Runtime /
-    "${IRON_BINARY_DIR}" "Iron C bindings" CBindings /
-    "${IRON_BINARY_DIR}" "Iron Python bindings" PythonBindings /
-    "${ZINC_BINARY_DIR}" "Zinc Runtime" Runtime /
-    "${ZINC_BINARY_DIR}" "Zinc Python bindings" PythonBindings /)
+    "${IRON_BINARY_DIR}" "Iron Runtime" Runtime "/${ARCHITECTURE_PATH_MPI}"
+    "${IRON_BINARY_DIR}" "Iron C bindings" CBindings "/${ARCHITECTURE_PATH_MPI}"
+    "${IRON_BINARY_DIR}" "Iron Python bindings" PythonBindings "/${ARCHITECTURE_PATH_MPI}/iron"
+    "${ZINC_BINARY_DIR}" "Zinc Runtime" Runtime "/${ARCHITECTURE_PATH_MPI}"
+    "${ZINC_BINARY_DIR}" "Zinc Python bindings" PythonBindings "/${ARCHITECTURE_PATH_MPI}/zinc"
+    "${PROJECT_BINARY_DIR}" "OpenCMISS Runtime files" Runtime /
+)
 CREATE_PACKAGING_TARGET()
 
 set(PACKAGE_NAME "OpenCMISS User SDK")
 set(PACKAGE_TYPE "usersdk")
+#set(PACKAGE_REGISTRY_KEY "OpenCMISSUserSDK")
 set(PACKAGE_NAME_BASE "OpenCMISS_${OpenCMISS_VERSION}_UserSDK")
 set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "OpenCMISS User SDK Summary")
-set(INSTALL_QUADS "${IRON_BINARY_DIR}" Iron ALL /)
-list(APPEND INSTALL_QUADS "${ZINC_BINARY_DIR}" Zinc ALL /)
+list(APPEND INSTALL_QUADS 
+    "${IRON_BINARY_DIR}" "Iron Development" Development "/${ARCHITECTURE_PATH_MPI}"
+    "${ZINC_BINARY_DIR}" "Zinc Development" Development "/${ARCHITECTURE_PATH_MPI}"
+    "${PROJECT_BINARY_DIR}" "OpenCMISS Development" Development /
+)
 CREATE_PACKAGING_TARGET()
 
 set(PACKAGE_NAME "OpenCMISS Developer SDK")
 set(PACKAGE_TYPE "developersdk")
+#set(PACKAGE_REGISTRY_KEY "OpenCMISSDeveloperSDK")
 set(PACKAGE_NAME_BASE "OpenCMISS_${OpenCMISS_VERSION}_DeveloperSDK")
 set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "OpenCMISS Developer SDK Summary")
 set(INSTALL_QUADS )
