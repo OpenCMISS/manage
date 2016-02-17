@@ -17,7 +17,7 @@
 # ================================================================ 
 
 # gTest
-if (OC_USE_GTEST AND BUILD_TESTS)
+if (OC_USE_GTEST AND (BUILD_TESTS OR OC_BUILD_ZINC_TESTS))
     find_package(GTEST ${GTEST_VERSION} QUIET)
     if(NOT GTEST_FOUND)
         set(GTEST_FWD_DEPS LLVM CSIM ZINC)
@@ -604,9 +604,14 @@ if (OC_USE_ZINC OR (OPENGL_FOUND AND OC_DEPENDENCIES_ONLY))
     
     if(NOT OC_DEPENDENCIES_ONLY)
         string(REPLACE ";" ${OC_LIST_SEPARATOR} CMAKE_MODULE_PATH_ESC "${CMAKE_MODULE_PATH}")
+        set(ZINC_BUILD_TESTS FALSE)
+        if(OC_BUILD_ZINC_TESTS OR BUILD_TESTS)
+            set(ZINC_BUILD_TESTS TRUE)
+        endif()
         set(SUBGROUP_PATH .)
         set(GITHUB_ORGANIZATION OpenCMISS)
         addAndConfigureLocalComponent(ZINC
+            ZINC_BUILD_TESTS=${ZINC_BUILD_TESTS}}
             ZINC_BUILD_PYTHON_BINDINGS=${ZINC_WITH_Python_BINDINGS}
             ZINC_MODULE_PATH=${CMAKE_MODULE_PATH_ESC}
             ZINC_DEPENDENCIES_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX}
