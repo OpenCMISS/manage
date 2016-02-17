@@ -565,7 +565,17 @@ function (interrogate_mpi_compiler lang try_libs)
       endif()
 
     elseif(try_libs)
-      #messagev("Falling back to classic library search as no MPI_${lang}_COMPILER is set")
+      messagev("Falling back to classic library search as no MPI_${lang}_COMPILER is set")
+      
+      # Decide between 32-bit and 64-bit libraries for Microsoft's MPI
+      if("${CMAKE_SIZEOF_VOID_P}" EQUAL 8)
+        set(MS_MPI_ARCH_DIR x64)
+        set(MS_MPI_ARCH_DIR2 amd64)
+      else()
+        set(MS_MPI_ARCH_DIR x86)
+        set(MS_MPI_ARCH_DIR2 i386)
+      endif()
+      
       # If we didn't have an MPI compiler script to interrogate, attempt to find everything
       # with plain old find functions.  This is nasty because MPI implementations have LOTS of
       # different library names, so this section isn't going to be very generic.  We need to
@@ -575,15 +585,6 @@ function (interrogate_mpi_compiler lang try_libs)
         HINTS ${_MPI_BASE_DIR} ${_MPI_PREFIX_PATH}
         PATH_SUFFIXES include Inc)
       set(MPI_INCLUDE_PATH_WORK ${MPI_HEADER_PATH})
-
-      # Decide between 32-bit and 64-bit libraries for Microsoft's MPI
-      if("${CMAKE_SIZEOF_VOID_P}" EQUAL 8)
-        set(MS_MPI_ARCH_DIR x64)
-        set(MS_MPI_ARCH_DIR2 amd64)
-      else()
-        set(MS_MPI_ARCH_DIR x86)
-        set(MS_MPI_ARCH_DIR2 i386)
-      endif()
 
       set(MPI_LIB "MPI_LIB-NOTFOUND" CACHE FILEPATH "Cleared" FORCE)
       find_library(MPI_LIB
@@ -624,6 +625,26 @@ function (interrogate_mpi_compiler lang try_libs)
           PATH_SUFFIXES lib)
         if (MPI_LIBRARIES_WORK AND MPI_LIB)
           list(APPEND MPI_LIBRARIES_WORK ${MPI_LIB})
+        endif()
+        
+        if (WIN32)
+            # MSMPI case: When using fortran mpif.h, it also needs an bit-dependent file
+            # mpifptr.h, which is located inside the Include/(x86|x64) folders, respectively.
+            find_path(MPI_HEADER_PATH_FORTRAN mpifptr.h
+                HINTS ${_MPI_BASE_DIR} ${_MPI_PREFIX_PATH}
+                PATH_SUFFIXES include/${MS_MPI_ARCH_DIR} Inc/${MS_MPI_ARCH_DIR})
+            if (MPI_HEADER_PATH_FORTRAN)
+                list(APPEND MPI_INCLUDE_PATH_WORK "${MPI_HEADER_PATH_FORTRAN}")
+            endif()
+            
+            # MSMPI: We also need additional fortran libraries!
+            find_library(MSMPI_EXTRA_FORTRAN_LIBRARY
+              NAMES         msmpifmc msmpifec
+              HINTS         ${_MPI_BASE_DIR} ${_MPI_PREFIX_PATH}
+              PATH_SUFFIXES lib/${MS_MPI_ARCH_DIR})
+            if (MPI_LIBRARIES_WORK AND MSMPI_EXTRA_FORTRAN_LIBRARY)
+              list(APPEND MPI_LIBRARIES_WORK ${MSMPI_EXTRA_FORTRAN_LIBRARY})
+            endif()
         endif()
       endif()
 
@@ -1113,7 +1134,9 @@ endfunction()
 # This is a problem of order whenever GNU/Intel compilers and MPI are mixed, as the gfortran mpi.mod file is located
 # within the fortran include path.
 foreach (lang Fortran C CXX)
-    create_mpi_target(${lang})
+    if (lang IN_LIST ENABLED_LANGUAGES)
+        create_mpi_target(${lang})
+    endif()
 endforeach()
 
 #=============================================================================
