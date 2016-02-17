@@ -131,7 +131,9 @@ include(FindPackageHandleStandardArgs)
 
 # Comment the message command line to shut up the script
 macro(messagev TEXT)
-    #message(STATUS "FindMPI: ${TEXT}")
+    if (NOT WIN32) #The backslashes in the path elements break cmake :-(
+        #message(STATUS "FindMPI: ${TEXT}")
+    endif()
 endmacro()
 
 # Get the currently enabled languages - the find mpi will only look for mpi wrappers to those languages
@@ -274,16 +276,22 @@ else()
     endif()
     
     if(WIN32)
-      # MSMPI
-      file(TO_CMAKE_PATH "$ENV{MSMPI_BIN}" msmpi_bin_path) # The default path ends with a '\' and doesn't mix with ';' when appending.
-      list(APPEND _MPI_PREFIX_PATH "${msmpi_bin_path}")
-      unset(msmpi_bin_path)
-      list(APPEND _MPI_PREFIX_PATH "[HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\MPI;InstallRoot]/Bin")
-      list(APPEND _MPI_PREFIX_PATH "$ENV{MSMPI_INC}/..") # The SDK is installed separately from the runtime
+      # MS MPI
+      string(TOLOWER "${MPI}" _MPI_LOWER)
+      if (_MPI_LOWER STREQUAL msmpi)
+          file(TO_CMAKE_PATH "$ENV{MSMPI_BIN}" msmpi_bin_path) # The default path ends with a '\' and doesn't mix with ';' when appending.
+          list(APPEND _MPI_PREFIX_PATH "${msmpi_bin_path}")
+          unset(msmpi_bin_path)
+          list(APPEND _MPI_PREFIX_PATH "[HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\MPI;InstallRoot]/Bin")
+          list(APPEND _MPI_PREFIX_PATH "$ENV{MSMPI_INC}/..") # The SDK is installed separately from the runtime
+      endif()
       # MPICH
-      list(APPEND _MPI_PREFIX_PATH "[HKEY_LOCAL_MACHINE\\SOFTWARE\\MPICH\\SMPD;binary]/..")
-      list(APPEND _MPI_PREFIX_PATH "[HKEY_LOCAL_MACHINE\\SOFTWARE\\MPICH2;Path]")
-      list(APPEND _MPI_PREFIX_PATH "$ENV{ProgramW6432}/MPICH2/")
+      if (_MPI_LOWER STREQUAL mpich2)
+          list(APPEND _MPI_PREFIX_PATH "[HKEY_LOCAL_MACHINE\\SOFTWARE\\MPICH\\SMPD;binary]/..")
+          list(APPEND _MPI_PREFIX_PATH "[HKEY_CURRENT_USER\\SOFTWARE\\MPICH\\SMPD;binary]/..")
+          list(APPEND _MPI_PREFIX_PATH "[HKEY_LOCAL_MACHINE\\SOFTWARE\\MPICH2;Path]")
+          list(APPEND _MPI_PREFIX_PATH "$ENV{ProgramW6432}/MPICH2/")
+      endif()
     endif()
     
     # Build a list of prefixes to search for MPI.
@@ -627,7 +635,7 @@ function (interrogate_mpi_compiler lang try_libs)
           list(APPEND MPI_LIBRARIES_WORK ${MPI_LIB})
         endif()
         
-        if (WIN32)
+        if (_MPI_LOWER STREQUAL msmpi)
             # MSMPI case: When using fortran mpif.h, it also needs an bit-dependent file
             # mpifptr.h, which is located inside the Include/(x86|x64) folders, respectively.
             find_path(MPI_HEADER_PATH_FORTRAN mpifptr.h
@@ -1188,3 +1196,4 @@ unset(_MPI_BASE_DIR)
 foreach (lang C CXX Fortran)
   unset(_MPI_${lang}_COMPILER_NAMES)
 endforeach()
+unset(_MPI_LOWER)
