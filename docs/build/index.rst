@@ -123,13 +123,15 @@ In addition to the :ref:`general prerequisites <build_prerequisites>`:
    #. Visual Studio 2013 Update 5. Other versions *might* work, they have not been tested yet. The Update 5 was necessary to
       fix some compiler issues for some dependencies.
    #. If you want to build Iron:
+   
       #. A Fortran compiler that integrates with Visual Studio. We use the Intel Composer Framework (license costs!)
-      #. MPI: We use MPICH2_, MSMPI_ can be configured but there are known compatibility issues regarding the MSVCRT.
+      #. MPI: We use MPICH2_, MSMPI_ can be configured but there are `known compatibility issues`_ regarding the MSVCRT.
    #. Make sure that any pre-installed programs (MPI, Git, ..) are available on the PATH (either User or System scope).
       Path entries must be *without* quotation marks in order to have CMake pick them up correctly!
 
 .. _MPICH2: http://www.mpich.org/static/tarballs/1.4.1p1/mpich2-1.4.1p1-win-x86-64.msi
 .. _MSMPI: https://msdn.microsoft.com/en-us/library/bb524831%28v=vs.85%29.aspx
+.. _`known compatibility issues`: https://github.com/OpenCMISS/manage/issues/52
 
 Visual Studio (32/64bit)
 ------------------------
@@ -151,9 +153,13 @@ Visual Studio (32/64bit)
    #. Within Visual Studio, select the build type (it seems to default to "Debug", you might want to select "Release")
    #. Build the project "opencmiss".
    #. Have a coffee or two.
+   
+.. note::
 
-Python bindings
-'''''''''''''''
+   Building with Visual Studio in 32bit mode has not been tested yet.
+
+Python bindings (64bit)
+'''''''''''''''''''''''
 Make sure you download a `64bit Python installer`_ (see e.g. general 2.7.11 `download page`_).
 
 Unfortunately, for NumPy_, there is **no** official support for 64bit Windows binaries!
@@ -170,14 +176,9 @@ For the above Python 2.7.11 link, we use `this build`_.
 .. _`Christoph Gohlke`: http://www.lfd.uci.edu/~gohlke/
 .. _`this build`: http://www.lfd.uci.edu/~gohlke/pythonlibs/bofhrmxk/numpy-1.10.4+mkl-cp27-none-win_amd64.whl
 
-Visual Studio (32bit)
----------------------
 
-*THIS HAS NOT BEEN TESTED YET*
-The documentation here is just to collect information and needs to be completed and checked.
-
-Python bindings
-'''''''''''''''
+Python bindings (32bit)
+'''''''''''''''''''''''
 For NumPy_, there are 32bit Windows binaries available via `SourceForge <numpy_dl_general>`_.
 For some reason newer releases don't come with the 'superpack' .msi installers, `Version 1.10.2 <numpy_dl>`_ currently does. 
 
