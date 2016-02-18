@@ -66,6 +66,17 @@ endmacro()
 set(CMAKE_INSTALL_DIR ${OPENCMISS_ROOT}/install/utilities/cmake)
 set(MY_CMAKE_EXECUTABLE ${CMAKE_INSTALL_DIR}/bin/cmake${CMAKE_EXECUTABLE_SUFFIX})
 
+# Add check to see if the mayhaps already built version is the desired one
+if (EXISTS ${MY_CMAKE_EXECUTABLE})
+    execute_process(COMMAND ${MY_CMAKE_EXECUTABLE} --version
+        OUTPUT_VARIABLE OUT)
+    string(REGEX MATCH "cmake version ([0-9.]*)" _MATCH "${OUT}")
+    if (CMAKE_MATCH_1 VERSION_LESS OPENCMISS_CMAKE_MIN_VERSION)
+        message(STATUS "Found already installed version ${CMAKE_MATCH_1}. Removing first..")
+        file(REMOVE_RECURSE "${CMAKE_INSTALL_DIR}")
+    endif (CMAKE_MATCH_1 VERSION_LESS OPENCMISS_CMAKE_MIN_VERSION)
+endif(EXISTS ${MY_CMAKE_EXECUTABLE})
+
 # Check if the binary is already there and hint the user to it
 if (EXISTS ${MY_CMAKE_EXECUTABLE})
     printfinishmessage()
