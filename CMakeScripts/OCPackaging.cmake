@@ -60,10 +60,16 @@ set(INSTALL_QUADS
     "${IRON_BINARY_DIR}" "Iron Runtime" Runtime "/${ARCHITECTURE_PATH_MPI}"
     "${IRON_BINARY_DIR}" "Iron C bindings" CBindings "/${ARCHITECTURE_PATH_MPI}"
     "${IRON_BINARY_DIR}" "Iron Python bindings" PythonBindings "/${ARCHITECTURE_PATH_MPI}"
-    "${ZINC_BINARY_DIR}" "Zinc Runtime" Runtime "/${ARCHITECTURE_PATH}"
+    "${ZINC_BINARY_DIR}" "Zinc Runtime" Runtime "/${ARCHITECTURE_PATH_MPI}"
     "${ZINC_BINARY_DIR}" "Zinc Python bindings" PythonBindings "/${ARCHITECTURE_PATH}"
     "${PROJECT_BINARY_DIR}" "OpenCMISS Runtime files" Runtime /
 )
+# This component is a install step that bundles dependent DLLs into the binary directory.
+if (WIN32)
+    list(APPEND INSTALL_QUADS
+        "${IRON_BINARY_DIR}" "OpenCMISS dependance DLLs" Redist "/${ARCHITECTURE_PATH_MPI}"
+    )
+endif()
 CREATE_PACKAGING_TARGET()
 
 set(PACKAGE_NAME "OpenCMISS User SDK")

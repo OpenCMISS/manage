@@ -131,7 +131,7 @@ install(
 # Copy the FindModule files so that the installation folder is self-contained
 install(DIRECTORY ${OPENCMISS_MANAGE_DIR}/CMakeModules/
     DESTINATION cmake/OpenCMISSExtraFindModules
-    COMPONENT DevelopmentSDK
+    COMPONENT Development
     PATTERN "FindOpenCMISS*.cmake" EXCLUDE) 
 install(FILES ${OPENCMISS_MANAGE_DIR}/CMakeScripts/OCArchitecturePath.cmake
     ${OPENCMISS_MANAGE_DIR}/CMakeScripts/OCToolchainCompilers.cmake
@@ -139,6 +139,7 @@ install(FILES ${OPENCMISS_MANAGE_DIR}/CMakeScripts/OCArchitecturePath.cmake
     COMPONENT Development)
     
 # Install mingw libraries if we built with mingw
+# Needs checking - maybe the bundle stuff in iron (for windows) can do this automatically.
 if (MINGW AND WIN32)
     get_filename_component(COMPILER_BIN_DIR ${CMAKE_C_COMPILER} PATH)
     file(GLOB MINGW_DLLS "${COMPILER_BIN_DIR}/*.dll")
@@ -146,4 +147,7 @@ if (MINGW AND WIN32)
         DESTINATION ${INSTALL_PATH_MPI}/bin
         COMPONENT Runtime)
 endif()
-   
+
+# Add the OpenCMISS.cmake file to the UserSDK - it is a tool to help find the correct installation paths.
+install(FILES ${OPENCMISS_MANAGE_DIR}/Packaging/OpenCMISS.cmake
+    DESTINATION . COMPONENT Development)
