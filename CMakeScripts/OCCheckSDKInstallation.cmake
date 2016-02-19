@@ -64,7 +64,5 @@ if (EXISTS "${OPENCMISS_SDK_DIR_ARCH}")
     else()
         log("No matching OpenCMISS installation found for the current configuration subpath '${ARCH_SUBPATH}' under ${OPENCMISS_SDK_DIR}. Please check your local setup." ERROR)
     endif()
-else()
-    log("Invalid SDK architecture path: ${OPENCMISS_SDK_DIR_ARCH}" ERROR)    
 endif()
 

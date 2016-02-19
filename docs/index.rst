@@ -177,6 +177,14 @@ Once you've installed the developer SDK, you can essentially follow the steps at
 You need to set the variable :cmake:`OPENCMISS_SDK_DIR` to your Developer SDK installation
 folder in CMake (define in CMake-GUI or set via :cmake:`-DOPENCMISS_SDK_DIR` in command line).
 
+Then, the main build script will simply pick up the matching pre-installed components instead of building them! :-)
+
+.. attention::
+
+   The manage script always compiles the current architecture path for your build selection and tries to find the corresponding pre-build
+   libraries at the same sub-path within the Developer SDK. If that path cannot be found, an error is issued and you should check if
+   your current selection (toolchain, mpi type, build type..) is contained in/supported by the SDK.
+
 .. note::
 
    If suitable, you may also define the :cmake:`OPENCMISS_SDK_DIR` variable in your environment. This way you dont have to specify it when
