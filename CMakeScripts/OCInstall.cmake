@@ -148,6 +148,21 @@ if (MINGW AND WIN32)
         COMPONENT Runtime)
 endif()
 
+# Additional User SDK files
+set(USERSDK_RESOURCE_DIR Resources)
 # Add the OpenCMISS.cmake file to the UserSDK - it is a tool to help find the correct installation paths.
 install(FILES ${OPENCMISS_MANAGE_DIR}/Packaging/OpenCMISS.cmake
-    DESTINATION . COMPONENT Development)
+    DESTINATION ${USERSDK_RESOURCE_DIR} COMPONENT UserSDK)
+    
+# Add the OpenCMISS.cmake file to the UserSDK - it is a tool to help find the correct installation paths.
+set(_VERSION_BRANCH v${OpenCMISS_VERSION})
+if (OC_DEVEL_ALL)
+    set(_VERSION_BRANCH devel)
+endif()
+install(CODE "
+    file(MAKE_DIRECTORY \"\${CMAKE_INSTALL_PREFIX}/${USERSDK_RESOURCE_DIR}/Examples\")
+    execute_process(COMMAND ${GIT_EXECUTABLE} clone -b ${_VERSION_BRANCH} https://github.com/OpenCMISS-Examples/classicalfield_laplace_simple
+        WORKING_DIRECTORY \"\${CMAKE_INSTALL_PREFIX}/${USERSDK_RESOURCE_DIR}/Examples\")
+"
+    COMPONENT UserSDK)
+unset(_VERSION_BRANCH)    

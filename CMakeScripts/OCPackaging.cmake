@@ -81,6 +81,7 @@ list(APPEND INSTALL_QUADS
     "${IRON_BINARY_DIR}" "Iron Development" Development "/${ARCHITECTURE_PATH_MPI}"
     "${ZINC_BINARY_DIR}" "Zinc Development" Development "/${ARCHITECTURE_PATH}"
     "${PROJECT_BINARY_DIR}" "OpenCMISS Development" Development /
+    "${PROJECT_BINARY_DIR}" "Additional User SDK files" UserSDK /
 )
 CREATE_PACKAGING_TARGET()
 

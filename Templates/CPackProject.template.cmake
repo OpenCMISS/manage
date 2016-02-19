@@ -65,7 +65,12 @@ elseif(UNIX)
 endif()
 
 # Put the package output directory on the same level as source and build folders
-set(CPACK_PACKAGE_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/../package")
+if (WIN32)
+    set(CPACK_PACKAGE_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}")
+else()
+    set(CPACK_PACKAGE_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/../package")
+endif()
+
 
 # Here the effective install components of the opencmiss projects are listed and forwarded to CPACK_INSTALL_CMAKE_PROJECTS
 set(INSTALL_QUADS "@INSTALL_QUADS@")
