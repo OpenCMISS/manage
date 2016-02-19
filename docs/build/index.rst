@@ -10,17 +10,6 @@ Building the OpenCMISS Suite
 The base for the installation is a folder called :path:`OPENCMISS_ROOT`.
 We’ll use :path:`<manage>` as shorthand to :path:`<OPENCMISS_ROOT>/manage`.
 
-We have two major groups of people using OpenCMISS:
-
-   Users 
-      only use the OpenCMISS components Iron/Zinc but may of course create/develop their own examples.
-   
-   Developers 
-      are people that intend to make changes to the OpenCMISS codebase itself,
-      i.e. add functionality to Iron, Zinc or any other component.
-      
-Consequently, some parts of this documentation apply only to certain user groups.
-
 .. _`build_prerequisites`:
 
 Prerequisites

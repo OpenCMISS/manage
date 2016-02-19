@@ -105,6 +105,7 @@ include(OCToolchainCompilers)
 # Ready to start the "build project"
 project(OpenCMISS VERSION 1.2 LANGUAGES C CXX)
 enable_language(Fortran OPTIONAL)
+enable_testing()
 
 include(OCMiscFunctionsMacros)
 
@@ -267,11 +268,6 @@ include(OCSupport)
 # Dependencies, Iron, ...
 include(OCConfigureComponents)
 
-# Examples
-if (NOT OC_DEPENDENCIES_ONLY)
-    include(OCAddExamplesProject)
-endif()
-
 ########################################################################
 # Installation and support
 include(OCInstall)
@@ -280,8 +276,7 @@ include(OCPackaging)
 ########################################################################
 # Testing
 # Need to enable testing in order for any add_test calls (see OCComponentSetupMacros) to work
-enable_testing()
-include(OCKeyTests)
+add_subdirectory(Tests)
 
 ########################################################################
 # Misc targets for convenience

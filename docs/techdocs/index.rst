@@ -115,7 +115,7 @@ This is far from ideal, but a quick way to see what’s working and what not.
 Key tests
 =========
 
-.. cmake-source:: ../../CMakeScripts/OCKeyTests.cmake
+.. cmake-source:: ../../Tests/OCKeyTests.cmake
 
 Writing Iron IO routines
 ========================
