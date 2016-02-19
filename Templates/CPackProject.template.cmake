@@ -61,7 +61,7 @@ if (WIN32)
 elseif(APPLE)
     #todo
 elseif(UNIX)
-    #todo
+    set(CPACK_GENERATOR "TGZ")
 endif()
 
 # Put the package output directory on the same level as source and build folders

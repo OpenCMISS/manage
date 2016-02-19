@@ -92,12 +92,17 @@ The testing can then be run using CTest_
 
 .. _CTest: https://cmake.org/cmake/help/v3.4/manual/ctest.1.html 
 
-For an CMake-enabled example using Fortran and C see the :path:`Resources/Examples/classicalfield_laplace_simple` example within the installation directory.
-      
+Finally, to configure your application, you need to set the variable :cmake:`OPENCMISS_SDK_DIR` to your User SDK installation
+folder in CMake (define in CMake-GUI or set via :cmake:`-DOPENCMISS_SDK_DIR` in command line).
+
 .. note::
 
-   *Windows only* If you chose the default install location, CMake can pick up the installation via system default paths. If you choose a different path, you
-   will have to configure your CMake build with a variable :cmake:`OPENCMISS_SDK_DIR` set to the appropriate install location.
+   If suitable, you may also define the :cmake:`OPENCMISS_SDK_DIR` variable in your environment. This way you dont have to specify it when
+   configuring your own component builds through CMake/manage.
+   *Windows only* If you chose the default install location, CMake can pick up the installation via system default paths and you dont have to
+   specify anything!
+
+For an CMake-enabled example using Fortran and C see the :path:`Resources/Examples/classicalfield_laplace_simple` example within the installation directory.
          
 .. _CMake: http://www.cmake.org/download
 .. _`added later`: https://github.com/OpenCMISS/manage/issues/54
@@ -156,10 +161,31 @@ you will need to :ref:`build the OpenCMISS suite from source <building opencmiss
 OpenCMISS Developer instructions
 ================================
 
+Depending on the scenario at hand, there are two options for OpenCMISS developers.
+If you intend to modify the OpenCMISS main components but wont need to fuddle with any of the dependencies, the :ref:`developer sdk` is
+probably the most convenient way to achieve this. If you need to modify some of the dependencies (*experienced programmers only*),
+you will have to stick with :ref:`building opencmiss`.
+
+.. _`developer sdk`:
+
+Using the Developer SDK
+=======================
+
+Check the `downloads section <http://www.opencmiss.org/downloads.html>`_ for current packages.
+
+Once you've installed the developer SDK, you can essentially follow the steps at :ref:`build opencmiss` with the following addition:
+You need to set the variable :cmake:`OPENCMISS_SDK_DIR` to your Developer SDK installation
+folder in CMake (define in CMake-GUI or set via :cmake:`-DOPENCMISS_SDK_DIR` in command line).
+
+.. note::
+
+   If suitable, you may also define the :cmake:`OPENCMISS_SDK_DIR` variable in your environment. This way you dont have to specify it when
+   configuring your own component builds through CMake/manage.
+
 .. _`building opencmiss`:
 
-Building OpenCMISS
-==================
+Building OpenCMISS from source
+==============================
 
 Specifications and Techdocs for building the OpenCMISS_ Modelling Suite with CMake_.
 
