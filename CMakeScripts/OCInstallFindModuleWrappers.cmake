@@ -53,3 +53,9 @@ endforeach()
 list(APPEND CMAKE_MODULE_PATH 
     ${OPENCMISS_FINDMODULE_WRAPPER_DIR}
 )
+
+# Even though the Wrappers are already at the OpenCMISS install dir,
+# we also use the install command to have cpack get a hold of them
+install(DIRECTORY ${OPENCMISS_FINDMODULE_WRAPPER_DIR}
+    DESTINATION cmake
+    COMPONENT DevelopmentSDK)

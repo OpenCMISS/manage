@@ -10,28 +10,14 @@ Building the OpenCMISS Suite
 The base for the installation is a folder called :path:`OPENCMISS_ROOT`.
 We’ll use :path:`<manage>` as shorthand to :path:`<OPENCMISS_ROOT>/manage`.
 
-We have two major groups of people using OpenCMISS:
-
-   Users 
-      only use the OpenCMISS components Iron/Zinc but may of course create/develop their own examples.
-   
-   Developers 
-      are people that intend to make changes to the OpenCMISS codebase itself,
-      i.e. add functionality to Iron, Zinc or any other component.
-      
-Consequently, some parts of this documentation apply only to certain user groups.
-
 .. _`build_prerequisites`:
 
 Prerequisites
 =============
 In order to build OpenCMISS or any part of it, you need:
-   1. A compiler toolchain :code:`(gnu/intel/clang/...)`
-   2. A MPI implementation - some are shipped with OpenCMISS and can be automatically built for you.
-      If you want a different one, no one holds you back.
-   3. [Optional] Git_ version control.
-      This is recommended as cloning the repositories makes contributing back easier from the start!
-   4. CMake_ 3.3.2 or higher.
+
+   #. A compiler toolchain :code:`(gnu/intel/clang/...)`
+   #. CMake_ 3.3.2 or higher.
    
       - If you are on Linux/Mac and already have an older version installed (higher than 2.6),
         the build procedure will automatically provide a target “cmake” to build the required CMake version and
@@ -42,7 +28,12 @@ In order to build OpenCMISS or any part of it, you need:
         OpenSSL_ will automatically be detected & built into CMake if the setup script triggers
         the build, for own/a-priori cmake builds please use the :cmake:`CMAKE_USE_OPENSSL=YES`
         flag at cmake build configuration time.
-   5. [Optional] Python_ and various libraries. Only relevant if you want to build Python bindings.
+   #. Disk space! Make sure to have at least 5 GB of free disk space if you plan to build everything in Release and Debug modes. 
+   #. [*Optional*] Git_ version control.
+      This is recommended as cloning the repositories makes contributing back easier from the start!
+   #. [*Iron only*] A MPI implementation - some are shipped with OpenCMISS and can be automatically built for you.
+      If you want a different one, no one holds you back.
+   #. [*Python bindings only*] Python_ and various libraries. This is only relevant if you want to build Python bindings.
    
       - Python itself (:code:`python`), minimum version 2.7.9.
       - The SWIG_ interface generator (e.g. `Windows download`_)  
@@ -118,20 +109,46 @@ Prerequisites
 
 In addition to the :ref:`general prerequisites <build_prerequisites>`:
 
-   1. Visual Studio 2013. Other versions *might* work, they have not been tested yet.
-   2. A Fortran compiler that integrates with Visual Studio. We use the Intel Composer Framework (license costs!)
-   3. MPI: We use MPICH2_, MSMPI_ will be tested soon. **Install to a location without spaces!**
-   4. Make sure that any pre-installed programs (MPI, Git, ..) are available on the PATH (either User or System scope).
+   #. Visual Studio 2013 Update 5. Other versions *might* work, they have not been tested yet. The Update 5 was necessary to
+      fix some compiler issues for some dependencies.
+   #. If you want to build Iron:
+   
+      #. A Fortran compiler that integrates with Visual Studio. We use the Intel Composer Framework (license costs!)
+      #. MPI: We use MPICH2_, MSMPI_ can be configured but there are `known compatibility issues`_ regarding the MSVCRT.
+   #. Make sure that any pre-installed programs (MPI, Git, ..) are available on the PATH (either User or System scope).
       Path entries must be *without* quotation marks in order to have CMake pick them up correctly!
 
 .. _MPICH2: http://www.mpich.org/static/tarballs/1.4.1p1/mpich2-1.4.1p1-win-x86-64.msi
 .. _MSMPI: https://msdn.microsoft.com/en-us/library/bb524831%28v=vs.85%29.aspx
+.. _`known compatibility issues`: https://github.com/OpenCMISS/manage/issues/52
 
-Visual Studio (64bit)
----------------------
+Visual Studio (32/64bit)
+------------------------
 
-Python bindings
-'''''''''''''''
+   #. Create the :cmake:`OPENCMISS_ROOT` folder somewhere and enter it
+   #. Clone the setup git repo into that folder via :sh:`git clone https://github.com/OpenCMISS/manage`.
+      Alternatively, if you don't have Git, go to `GitHub and download a zip file`_
+   #. Open CMake GUI
+   
+      #. Use the "Browse Source" button and select the :path:`OPENCMISS_ROOT/manage` folder
+      #. Use the "Browse Build" button and select the :path:`OPENCMISS_ROOT/manage/build` folder
+   
+   #. If you want to use MPI, you *need* to specify the MPI cache variable to "msmpi" or "mpich2" in order to have the 
+      build system find the corresponding packages. Use the "Add entry" button for that (Type "STRING").
+   #. Click on "Configure". CMake will prompt you to select a Toolchain. Make sure you choose the correct one, this also
+      determines if you will build 32 or 64 bit versions.
+   #. After the configuration finished, click "Generate".
+   #. Navigate to :path:`OPENCMISS_ROOT/manage/build` and open the generated Visual Studio solution file "OpenCMISS"
+   #. Within Visual Studio, select the build type (it seems to default to "Debug", you might want to select "Release")
+   #. Build the project "opencmiss".
+   #. Have a coffee or two.
+   
+.. note::
+
+   Building with Visual Studio in 32bit mode has not been tested yet.
+
+Python bindings (64bit)
+'''''''''''''''''''''''
 Make sure you download a `64bit Python installer`_ (see e.g. general 2.7.11 `download page`_).
 
 Unfortunately, for NumPy_, there is **no** official support for 64bit Windows binaries!
@@ -148,14 +165,9 @@ For the above Python 2.7.11 link, we use `this build`_.
 .. _`Christoph Gohlke`: http://www.lfd.uci.edu/~gohlke/
 .. _`this build`: http://www.lfd.uci.edu/~gohlke/pythonlibs/bofhrmxk/numpy-1.10.4+mkl-cp27-none-win_amd64.whl
 
-Visual Studio (32bit)
----------------------
 
-*THIS HAS NOT BEEN TESTED YET*
-The documentation here is just to collect information and needs to be completed and checked.
-
-Python bindings
-'''''''''''''''
+Python bindings (32bit)
+'''''''''''''''''''''''
 For NumPy_, there are 32bit Windows binaries available via `SourceForge <numpy_dl_general>`_.
 For some reason newer releases don't come with the 'superpack' .msi installers, `Version 1.10.2 <numpy_dl>`_ currently does. 
 

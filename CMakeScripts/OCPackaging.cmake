@@ -29,10 +29,9 @@
 
 # This is where additional packaging files are located
 set(OC_PACKAGE_FILES_DIR "${CMAKE_CURRENT_SOURCE_DIR}/Packaging")
-# Base directory for produced packages
-set(OC_PACKAGE_ROOT "${CMAKE_CURRENT_BINARY_DIR}/packaging")
+# Base directory for produced packages - you can specify your own one
+set(OC_PACKAGE_ROOT "${CMAKE_CURRENT_BINARY_DIR}/packaging" CACHE PATH "Base directory for produced packages")
 file(MAKE_DIRECTORY "${OC_PACKAGE_ROOT}")
-
 
 set(PACKAGE_ARCH "${MPI}_${CMAKE_SYSTEM_NAME}_${MACHINE}")
 set(PACKAGE_ARCH_DESC "${MPI} / ${CMAKE_SYSTEM_NAME} (${MACHINE}bit)")
@@ -60,11 +59,17 @@ set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "OpenCMISS Summary")
 set(INSTALL_QUADS 
     "${IRON_BINARY_DIR}" "Iron Runtime" Runtime "/${ARCHITECTURE_PATH_MPI}"
     "${IRON_BINARY_DIR}" "Iron C bindings" CBindings "/${ARCHITECTURE_PATH_MPI}"
-    "${IRON_BINARY_DIR}" "Iron Python bindings" PythonBindings "/${ARCHITECTURE_PATH_MPI}/iron"
+    "${IRON_BINARY_DIR}" "Iron Python bindings" PythonBindings "/${ARCHITECTURE_PATH_MPI}"
     "${ZINC_BINARY_DIR}" "Zinc Runtime" Runtime "/${ARCHITECTURE_PATH_MPI}"
-    "${ZINC_BINARY_DIR}" "Zinc Python bindings" PythonBindings "/${ARCHITECTURE_PATH_MPI}/zinc"
+    "${ZINC_BINARY_DIR}" "Zinc Python bindings" PythonBindings "/${ARCHITECTURE_PATH}"
     "${PROJECT_BINARY_DIR}" "OpenCMISS Runtime files" Runtime /
 )
+# This component is a install step that bundles dependent DLLs into the binary directory.
+if (WIN32)
+    list(APPEND INSTALL_QUADS
+        "${IRON_BINARY_DIR}" "OpenCMISS dependance DLLs" Redist "/${ARCHITECTURE_PATH_MPI}"
+    )
+endif()
 CREATE_PACKAGING_TARGET()
 
 set(PACKAGE_NAME "OpenCMISS User SDK")
@@ -74,8 +79,9 @@ set(PACKAGE_NAME_BASE "OpenCMISS_${OpenCMISS_VERSION}_UserSDK")
 set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "OpenCMISS User SDK Summary")
 list(APPEND INSTALL_QUADS 
     "${IRON_BINARY_DIR}" "Iron Development" Development "/${ARCHITECTURE_PATH_MPI}"
-    "${ZINC_BINARY_DIR}" "Zinc Development" Development "/${ARCHITECTURE_PATH_MPI}"
+    "${ZINC_BINARY_DIR}" "Zinc Development" Development "/${ARCHITECTURE_PATH}"
     "${PROJECT_BINARY_DIR}" "OpenCMISS Development" Development /
+    "${PROJECT_BINARY_DIR}" "Additional User SDK files" UserSDK /
 )
 CREATE_PACKAGING_TARGET()
 
@@ -84,8 +90,18 @@ set(PACKAGE_TYPE "developersdk")
 #set(PACKAGE_REGISTRY_KEY "OpenCMISSDeveloperSDK")
 set(PACKAGE_NAME_BASE "OpenCMISS_${OpenCMISS_VERSION}_DeveloperSDK")
 set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "OpenCMISS Developer SDK Summary")
-set(INSTALL_QUADS )
+set(INSTALL_QUADS 
+    "${PROJECT_BINARY_DIR}" "OpenCMISS Runtime files" Runtime /
+    "${PROJECT_BINARY_DIR}" "OpenCMISS Development" Development /
+    "${PROJECT_BINARY_DIR}" "OpenCMISS Development" DevelopmentSDK /
+)
 foreach(COMP ${_OC_SELECTED_COMPONENTS})
-    list(APPEND INSTALL_QUADS "${${COMP}_BINARY_DIR}" ${COMP} Development /)
+    if (NOT COMP STREQUAL IRON AND NOT COMP STREQUAL ZINC)
+        if (${COMP} IN_LIST OPENCMISS_COMPONENTS_WITHMPI)
+            list(APPEND INSTALL_QUADS "${${COMP}_BINARY_DIR}" ${COMP} ALL "/${ARCHITECTURE_PATH_MPI}")
+        else()
+            list(APPEND INSTALL_QUADS "${${COMP}_BINARY_DIR}" ${COMP} ALL "/${ARCHITECTURE_PATH}")
+        endif()
+    endif()
 endforeach()
-#CREATE_PACKAGING_TARGET()
+CREATE_PACKAGING_TARGET()

@@ -103,8 +103,9 @@ include(OCToolchainCompilers)
 
 ########################################################################
 # Ready to start the "build project"
-project(OpenCMISS VERSION 1.2 LANGUAGES C CXX)
+project(OpenCMISS VERSION 1.3 LANGUAGES C CXX)
 enable_language(Fortran OPTIONAL)
+enable_testing()
 
 include(OCMiscFunctionsMacros)
 
@@ -130,9 +131,11 @@ include(OpenCMISSConfig)
 string(TIMESTAMP NOW "%Y-%m-%d, %H:%M")
 log("Starting configuration in ${CMAKE_CURRENT_BINARY_DIR} at ${NOW}")
 
-if ((NOT WIN32 OR MINGW) AND CMAKE_BUILD_TYPE STREQUAL "")
-    SET(CMAKE_BUILD_TYPE RELEASE)
-    message(STATUS "No CMAKE_BUILD_TYPE has been defined. Using RELEASE.")
+if (NOT WIN32 OR MINGW)
+    if (CMAKE_BUILD_TYPE STREQUAL "")
+        SET(CMAKE_BUILD_TYPE RELEASE)
+        message(STATUS "No CMAKE_BUILD_TYPE has been defined. Using RELEASE.")
+    endif()
 endif()
 
 include(ExternalProject)
@@ -265,11 +268,6 @@ include(OCSupport)
 # Dependencies, Iron, ...
 include(OCConfigureComponents)
 
-# Examples
-if (NOT OC_DEPENDENCIES_ONLY)
-    include(OCAddExamplesProject)
-endif()
-
 ########################################################################
 # Installation and support
 include(OCInstall)
@@ -278,8 +276,7 @@ include(OCPackaging)
 ########################################################################
 # Testing
 # Need to enable testing in order for any add_test calls (see OCComponentSetupMacros) to work
-enable_testing()
-include(OCKeyTests)
+add_subdirectory(Tests)
 
 ########################################################################
 # Misc targets for convenience

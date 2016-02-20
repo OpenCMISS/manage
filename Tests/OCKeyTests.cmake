@@ -2,32 +2,50 @@
 # In order to verify the overall functionality of an OpenCMISS build, we use *key tests*
 # to quickly check core functionality *every time after build and installation*.
 #
-# The key tests are a selected set of OpenCMISS examples from the GitHub `OpenCMISS-Examples`_ organisation,
-# which are build along with the main components and added as CTest test cases. 
+# The key tests are a selected set of tests available from the OpenCMISS main libaries
+# and some dependencies. 
 #
-# Depending on the effective configuration, a suitable selection of the following examples is build and run:
+# Depending on the effective configuration and component selection, a suitable selection of the following examples is build and run:
 #
-#    Classical field - Fortran
-#        This key test is build whenever Iron is build. See :var:`OC_USE_<COMP>`.
+#    :Iron-Fortran: Run whenever Iron is build. See :var:`OC_USE_IRON`.
 #
-#    Classical field - C
-#        This example is only build when the C bindings for Iron are build.
-#        See the :ref:`IRON_WITH_C_BINDINGS <intercomponent>` variable.
+#      - ClassicalField_Laplace
+#      - ClassicalField_AnalyticLaplace
+#      - ClassicalField_AnalyticNonlinearPoisson
+#      - FiniteElasticity_Cantilever
+#      - LinearElasticity_Extension
 #
-#    Finite elasticity cantilever - Fortran
-#        This key test is build whenever Iron is build. See :var:`OC_USE_<COMP>`.
+#    :Iron-C: Run when the C bindings for Iron are build.
+#      See the :ref:`IRON_WITH_C_BINDINGS <intercomponent>` variable.
+#    
+#      - C_Bindings_ComplexMesh
 #
-#    Bioelectrics Monodomain - Fortran
-#        This key test is build whenever
+#    :Iron-Python: Run when the Python bindings for Iron are build.
+#      See the :ref:`IRON_WITH_Python_BINDINGS <intercomponent>` variable.
+#  
+#      - Python_Bindings_Import
+#      - Python_Bindings_Cantilever
 #
-#            * Iron and CellML are build, see :var:`OC_USE_<COMP>`.
-#            * Iron with CellML is enabled, see :ref:`IRON_WITH_CELLML <intercomponent>`.
+#    :Iron-CellML: Tests CellML models through Iron. Build when 
+#      Iron and CellML are build, see :var:`OC_USE_<COMP>`.
+#      Iron with CellML is enabled, see :ref:`IRON_WITH_CELLML <intercomponent>`.
 #
-#    Classical field static advection diffusion with FieldML - Fortran
-#        This key test is build whenever
+#      - CellML Model Integration
 #
-#            * Iron and FieldML-API are build, see :var:`OC_USE_<COMP>`.
-#            * Iron with FieldML is enabled, see :ref:`IRON_WITH_FIELDML <intercomponent>`.
+#    :Iron-FieldML: Classical field static advection diffusion with FieldML. Run when
+#      Iron and FieldML-API are build, see :var:`OC_USE_<COMP>`.
+#      Iron with FieldML is enabled, see :ref:`IRON_WITH_FIELDML <intercomponent>`.
+#
+#      - StaticAdvectionDiffusion_FieldML
+#
+#    :Zinc-API: Run whenever Zinc is build, see :var:`OC_USE_ZINC`.
+#
+#      - APITest_*
+#
+#    :Zinc-Python: Run whenever Python bindings for Zinc are build.
+#      See the :ref:`ZINC_WITH_Python_BINDINGS <intercomponent>` variable.
+#
+#      - Python_Bindings_*
 #
 # See also: :ref:`build targets`.
 #

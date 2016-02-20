@@ -120,7 +120,7 @@ option(PASTIX_USE_PTSCOTCH "Have PASTIX use PT-Scotch" YES)
 #    PETSC_WITH_PARMETIS : YES
 #        Have PetSC use PARMETIS
 #    PETSC_WITH_PASTIX : YES
-#        Have PetSC use PASTIX
+#        Have PetSC use PASTIX. Defaults to NO for Visual Studio.
 #    PETSC_WITH_PTSCOTCH : YES
 #        Have PetSC use PTSCOTCH
 #    PETSC_WITH_SCALAPACK : YES
@@ -133,7 +133,11 @@ option(PASTIX_USE_PTSCOTCH "Have PASTIX use PT-Scotch" YES)
 #        Have PetSC use SUPERLU
 #    PETSC_WITH_SUPERLU_DIST : YES
 #        Have PetSC use SUPERLU_DIST
-option(PETSC_WITH_PASTIX "Have PetSC use PASTIX" YES)
+set(_VAL YES)
+if (MSVC)
+    set(_VAL NO)
+endif()
+option(PETSC_WITH_PASTIX "Have PetSC use PASTIX" ${_VAL})
 option(PETSC_WITH_MUMPS "Have PetSC use MUMPS" YES)
 option(PETSC_WITH_SUITESPARSE "Have PetSC use SUITESPARSE" YES)
 option(PETSC_WITH_SCALAPACK "Have PetSC use SCALAPACK" YES)

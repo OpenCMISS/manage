@@ -19,7 +19,10 @@ else()
     set(PSEP "/")
 endif()
 
-set(CPACK_PACKAGE_FILE_NAME "@PACKAGE_NAME_BASE@_@MPI@_${CMAKE_SYSTEM_NAME}${MACHINE_ARCH}")
+set(CPACK_PROJECT_CONFIG_FILE ${CMAKE_CURRENT_BINARY_DIR}/CPackRunConfig.cmake)
+file(WRITE "${CPACK_PROJECT_CONFIG_FILE}"
+"set(CPACK_PACKAGE_FILE_NAME \"@PACKAGE_NAME_BASE@_@MPI@_${CMAKE_SYSTEM_NAME}${MACHINE_ARCH}_\${CPACK_BUILD_CONFIG}\")"
+)
 
 # NEVER CHANGE THIS AFTER THE FIRST SDK RELEASES.
 # The windows registry key is (automatically) constructed using the vendor. 
@@ -58,11 +61,16 @@ if (WIN32)
 elseif(APPLE)
     #todo
 elseif(UNIX)
-    #todo
+    set(CPACK_GENERATOR "TGZ")
 endif()
 
 # Put the package output directory on the same level as source and build folders
-set(CPACK_PACKAGE_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/../package")
+if (WIN32)
+    set(CPACK_PACKAGE_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}")
+else()
+    set(CPACK_PACKAGE_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/../package")
+endif()
+
 
 # Here the effective install components of the opencmiss projects are listed and forwarded to CPACK_INSTALL_CMAKE_PROJECTS
 set(INSTALL_QUADS "@INSTALL_QUADS@")

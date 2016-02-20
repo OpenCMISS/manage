@@ -216,6 +216,12 @@ if(iron IN_LIST OpenCMISS_FIND_COMPONENTS)
         # See FindMPI.cmake for declaration of 'mpi' target
         target_link_libraries(opencmiss INTERFACE mpi)
         
+        # On some platforms (windows), we do not have the mpi.mod file or it could not be compatible for inclusion
+        # This variable is set by the FindMPI.cmake module in OPENCMISS_INSTALL_DIR/cmake/OpenCMISSExtraFindModules
+        if (NOT MPI_Fortran_MODULE_COMPATIBLE)
+            add_definitions(-DNOMPIMOD)
+        endif()
+        
         message(STATUS "Looking for OpenCMISS-Iron ... Success")
     else()
         message(FATAL_ERROR "OpenCMISS installation at ${_OPENCMISS_IMPORT_PREFIX} does not contain Iron")
@@ -243,50 +249,50 @@ unset(BUILDTYPE_SUFFIX)
 #################################################################################
 # Extra functions to use within CMake-enabled OpenCMISS applications and examples
 
-if (WIN32)
-    set(_LD_VARNAME "PATH")
-elseif(APPLE)
-    set(_LD_VARNAME "DYLD_LIBRARY_PATH")
-elseif(UNIX)
-    set(_LD_VARNAME "LD_LIBRARY_PATH")
-else()
-    message(WARNING "Adding OpenCMISS environment not implemented for '${CMAKE_HOST_SYSTEM}'")
-endif()
-
-# Composes a native PATH-compatible variable to use for DLL/SO finding.
+ # Composes a native PATH-compatible variable to use for DLL/SO finding.
 # Each extra argument is assumed a path to add. Added in the order specified.
 function(get_library_path OUTPUT_VARIABLE)
     if (WIN32)
-       set(LD_PATH "$ENV{${_LD_VARNAME}}")
-       foreach(_PATH ${ARGN})
-           file(TO_NATIVE_PATH "${_PATH}" _PATH)
-           set(LD_PATH "${_PATH};${LD_PATH}")
-       endforeach()
-       string(REPLACE ";" "\\;" LD_PATH "${LD_PATH}")
+        set(PSEP "\\;")
+        #set(HAVE_MULTICONFIG_ENV YES)
+        set(LD_VARNAME "PATH")
+    elseif(APPLE)
+        set(LD_VARNAME "DYLD_LIBRARY_PATH")
+        set(PSEP ":")
+    elseif(UNIX)
+        set(LD_VARNAME "LD_LIBRARY_PATH")
+        set(PSEP ":")
     else()
-       set(LD_PATH "$ENV{${_LD_VARNAME}}")
-       foreach(_PATH ${ARGN})
-           file(TO_NATIVE_PATH "${_PATH}" _PATH)
-           set(LD_PATH "${_PATH}:${LD_PATH}")
-       endforeach()
+        message(WARNING "get_library_path not implemented for '${CMAKE_HOST_SYSTEM}'")
     endif()
-    set(${OUTPUT_VARIABLE} "${LD_PATH}" PARENT_SCOPE)
+    # Load system environment - on windows its separated by semicolon, so we need to protect those 
+    string(REPLACE ";" "\\;" LD_PATH "$ENV{${LD_VARNAME}}")
+    foreach(_PATH ${ARGN})
+        # For now: We dont have /Release or /Debug subfolders in any installed/packaged structure.
+        #if (HAVE_MULTICONFIG_ENV)
+        #    file(TO_NATIVE_PATH "${_PATH}/$<CONFIG>" _PATH)
+        #else()
+            file(TO_NATIVE_PATH "${_PATH}" _PATH)
+        #endif()
+        set(LD_PATH "${_PATH}${PSEP}${LD_PATH}")
+    endforeach()
+    set(${OUTPUT_VARIABLE} "${LD_VARNAME}=${LD_PATH}" PARENT_SCOPE)
 endfunction()
 
 # Convenience function to add the currently found OpenCMISS runtime environment to any
 # test using OpenCMISS libraries
 # Intended use is the OpenCMISS User SDK.
 function(add_opencmiss_environment TESTNAME)
-    get_library_path(LD_PATH "${OPENCMISS_INSTALL_DIR_ARCHPATH}/bin")
-    messaged("Setting environment for test ${TESTNAME}: ${LD_VARNAME}=${LD_PATH}")
+    get_library_path(PATH_DEFINITION "${OPENCMISS_INSTALL_DIR_ARCHPATH}/bin")
+    messaged("Setting environment for test ${TESTNAME}: ${LD_PATH}")
     # Set up the correct environment for the test
     # See https://cmake.org/pipermail/cmake/2009-May/029464.html
     get_test_property(${TESTNAME} ENVIRONMENT EXISTING_TEST_ENV)
     if (EXISTING_TEST_ENV)
         set_tests_properties(${TESTNAME} PROPERTIES
-            ENVIRONMENT "${EXISTING_TEST_ENV};${_LD_VARNAME}=${LD_PATH}")
+            ENVIRONMENT "${EXISTING_TEST_ENV};${PATH_DEFINITION}")
     else()
         set_tests_properties(${TESTNAME} PROPERTIES
-            ENVIRONMENT "${_LD_VARNAME}=${LD_PATH}")
+            ENVIRONMENT "${PATH_DEFINITION}")
     endif()
 endfunction()

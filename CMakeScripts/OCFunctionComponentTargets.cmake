@@ -58,7 +58,7 @@ function(addConvenienceTargets COMPONENT_NAME BINARY_DIR SOURCE_DIR)
             WORKING_DIRECTORY ${SOURCE_DIR}
             COMMENT "Git status report for ${COMPONENT_NAME_LOWER} at ${SOURCE_DIR}"
         )
-        set_target_properties(${COMPONENT_NAME_LOWER}-gitstatus PROPERTIES FOLDER "${COMPONENT_NAME_LOWER}")
+        set_target_properties(${COMPONENT_NAME_LOWER}-gitstatus PROPERTIES FOLDER "Git")
     endif()
     
     # Add convenience direct-access forced build target for component
