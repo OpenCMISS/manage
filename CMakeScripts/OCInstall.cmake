@@ -159,10 +159,12 @@ set(_VERSION_BRANCH v${OpenCMISS_VERSION})
 if (OC_DEVEL_ALL)
     set(_VERSION_BRANCH devel)
 endif()
-install(CODE "
-    file(MAKE_DIRECTORY \"\${CMAKE_INSTALL_PREFIX}/${USERSDK_RESOURCE_DIR}/Examples\")
-    execute_process(COMMAND ${GIT_EXECUTABLE} clone -b ${_VERSION_BRANCH} https://github.com/OpenCMISS-Examples/classicalfield_laplace_simple
-        WORKING_DIRECTORY \"\${CMAKE_INSTALL_PREFIX}/${USERSDK_RESOURCE_DIR}/Examples\")
-"
-    COMPONENT UserSDK)
+if(NOT EXISTS ${CMAKE_INSTALL_PREFIX}/${USERSDK_RESOURCE_DIR}/Examples)
+    install(CODE "
+       file(MAKE_DIRECTORY \"\${CMAKE_INSTALL_PREFIX}/${USERSDK_RESOURCE_DIR}/Examples\")
+       execute_process(COMMAND ${GIT_EXECUTABLE} clone -b ${_VERSION_BRANCH} https://github.com/OpenCMISS-Examples/classicalfield_laplace_simple
+           WORKING_DIRECTORY \"\${CMAKE_INSTALL_PREFIX}/${USERSDK_RESOURCE_DIR}/Examples\")
+       "
+       COMPONENT UserSDK)
+endif()
 unset(_VERSION_BRANCH)    
