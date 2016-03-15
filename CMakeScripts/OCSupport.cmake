@@ -85,9 +85,10 @@ OpenCMISS Support variable dump file, ${NOW}
         # to collect their respective log files. Using PRE_BUILD directly on "support"
         # does not work everywhere (only with Win/VS)
         add_custom_target(collect_logs
-            COMMAND ${CMAKE_COMMAND} -E echo "Collecting log files from build directories"
+            COMMAND ${CMAKE_COMMAND} -E echo "--"
+            COMMENT "Support: Collected log files from build directories"
         )
-        list(APPEND _SUPPORT_DEPS DEPENDS collect_logs)
+        set(_SUPPORT_DEPS DEPENDS collect_logs)
     endif()
     
     # Fall back to the OC_BUILD_SUPPORT_EMAIL if no install email is set.
