@@ -73,7 +73,7 @@ endif()
 # LAPACK (includes BLAS)
 # Thus far only Iron really makes heavy use of BLAS/LAPACK, opt++ from zinc
 # dependencies is the only other dependency that can make use of (external) BLAS/LAPACK.
-if ((OC_USE_BLAS OR OC_USE_LAPACK) AND (OC_USE_IRON OR (OC_USE_OPTPP AND OPTPP_WITH_BLAS)))
+if ((OC_USE_BLAS OR OC_USE_LAPACK) AND (OC_DEPENDENCIES_ONLY OR OC_USE_IRON OR (OC_USE_OPTPP AND OPTPP_WITH_BLAS)))
     find_package(BLAS ${BLAS_VERSION} QUIET)
     find_package(LAPACK ${LAPACK_VERSION} QUIET)
     if(NOT (LAPACK_FOUND AND BLAS_FOUND))
