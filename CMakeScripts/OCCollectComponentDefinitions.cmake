@@ -51,11 +51,9 @@ endforeach()
 
 # Pass on local lookup flags (consumed by find_package calls)
 foreach(COMP ${OPENCMISS_COMPONENTS})
-    if (OC_SYSTEM_${COMP})
-        LIST(APPEND COMPONENT_COMMON_DEFS 
-            -DOC_SYSTEM_${COMP}=${OC_SYSTEM_${COMP}}
-        )
-    endif()
+    LIST(APPEND COMPONENT_COMMON_DEFS 
+        -DOC_SYSTEM_${COMP}=${OC_SYSTEM_${COMP}}
+    )
 endforeach()
 
 # Use the correct install RPATH to enable binaries to find the shared libs (if any, ignored otherwise).
