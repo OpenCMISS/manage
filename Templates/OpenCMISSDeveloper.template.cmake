@@ -46,7 +46,7 @@
 #
 # Use in conjunction with `<COMP>_BRANCH`_ if necessary.
 
-#set(IRON_DEVEL git@github.com:mygithub/iron)
+#set(IRON_REPO git@github.com:mygithub/iron)
 
 ##
 # GITHUB_USERNAME
