@@ -7,20 +7,25 @@
 #
 #    :architecture: The system architecture, e.g. :literal:`x86_64_linux` 
 #    :toolchain: The toolchain info for the build.
-#        This path is composed following the pattern :path:`/<mnemonic>-<version>-F<fortran_version>`,
-#        where *mnemonic* stands for one of the items below, *version* the version of the C compiler and
+#        This path is composed following the pattern :path:`/<mnemonic>-C<c_version>-<mnemonic>-F<fortran_version>`,
+#        where *mnemonic* stands for one of the items below, *c_version* the version of the C compiler and
 #        *fortran_version* the version of the Fortran compiler.
 # 
 #        All the short mnemonics are:
 #        
+#            :absoft: The Absoft Fortran compiler
 #            :borland: The Borland compilers
+#            :ccur: The Concurrent Fortran compiler
 #            :clang: The CLang toolchain (commonly Mac OS)
 #            :cygwin: The CygWin toolchain for Windows environments
 #            :gnu: The GNU toolchain
+#            :g95: The G95 Fortran compiler
 #            :intel: The Intel toolchain
 #            :mingw: The MinGW toolchain for Windows environments
 #            :msvc: MS Visual Studio compilers
+#            :pgi: The Portland Group compilers
 #            :watcom: The Watcom toolchain
+#            :unknown: Unknown compiler
 #    
 #    :multithreading: If :var:`OC_USE_MULTITHREADING` is enabled, this segment is :path:`/mt`.
 #        Otherwise, the path element is skipped.
@@ -35,7 +40,7 @@
 #
 # For example, a typical architecture path looks like::
 #
-#     x86_64_linux/gnu-4.6-F4.6/openmpi_release/release
+#     x86_64_linux/gnu-C4.6-gnu-F4.6/openmpi_release/release
 #
 # See also: :var:`OC_USE_ARCHITECTURE_PATH`
 
@@ -99,43 +104,66 @@ function(getShortArchitecturePath VARNAME)
 endfunction()
 
 function(getCompilerPathElem VARNAME)
-	# Get the compiler name
-	if(MINGW)
-		set(_COMP "mingw" )
-	elseif(MSYS )
-		set(_COMP "msys" )
-	elseif(BORLAND )
-		set(_COMP "borland" )
-	elseif(WATCOM )
-		set(_COMP "watcom" )
-	elseif(MSVC OR MSVC_IDE OR MSVC60 OR MSVC70 OR MSVC71 OR MSVC80 OR CMAKE_COMPILER_2005 OR MSVC90 )
-		set(_COMP "msvc" )
-	elseif(CMAKE_COMPILER_IS_GNUCC)
-	    set(_COMP "gnu")
-	elseif(CMAKE_C_COMPILER_ID MATCHES Clang)
-	    set(_COMP "clang")
-	elseif(CMAKE_C_COMPILER_ID MATCHES Intel 
-	    OR CMAKE_CXX_COMPILER_ID MATCHES Intel
-	    OR CMAKE_Fortran_COMPILER_ID MATCHES Intel)
-	    set(_COMP "intel")
-	elseif( CYGWIN )
-		set(_COMP "cygwin")
-	endif()
+    # Form the C compiler part
+    # Get the C compiler name
+    if(MINGW)
+	set(_C_COMP "mingw" )
+    elseif(MSYS )
+	set(_C_COMP "msys" )
+    elseif(BORLAND )
+	set(_C_COMP "borland" )
+    elseif(WATCOM )
+	set(_C_COMP "watcom" )
+    elseif(MSVC OR MSVC_IDE OR MSVC60 OR MSVC70 OR MSVC71 OR MSVC80 OR CMAKE_COMPILER_2005 OR MSVC90 )
+	set(_C_COMP "msvc" )
+    elseif(CMAKE_COMPILER_IS_GNUCC)
+	set(_C_COMP "gnu")
+    elseif(CMAKE_C_COMPILER_ID MATCHES Clang)
+	set(_C_COMP "clang")
+    elseif(CMAKE_C_COMPILER_ID MATCHES Intel 
+	   OR CMAKE_CXX_COMPILER_ID MATCHES Intel)
+	set(_C_COMP "intel")
+    elseif(CMAKE_C_COMPILER_ID MATCHES PGI)
+	set(_C_COMP "pgi")
+    elseif( CYGWIN )
+	set(_C_COMP "cygwin")
+    else()
+        set(_C_COMP "unknown")       
+    endif()
 	
-	# Get compiler major + minor versions
-	set(_COMPILER_VERSION_REGEX "^[0-9]+\.[0-9]+")
-	string(REGEX MATCH ${_COMPILER_VERSION_REGEX}
+    # Get compiler major + minor versions
+    set(_COMPILER_VERSION_REGEX "^[0-9]+\.[0-9]+")
+    string(REGEX MATCH ${_COMPILER_VERSION_REGEX}
        _C_COMPILER_VERSION_MM "${CMAKE_C_COMPILER_VERSION}")
+    # Form C part
+    set(_C_PART "${_C_COMP}-C${_C_COMPILER_VERSION_MM}")
+ 
     # Also for the fortran compiler (if exists)
     set(_FORTRAN_PART "")
     if (CMAKE_Fortran_COMPILER)
-        string(REGEX MATCH ${_COMPILER_VERSION_REGEX}
+       # Get the Fortran compiler name
+       if(CMAKE_Fotran_COMPILER_ID MATCHES Absoft)
+	   set(_Fortran_COMP "absoft")
+       elseif(CMAKE_Fotran_COMPILER_ID MATCHES Ccur)
+	   set(_Fortran_COMP "ccur")
+       elseif(CMAKE_Fotran_COMPILER_ID MATCHES GNU)
+	   set(_Fortran_COMP "gnu")
+       elseif(CMAKE_Fortran_COMPILER_ID MATCHES G95)
+           set(_Fortran_COMP "g95")
+       elseif(CMAKE_Fortran_COMPILER_ID MATCHES Intel)
+           set(_Fortran_COMP "intel")
+       elseif(CMAKE_Fortran_COMPILER_ID MATCHES PGI)
+           set(_Fortran_COMP "pgi")
+       else()
+           set(_Fortran_COMP "unknown")       
+       endif()
+       string(REGEX MATCH ${_COMPILER_VERSION_REGEX}
            _Fortran_COMPILER_VERSION_MM "${CMAKE_Fortran_COMPILER_VERSION}")
-        set(_FORTRAN_PART "-F${_Fortran_COMPILER_VERSION_MM}")
+       set(_FORTRAN_PART "-${_Fortran_COMP}-F${_Fortran_COMPILER_VERSION_MM}")
     endif()
     
-    # Combine into e.g. gnu-4.8-F4.5
-	set(${VARNAME} "${_COMP}-${_C_COMPILER_VERSION_MM}${_FORTRAN_PART}" PARENT_SCOPE)
+    # Combine C and Fortran part into e.g. gnu-C4.8-intel-F4.5
+    set(${VARNAME} "${_C_PART}${_FORTRAN_PART}" PARENT_SCOPE)
 endfunction()
 
 # Returns the build type arch path element.

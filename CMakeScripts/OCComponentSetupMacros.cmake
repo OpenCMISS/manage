@@ -358,13 +358,15 @@ Configure definitions:
     if (OC_CREATE_LOGS)
         # Using PRE_BUILD directly for target support does not work :-| See docs.
         # So we have an extra target in between. 
-        add_custom_command(TARGET collect_logs POST_BUILD
+        add_custom_target(${OC_EP_PREFIX}${NAME}_collect_log
             COMMAND ${CMAKE_COMMAND}
                 -DLOG_DIR=${BIN}/${_OC_EXTPROJ_STAMP_DIR}
                 -DSUPPORT_DIR=${OC_SUPPORT_DIR} 
                 -P ${OPENCMISS_MANAGE_DIR}/CMakeScripts/OCSupport.cmake
             COMMENT "Support: Collecting ${COMPONENT_NAME} log files"
         )
+        add_dependencies(collect_logs ${OC_EP_PREFIX}${NAME}_collect_log)
+        set_target_properties(${OC_EP_PREFIX}${NAME}_collect_log PROPERTIES FOLDER "Internal")
     endif()
     
     add_custom_target(${OC_EP_PREFIX}${NAME}_buildlog
@@ -373,6 +375,7 @@ Configure definitions:
             -DCOMPONENT_NAME=${NAME}
             -DLOGFILE="${OC_BUILDLOG}"
             -P ${OPENCMISS_MANAGE_DIR}/CMakeScripts/OCSupport.cmake
+        COMMENT "Support: Creating ${COMPONENT_NAME} buildlog"             
         WORKING_DIRECTORY "${OC_SUPPORT_DIR}")
     add_dependencies(${OC_EP_PREFIX}${NAME} ${OC_EP_PREFIX}${NAME}_buildlog)
     set_target_properties(${OC_EP_PREFIX}${NAME}_buildlog PROPERTIES FOLDER "Internal")
