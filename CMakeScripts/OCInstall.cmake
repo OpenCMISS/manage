@@ -167,4 +167,4 @@ if(NOT EXISTS ${CMAKE_INSTALL_PREFIX}/${USERSDK_RESOURCE_DIR}/Examples)
        "
        COMPONENT UserSDK)
 endif()
-unset(_VERSION_BRANCH)    
+unset(_VERSION_BRANCH)
