@@ -30,3 +30,7 @@ CMakeLists.txt.user
 *.exe
 *.out
 *.app
+
+.pydevproject
+.project
+
