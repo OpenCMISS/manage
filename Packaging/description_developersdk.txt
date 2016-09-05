@@ -1,1 +1,0 @@
-This is the OpenCMISS Developer SDK description file.
