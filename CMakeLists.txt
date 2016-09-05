@@ -69,20 +69,19 @@
 ########################################################
 # If your cmake is older than 2.6 - goodbye. 
 cmake_minimum_required(VERSION 2.6.0 FATAL_ERROR)
-# Set the manage directory
-set(OPENCMISS_MANAGE_DIR ${CMAKE_CURRENT_SOURCE_DIR})
+
 # The default opencmiss root is the parent directory of "manage"
-set(OPENCMISS_ROOT "${OPENCMISS_MANAGE_DIR}/.." CACHE PATH "Root directory for OpenCMISS.")
-if (ROOT)
-    SET(OPENCMISS_ROOT "${ROOT}" CACHE PATH "Root directory for OpenCMISS." FORCE)
-endif(ROOT)
-get_filename_component(OPENCMISS_ROOT ${OPENCMISS_ROOT} ABSOLUTE)
+#set(OPENCMISS_ROOT "${OPENCMISS_MANAGE_DIR}/.." CACHE PATH "Root directory for OpenCMISS.")
+#if (ROOT)
+#    SET(OPENCMISS_ROOT "${ROOT}" CACHE PATH "Root directory for OpenCMISS." FORCE)
+#endif(ROOT)
+#get_filename_component(OPENCMISS_ROOT ${OPENCMISS_ROOT} ABSOLUTE)
 
 # Set up include path required at this stage
 list(APPEND CMAKE_MODULE_PATH
-    ${OPENCMISS_MANAGE_DIR}/CMakeScripts
-    ${OPENCMISS_MANAGE_DIR}/Config
-    ${OPENCMISS_MANAGE_DIR})
+    ${OPENCMISS_MODULE_PATH}/CMakeScripts
+    ${OPENCMISS_MODULE_PATH}/Config
+    ${OPENCMISS_MODULE_PATH})
 
 # This ensures that CMake is new enough before anything else is done
 # If its too old, the script will stop with an appropriate error message.
