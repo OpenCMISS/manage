@@ -83,7 +83,6 @@ list(APPEND CMAKE_MODULE_PATH
     ${OPENCMISS_MODULE_PATH}/Config
     ${OPENCMISS_MODULE_PATH})
 
-message(STATUS "::::::${OPENCMISS_MODULE_PATH}/CMakeScripts")
 # This ensures that CMake is new enough before anything else is done
 # If its too old, the script will stop with an appropriate error message.
 # The option is to either come up with a sufficiently new version yourself,
