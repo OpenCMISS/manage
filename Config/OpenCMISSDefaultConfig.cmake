@@ -186,6 +186,12 @@ set(TIFF_VERSION 4.0.5)# Alternatives: 3.8.2
 set(GDCM-ABI_VERSION 2.0.12)
 set(IMAGEMAGICK_VERSION 6.7.0.8)
 set(ITK_VERSION 3.20.0)
+set(SCALASCA_VERSION 2.3.1)
+set(CUBE_VERSION 4.3.4)
+set(OPARI2_VERSION 2.0)
+set(OTF2_VERSION 2.0)
+set(SCORE-P_VERSION 2.0.2)
+set(PAPI_VERSION 5.5.0)
 
 # MPI
 set(OPENMPI_VERSION 1.8.4) #1.8.4, 1.10.0 (unstable, does fail on e.g. ASES/Stuttgart)
@@ -355,6 +361,16 @@ option(OC_DEPENDENCIES_ONLY "Build dependencies only (no Iron or Zinc)" NO)
 #
 # .. default:: NO
 option(OC_MULTITHREADING "Use multithreading in OpenCMISS (where applicable)" NO)
+
+##
+# OC_PERFORMANCE_ANALYSIS
+# -----------------------
+#
+# The build environment uses this to control if performance analysis instrumentation and tools
+# as used.
+#
+# .. default:: NO
+option(OC_PERFORMANCE_ANALYSIS "Use performance analysis instrumentation in OpenCMISS (where applicable)" NO)
 
 ##
 # OC_PYTHON_BINDINGS_USE_VIRTUALENV

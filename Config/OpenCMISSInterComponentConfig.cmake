@@ -170,6 +170,14 @@ option(SUNDIALS_WITH_LAPACK "Have Sundials use LAPACK" YES)
 option(SUPERLU_DIST_WITH_PARMETIS "Enable Parmetis support for SuperLU-Dist" YES)
 
 ##
+#    SCALASCA_WITH_CUBE : YES
+#        Enable cube support for Scalasca
+#    SCALASCA_WITH_OTF2 : YES
+#        Enable OTF2 support for Scalasca
+option(SCALASCA_WITH_CUBE "Enable Cube support for Scalasca" YES)
+option(SCALASCA_WITH_OTF2 "Enable OTF2 support for Scalasca" YES)
+
+##
 #    ZINC_WITH_Python_BINDINGS : YES if Python bindings prerequisites are given, NO otherwise
 #        Build Python bindings for ZINC. This setting is automatically enabled if the build system
 #        finds local Python(-libraries) and Swig
