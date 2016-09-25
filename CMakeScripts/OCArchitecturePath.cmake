@@ -27,6 +27,8 @@
 #            :watcom: The Watcom toolchain
 #            :unknown: Unknown compiler
 #    
+#    :instrumenation: Any instrumentation systems
+#        Otherwise, the path element is skipped.
 #    :multithreading: If :var:`OC_USE_MULTITHREADING` is enabled, this segment is :path:`/mt`.
 #        Otherwise, the path element is skipped.
 #    :mpi: Denotes the used MPI implementation along with the mpi build type.
@@ -75,7 +77,7 @@ function(getArchitecturePath VARNAME VARNAME_MPI)
 endfunction()
 
 # This function assembles a short version (the beginning) of the architecture path
-# We have [ARCH][COMPILER][MT]
+# We have [ARCH][COMPILER][INSTRUMENTATION][MT]
 #
 function(getShortArchitecturePath VARNAME)
     
@@ -92,7 +94,16 @@ function(getShortArchitecturePath VARNAME)
     getCompilerPathElem(COMPILER)
     SET(ARCHPATH ${ARCHPATH}/${COMPILER})
     
-    # Profiling
+    # Instrumentation
+    if (OC_INSTRUMENTATION STREQUAL scorep)
+        SET(ARCHPATH ${ARCHPATH}/scorep)
+    elseif( OC_INSTRUMENTATION STREQUAL vtune)
+        SET(ARCHPATH ${ARCHPATH}/vtune)
+    elseif( OC_INSTRUMENTATION STREQUAL none)
+      #Do nothing
+    else()
+      #error?
+    endif()
     
     # Multithreading
     if (OC_MULTITHREADING)

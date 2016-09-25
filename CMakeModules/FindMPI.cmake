@@ -159,10 +159,10 @@ get_property(ENABLED_LANGUAGES GLOBAL PROPERTY ENABLED_LANGUAGES)
 #
 
 # Start out with the generic MPI compiler names, as these are most commonly used.
-set(_MPI_C_COMPILER_NAMES                  mpicc    mpcc      mpicc_r mpcc_r)
-set(_MPI_CXX_COMPILER_NAMES                mpicxx   mpiCC     mpcxx   mpCC    mpic++   mpc++
+set(_MPI_Generic_C_COMPILER_NAMES          mpicc    mpcc      mpicc_r mpcc_r)
+set(_MPI_Generic_CXX_COMPILER_NAMES        mpicxx   mpiCC     mpcxx   mpCC    mpic++   mpc++
                                            mpicxx_r mpiCC_r   mpcxx_r mpCC_r  mpic++_r mpc++_r)
-set(_MPI_Fortran_COMPILER_NAMES            #mpif77   mpif77_r  mpf77   mpf77_r
+set(_MPI_Generic_Fortran_COMPILER_NAMES   #mpif77   mpif77_r  mpf77   mpf77_r
                                            mpif90   mpif90_r  mpf90   mpf90_r
                                            mpif95   mpif95_r  mpf95   mpf95_r)
 
@@ -188,7 +188,7 @@ set(_MPI_XL_CXX_COMPILER_NAMES             mpixlcxx   mpixlC     mpixlc++   mpxl
                                            mpixlcxx_r mpixlC_r   mpixlc++_r mpxlcxx_r mpxlc++_r mpixlc++_r mpxlCC_r)
 set(_MPI_XL_Fortran_COMPILER_NAMES         mpixlf95   mpixlf95_r mpxlf95 mpxlf95_r
                                            mpixlf90   mpixlf90_r mpxlf90 mpxlf90_r
-                                           #mpixlf77   mpixlf77_r mpxlf77 mpxlf77_r
+                                           #mpixlf77  mpixlf77_r mpxlf77 mpxlf77_r
                                            mpixlf     mpixlf_r   mpxlf   mpxlf_r)
                                            
 ############################################################
@@ -197,14 +197,24 @@ set(_MPI_XL_Fortran_COMPILER_NAMES         mpixlf95   mpixlf95_r mpxlf95 mpxlf95
 # append vendor-specific compilers to the list if we either don't know the compiler id,
 # or if we know it matches the regular compiler.
 foreach (lang C CXX Fortran)
+  set(_MPI_${lang}_COMPILER_NAMES )
   if (lang IN_LIST ENABLED_LANGUAGES)
-      foreach (id GNU Intel PGI XL)
-        if (NOT CMAKE_${lang}_COMPILER_ID OR CMAKE_${lang}_COMPILER_ID STREQUAL id)
+    foreach (id Generic GNU Intel PGI XL)
+      if (NOT CMAKE_${lang}_COMPILER_ID OR CMAKE_${lang}_COMPILER_ID STREQUAL id)
+	#Add in add instrumentation wrappers
+        if(OC_INSTRUMENTATION STREQUAL "scorep")
+	  # Replace mpi compiler name with the appropriate scorep wrapper name
+	  foreach (mpicompiler ${_MPI_${id}_${lang}_COMPILER_NAMES})
+	    message(STATUS ${mpicompiler})
+            list(INSERT _MPI_${lang}_COMPILER_NAMES 0 "scorep-${mpicompiler}")
+	  endforeach()
+	else()
           list(INSERT _MPI_${lang}_COMPILER_NAMES 0 ${_MPI_${id}_${lang}_COMPILER_NAMES})
         endif()
-        unset(_MPI_${id}_${lang}_COMPILER_NAMES)    # clean up the namespace here
-      endforeach()
-      messagev("Looking for _MPI_${lang}_COMPILER_NAMES=${_MPI_${lang}_COMPILER_NAMES}")
+      endif()
+      unset(_MPI_${id}_${lang}_COMPILER_NAMES)    # clean up the namespace here
+    endforeach()
+    message(STATUS "Looking for _MPI_${lang}_COMPILER_NAMES=${_MPI_${lang}_COMPILER_NAMES}")
   endif()
 endforeach()
 
