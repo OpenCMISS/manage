@@ -135,6 +135,7 @@ install(DIRECTORY ${OPENCMISS_MANAGE_DIR}/CMakeModules/
     PATTERN "FindOpenCMISS*.cmake" EXCLUDE) 
 install(FILES ${OPENCMISS_MANAGE_DIR}/CMakeScripts/OCArchitecturePath.cmake
     ${OPENCMISS_MANAGE_DIR}/CMakeScripts/OCToolchainCompilers.cmake
+    ${OPENCMISS_MANAGE_DIR}/CMakeScripts/OCInstrumentation.cmake
     DESTINATION cmake
     COMPONENT Development)
     
