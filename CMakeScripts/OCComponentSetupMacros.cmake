@@ -47,7 +47,7 @@ function(addAndConfigureLocalComponent COMPONENT_NAME)
     list(APPEND COMPONENT_DEFS -DBUILD_SHARED_LIBS=${${COMPONENT_NAME}_SHARED})
 
     # Instrumentation
-    list(APPEND COMPONENT_DEFS -DINSTRUMENTATION=${INSTRUMENTATION})
+    list(APPEND COMPONENT_DEFS -DINSTRUMENTATION=${OC_INSTRUMENTATION})
 
     # OpenMP multithreading
     if(COMPONENT_NAME IN_LIST OPENCMISS_COMPONENTS_WITH_OPENMP)
@@ -236,11 +236,6 @@ function(createExternalProjects COMPONENT_NAME SOURCE_DIR BINARY_DIR DEFS)
 
     #Disable warning for unused cmdline options
     set(FULL_CMAKE_COMMAND ${CMAKE_COMMAND} --no-warn-unused-cli)
-    #If we are using Score-p instrumentation then set the wrapper mode off whilst we configure using cmake
-    if(INSTRUMENTATION STREQUAL "scorep")
-      set(FULL_CMAKE_COMMAND ${FULL_CMAKE_COMMAND} -E env SCOREP_WRAPPER=OFF)
-      set(DEFS ${DEFS} -DINSTRUMENTATION=scorep)
-    endif()
     
     log("Adding ${COMPONENT_NAME} with DEPS=${${COMPONENT_NAME}_DEPS}" VERBOSE)
     ExternalProject_Add(${OC_EP_PREFIX}${COMPONENT_NAME}

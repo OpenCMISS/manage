@@ -57,7 +57,7 @@ if (CMAKE_COMPILER_IS_GNUC OR CMAKE_C_COMPILER_ID STREQUAL "GNU" OR MINGW)
     # These flags are set by CMake by default anyways.
     # addFlagAll("-O3" RELEASE)
     addFlagAll("-O0" DEBUG)
-    
+
     # Release
     
     addFlagAll("-Ofast" RELEASE)
@@ -103,6 +103,12 @@ elseif (CMAKE_C_COMPILER_ID STREQUAL "Intel" OR CMAKE_CXX_COMPILER_ID STREQUAL "
     #	addFlag("-std=c99" C)
     #endif()
     
+    # Instrumentation
+    if(OC_INSTRUMENTATION STREQUAL vtune)
+      set(CMAKE_EXE_LINKER_FLAGS ${CMAKE_EXE_LINKER_FLAGS} -tcollect)
+      addFlagAll("-tcollect")
+    endif()
+
     # Release
 #    addFlagAll("-fast" RELEASE)
     

@@ -103,14 +103,14 @@ option(OPTPP_WITH_BLAS "Have Opt++ use external BLAS routines" NO)
 
 ##
 #    PASTIX_USE_THREADS : YES
-#        Have Sundials use LAPACK
-#    PASTIX_USE_METIS : YES
+#        Have PASTIX use threading
+#    PASTIX_WITH_METIS : YES
 #        Have PASTIX use Metis
-#    PASTIX_USE_PTSCOTCH : YES
+#    PASTIX_WITH_PTSCOTCH : YES
 #        Have PASTIX use PT-Scotch
 option(PASTIX_USE_THREADS "Enable use of threading for PASTIX" YES)
-option(PASTIX_USE_METIS "Have PASTIX use Metis" YES)
-option(PASTIX_USE_PTSCOTCH "Have PASTIX use PT-Scotch" YES)
+option(PASTIX_WITH_METIS "Have PASTIX use Metis" YES)
+option(PASTIX_WITH_PTSCOTCH "Have PASTIX use PT-Scotch" YES)
 
 ##
 #    PETSC_WITH_HYPRE : YES

@@ -74,6 +74,10 @@ function(getArchitecturePath VARNAME VARNAME_MPI)
     # The full architecture path without mpi is the same but with "no_mpi" at the same level
     string(REPLACE "/${MPI_PART}" "/no_mpi" ARCHPATH_NOMPI ${ARCHPATH})
     set(${VARNAME} ${ARCHPATH_NOMPI} PARENT_SCOPE)
+
+    #log("Architecture path (No MPI) = ${ARCHPATH}" DEBUG)
+    #log("Architecture path (MPI)    = ${ARCHPATH_NOMPI}" DEBUG)
+    
 endfunction()
 
 # This function assembles a short version (the beginning) of the architecture path
@@ -93,13 +97,17 @@ function(getShortArchitecturePath VARNAME)
     # Compiler
     getCompilerPathElem(COMPILER)
     SET(ARCHPATH ${ARCHPATH}/${COMPILER})
+
+
+    #log("OC_INSTRUMENTATION = ${OC_INSTRUMENTATION}" DEBUG)
     
     # Instrumentation
-    if (OC_INSTRUMENTATION STREQUAL scorep)
+    if (OC_INSTRUMENTATION STREQUAL "scorep")
         SET(ARCHPATH ${ARCHPATH}/scorep)
-    elseif( OC_INSTRUMENTATION STREQUAL vtune)
+    elseif(OC_INSTRUMENTATION STREQUAL "vtune")
         SET(ARCHPATH ${ARCHPATH}/vtune)
-    elseif( OC_INSTRUMENTATION STREQUAL none)
+        #log("In here. ARCHPATH = ${ARCHPATH}" DEBUG)
+    elseif(OC_INSTRUMENTATION STREQUAL "none")
       #Do nothing
     else()
       #error?

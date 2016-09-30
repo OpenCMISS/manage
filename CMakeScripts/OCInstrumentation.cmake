@@ -14,15 +14,13 @@ if (INSTRUMENTATION)
 	if(DEFINED CMAKE_Fortran_COMPILER)
 	  string(CONCAT CMAKE_Fortran_COMPILER "scorep-" "${CMAKE_Fortran_COMPILER}")
 	endif()
-	#Turn off the wrapper whilst we configure with cmake
-	set(ENV{SCOREP_WRAPPER} "OFF")
     elseif (INSTRUMENTATION STREQUAL "vtune")
-        if(TOOLCHAIN STREQUAL intel)
+        if(TOOLCHAIN STREQUAL "intel")
           SET(OC_INSTRUMENTATION vtune)
 	else()
-          message(WARNING "Can only use vtune instrumentation with an intel toolchain. Proceeding with no instrumentation.")
+          message(WARNING "Can only use vtune instrumentation with an Intel toolchain. Proceeding with no instrumentation.")
         endif()
-    elseif (TOOLCHAIN STREQUAL "none")
+    elseif (INSTRUMENTATION STREQUAL "none")
         # Do nothing
 
     else()
