@@ -90,9 +90,9 @@ function(addAndConfigureLocalComponent COMPONENT_NAME)
                 # Also forward build-type specific flags
                 foreach(BUILDTYPE RELEASE DEBUG)
                   if (CMAKE_${lang}_FLAGS_${BUILDTYPE})
-		    SET(MPI_CMAKE_FLAGS_${BUILDTYPE} ${CMAKE_${lang}_FLAGS_${BUILDTYPE}} ${OC_MPI_ONLY_${lang}_FLAGS_${BUILDTYPE}})
+		    SET(MPI_CMAKE_FLAGS_${BUILDTYPE} "${CMAKE_${lang}_FLAGS_${BUILDTYPE}} ${OC_MPI_ONLY_${lang}_FLAGS_${BUILDTYPE}}")
                     LIST(APPEND COMPONENT_DEFS
-                      -DCMAKE_${lang}_FLAGS_${BUILDTYPE}="${MPI_CMAKE_FLAGS_${BUILDTYPE}}"
+                      -DCMAKE_${lang}_FLAGS_${BUILDTYPE}=${MPI_CMAKE_FLAGS_${BUILDTYPE}}
                       )
                   endif()
                 endforeach()
