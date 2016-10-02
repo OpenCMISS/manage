@@ -2,6 +2,17 @@
 # Also performs a check if the current compiler supports the flag
 #
 # This needs to be included AFTER the MPIConfig as the used MPI mnemonic is used here, too!
+
+set(OC_MPI_ONLY_C_FLAGS )
+set(OC_MPI_ONLY_C_FLAGS_DEBUG )
+set(OC_MPI_ONLY_C_FLAGS_RELEASE )
+set(OC_MPI_ONLY_CXX_FLAGS )
+set(OC_MPI_ONLY_CXX_FLAGS_DEBUG )
+set(OC_MPI_ONLY_CXX_FLAGS_RELEASE )
+set(OC_MPI_ONLY_Fortran_FLAGS )
+set(OC_MPI_ONLY_Fortran_FLAGS_DEBUG )
+set(OC_MPI_ONLY_Fortran_FLAGS_RELEASE )
+
 macro(addFlag VALUE LANGUAGE)
     getFlagCheckVariableName(${VALUE} ${LANGUAGE} CHK_VAR)
     if (${LANGUAGE} STREQUAL C)
@@ -21,10 +32,46 @@ macro(addFlag VALUE LANGUAGE)
     endif()
 endmacro()
 
+macro(addMPIOnlyFlag VALUE LANGUAGE)
+    getFlagCheckVariableName(${VALUE} ${LANGUAGE} CHK_VAR)
+    if (${LANGUAGE} STREQUAL C)
+        CHECK_C_COMPILER_FLAG("${VALUE}" ${CHK_VAR})
+    elseif(${LANGUAGE} STREQUAL CXX)
+        CHECK_CXX_COMPILER_FLAG("${VALUE}" ${CHK_VAR})
+    elseif(${LANGUAGE} STREQUAL Fortran)
+        CHECK_Fortran_COMPILER_FLAG("${VALUE}" ${CHK_VAR})
+    endif()
+    # Only add the flag if the check succeeded
+    if (${CHK_VAR})
+        set(__FLAGS_VARNAME OC_MPI_ONLY_${LANGUAGE}_FLAGS)
+        if (NOT "${ARGV2}" STREQUAL "")
+            set(__FLAGS_VARNAME ${__FLAGS_VARNAME}_${ARGV2})
+        endif()
+        set(${__FLAGS_VARNAME} "${${__FLAGS_VARNAME}} ${VALUE}")
+    endif()
+endmacro()
+
 macro(addFlagAll VALUE)
     foreach(lang C CXX Fortran)
         addFlag(${VALUE} ${lang} ${ARGV1})
     endforeach()
+endmacro()
+
+macro(addMPIOnlyFlagAll VALUE)
+    foreach(lang C CXX Fortran)
+        addMPIOnlyFlag(${VALUE} ${lang} ${ARGV1})
+    endforeach()
+endmacro()
+
+macro(addLinkerFlag VALUE)
+    getFlagCheckVariableName(${VALUE} LINKER CHK_VAR)
+    set(CMAKE_REQUIRED_FLAGS ${VALUE})
+    CHECK_C_COMPILER_FLAG("" ${CHK_VAR})
+    # Only add the flag if the check succeeded
+    if (${CHK_VAR})
+      set(CMAKE_EXE_LINKER_FLAGS ${CMAKE_EXE_LINKER_FLAGS} ${CMAKE_REQUIRED_FLAGS})
+    endif()
+    unset(CMAKE_REQUIRED_FLAGS)
 endmacro()
 
 function(getFlagCheckVariableName FLAG LANGUAGE RESULT_VAR)
@@ -105,11 +152,11 @@ elseif (CMAKE_C_COMPILER_ID STREQUAL "Intel" OR CMAKE_CXX_COMPILER_ID STREQUAL "
     
     # Instrumentation
     if(OC_INSTRUMENTATION STREQUAL vtune)
-      set(CMAKE_EXE_LINKER_FLAGS ${CMAKE_EXE_LINKER_FLAGS} -tcollect)
-      addFlagAll("-tcollect")
+      addLinkerFlag("-tcollect")
+      addMPIOnlyFlagAll("-tcollect")
     endif()
 
-    # Release
+# Release
 #    addFlagAll("-fast" RELEASE)
     
     # Debug
