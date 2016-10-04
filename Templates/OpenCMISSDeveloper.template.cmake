@@ -26,9 +26,9 @@
 #
 # See also: OC_DEVEL_ALL_.
 #
-# .. default:: NO
+# .. default:: NO 
 
-#set(IRON_DEVEL YES)
+set(IRON_DEVEL YES)
 
 ##
 # <COMP>_REPO
