@@ -228,7 +228,16 @@ function(createExternalProjects COMPONENT_NAME SOURCE_DIR BINARY_DIR DEFS)
     else()
         set(_LOGFLAG 0)
     endif()  
-    
+   
+    # Score-P wrapper usage (if profiling is requested by user)
+    if(${COMPONENT_NAME} IN_LIST OPENCMISS_COMPONENTS_WITHMPI)
+       if (MPI_PROFILING AND TOOLCHAIN STREQUAL "gnu" AND MPI STREQUAL "openmpi")
+          set(EXTRA_CONFIGURE_OPTS -DCMAKE_C_COMPILER=scorep-gcc -DCMAKE_CXX_COMPILER=scorep-g++ -DCMAKE_Fortran_COMPILER=scorep-gfortran)
+       else()
+          set(EXTRA_CONFIGURE_OPTS )
+       endif()
+    endif()
+ 
     log("Adding ${COMPONENT_NAME} with DEPS=${${COMPONENT_NAME}_DEPS}" VERBOSE)
     ExternalProject_Add(${OC_EP_PREFIX}${COMPONENT_NAME}
         DEPENDS ${${COMPONENT_NAME}_DEPS} ${COMPONENT_NAME}-sources
@@ -238,27 +247,21 @@ function(createExternalProjects COMPONENT_NAME SOURCE_DIR BINARY_DIR DEFS)
         STAMP_DIR ${BINARY_DIR}/${_OC_EXTPROJ_STAMP_DIR}
         
         #--Download step--------------
-        # Ideal solution - include in the external project that also builds.
-        # Still a mess with mixed download/build stamp files and even though the UPDATE_DISCONNECTED command
-        # skips the update command the configure etc dependency chain is yet executed each time :-(
-        #${DOWNLOAD_CMDS}
-        #UPDATE_DISCONNECTED 1 # Dont update without being asked. New feature of CMake 3.2.0-rc1
-        
         # Need empty download command, otherwise creation of external project fails with "no download info"
         DOWNLOAD_COMMAND ""
         
         #--Configure step-------------
-        CMAKE_COMMAND ${CMAKE_COMMAND} --no-warn-unused-cli # disables warnings for unused cmdline options
+        CMAKE_COMMAND ${CMAKE_COMMAND} --no-warn-unused-cli ${EXTRA_CONFIGURE_FLAGS} # disables warnings for unused cmdline options
         SOURCE_DIR ${SOURCE_DIR}
         BINARY_DIR ${BINARY_DIR}
         CMAKE_ARGS ${DEFS}
         
         #--Build step-----------------
         BUILD_COMMAND ${BUILD_COMMAND}
+
         #--Install step---------------
-        # currently set as extra arg (above), somehow does not work
-        #INSTALL_DIR ${CMAKE_INSTALL_PREFIX} 
         INSTALL_COMMAND ${INSTALL_COMMAND}
+
         # Logging
         LOG_CONFIGURE ${_LOGFLAG}
         LOG_BUILD ${_LOGFLAG}
