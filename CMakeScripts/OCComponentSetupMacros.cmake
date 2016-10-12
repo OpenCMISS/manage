@@ -230,10 +230,13 @@ function(createExternalProjects COMPONENT_NAME SOURCE_DIR BINARY_DIR DEFS)
     endif()  
   
     #-------------------------------------------------------------------------------------
-    # Add support for MPI Profiling
+    # PROFILING
+    # All MPI-enabled components are instrument for performance monitoring if requested
+    # by the user 
     #-------------------------------------------------------------------------------------
-    # Score-P wrapper usage 
     if(${COMPONENT_NAME} IN_LIST OPENCMISS_COMPONENTS_WITHMPI)
+
+       # Score-P profiler requested
        if (MPI_PROFILING STREQUAL "scorep")
           if (TOOLCHAIN STREQUAL "gnu")
              set(EXTRA_CONFIGURE_OPTS -DCMAKE_C_COMPILER=scorep-gcc -DCMAKE_CXX_COMPILER=scorep-g++ -DCMAKE_Fortran_COMPILER=scorep-gfortran)
@@ -242,9 +245,13 @@ function(createExternalProjects COMPONENT_NAME SOURCE_DIR BINARY_DIR DEFS)
           else()
              set(EXTRA_CONFIGURE_OPTS )
           endif()
+       # TAU profiler requested
+       elseif (MPI_PROFILING STREQUAL "tau")
+          set(EXTRA_CONFIGURE_OPTS -DCMAKE_C_COMPILER=tau_cc.sh -DCMAKE_CXX_COMPILER=tau_cxx.sh -DCMAKE_Fortran_COMPILER=tau_f90.sh)
        else()
           set(EXTRA_CONFIGURE_OPTS )
        endif()
+
     else()
        set(EXTRA_CONFIGURE_OPTS )
     endif()
@@ -262,7 +269,7 @@ function(createExternalProjects COMPONENT_NAME SOURCE_DIR BINARY_DIR DEFS)
         DOWNLOAD_COMMAND ""
         
         #--Configure step-------------
-        CMAKE_COMMAND ${CMAKE_COMMAND} --no-warn-unused-cli ${EXTRA_CONFIGURE_FLAGS} # disables warnings for unused cmdline options
+        CMAKE_COMMAND ${CMAKE_COMMAND} --no-warn-unused-cli ${EXTRA_CONFIGURE_OPTS} # disables warnings for unused cmdline options
         SOURCE_DIR ${SOURCE_DIR}
         BINARY_DIR ${BINARY_DIR}
         CMAKE_ARGS ${DEFS}

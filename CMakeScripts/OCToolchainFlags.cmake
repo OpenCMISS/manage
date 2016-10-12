@@ -104,7 +104,7 @@ elseif (CMAKE_C_COMPILER_ID STREQUAL "Intel" OR CMAKE_CXX_COMPILER_ID STREQUAL "
     #endif()
     
     # Release
-#    addFlagAll("-fast" RELEASE)
+    addFlagAll("-fast" RELEASE)
     
     # Debug
     addFlagAll("-traceback" DEBUG)
@@ -150,11 +150,6 @@ elseif(CMAKE_C_COMPILER_ID STREQUAL "XL" OR CMAKE_CXX_COMPILER_ID STREQUAL "XL")
     endif()
 endif()
 
-# For MPI profiling with Allinea MAP
-if (MPI_PROFILING STREQUAL "map")
-   addFlagAll("-g")
-endif()
-
 # Thus far all compilers seem to use the -p flag for profiling
 if (OC_PROFILING)
     addFlagAll("-p" )
@@ -182,3 +177,10 @@ foreach(lang C CXX Fortran)
         message(STATUS "${lang} flags (DEBUG)=${CMAKE_${lang}_FLAGS_DEBUG}")
     endif()
 endforeach()
+
+#######################
+# PROFILING SUPPORT
+# Alinea's MAP profiler requires debugging symbols present in all executables
+if(MPI_PROFILING STREQUAL "map")
+   addFlagAll("-g" )
+endif()
