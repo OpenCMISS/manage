@@ -228,14 +228,25 @@ function(createExternalProjects COMPONENT_NAME SOURCE_DIR BINARY_DIR DEFS)
     else()
         set(_LOGFLAG 0)
     endif()  
-   
-    # Score-P wrapper usage (if profiling is requested by user)
+  
+    #-------------------------------------------------------------------------------------
+    # Add support for MPI Profiling
+    #-------------------------------------------------------------------------------------
+    # Score-P wrapper usage 
     if(${COMPONENT_NAME} IN_LIST OPENCMISS_COMPONENTS_WITHMPI)
-       if (MPI_PROFILING AND TOOLCHAIN STREQUAL "gnu" AND MPI STREQUAL "openmpi")
-          set(EXTRA_CONFIGURE_OPTS -DCMAKE_C_COMPILER=scorep-gcc -DCMAKE_CXX_COMPILER=scorep-g++ -DCMAKE_Fortran_COMPILER=scorep-gfortran)
+       if (MPI_PROFILING STREQUAL "scorep")
+          if (TOOLCHAIN STREQUAL "gnu")
+             set(EXTRA_CONFIGURE_OPTS -DCMAKE_C_COMPILER=scorep-gcc -DCMAKE_CXX_COMPILER=scorep-g++ -DCMAKE_Fortran_COMPILER=scorep-gfortran)
+          elseif (TOOLCHAIN STREQUAL "intel")
+             set(EXTRA_CONFIGURE_OPTS -DCMAKE_C_COMPILER=scorep-icc -DCMAKE_CXX_COMPILER=scorep-icpc -DCMAKE_Fortran_COMPILER=scorep-ifort)
+          else()
+             set(EXTRA_CONFIGURE_OPTS )
+          endif()
        else()
           set(EXTRA_CONFIGURE_OPTS )
        endif()
+    else()
+       set(EXTRA_CONFIGURE_OPTS )
     endif()
  
     log("Adding ${COMPONENT_NAME} with DEPS=${${COMPONENT_NAME}_DEPS}" VERBOSE)
