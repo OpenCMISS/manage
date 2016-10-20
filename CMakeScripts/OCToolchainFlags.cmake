@@ -178,9 +178,3 @@ foreach(lang C CXX Fortran)
     endif()
 endforeach()
 
-#######################
-# PROFILING SUPPORT
-# Alinea's MAP profiler requires debugging symbols present in all executables
-if(MPI_PROFILING STREQUAL "map")
-   addFlagAll("-g" )
-endif()

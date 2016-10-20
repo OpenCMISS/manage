@@ -229,62 +229,68 @@ function(createExternalProjects COMPONENT_NAME SOURCE_DIR BINARY_DIR DEFS)
         set(_LOGFLAG 0)
     endif()  
   
-    #-------------------------------------------------------------------------------------
-    # PROFILING
-    # All MPI-enabled components are instrument for performance monitoring if requested
-    # by the user 
-    #-------------------------------------------------------------------------------------
-    if(${COMPONENT_NAME} IN_LIST OPENCMISS_COMPONENTS_WITHMPI)
-
-       # Score-P profiler requested
-       if (MPI_PROFILING STREQUAL "scorep")
-          if (TOOLCHAIN STREQUAL "gnu")
-             set(EXTRA_CONFIGURE_OPTS -DCMAKE_C_COMPILER=scorep-gcc -DCMAKE_CXX_COMPILER=scorep-g++ -DCMAKE_Fortran_COMPILER=scorep-gfortran)
-          elseif (TOOLCHAIN STREQUAL "intel")
-             set(EXTRA_CONFIGURE_OPTS -DCMAKE_C_COMPILER=scorep-icc -DCMAKE_CXX_COMPILER=scorep-icpc -DCMAKE_Fortran_COMPILER=scorep-ifort)
-          else()
-             set(EXTRA_CONFIGURE_OPTS )
-          endif()
-       # TAU profiler requested
-       elseif (MPI_PROFILING STREQUAL "tau")
-          set(EXTRA_CONFIGURE_OPTS -DCMAKE_C_COMPILER=tau_cc.sh -DCMAKE_CXX_COMPILER=tau_cxx.sh -DCMAKE_Fortran_COMPILER=tau_f90.sh)
-       else()
-          set(EXTRA_CONFIGURE_OPTS )
-       endif()
-
-    else()
-       set(EXTRA_CONFIGURE_OPTS )
-    endif()
- 
     log("Adding ${COMPONENT_NAME} with DEPS=${${COMPONENT_NAME}_DEPS}" VERBOSE)
-    ExternalProject_Add(${OC_EP_PREFIX}${COMPONENT_NAME}
-        DEPENDS ${${COMPONENT_NAME}_DEPS} ${COMPONENT_NAME}-sources
-        PREFIX ${BINARY_DIR}
-        LIST_SEPARATOR ${OC_LIST_SEPARATOR}
-        TMP_DIR ${BINARY_DIR}/ep_tmp
-        STAMP_DIR ${BINARY_DIR}/${_OC_EXTPROJ_STAMP_DIR}
-        
-        #--Download step--------------
-        # Need empty download command, otherwise creation of external project fails with "no download info"
-        DOWNLOAD_COMMAND ""
-        
-        #--Configure step-------------
-        CMAKE_COMMAND ${CMAKE_COMMAND} --no-warn-unused-cli ${EXTRA_CONFIGURE_OPTS} # disables warnings for unused cmdline options
-        SOURCE_DIR ${SOURCE_DIR}
-        BINARY_DIR ${BINARY_DIR}
-        CMAKE_ARGS ${DEFS}
-        
-        #--Build step-----------------
-        BUILD_COMMAND ${BUILD_COMMAND}
 
-        #--Install step---------------
-        INSTALL_COMMAND ${INSTALL_COMMAND}
+    if (MPI_PROFILING)
+      ExternalProject_Add(${OC_EP_PREFIX}${COMPONENT_NAME}
+          DEPENDS ${${COMPONENT_NAME}_DEPS} ${COMPONENT_NAME}-sources
+          PREFIX ${BINARY_DIR}
+          LIST_SEPARATOR ${OC_LIST_SEPARATOR}
+          TMP_DIR ${BINARY_DIR}/ep_tmp
+          STAMP_DIR ${BINARY_DIR}/${_OC_EXTPROJ_STAMP_DIR}
+        
+          #--Download step--------------
+          # Need empty download command, otherwise creation of external project fails with "no download info"
+          DOWNLOAD_COMMAND ""
+        
+          #--Configure step-------------
+          CMAKE_COMMAND ${CMAKE_COMMAND} --no-warn-unused-cli -DCMAKE_C_COMPILER=scorep-gcc -DCMAKE_CXX_COMPILER=scorep-g++ -DCMAKE_Fortran_COMPILER=scorep-gfortran 
+          SOURCE_DIR ${SOURCE_DIR}
+          BINARY_DIR ${BINARY_DIR}
+          CMAKE_ARGS ${DEFS}
+        
+          #--Build step-----------------
+          BUILD_COMMAND ${BUILD_COMMAND}
 
-        # Logging
-        LOG_CONFIGURE ${_LOGFLAG}
-        LOG_BUILD ${_LOGFLAG}
-        LOG_INSTALL ${_LOGFLAG}
-    )
+          #--Install step---------------
+          INSTALL_COMMAND ${INSTALL_COMMAND}
+
+          # Logging
+          LOG_CONFIGURE ${_LOGFLAG}
+          LOG_BUILD ${_LOGFLAG}
+          LOG_INSTALL ${_LOGFLAG}
+      )
+    else() 
+      ExternalProject_Add(${OC_EP_PREFIX}${COMPONENT_NAME}
+          DEPENDS ${${COMPONENT_NAME}_DEPS} ${COMPONENT_NAME}-sources
+          PREFIX ${BINARY_DIR}
+          LIST_SEPARATOR ${OC_LIST_SEPARATOR}
+          TMP_DIR ${BINARY_DIR}/ep_tmp
+          STAMP_DIR ${BINARY_DIR}/${_OC_EXTPROJ_STAMP_DIR}
+        
+          #--Download step--------------
+          # Need empty download command, otherwise creation of external project fails with "no download info"
+          DOWNLOAD_COMMAND ""
+        
+          #--Configure step-------------
+          CMAKE_COMMAND ${CMAKE_COMMAND} --no-warn-unused-cli # disables warnings for unused cmdline options
+          SOURCE_DIR ${SOURCE_DIR}
+          BINARY_DIR ${BINARY_DIR}
+          CMAKE_ARGS ${DEFS}
+        
+          #--Build step-----------------
+          BUILD_COMMAND ${BUILD_COMMAND}
+
+          #--Install step---------------
+          INSTALL_COMMAND ${INSTALL_COMMAND}
+
+          # Logging
+          LOG_CONFIGURE ${_LOGFLAG}
+          LOG_BUILD ${_LOGFLAG}
+          LOG_INSTALL ${_LOGFLAG}
+      )
+    endif()
+
     set_target_properties(${OC_EP_PREFIX}${COMPONENT_NAME} PROPERTIES FOLDER "ExternalProjects")
         
     # See OpenCMISSDeveloper.cmake
