@@ -17,7 +17,7 @@ Prerequisites
 In order to build OpenCMISS or any part of it, you need:
 
    #. A compiler toolchain :code:`(gnu/intel/clang/...)`
-   #. CMake_ 3.3.2 or higher.
+   #. CMake_ 3.4 or higher.
    
       - If you are on Linux/Mac and already have an older version installed (higher than 2.6),
         the build procedure will automatically provide a target “cmake” to build the required CMake version and
