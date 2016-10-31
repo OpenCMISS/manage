@@ -73,7 +73,7 @@ cmake_minimum_required(VERSION 2.6.0 FATAL_ERROR)
 # Check bare minimum configuration
 # OPENCMISS_MODULE_PATH must be set 
 if (NOT DEFINED OPENCMISS_MODULE_PATH)
-  message(FATAL_ERROR "OPENCMISS_MODULE_PATH is not defined."
+  message(FATAL_ERROR "OPENCMISS_MODULE_PATH is not defined.")
 endif ()
 if (NOT EXISTS "${OPENCMISS_MODULE_PATH}/CMakeScripts/OCToolchainCompilers.cmake")
     message(FATAL_ERROR "'${OPENCMISS_MODULE_PATH}/CMakeScripts/OCToolchainCompilers.cmake' does not exists.  The OpenCMISS CMake modules may not be installed/available.")
