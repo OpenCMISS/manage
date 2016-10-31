@@ -70,12 +70,22 @@
 # If your cmake is older than 2.6 - goodbye. 
 cmake_minimum_required(VERSION 2.6.0 FATAL_ERROR)
 
-# The default opencmiss root is the parent directory of "manage"
-#set(OPENCMISS_ROOT "${OPENCMISS_MANAGE_DIR}/.." CACHE PATH "Root directory for OpenCMISS.")
-#if (ROOT)
-#    SET(OPENCMISS_ROOT "${ROOT}" CACHE PATH "Root directory for OpenCMISS." FORCE)
-#endif(ROOT)
-#get_filename_component(OPENCMISS_ROOT ${OPENCMISS_ROOT} ABSOLUTE)
+# Check bare minimum configuration
+# OPENCMISS_MODULE_PATH must be set 
+if (NOT DEFINED OPENCMISS_MODULE_PATH)
+  message(FATAL_ERROR "OPENCMISS_MODULE_PATH is not defined."
+endif ()
+if (NOT EXISTS "${OPENCMISS_MODULE_PATH}/CMakeScripts/OCToolchainCompilers.cmake")
+    message(FATAL_ERROR "'${OPENCMISS_MODULE_PATH}/CMakeScripts/OCToolchainCompilers.cmake' does not exists.  The OpenCMISS CMake modules may not be installed/available.")
+endif ()
+
+# The default opencmiss root is the grandparent directory of "manage"
+if (NOT DEFINED OPENCMISS_ROOT)
+  get_filename_component(OPENCMISS_ROOT "${CMAKE_CURRENT_LIST_DIR}/../.." REALPATH)
+endif ()
+
+# Make sure OPENCMISS_ROOT is an absolute path.
+get_filename_component(OPENCMISS_ROOT ${OPENCMISS_ROOT} ABSOLUTE)
 
 # Set up include path required at this stage
 list(APPEND CMAKE_MODULE_PATH
@@ -132,7 +142,7 @@ log("Starting configuration in ${CMAKE_CURRENT_BINARY_DIR} at ${NOW}")
 
 if (NOT WIN32 OR MINGW)
     if (CMAKE_BUILD_TYPE STREQUAL "")
-        SET(CMAKE_BUILD_TYPE RELEASE)
+        SET(CMAKE_BUILD_TYPE Release)
         message(STATUS "No CMAKE_BUILD_TYPE has been defined. Using RELEASE.")
     endif()
 endif()
@@ -149,7 +159,7 @@ include(OCInstallFindModuleWrappers)
 # This folder is also exported to the install tree upon "make install" and
 # then used within the FindOpenCMISS.cmake module script
 list(APPEND CMAKE_MODULE_PATH 
-    ${OPENCMISS_MANAGE_DIR}/CMakeModules
+    ${OPENCMISS_MODULE_PATH}/CMakeModules
 )
 
 # No point in building ZINC if there's no OpenGL around
@@ -176,9 +186,11 @@ endif()
 
 # MPI
 # Unless we said to not have MPI, see that it's available.
-if(NOT MPI STREQUAL none)
+if(MPI STREQUAL none)
+  message(FATAL_ERROR "MPI value of 'none' not yet implemented.  Please spedify an MPI to use.") 
+else ()
     include(OCMPIConfig)
-endif()
+endif ()
 
 # Toolchain flags
 #
@@ -190,17 +202,22 @@ include(OCToolchainFlags)
 #if (CMAKE_COMPILER_IS_GNUC AND MPI STREQUAL intel)
 #    message(FATAL_ERROR "Invalid compiler/MPI combination: Cannot build with GNU compiler and Intel MPI.")
 #endif()
+include(OCToolchainChecks)
 
 ########################################################################
 # General paths & preps
+include(OCPaths)
+
 set(ARCHITECTURE_PATH .)
 set(ARCHITECTURE_PATH_MPI .)
 if (OC_USE_ARCHITECTURE_PATH)
     getArchitecturePath(ARCHITECTURE_PATH ARCHITECTURE_PATH_MPI)
 endif()
-# Build tree location for components (with/without mpi)
-SET(OPENCMISS_COMPONENTS_BINARY_DIR "${OPENCMISS_ROOT}/build/${ARCHITECTURE_PATH}")
-SET(OPENCMISS_COMPONENTS_BINARY_DIR_MPI "${OPENCMISS_ROOT}/build/${ARCHITECTURE_PATH_MPI}")
+
+# Build tree location for components (with/without mpi), these are not used anywhere remove when certain they are not.
+#SET(OPENCMISS_COMPONENTS_BINARY_DIR "${OPENCMISS_ROOT}/build/${ARCHITECTURE_PATH}")
+#SET(OPENCMISS_COMPONENTS_BINARY_DIR_MPI "${OPENCMISS_ROOT}/build/${ARCHITECTURE_PATH_MPI}")
+
 # Install dir
 # Extra path segment for single configuration case - will give release/debug/...
 getBuildTypePathElem(BUILDTYPEEXTRA)
