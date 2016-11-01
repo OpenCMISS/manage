@@ -81,11 +81,13 @@ endif ()
 
 # The default opencmiss root is the grandparent directory of "manage"
 if (NOT DEFINED OPENCMISS_ROOT)
-  get_filename_component(OPENCMISS_ROOT "${CMAKE_CURRENT_LIST_DIR}/../.." REALPATH)
-endif ()
+  if (NOT DEFINED OPENCMISS_LIBRARIES_ROOT AND NOT DEFINED OPENCMISS_DEPENDENCIES_ROOT)
+    get_filename_component(OPENCMISS_ROOT "${CMAKE_CURRENT_LIST_DIR}/../.." REALPATH)
 
-# Make sure OPENCMISS_ROOT is an absolute path.
-get_filename_component(OPENCMISS_ROOT ${OPENCMISS_ROOT} ABSOLUTE)
+    # Make sure OPENCMISS_ROOT is an absolute path.
+    get_filename_component(OPENCMISS_ROOT ${OPENCMISS_ROOT} ABSOLUTE)
+  endif ()
+endif ()
 
 # Set up include path required at this stage
 list(APPEND CMAKE_MODULE_PATH
@@ -283,7 +285,15 @@ source_group(CMake FILES CMakeLists.txt CMakeCache.txt)
 # Print a neat summary
 message(STATUS "@@@@@@@@@@@@@@@@@@@ SUMMARY @@@@@@@@@@@@@@@@@@@@@@@@@")
 message(STATUS "@")
-message(STATUS "@ OPENCMISS_ROOT: ${OPENCMISS_ROOT}")
+if (DEFINED OPENCMISS_ROOT)
+  message(STATUS "@ OPENCMISS_ROOT: ${OPENCMISS_ROOT}")
+endif ()
+if (DEFINED OPENCMISS_LIBRARIES_ROOT)
+  message(STATUS "@ OPENCMISS_LIBRARIES_ROOT: ${OPENCMISS_LIBRARIES_ROOT}")
+endif ()
+if (DEFINED OPENCMISS_DEPENDENCIES_ROOT)
+  message(STATUS "@ OPENCMISS_DEPENDENCIES_ROOT: ${OPENCMISS_DEPENDENCIES_ROOT}")
+endif ()
 if (OPENCMISS_SDK_INSTALL_DIR)
     message(STATUS "@ OPENCMISS_SDK_INSTALL_DIR: ${OPENCMISS_SDK_INSTALL_DIR}")
 endif()
