@@ -270,7 +270,7 @@ include(OCPackaging)
 ########################################################################
 # Testing
 # Need to enable testing in order for any add_test calls (see OCComponentSetupMacros) to work
-add_subdirectory(Tests)
+add_subdirectory(tests)
 
 ########################################################################
 # Misc targets for convenience
