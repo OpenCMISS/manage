@@ -27,6 +27,17 @@ LIST(APPEND COMPONENT_COMMON_DEFS
     -DCMAKE_INSTALL_DEFAULT_COMPONENT_NAME=Development
 )
 
+if(TOOLCHAIN STREQUAL "intel")
+   LIST(APPEND COMPONENT_COMMON_DEFS
+       -DUSING_INTEL_COMPILERS=1
+   )
+endif()
+if(MPI_PROFILING)
+   LIST(APPEND COMPONENT_COMMON_DEFS
+       -DENABLE_MPI_PROFILING=1
+   )
+endif()
+
 # Add compilers and flags
 foreach(lang C CXX Fortran)
     # Define flags

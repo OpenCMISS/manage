@@ -65,6 +65,13 @@
 #    Further, you can specify an explicit mpi compiler wrapper (full path or just the binary name) for each language,
 #    where <lang> can be each of "C","CXX" or "Fortran".
 #    This can be used independently of (but possibly with) the MPI_HOME setting.
+#
+# ============== PROFILING ====================
+#
+# MPI_PROFILING: []|<any value>
+#    If set, MPI profiling will be enabled.  Currently the Score-P profiling package (www.vi-hps.org/projects/score-p) 
+#    is used when GNU compilers are enabled.  The TAU profiler (www.cs.oregon.edu/research/tau) is used for when Intel 
+#    compilers are enabled.  MPI profiling is not supported for other compilers at this time.
 
 ########################################################
 # If your cmake is older than 2.6 - goodbye. 
@@ -301,7 +308,7 @@ if (TOOLCHAIN)
     message(STATUS "@ TOOLCHAIN: ${TOOLCHAIN}")
 endif()
 if (MPI_PROFILING)
-    message(STATUS "@ SCORE-P PROFILING ENABLED")
+    message(STATUS "@ PROFILER: ${MPI_PROFILING}")
 endif()
 message(STATUS "@")
 printnextsteps()
