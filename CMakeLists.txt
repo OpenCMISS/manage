@@ -151,11 +151,16 @@ endif()
 
 include(ExternalProject)
 include(OCArchitecturePath)
-include(OCComponentSetupMacros)
+
+########################################################################
+# General paths & preps
+include(OCPaths)
+
 
 ########################################################################
 # Utilities and external packages
 
+include(OCComponentSetupMacros)
 include(OCInstallFindModuleWrappers)
 # Add CMakeModules directory after wrapper module directory (set in above script)
 # This folder is also exported to the install tree upon "make install" and
@@ -205,10 +210,6 @@ include(OCToolchainFlags)
 #    message(FATAL_ERROR "Invalid compiler/MPI combination: Cannot build with GNU compiler and Intel MPI.")
 #endif()
 include(OCToolchainChecks)
-
-########################################################################
-# General paths & preps
-include(OCPaths)
 
 ######################
 # The COMMON_PACKAGE_CONFIG_DIR contains the cmake-generated target config files consumed by find_package(... CONFIG).
