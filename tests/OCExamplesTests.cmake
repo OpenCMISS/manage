@@ -1,7 +1,15 @@
 # This file adds test cases that could well be considered "manage" unit tests!
 
-set(TEST_EXAMPLES_BINARY_DIR ${OPENCMISS_COMPONENTS_BINARY_DIR_MPI}/example_tests)
-set(TEST_EXAMPLES_SRC_DIR ${OPENCMISS_ROOT}/src/example_tests)
+if (EXISTS "${OPENCMISS_ROOT}")
+    set(TEST_EXAMPLES_BINARY_DIR ${OPENCMISS_COMPONENTS_BINARY_DIR_MPI}/example_tests)
+    set(TEST_EXAMPLES_SRC_DIR ${OPENCMISS_ROOT}/src/example_tests)
+    set(OPENCMISS_TEST_INSTALL_ROOT ${OPENCMISS_INSTALL_ROOT})
+else ()
+    set(TEST_EXAMPLES_BINARY_DIR ${OPENCMISS_LIBRARIES_BINARY_DIR_MPI}/example_tests)
+    set(TEST_EXAMPLES_SRC_DIR ${OPENCMISS_LIBRARIES_ROOT}/src/example_tests)
+    set(OPENCMISS_TEST_INSTALL_ROOT ${OPENCMISS_LIBRARIES_ROOT}/install)
+endif ()
+
 set(GITHUB_ORGANIZATION OpenCMISS-Examples)
 set(OC_TEST_EXAMPLES classicalfield_laplace_simple)
 
@@ -14,7 +22,7 @@ foreach(example_name ${OC_TEST_EXAMPLES})
     set(INSTALL_DIR ${BIN_DIR}/install)
     # Set correct paths
     set(DEFS 
-        -DOPENCMISS_INSTALL_DIR=${OPENCMISS_INSTALL_ROOT}
+        -DOPENCMISS_INSTALL_DIR=${OPENCMISS_TEST_INSTALL_ROOT}
         -DCMAKE_INSTALL_PREFIX=${INSTALL_DIR}
         -DMPI=${MPI}
     )
