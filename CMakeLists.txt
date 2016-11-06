@@ -1,7 +1,7 @@
 ########################################################
 # Welcome to the OpenCMISS build system!
 ########################################################
-# This script realises the top-level setup/generation phase.
+# This script realises the top-level generation phase.
 # All it does is making sure you have the minimum cmake version available (if not, you can have us build for you)
 # and generates the actual main build project for any choice of compiler/toolchain and MPI combination you'd like.
 #
@@ -15,8 +15,8 @@
 #
 # ============== General ================
 #
-# ROOT: [Parent of the manage directory containing this file]
-#    Set this to any directory that you want to contain OpenCMISS sources, build- and install trees.
+# OPENCMISS_ROOT: [Grandparent of the directory containing this file]
+#    Set this to any directory that you want to contain OpenCMISS sources, build, and install trees.
 #
 # EVEL: []|<any value>
 #     If you want to initialize your OpenCMISS installation to developer defaults, define the EVEL variable to any value.
@@ -67,8 +67,8 @@
 #    This can be used independently of (but possibly with) the MPI_HOME setting.
 
 ########################################################
-# If your cmake is older than 2.6 - goodbye. 
-cmake_minimum_required(VERSION 2.6.0 FATAL_ERROR)
+# If your cmake is older than 3.4 - goodbye. 
+cmake_minimum_required(VERSION 3.4.0 FATAL_ERROR)
 
 # Check bare minimum configuration
 # OPENCMISS_MODULE_PATH must be set 
@@ -94,20 +94,6 @@ list(APPEND CMAKE_MODULE_PATH
     ${OPENCMISS_MODULE_PATH}/CMakeScripts
     ${OPENCMISS_MODULE_PATH}/Config
     ${OPENCMISS_MODULE_PATH})
-
-# This ensures that CMake is new enough before anything else is done
-# If its too old, the script will stop with an appropriate error message.
-# The option is to either come up with a sufficiently new version yourself,
-# or to build cmake using the (then generated) "cmake" target.
-include(OCCMakeCheck)
-# Need to make this outside the include as the return is intended for the main level
-if (NOT CMAKE_COMPATIBLE)
-    return()
-endif(NOT CMAKE_COMPATIBLE)
-############################## END OF FULLY BACKWARDS-COMPATIBLE PART ###############################
-
-# OPENCMISS_CMAKE_MIN_VERSION is defined in OCCMakeCheck
-cmake_minimum_required(VERSION ${OPENCMISS_CMAKE_MIN_VERSION} FATAL_ERROR)
 
 # Need to set the compilers before any project call
 include(OCToolchainCompilers)
