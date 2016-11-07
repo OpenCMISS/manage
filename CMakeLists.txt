@@ -69,9 +69,8 @@
 # ============== PROFILING ====================
 #
 # MPI_PROFILING: []|<any value>
-#    If set, MPI profiling will be enabled.  Currently the Score-P profiling package (www.vi-hps.org/projects/score-p) 
-#    is used when GNU compilers are enabled.  The TAU profiler (www.cs.oregon.edu/research/tau) is used for when Intel 
-#    compilers are enabled.  MPI profiling is not supported for other compilers at this time.
+#    If set, MPI profiling will be enabled.  Currently Intel's VTune package is used for performance performance
+#    and analysis.  It is only available if Intel compilers and MPI and being used. 
 
 ########################################################
 # If your cmake is older than 2.6 - goodbye. 
@@ -101,6 +100,13 @@ if (NOT CMAKE_COMPATIBLE)
     return()
 endif(NOT CMAKE_COMPATIBLE)
 ############################## END OF FULLY BACKWARDS-COMPATIBLE PART ###############################
+
+# MPI Profiling only available when using Intel compilers
+if(TOOLCHAIN STREQUAL "intel")
+else()
+   set(MPI_PROFILING OFF)
+endif()
+
 
 # OPENCMISS_CMAKE_MIN_VERSION is defined in OCCMakeCheck
 cmake_minimum_required(VERSION ${OPENCMISS_CMAKE_MIN_VERSION} FATAL_ERROR)
@@ -308,7 +314,7 @@ if (TOOLCHAIN)
     message(STATUS "@ TOOLCHAIN: ${TOOLCHAIN}")
 endif()
 if (MPI_PROFILING)
-    message(STATUS "@ PROFILER: ${MPI_PROFILING}")
+    message(STATUS "@ PROFILER: Intel VTune")
 endif()
 message(STATUS "@")
 printnextsteps()

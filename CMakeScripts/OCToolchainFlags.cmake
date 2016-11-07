@@ -91,7 +91,8 @@ elseif (CMAKE_C_COMPILER_ID STREQUAL "Intel" OR CMAKE_CXX_COMPILER_ID STREQUAL "
     # ABI Flag -m$(ABI)
     
     # CMake default anyways
-    #addFlagAll("-O3" RELEASE)
+    addFlagAll("-O3" RELEASE)
+    addFlagAll("-g" RELEASE)
 
     # Somehow CMake does not add the appropriate C-standard flags even though
     # the C_STANDARD variable is set. Well do it manually for now.
@@ -102,9 +103,11 @@ elseif (CMAKE_C_COMPILER_ID STREQUAL "Intel" OR CMAKE_CXX_COMPILER_ID STREQUAL "
     #	addFlag("-std=c99" C)
     #endif()
     
-    # Release
-    addFlagAll("-O3" RELEASE)
+    # Release - needed for Intel Parallel Studio 2017+
     addFlagAll("-fPIE" Fortran RELEASE)
+
+    # Release - added for vector optimisation
+    addFlagAll("-xAVX" RELEASE)
     
     # Debug
     addFlagAll("-traceback" DEBUG)

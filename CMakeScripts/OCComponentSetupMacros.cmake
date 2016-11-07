@@ -231,18 +231,6 @@ function(createExternalProjects COMPONENT_NAME SOURCE_DIR BINARY_DIR DEFS)
   
     log("Adding ${COMPONENT_NAME} with DEPS=${${COMPONENT_NAME}_DEPS}" VERBOSE)
 
-    if (MPI_PROFILING)
-       if (TOOLCHAIN STREQUAL "gnu")
-          set(CONFIGURE_COMMAND ${CMAKE_COMMAND} --no-warn-unused-cli -DCMAKE_C_COMPILER=scorep-gcc -DCMAKE_CXX_COMPILER=scorep-g++ -DCMAKE_Fortran_COMPILER=scorep-gfortran)
-       else()
-          if (TOOLCHAIN STREQUAL "intel")
-             set(CONFIGURE_COMMAND ${CMAKE_COMMAND} --no-warn-unused-cli -DCMAKE_C_COMPILER=tau_cc.sh -DCMAKE_CXX_COMPILER=tau_cxx.sh -DCMAKE_Fortran_COMPILER=tau_f90.sh)
-          else()
-             set(CONFIGURE_COMMAND ${CMAKE_COMMAND} --no-warn-unused-cli)
-          endif() 
-       endif() 
-    endif()
-
 
     ExternalProject_Add(${OC_EP_PREFIX}${COMPONENT_NAME}
           DEPENDS ${${COMPONENT_NAME}_DEPS} ${COMPONENT_NAME}-sources
@@ -256,7 +244,7 @@ function(createExternalProjects COMPONENT_NAME SOURCE_DIR BINARY_DIR DEFS)
           DOWNLOAD_COMMAND ""
         
           #--Configure step-------------
-          CMAKE_COMMAND ${CONFIGURE_COMMAND}
+          CMAKE_COMMAND ${CMAKE_COMMAND} --no-warn-unused-cli 
           SOURCE_DIR ${SOURCE_DIR}
           BINARY_DIR ${BINARY_DIR}
           CMAKE_ARGS ${DEFS}
