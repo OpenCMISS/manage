@@ -92,8 +92,7 @@ endif ()
 # Set up include path required at this stage
 list(APPEND CMAKE_MODULE_PATH
     ${OPENCMISS_MODULE_PATH}/CMakeScripts
-    ${OPENCMISS_MODULE_PATH}/Config
-    ${OPENCMISS_MODULE_PATH})
+    ${OPENCMISS_MODULE_PATH}/Config)
 
 # Need to set the compilers before any project call
 include(OCToolchainCompilers)
