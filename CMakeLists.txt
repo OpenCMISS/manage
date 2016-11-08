@@ -136,7 +136,7 @@ if (NOT WIN32 OR MINGW)
 endif()
 
 include(ExternalProject)
-include(OCArchitecturePath)
+include(OCArchitecturePathFunctions)
 
 ########################################################################
 # Utilities and external packages
