@@ -4,7 +4,7 @@
 Building OpenCMISS examples (Unix/terminal)
 -------------------------------------------
 With the new CMake-based build system, building OpenCMISS applications and examples has become much easier.
-Any installed OpenCMISS suite has a :var:`OPENCMISS_INSTALL_ROOT` directory, which contains all the information needed
+Any installed OpenCMISS suite has a :var:`OPENCMISS_CONFIG_DIR` directory, which contains all the information needed
 to build and link applications against the installed libraries.
 
 Building existing PMR examples
@@ -13,7 +13,7 @@ Building examples obtained from the PMR_ (Physiome Model Repository) is very sim
 
    1. Download/clone the examples source code to a location of your choice
    2. Create a :path:`build` folder inside and enter it
-   3. Invoke :sh:`cmake -DOPENCMISS_INSTALL_DIR=<OPENCMISS_INSTALL_ROOT> ..`
+   3. Invoke :sh:`cmake -DOPENCMISS_INSTALL_DIR=<OPENCMISS_CONFIG_DIR> ..`
    4. Invoke :sh:`make install`
    
 Now you should have a binary :path:`./run` in your example source that can be executed.
@@ -49,7 +49,7 @@ Also see the :ref:`troubleshooting` section for common issues.
 Creating new OpenCMISS applications
 ===================================
 With the new CMake-based build system, building OpenCMISS applications and examples has become much easier.
-Any installed OpenCMISS suite has a :var:`OPENCMISS_INSTALL_ROOT` directory, which also contains a CMake package config file.
+Any installed OpenCMISS suite has a :var:`OPENCMISS_CONFIG_DIR` directory, which also contains a CMake package config file.
 
 Hence, any (CMake-powered) application using OpenCMISS just need to add the OpenCMISS installation directory
 to their :cmake:`CMAKE_PREFIX_PATH` and can import OpenCMISS build targets via :cmake:`find_package(OpenCMISS)`.
