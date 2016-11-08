@@ -97,6 +97,7 @@ list(APPEND CMAKE_MODULE_PATH
 # Need to set the compilers before any project call
 include(OCToolchainCompilers)
 
+message(STATUS "MPI: ${MPI}")
 ########################################################################
 # Ready to start the "build project"
 project(OpenCMISS VERSION 1.3 LANGUAGES C CXX)
