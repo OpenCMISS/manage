@@ -140,8 +140,20 @@ include(OCArchitecturePath)
 
 ########################################################################
 # Utilities and external packages
-
 include(OCComponentSetupMacros)
+
+# MPI
+# Unless we said to not have MPI, see that it's available.
+if(MPI STREQUAL none)
+  message(FATAL_ERROR "MPI value of 'none' not yet implemented.  Please spedify an MPI to use.") 
+else ()
+    include(OCMPIConfig)
+endif ()
+
+########################################################################
+# General paths & preps
+include(OCPaths)
+
 include(OCInstallFindModuleWrappers)
 # Add CMakeModules directory after wrapper module directory (set in above script)
 # This folder is also exported to the install tree upon "make install" and
@@ -172,14 +184,6 @@ if(OC_MULTITHREADING)
     find_package(OpenMP REQUIRED)
 endif()
 
-# MPI
-# Unless we said to not have MPI, see that it's available.
-if(MPI STREQUAL none)
-  message(FATAL_ERROR "MPI value of 'none' not yet implemented.  Please spedify an MPI to use.") 
-else ()
-    include(OCMPIConfig)
-endif ()
-
 # Toolchain flags
 #
 # Needs to be after MPI config as the mnemonic is used inside that script, too
@@ -191,10 +195,6 @@ include(OCToolchainFlags)
 #    message(FATAL_ERROR "Invalid compiler/MPI combination: Cannot build with GNU compiler and Intel MPI.")
 #endif()
 include(OCToolchainChecks)
-
-########################################################################
-# General paths & preps
-include(OCPaths)
 
 ######################
 # The COMMON_PACKAGE_CONFIG_DIR contains the cmake-generated target config files consumed by find_package(... CONFIG).
