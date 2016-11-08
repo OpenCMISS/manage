@@ -139,20 +139,12 @@ include(ExternalProject)
 include(OCArchitecturePathFunctions)
 
 ########################################################################
-# Utilities and external packages
-include(OCComponentSetupMacros)
-
-# MPI
-# Unless we said to not have MPI, see that it's available.
-if(MPI STREQUAL none)
-  message(FATAL_ERROR "MPI value of 'none' not yet implemented.  Please spedify an MPI to use.") 
-else ()
-    include(OCMPIConfig)
-endif ()
-
-########################################################################
 # General paths & preps
 include(OCPaths)
+
+########################################################################
+# Utilities and external packages
+include(OCComponentSetupMacros)
 
 include(OCInstallFindModuleWrappers)
 # Add CMakeModules directory after wrapper module directory (set in above script)
@@ -183,6 +175,18 @@ include(OCDetectFortranMangling)
 if(OC_MULTITHREADING)
     find_package(OpenMP REQUIRED)
 endif()
+
+# MPI
+# Unless we said to not have MPI, see that it's available.
+if(MPI STREQUAL none)
+  message(FATAL_ERROR "MPI value of 'none' not yet implemented.  Please spedify an MPI to use.") 
+else ()
+    include(OCMPIConfig)
+endif ()
+
+########################################################################
+# Architecture paths
+include(OCPathsArchitecture)
 
 # Toolchain flags
 #
