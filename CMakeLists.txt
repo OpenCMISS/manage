@@ -11,6 +11,7 @@ enable_testing()
 
 list(APPEND CMAKE_MODULE_PATH ${OPENCMISS_MODULE_PATH}/CMakeScripts)
 
+include(OCToolchainCompilers)
 
 getToolchain(CURRENT_TOOLCHAIN)
 
