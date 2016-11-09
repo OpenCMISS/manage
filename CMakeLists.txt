@@ -9,6 +9,8 @@ project(OpenCMISS-Manage VERSION 1.0 LANGUAGES C CXX)
 enable_language(Fortran OPTIONAL)
 enable_testing()
 
+set(OPENCMISS_MODULE_PATH ${OPENCMISS_MODULE_PATH} CACHE PATH "Location of the OpenCMISS CMake modules.")
+
 list(APPEND CMAKE_MODULE_PATH ${OPENCMISS_MODULE_PATH}/CMakeScripts)
 
 include(OCToolchainCompilers)
