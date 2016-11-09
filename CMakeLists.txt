@@ -13,8 +13,11 @@ set(OPENCMISS_MODULE_PATH ${OPENCMISS_MODULE_PATH} CACHE PATH "Location of the O
 
 list(APPEND CMAKE_MODULE_PATH ${OPENCMISS_MODULE_PATH}/CMakeScripts)
 
+include(OCMiscFunctionsMacros)
 include(OCToolchainCompilers)
+include(OCMPIConfig)
 
 getToolchain(CURRENT_TOOLCHAIN)
 
 set(OPENCMISS_TOOLCHAIN ${CURRENT_TOOLCHAIN} CACHE STRING "Specify the toolchain mnemonic.")
+set(OPENCMISS_MPI ${MPI} CACHE STRING "Specify the MPI mnemonic")
