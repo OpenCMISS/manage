@@ -15,10 +15,6 @@ list(APPEND CMAKE_MODULE_PATH ${OPENCMISS_MODULE_PATH}/CMakeScripts)
 list(APPEND CMAKE_MODULE_PATH ${OPENCMISS_MODULE_PATH}/Config)
 list(APPEND CMAKE_MODULE_PATH ${OPENCMISS_MODULE_PATH}/CMakeModules)
 
-# Start log file for config run
-string(TIMESTAMP NOW "%Y-%m-%d, %H:%M")
-log("Starting configuration in ${CMAKE_CURRENT_BINARY_DIR} at ${NOW}")
-
 if (NOT WIN32 OR MINGW)
     if (CMAKE_BUILD_TYPE STREQUAL "")
         SET(CMAKE_BUILD_TYPE Release)
@@ -29,6 +25,11 @@ endif()
 include(OCArchitecturePathFunctions)
 include(OCPaths)
 include(OCMiscFunctionsMacros)
+
+# Start log file for config run
+string(TIMESTAMP NOW "%Y-%m-%d, %H:%M")
+log("Starting configuration in ${CMAKE_CURRENT_BINARY_DIR} at ${NOW}")
+
 include(OCToolchainCompilers)
 include(OCMPIConfig)
 
