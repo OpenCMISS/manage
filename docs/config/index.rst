@@ -62,14 +62,14 @@ OpenCMISS inter-component configuration
 ---------------------------------------
 .. cmake-source:: ../../Config/OpenCMISSInterComponentConfig.cmake
    
-.. _OpenCMISSDeveloper:
-.. _develconf:
+.. _OpenCMISSInstallaionConfig:
+.. _installationconf:
    
 OpenCMISS developer options
 ===========================
 
 For OpenCMISS developers, there are a range of extra options that can be set.
-The corresponding file is located at the root directory: :path:`<manage>/OpenCMISSDeveloper.cmake`.
+The corresponding file is located at the build directory: :path:`<manage>/OpenCMISSInstallationConfig.cmake`.
 
 In principal, all the configuration options :ref:`above <localconf>` can also be set in the developer config file.
 However, this file is included in **all** top-level build tree configurations for all architectures
@@ -77,7 +77,7 @@ However, this file is included in **all** top-level build tree configurations fo
 
 .. caution::
    
-   The OpenCMISSDeveloper file is included *after* any OpenCMISSLocalConfig file. Hence, all settings specified in the
+   The OpenCMISSInstallationConfig file is included *after* any OpenCMISSLocalConfig file. Hence, all settings specified in the
    developer config take precedence over any local setting.
 
 As OpenCMISS-Developers will mainly work only on a selection of components, the extra configuration
@@ -87,4 +87,4 @@ the correct Git repos etc.
 .. toctree::
    :maxdepth: 1
    
-   developer/index
+   installation/index

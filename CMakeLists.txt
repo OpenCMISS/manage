@@ -15,6 +15,19 @@ list(APPEND CMAKE_MODULE_PATH ${OPENCMISS_MODULE_PATH}/CMakeScripts)
 list(APPEND CMAKE_MODULE_PATH ${OPENCMISS_MODULE_PATH}/Config)
 list(APPEND CMAKE_MODULE_PATH ${OPENCMISS_MODULE_PATH}/CMakeModules)
 
+# Start log file for config run
+string(TIMESTAMP NOW "%Y-%m-%d, %H:%M")
+log("Starting configuration in ${CMAKE_CURRENT_BINARY_DIR} at ${NOW}")
+
+if (NOT WIN32 OR MINGW)
+    if (CMAKE_BUILD_TYPE STREQUAL "")
+        SET(CMAKE_BUILD_TYPE Release)
+        message(STATUS "No CMAKE_BUILD_TYPE has been defined. Using Release.")
+    endif()
+endif()
+
+include(OCArchitecturePathFunctions)
+include(OCPaths)
 include(OCMiscFunctionsMacros)
 include(OCToolchainCompilers)
 include(OCMPIConfig)
@@ -32,18 +45,7 @@ else()
 endif()
 
 # This includes the configuration, both default and local
-include(OpenCMISSConfig)
-
-# Start log file for config run
-string(TIMESTAMP NOW "%Y-%m-%d, %H:%M")
-log("Starting configuration in ${CMAKE_CURRENT_BINARY_DIR} at ${NOW}")
-
-if (NOT WIN32 OR MINGW)
-    if (CMAKE_BUILD_TYPE STREQUAL "")
-        SET(CMAKE_BUILD_TYPE Release)
-        message(STATUS "No CMAKE_BUILD_TYPE has been defined. Using Release.")
-    endif()
-endif()
+#include(OpenCMISSConfig)
 
 getToolchain(CURRENT_TOOLCHAIN)
 

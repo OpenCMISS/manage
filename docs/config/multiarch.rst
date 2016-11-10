@@ -10,7 +10,7 @@ places builds in appropriate `architecture paths`_.
 Most importantly:
 
    * All architecture choices **except** toolchain and MPI configuration can be made
-     inside the :ref:`local config files <localconf>` (and :ref:`developer config files <develconf>`).
+     inside the :ref:`local config files <localconf>` (and :ref:`developer config files <installationconf>`).
      Toolchain and MPI setup are explained below. See also the main :path:`CMakeLists.txt` file.
    * You need a different base binary directory for each intended toolchain/mpi combination!
      The build instructions above are laid out by default for only one (=the default) toolchain and mpi choice.

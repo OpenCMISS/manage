@@ -90,7 +90,7 @@ Default steps for Developers (terminal/command line)
 The default steps are the same as for users, but with two changes:
       1. At step 4, invoke :sh:`cmake -DEVIL=<YES|your_freely_chooseable_evilness_value> ..`
       2. In addition to the changes you can make at step 5, change the 
-         :ref:`OpenCMISSDeveloper <develconf>` file according to your OpenCMISS development needs.
+         :ref:`OpenCMISSInstallationConfig <installationconf>` file according to your OpenCMISS development needs.
          
 .. note::
    Ideally, the first step for developers is to fork any components of OpenCMISS that should be worked

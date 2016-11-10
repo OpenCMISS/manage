@@ -23,7 +23,7 @@ to the mpi-dependent architecture sub-path of the sdk installation which contain
 Developer instructions (=”Server-side”)
 ---------------------------------------
 To set up a central OpenCMISS installation:
-   -  Set up the :ref:`OpenCMISSDeveloper <develconf>` file and
+   -  Set up the :ref:`OpenCMISSDeveloper <installationconf>` file and
       enable the (in this case mandatory) :var:`OC_USE_ARCHITECTURE_PATH` setting.
    -  Please also make sure to fill in your eMail address into :var:`OC_INSTALL_SUPPORT_EMAIL`.
    -  Next, :ref:`build and install all the different configurations <multiarchbuilds>` that you want to provide for the consuming clients.
