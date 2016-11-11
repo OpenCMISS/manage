@@ -132,7 +132,7 @@ include(FindPackageHandleStandardArgs)
 # Comment the message command line to shut up the script
 macro(messagev TEXT)
     if (NOT WIN32) #The backslashes in the path elements break cmake :-(
-        #message(STATUS "FindMPId: ${TEXT}")
+        #message(STATUS "FindMPI: ${TEXT}")
     endif()
 endmacro()
 
@@ -248,7 +248,10 @@ if (DEFINED MPI_HOME)
 else()
     # Allow all paths, and add an extra path if set
     set(PATHOPT )
-    # Start with MPI_HOME from the environment, of given
+    # CPB 11/11/16 Don't look at MPI_HOME environment variable. Some MPI distros set this but others don't. This can mean that
+    # the MPI_HOME environment variable might clash with what has been specified via the -DMPI= option. The common MPI_HOME's
+    # are covered below regardless.
+    # Start with MPI_HOME from the environment, of given    
     #set(_MPI_PREFIX_PATH $ENV{MPI_HOME})
     set(_MPI_PREFIX_PATH )
     # Check if a mpi mnemonic is given

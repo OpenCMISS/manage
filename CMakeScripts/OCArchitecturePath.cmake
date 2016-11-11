@@ -110,7 +110,7 @@ function(getShortArchitecturePath VARNAME)
     elseif(OC_INSTRUMENTATION STREQUAL "none")
       #Do nothing
     else()
-      #error?
+      message(WARNING "Unknown instrumentation option. Ignoring.")
     endif()
     
     # Multithreading
