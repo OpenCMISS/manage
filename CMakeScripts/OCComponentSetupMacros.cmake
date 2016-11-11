@@ -228,42 +228,39 @@ function(createExternalProjects COMPONENT_NAME SOURCE_DIR BINARY_DIR DEFS)
     else()
         set(_LOGFLAG 0)
     endif()  
-    
+  
     log("Adding ${COMPONENT_NAME} with DEPS=${${COMPONENT_NAME}_DEPS}" VERBOSE)
+
+
     ExternalProject_Add(${OC_EP_PREFIX}${COMPONENT_NAME}
-        DEPENDS ${${COMPONENT_NAME}_DEPS} ${COMPONENT_NAME}-sources
-        PREFIX ${BINARY_DIR}
-        LIST_SEPARATOR ${OC_LIST_SEPARATOR}
-        TMP_DIR ${BINARY_DIR}/ep_tmp
-        STAMP_DIR ${BINARY_DIR}/${_OC_EXTPROJ_STAMP_DIR}
+          DEPENDS ${${COMPONENT_NAME}_DEPS} ${COMPONENT_NAME}-sources
+          PREFIX ${BINARY_DIR}
+          LIST_SEPARATOR ${OC_LIST_SEPARATOR}
+          TMP_DIR ${BINARY_DIR}/ep_tmp
+          STAMP_DIR ${BINARY_DIR}/${_OC_EXTPROJ_STAMP_DIR}
         
-        #--Download step--------------
-        # Ideal solution - include in the external project that also builds.
-        # Still a mess with mixed download/build stamp files and even though the UPDATE_DISCONNECTED command
-        # skips the update command the configure etc dependency chain is yet executed each time :-(
-        #${DOWNLOAD_CMDS}
-        #UPDATE_DISCONNECTED 1 # Dont update without being asked. New feature of CMake 3.2.0-rc1
+          #--Download step--------------
+          # Need empty download command, otherwise creation of external project fails with "no download info"
+          DOWNLOAD_COMMAND ""
         
-        # Need empty download command, otherwise creation of external project fails with "no download info"
-        DOWNLOAD_COMMAND ""
+          #--Configure step-------------
+          CMAKE_COMMAND ${CMAKE_COMMAND} --no-warn-unused-cli 
+          SOURCE_DIR ${SOURCE_DIR}
+          BINARY_DIR ${BINARY_DIR}
+          CMAKE_ARGS ${DEFS}
         
-        #--Configure step-------------
-        CMAKE_COMMAND ${CMAKE_COMMAND} --no-warn-unused-cli # disables warnings for unused cmdline options
-        SOURCE_DIR ${SOURCE_DIR}
-        BINARY_DIR ${BINARY_DIR}
-        CMAKE_ARGS ${DEFS}
-        
-        #--Build step-----------------
-        BUILD_COMMAND ${BUILD_COMMAND}
-        #--Install step---------------
-        # currently set as extra arg (above), somehow does not work
-        #INSTALL_DIR ${CMAKE_INSTALL_PREFIX} 
-        INSTALL_COMMAND ${INSTALL_COMMAND}
-        # Logging
-        LOG_CONFIGURE ${_LOGFLAG}
-        LOG_BUILD ${_LOGFLAG}
-        LOG_INSTALL ${_LOGFLAG}
+          #--Build step-----------------
+          BUILD_COMMAND ${BUILD_COMMAND}
+
+          #--Install step---------------
+          INSTALL_COMMAND ${INSTALL_COMMAND}
+
+          # Logging
+          LOG_CONFIGURE ${_LOGFLAG}
+          LOG_BUILD ${_LOGFLAG}
+          LOG_INSTALL ${_LOGFLAG}
     )
+
     set_target_properties(${OC_EP_PREFIX}${COMPONENT_NAME} PROPERTIES FOLDER "ExternalProjects")
         
     # See OpenCMISSDeveloper.cmake

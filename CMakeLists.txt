@@ -65,6 +65,12 @@
 #    Further, you can specify an explicit mpi compiler wrapper (full path or just the binary name) for each language,
 #    where <lang> can be each of "C","CXX" or "Fortran".
 #    This can be used independently of (but possibly with) the MPI_HOME setting.
+#
+# ============== PROFILING ====================
+#
+# MPI_PROFILING: []|<any value>
+#    If set, MPI profiling will be enabled.  Currently Intel's VTune package is used for performance
+#    and analysis.  It is only available if Intel compilers and MPI and being used. 
 
 ########################################################
 # If your cmake is older than 2.6 - goodbye. 
@@ -94,6 +100,13 @@ if (NOT CMAKE_COMPATIBLE)
     return()
 endif(NOT CMAKE_COMPATIBLE)
 ############################## END OF FULLY BACKWARDS-COMPATIBLE PART ###############################
+
+# MPI Profiling only available when using Intel compilers
+if(TOOLCHAIN STREQUAL "intel")
+else()
+   set(MPI_PROFILING OFF)
+endif()
+
 
 # OPENCMISS_CMAKE_MIN_VERSION is defined in OCCMakeCheck
 cmake_minimum_required(VERSION ${OPENCMISS_CMAKE_MIN_VERSION} FATAL_ERROR)
@@ -299,6 +312,9 @@ if (MPI_HOME)
 endif()
 if (TOOLCHAIN)
     message(STATUS "@ TOOLCHAIN: ${TOOLCHAIN}")
+endif()
+if (MPI_PROFILING)
+    message(STATUS "@ PROFILER: Intel VTune")
 endif()
 message(STATUS "@")
 printnextsteps()

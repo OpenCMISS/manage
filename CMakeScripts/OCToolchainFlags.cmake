@@ -55,12 +55,11 @@ if (CMAKE_COMPILER_IS_GNUC OR CMAKE_C_COMPILER_ID STREQUAL "GNU" OR MINGW)
     # ABI Flag -m$(ABI)
     
     # These flags are set by CMake by default anyways.
-    # addFlagAll("-O3" RELEASE)
     addFlagAll("-O0" DEBUG)
     
     # Release
     
-    addFlagAll("-Ofast" RELEASE)
+    addFlagAll("-O3" RELEASE)
         
     # Debug
     
@@ -92,7 +91,8 @@ elseif (CMAKE_C_COMPILER_ID STREQUAL "Intel" OR CMAKE_CXX_COMPILER_ID STREQUAL "
     # ABI Flag -m$(ABI)
     
     # CMake default anyways
-    #addFlagAll("-O3" RELEASE)
+    addFlagAll("-O3" RELEASE)
+    addFlagAll("-g" RELEASE)
 
     # Somehow CMake does not add the appropriate C-standard flags even though
     # the C_STANDARD variable is set. Well do it manually for now.
@@ -103,8 +103,11 @@ elseif (CMAKE_C_COMPILER_ID STREQUAL "Intel" OR CMAKE_CXX_COMPILER_ID STREQUAL "
     #	addFlag("-std=c99" C)
     #endif()
     
-    # Release
-#    addFlagAll("-fast" RELEASE)
+    # Release - needed for Intel Parallel Studio 2017+
+    addFlagAll("-fPIE" Fortran RELEASE)
+
+    # Release - added for vector optimisation
+    addFlagAll("-xAVX" RELEASE)
     
     # Debug
     addFlagAll("-traceback" DEBUG)
@@ -177,3 +180,4 @@ foreach(lang C CXX Fortran)
         message(STATUS "${lang} flags (DEBUG)=${CMAKE_${lang}_FLAGS_DEBUG}")
     endif()
 endforeach()
+
