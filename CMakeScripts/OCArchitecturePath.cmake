@@ -27,6 +27,8 @@
 #            :watcom: The Watcom toolchain
 #            :unknown: Unknown compiler
 #    
+#    :instrumenation: Any instrumentation systems
+#        Otherwise, the path element is skipped.
 #    :multithreading: If :var:`OC_USE_MULTITHREADING` is enabled, this segment is :path:`/mt`.
 #        Otherwise, the path element is skipped.
 #    :mpi: Denotes the used MPI implementation along with the mpi build type.
@@ -72,10 +74,14 @@ function(getArchitecturePath VARNAME VARNAME_MPI)
     # The full architecture path without mpi is the same but with "no_mpi" at the same level
     string(REPLACE "/${MPI_PART}" "/no_mpi" ARCHPATH_NOMPI ${ARCHPATH})
     set(${VARNAME} ${ARCHPATH_NOMPI} PARENT_SCOPE)
+
+    #log("Architecture path (No MPI) = ${ARCHPATH}" DEBUG)
+    #log("Architecture path (MPI)    = ${ARCHPATH_NOMPI}" DEBUG)
+    
 endfunction()
 
 # This function assembles a short version (the beginning) of the architecture path
-# We have [ARCH][COMPILER][MT]
+# We have [ARCH][COMPILER][INSTRUMENTATION][MT]
 #
 function(getShortArchitecturePath VARNAME)
     
@@ -91,8 +97,21 @@ function(getShortArchitecturePath VARNAME)
     # Compiler
     getCompilerPathElem(COMPILER)
     SET(ARCHPATH ${ARCHPATH}/${COMPILER})
+
+
+    #log("OC_INSTRUMENTATION = ${OC_INSTRUMENTATION}" DEBUG)
     
-    # Profiling
+    # Instrumentation
+    if (OC_INSTRUMENTATION STREQUAL "scorep")
+        SET(ARCHPATH ${ARCHPATH}/scorep)
+    elseif(OC_INSTRUMENTATION STREQUAL "vtune")
+        SET(ARCHPATH ${ARCHPATH}/vtune)
+        #log("In here. ARCHPATH = ${ARCHPATH}" DEBUG)
+    elseif(OC_INSTRUMENTATION STREQUAL "none")
+      #Do nothing
+    else()
+      message(WARNING "Unknown instrumentation option. Ignoring.")
+    endif()
     
     # Multithreading
     if (OC_MULTITHREADING)

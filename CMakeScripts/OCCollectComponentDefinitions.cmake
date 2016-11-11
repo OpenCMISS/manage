@@ -21,33 +21,12 @@ LIST(APPEND COMPONENT_COMMON_DEFS
     -DCMAKE_NO_SYSTEM_FROM_IMPORTED=YES
     -DCMAKE_DEBUG_POSTFIX=${CMAKE_DEBUG_POSTFIX}
     -DCMAKE_POSITION_INDEPENDENT_CODE=YES # -fPIC flag - always enable
+    -DOC_INSTRUMENTATION=${OC_INSTRUMENTATION}
     -DWARN_ALL=${OC_WARN_ALL}
     -DCHECK_ALL=${OC_CHECK_ALL}
     -DWITH_PROFILING=${OC_PROFILING}
     -DCMAKE_INSTALL_DEFAULT_COMPONENT_NAME=Development
 )
-
-# Add compilers and flags
-foreach(lang C CXX Fortran)
-    # Define flags
-    if (CMAKE_${lang}_FLAGS)
-        LIST(APPEND COMPONENT_COMMON_DEFS
-            -DCMAKE_${lang}_FLAGS=${CMAKE_${lang}_FLAGS}
-        )
-    endif()
-    # Also forward build-type specific flags
-    foreach(BUILDTYPE RELEASE DEBUG)
-        if (CMAKE_${lang}_FLAGS_${BUILDTYPE})
-            LIST(APPEND COMPONENT_COMMON_DEFS
-                -DCMAKE_${lang}_FLAGS_${BUILDTYPE}=${CMAKE_${lang}_FLAGS_${BUILDTYPE}}
-            )
-        endif()
-    endforeach()
-    # Note: we dont define the compilers in the COMPONENT_COMMON_DEFS any more,
-    # as the OCComponentSetupMacros re-defines the compilers if MPI wrappers
-    # are found. To make the definitions list less confusing we'll completely leave
-    # out compiler definitions here and just define them in the OCComponentSetupMacros#addAndConfigureLocalComponent
-endforeach()
 
 # Pass on local lookup flags (consumed by find_package calls)
 foreach(COMP ${OPENCMISS_COMPONENTS})

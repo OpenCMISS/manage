@@ -45,7 +45,7 @@ function(addAndConfigureLocalComponent COMPONENT_NAME)
     
     # Shared or static?
     list(APPEND COMPONENT_DEFS -DBUILD_SHARED_LIBS=${${COMPONENT_NAME}_SHARED})
-    
+
     # OpenMP multithreading
     if(COMPONENT_NAME IN_LIST OPENCMISS_COMPONENTS_WITH_OPENMP)
         list(APPEND COMPONENT_DEFS
@@ -53,8 +53,7 @@ function(addAndConfigureLocalComponent COMPONENT_NAME)
         )
     endif()
     
-    # check if MPI compilers should be forwarded/set
-    # so that the local FindMPI uses that
+    # check if MPI compilers should be forwarded/set so that the local FindMPI uses that
     if(${COMPONENT_NAME} IN_LIST OPENCMISS_COMPONENTS_WITHMPI)
         # Pass on settings and take care to undefine them if no longer used at this level
         if (MPI)
@@ -67,12 +66,12 @@ function(addAndConfigureLocalComponent COMPONENT_NAME)
         else()
             LIST(APPEND COMPONENT_DEFS -UMPI_HOME)
         endif()
-        # Override (=defined later in the args list) Compilers with MPI compilers
-        # for all components that may use MPI
-        # This takes precedence over the first definition of the compilers
-        # collected in COMPONENT_COMMON_DEFS
+        # Override compilers with MPI compilers for all components that may use MPI. Also set
+	# compiler flags. We do this here as we may need different compiler flags with MPI.
         foreach(lang C CXX Fortran)
+	    log("Adding MPI compiler for ${lang}. MPI_${lang}_COMPILER = ${MPI_${lang}_COMPILER}" VERBOSE)
             if(MPI_${lang}_COMPILER)
+ 	        log("In block for MPI_${lang}_COMPILER" VERBOSE)
                 list(APPEND COMPONENT_DEFS
                     # Directly specify the compiler wrapper as compiler!
                     # That is a perfect workaround for the "finding MPI after compilers have been initialized" problem
@@ -81,6 +80,22 @@ function(addAndConfigureLocalComponent COMPONENT_NAME)
                     # Also specify the MPI_ versions so that FindMPI is faster (checks them directly)
                     -DMPI_${lang}_COMPILER=${MPI_${lang}_COMPILER}
                 )
+                # Define compiler flags
+                if (CMAKE_${lang}_FLAGS)
+		  SET(MPI_CMAKE_FLAGS "${CMAKE_${lang}_FLAGS} ${OC_MPI_ONLY_${lang}_FLAGS}")
+                 LIST(APPEND COMPONENT_DEFS
+                    -DCMAKE_${lang}_FLAGS=${MPI_CMAKE_FLAGS}
+                    )
+                endif()
+                # Also forward build-type specific flags
+                foreach(BUILDTYPE RELEASE DEBUG)
+                  if (CMAKE_${lang}_FLAGS_${BUILDTYPE})
+		    SET(MPI_CMAKE_FLAGS_${BUILDTYPE} "${CMAKE_${lang}_FLAGS_${BUILDTYPE}} ${OC_MPI_ONLY_${lang}_FLAGS_${BUILDTYPE}}")
+                    LIST(APPEND COMPONENT_DEFS
+                      -DCMAKE_${lang}_FLAGS_${BUILDTYPE}=${MPI_CMAKE_FLAGS_${BUILDTYPE}}
+                      )
+                  endif()
+                endforeach()
             endif()
         endforeach()
     else()
@@ -89,6 +104,20 @@ function(addAndConfigureLocalComponent COMPONENT_NAME)
             list(APPEND COMPONENT_DEFS
                 -DCMAKE_${lang}_COMPILER=${CMAKE_${lang}_COMPILER}
             )
+            # Define compiler flags
+            if (CMAKE_${lang}_FLAGS)
+              LIST(APPEND COMPONENT_DEFS
+                -DCMAKE_${lang}_FLAGS=${CMAKE_${lang}_FLAGS}
+                )
+            endif()
+            # Also forward build-type specific flags
+            foreach(BUILDTYPE RELEASE DEBUG)
+              if (CMAKE_${lang}_FLAGS_${BUILDTYPE})
+                LIST(APPEND COMPONENT_DEFS
+                  -DCMAKE_${lang}_FLAGS_${BUILDTYPE}=${CMAKE_${lang}_FLAGS_${BUILDTYPE}}
+                  )
+              endif()
+            endforeach()
         endforeach()
     endif()
     
@@ -228,6 +257,9 @@ function(createExternalProjects COMPONENT_NAME SOURCE_DIR BINARY_DIR DEFS)
     else()
         set(_LOGFLAG 0)
     endif()  
+
+    #Disable warning for unused cmdline options
+    set(FULL_CMAKE_COMMAND ${CMAKE_COMMAND} --no-warn-unused-cli)
     
     log("Adding ${COMPONENT_NAME} with DEPS=${${COMPONENT_NAME}_DEPS}" VERBOSE)
     ExternalProject_Add(${OC_EP_PREFIX}${COMPONENT_NAME}
@@ -242,13 +274,13 @@ function(createExternalProjects COMPONENT_NAME SOURCE_DIR BINARY_DIR DEFS)
         # Still a mess with mixed download/build stamp files and even though the UPDATE_DISCONNECTED command
         # skips the update command the configure etc dependency chain is yet executed each time :-(
         #${DOWNLOAD_CMDS}
-        #UPDATE_DISCONNECTED 1 # Dont update without being asked. New feature of CMake 3.2.0-rc1
+        #UPDATE_DISCONNECTED 1 # Dont update without being asked. New feature of CMake 3.2.0-rc1 
         
         # Need empty download command, otherwise creation of external project fails with "no download info"
         DOWNLOAD_COMMAND ""
         
         #--Configure step-------------
-        CMAKE_COMMAND ${CMAKE_COMMAND} --no-warn-unused-cli # disables warnings for unused cmdline options
+        CMAKE_COMMAND ${FULL_CMAKE_COMMAND}
         SOURCE_DIR ${SOURCE_DIR}
         BINARY_DIR ${BINARY_DIR}
         CMAKE_ARGS ${DEFS}

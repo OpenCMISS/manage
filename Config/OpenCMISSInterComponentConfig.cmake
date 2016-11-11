@@ -103,14 +103,14 @@ option(OPTPP_WITH_BLAS "Have Opt++ use external BLAS routines" NO)
 
 ##
 #    PASTIX_USE_THREADS : YES
-#        Have Sundials use LAPACK
-#    PASTIX_USE_METIS : YES
+#        Have PASTIX use threading
+#    PASTIX_WITH_METIS : YES
 #        Have PASTIX use Metis
-#    PASTIX_USE_PTSCOTCH : YES
+#    PASTIX_WITH_PTSCOTCH : YES
 #        Have PASTIX use PT-Scotch
 option(PASTIX_USE_THREADS "Enable use of threading for PASTIX" YES)
-option(PASTIX_USE_METIS "Have PASTIX use Metis" YES)
-option(PASTIX_USE_PTSCOTCH "Have PASTIX use PT-Scotch" YES)
+option(PASTIX_WITH_METIS "Have PASTIX use Metis" YES)
+option(PASTIX_WITH_PTSCOTCH "Have PASTIX use PT-Scotch" YES)
 
 ##
 #    PETSC_WITH_HYPRE : YES
@@ -168,6 +168,14 @@ option(SUNDIALS_WITH_LAPACK "Have Sundials use LAPACK" YES)
 #    SUPERLU_DIST_WITH_PARMETIS : YES
 #        Enable Parmetis support for SuperLU-Dist
 option(SUPERLU_DIST_WITH_PARMETIS "Enable Parmetis support for SuperLU-Dist" YES)
+
+##
+#    SCALASCA_WITH_CUBE : YES
+#        Enable cube support for Scalasca
+#    SCALASCA_WITH_OTF2 : YES
+#        Enable OTF2 support for Scalasca
+option(SCALASCA_WITH_CUBE "Enable Cube support for Scalasca" YES)
+option(SCALASCA_WITH_OTF2 "Enable OTF2 support for Scalasca" YES)
 
 ##
 #    ZINC_WITH_Python_BINDINGS : YES if Python bindings prerequisites are given, NO otherwise
