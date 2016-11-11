@@ -69,7 +69,7 @@
 # ============== PROFILING ====================
 #
 # MPI_PROFILING: []|<any value>
-#    If set, MPI profiling will be enabled.  Currently Intel's VTune package is used for performance performance
+#    If set, MPI profiling will be enabled.  Currently Intel's VTune package is used for performance
 #    and analysis.  It is only available if Intel compilers and MPI and being used. 
 
 ########################################################
