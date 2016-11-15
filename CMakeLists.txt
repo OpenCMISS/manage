@@ -51,8 +51,8 @@ endif ()
 # OPENCMISS_MODULE_PATH must be set
 set(OPENCMISS_CMAKE_MODULES_PATH ${OPENCMISS_CMAKE_MODULES_PATH} CACHE PATH "Location of the OpenCMISS CMake modules.")
 
-if (NOT EXISTS "${OPENCMISS_CMAKE_MODULES_PATH}/Modules/OCToolchainCompilers.cmake")
-    message(FATAL_ERROR "'${OPENCMISS_CMAKE_MODULES_PATH}/Modules/OCToolchainCompilers.cmake' does not exists.  The OpenCMISS CMake modules may not be installed/available.")
+if (NOT EXISTS "${OPENCMISS_CMAKE_MODULES_PATH}/Modules/OCArchitecturePathFunctions.cmake")
+    message(FATAL_ERROR "'${OPENCMISS_CMAKE_MODULES_PATH}/Modules/OCArchitecturePathFunctions.cmake' does not exists.  The OpenCMISS CMake modules may not be installed/available.")
 endif ()
 
 if (NOT WIN32 OR MINGW)
@@ -62,26 +62,28 @@ if (NOT WIN32 OR MINGW)
     endif()
 endif()
 
+list(APPEND CMAKE_MODULE_PATH ${OPENCMISS_CMAKE_MODULES_PATH}/Modules)
+
 if (NOT _INSTALLATION_CONFIG_FINALISED)
-    configure_file(${CMAKE_CURRENT_SOURCE_DIR}/Templates/${OPENCMISS_ROOT_CONFIG}.template.cmake ${CMAKE_CURRENT_BINARY_DIR}/${OPENCMISS_ROOT_CONFIG}.cmake)
+    configure_file(${CMAKE_CURRENT_SOURCE_DIR}/Templates/${OPENCMISS_ROOT_CONFIG}.template.cmake ${CMAKE_CURRENT_BINARY_DIR}/OpenCMISSRoots.cmake @ONLY)
     configure_file(${CMAKE_CURRENT_SOURCE_DIR}/Templates/OpenCMISSInstallationConfig.template.cmake ${CMAKE_CURRENT_BINARY_DIR}/OpenCMISSInstallationConfig.cmake)
 endif ()
 
-#include(OCArchitecturePathFunctions)
+include(OCArchitecturePathFunctions)
 #include(OCPaths)
-#include(OCMiscFunctionsMacros)
+include(OCMiscFunctionsMacros)
 
 # Start log file for config run
 #string(TIMESTAMP NOW "%Y-%m-%d, %H:%M")
 #log("Starting configuration in ${CMAKE_CURRENT_BINARY_DIR} at ${NOW}")
 
-#include(OCToolchainCompilers)
-#include(OCMPIConfig)
+include(OCToolchainCompilers)
+include(OCMPIConfig)
 
 # Pre-check for Python and Swig availability so that bindings will be built automatically (unless explicitly specified)
 #find_package(PythonInterp ${PYTHON_VERSION} QUIET)
 #find_package(PythonLibs QUIET)
-find_package(SWIG QUIET)
+#find_package(SWIG QUIET)
 #if (PYTHONINTERP_FOUND AND PYTHONLIBS_FOUND AND SWIG_FOUND)
 #    set(OC_PYTHON_PREREQ_FOUND YES)
     # Already check for the virtualenv - this is the default way if found.
@@ -97,7 +99,7 @@ find_package(SWIG QUIET)
 # This includes the configuration, both default and local
 #include(OpenCMISSConfig)
 
-#getToolchain(CURRENT_TOOLCHAIN)
+getToolchain(CURRENT_TOOLCHAIN)
 
 set(OPENCMISS_TOOLCHAIN ${CURRENT_TOOLCHAIN} CACHE STRING "Specify the toolchain mnemonic.")
 set(OPENCMISS_MPI ${MPI} CACHE STRING "Specify the MPI mnemonic")
