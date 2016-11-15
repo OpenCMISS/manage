@@ -74,7 +74,7 @@ If you want a specific MPI version, there are several ways to achieve that:
      e.g. :sh:`cmake -DMPI=mpich`.
      The build system is aware of those implementations and tries to find according compiler
      wrappers at pre-guessed locations.
-   - If you want the build environment to build the specified MPI for you, set :var:`SYSTEM_MPI` to :cmake:`NO`
+   - If you want the build environment to build the specified MPI for you, set :var:`MPI_USE_SYSTEM` to :cmake:`NO`
      and let the build system download and compile the specified implementation.
      
      .. note::

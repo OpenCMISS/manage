@@ -84,6 +84,6 @@ See for example https://www.open-mpi.org/community/lists/devel/2005/09/0359.php 
    - Install a statically build version of OpenMPI
    - If you built OpenMPI yourself, rebuild with :sh:`--disable-dlopen`
    - Use another MPI implementation: Specify e.g. :sh:`-DMPI=mpich` at configure stage (Remember to build :sh:`reset-mpionly` and clear the build folder *before*, see also :ref:`multiarchbuilds`)
-   - Have the build system build OpenMPI for you by specifying :sh:`-DSYSTEM_MPI=NO -DMPI=openmpi`; see also :ref:`multiarchbuilds`
+   - Have the build system build OpenMPI for you by specifying :sh:`-DMPI_USE_SYSTEM=NO -DMPI=openmpi`; see also :ref:`multiarchbuilds`
    - Modify your Python script: https://code.google.com/archive/p/distnumpy/issues/1
     

@@ -24,7 +24,7 @@
 # At first, a flag :var:`<COMPNAME>_DEVEL` must be set in order to notify the setup that
 # this component (Iron, Zinc, any dependency) should be under development.
 #
-# See also: OC_DEVEL_ALL_.
+# See also: `OPENCMISS_DEVEL_ALL`_.
 #
 # .. default:: NO
 
@@ -102,7 +102,7 @@ set(OC_DEFAULT_MPI )
 set(OC_DEFAULT_MPI_BUILD_TYPE )
 
 ##
-# OC_DEVEL_ALL
+# OPENCMISS_DEVEL_ALL
 # ------------
 #
 # Override any local variable and have CMake download/checkout the "devel" branch of any components repository
@@ -110,40 +110,15 @@ set(OC_DEFAULT_MPI_BUILD_TYPE )
 # See also: `<COMP>_DEVEL`_
 #
 # .. default:: NO
-set(OC_DEVEL_ALL NO)
+option(OPENCMISS_DEVEL_ALL "Download/checkout development branches of all components of the OpenCMISS build." NO)
 
 ##
-# OC_INSTALL_SUPPORT_EMAIL
-# ------------------------
+# OPENCMISS_INSTALLATION_SUPPORT_EMAIL
+# ------------------------------------
 # 
 # Please set this to your email address, especially if you plan to provide several architecture installations and
 # expect people to use your installation
 #
-# .. default:: OC_BUILD_SUPPORT_EMAIL
-set(OC_INSTALL_SUPPORT_EMAIL ${OC_BUILD_SUPPORT_EMAIL})
-
-##
-# OC_PROFILING
-# ------------
-#
-# Set this to YES to build with the -p profiling flags.
-#
-# .. default:: NO
-set(OC_PROFILING NO)
-
-# ######################################################################################################
-# The following variables simply define different default values as those set in
-# the default configuration. Refer to the documentation for more details. 
-set(OC_CREATE_LOGS NO)
-set(OC_CONFIG_LOG_LEVELS SCREEN WARNING ERROR DEBUG)
-
-# Here are some pre-written variables that you might want to use some day:
-#set(OC_USE_ARCHITECTURE_PATH NO) 
-#set(CMAKE_VERBOSE_MAKEFILE ON)
-#set(OC_CONFIG_LOG_TO_SCREEN YES)
-#set(OC_DEFAULT_MPI "openmpi")
-#set(DISABLE_GIT YES)
-
-
-
+# .. default:: OPENCMISS_BUILD_SUPPORT_EMAIL
+set(OPENCMISS_INSTALLATION_SUPPORT_EMAIL ${OPENCMISS_BUILD_SUPPORT_EMAIL} CACHE STRING "Please set this to your email address, especially if you plan to provide several architecture installations and expect people to use your installation")
 

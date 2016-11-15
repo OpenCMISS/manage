@@ -34,6 +34,7 @@ if (DEFINED OPENCMISS_ROOT)
     else ()
         set(OPENCMISS_ROOT ${OPENCMISS_ROOT} CACHE PATH "Root location for building OpenCMISS from source.")
         set(OPENCMISS_ROOT_CONFIG OpenCMISSRoot)
+        set(OPENCMISS_OWN_MPI_CONFIG OpenCMISSOwnMPIRoot)
     endif ()
 else ()
     if (_INSTALLATION_CONFIG_FINALISED)
@@ -45,6 +46,7 @@ else ()
         set(OPENCMISS_DEPENDENCIES_ROOT ${OPENCMISS_DEPENDENCIES_ROOT} CACHE PATH "Root location for building OpenCMISS dependencies from source.")
         set(OPENCMISS_CMAKE_MODULES_ROOT ${OPENCMISS_CMAKE_MODULES_ROOT} CACHE PATH "Root location for building OpenCMISS cmake modules from source.")
         set(OPENCMISS_ROOT_CONFIG OpenCMISSIndependentRoots)
+        set(OPENCMISS_OWN_MPI_CONFIG OpenCMISSOwnMPIIndependentRoots)
     endif ()
 endif ()
 
@@ -64,40 +66,36 @@ endif()
 
 list(APPEND CMAKE_MODULE_PATH ${OPENCMISS_CMAKE_MODULES_PATH}/Modules)
 
+set(CONFIGURED_FILES_DIR ${CMAKE_CURRENT_BINARY_DIR}/ConfiguredFiles)
+list(APPEND CMAKE_MODULE_PATH ${CONFIGURED_FILES_DIR})
 if (NOT _INSTALLATION_CONFIG_FINALISED)
-    configure_file(${CMAKE_CURRENT_SOURCE_DIR}/Templates/${OPENCMISS_ROOT_CONFIG}.template.cmake ${CMAKE_CURRENT_BINARY_DIR}/OpenCMISSRoots.cmake @ONLY)
-    configure_file(${CMAKE_CURRENT_SOURCE_DIR}/Templates/OpenCMISSInstallationConfig.template.cmake ${CMAKE_CURRENT_BINARY_DIR}/OpenCMISSInstallationConfig.cmake)
+    configure_file(${CMAKE_CURRENT_SOURCE_DIR}/Templates/${OPENCMISS_OWN_MPI_CONFIG}.template.cmake ${CONFIGURED_FILES_DIR}/OpenCMISSOwnMPI.cmake @ONLY)
+    configure_file(${CMAKE_CURRENT_SOURCE_DIR}/Templates/${OPENCMISS_ROOT_CONFIG}.template.cmake ${CONFIGURED_FILES_DIR}/OpenCMISSRoots.cmake @ONLY)
+    configure_file(${CMAKE_CURRENT_SOURCE_DIR}/Templates/OpenCMISSInstallationConfig.template.cmake ${CONFIGURED_FILES_DIR}/OpenCMISSInstallationConfig.cmake)
 endif ()
 
 include(OCArchitecturePathFunctions)
-#include(OCPaths)
 include(OCMiscFunctionsMacros)
 
-# Start log file for config run
-#string(TIMESTAMP NOW "%Y-%m-%d, %H:%M")
-#log("Starting configuration in ${CMAKE_CURRENT_BINARY_DIR} at ${NOW}")
+# Path for own MPI BUILD?
+include(OpenCMISSOwnMPI)
 
 include(OCToolchainCompilers)
-include(OCMPIConfig)
-
-# Pre-check for Python and Swig availability so that bindings will be built automatically (unless explicitly specified)
-#find_package(PythonInterp ${PYTHON_VERSION} QUIET)
-#find_package(PythonLibs QUIET)
-#find_package(SWIG QUIET)
-#if (PYTHONINTERP_FOUND AND PYTHONLIBS_FOUND AND SWIG_FOUND)
-#    set(OC_PYTHON_PREREQ_FOUND YES)
-    # Already check for the virtualenv - this is the default way if found.
-#    find_program(VIRTUALENV_EXECUTABLE virtualenv)
-#else()
-#    set(OC_PYTHON_PREREQ_FOUND NO)
-#endif()
+include(OCDetermineMPI)
 
 ########################################################################
 # Architecture paths
-#include(OCPathsArchitecture)
+set(ARCHITECTURE_PATH_NOMPI .)
+set(ARCHITECTURE_PATH_MPI .)
+if (OC_USE_ARCHITECTURE_PATH)
+    getArchitecturePath(ARCHITECTURE_PATH_NOMPI ARCHITECTURE_PATH_MPI)
+endif()
 
 # This includes the configuration, both default and local
 #include(OpenCMISSConfig)
+
+# Hide some of the variables in the interface that we don't want to see.
+tidyUpVariables()
 
 getToolchain(CURRENT_TOOLCHAIN)
 
