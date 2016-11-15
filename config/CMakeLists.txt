@@ -121,9 +121,31 @@ else()
     set(OC_PYTHON_PREREQ_FOUND NO)
 endif()
     
-# This includes the configuration, both default and local
-include(OpenCMISSConfig)
+# Load local configuration to allow overrides
+# First try at a given path, then local
+SET(_CONFIG_FOUND NO)
+if (OPENCMISS_CONFIG_DIR)
+    SET(LOCALCONF ${OPENCMISS_CONFIG_DIR}/OpenCMISSLocalConfig.cmake)
+    if (EXISTS ${LOCALCONF})
+        message(STATUS "Applying OpenCMISS local configuration at ${LOCALCONF}...")
+        include(${LOCALCONF})
+        SET(_CONFIG_FOUND YES)
+    endif ()
+endif ()
+SET(_LC_CDIR ${LOCALCONF})
+SET(LOCALCONF ${CMAKE_CURRENT_BINARY_DIR}/OpenCMISSLocalConfig.cmake)
+if (EXISTS ${LOCALCONF} AND NOT _LC_CDIR STREQUAL LOCALCONF)
+    message(STATUS "Applying OpenCMISS local configuration at ${LOCALCONF}...")
+    include(${LOCALCONF})
+    SET(_CONFIG_FOUND YES)
+endif ()
+if (NOT _CONFIG_FOUND)
+    message(STATUS "No local OpenCMISS configuration file present.")
+endif ()
+unset(_LC_CDIR)
+unset(_CONFIG_FOUND)
 
+#
 # Start log file for config run
 string(TIMESTAMP NOW "%Y-%m-%d, %H:%M")
 log("Starting configuration in ${CMAKE_CURRENT_BINARY_DIR} at ${NOW}")
@@ -150,7 +172,7 @@ include(OCInstallFindModuleWrappers)
 # Add CMakeModules directory after wrapper module directory (set in above script)
 # This folder is also exported to the install tree upon "make install" and
 # then used within the FindOpenCMISS.cmake module script
-list(APPEND CMAKE_MODULE_PATH 
+list(APPEND CMAKE_MODULE_PATH
     ${OPENCMISS_MODULE_PATH}/CMakeModules
 )
 
