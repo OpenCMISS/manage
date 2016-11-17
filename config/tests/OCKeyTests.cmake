@@ -109,6 +109,6 @@ endif()
 
 # Add a top level target that runs only the key tests
 add_custom_target(keytests
-    COMMAND ${CMAKE_CTEST_COMMAND} -R "^${KEY_TEST_PREFIX}*" -O ${OC_SUPPORT_DIR}/keytests.log --output-on-failure -C $<CONFIG>
+    COMMAND ${CMAKE_CTEST_COMMAND} -R "^${KEY_TEST_PREFIX}*" -O ${OPENCMISS_SUPPORT_DIR}/keytests.log --output-on-failure -C $<CONFIG>
     COMMENT "Running OpenCMISS key tests"
 )

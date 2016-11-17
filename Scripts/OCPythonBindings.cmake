@@ -1,4 +1,7 @@
 set(OC_TARGET_VIRTUALENV )
+string(REPLACE "${ARCHITECTURE_MPI_PATH}" "" _OC_PYTHON_INSTALL_PREFIX ${OPENCMISS_LIBRARIES_INSTALL_MPI_PREFIX})
+set(_OC_PYTHON_INSTALL_PREFIX _OC_PYTHON_INSTALL_PREFIX/python)
+
 if (IRON_WITH_Python_BINDINGS OR ZINC_WITH_Python_BINDINGS)
     if (NOT OC_PYTHON_PREREQ_FOUND)
         log("Python bindings were requested for Iron or Zinc but the prerequisites are not met.\nPython, Python development libraries and Swig are required.\nSee http://www.opencmiss.org/documentation for more information." ERROR)
@@ -15,13 +18,17 @@ if (IRON_WITH_Python_BINDINGS OR ZINC_WITH_Python_BINDINGS)
     endif()
     
     function(genBindingInfoFile BTYPE)
-        # OPENCMISS_INSTALL_ROOT_PYTHON is defined in OCPaths.cmake
-        if (NOT EXISTS "${OPENCMISS_INSTALL_ROOT_PYTHON}")
-          file(MAKE_DIRECTORY ${OPENCMISS_INSTALL_ROOT_PYTHON})
+        # _OC_PYTHON_INSTALL_PREFIX is defined in OCPaths.cmake
+        if (NOT EXISTS "${_OC_PYTHON_INSTALL_PREFIX}")
+          file(MAKE_DIRECTORY ${_OC_PYTHON_INSTALL_PREFIX})
         endif ()
         string(TOLOWER ${BTYPE} BTYPE)
-        string(REPLACE "/" "_" _APATH "${ARCHITECTURE_PATH_MPI}")
-        set(VIRTUALENV_INFO_FILE ${OPENCMISS_INSTALL_ROOT_PYTHON}/bindings_${_APATH}_${BTYPE}.py)
+        if (OPENCMISS_USE_ARCHITECTURE_PATH)
+            string(REPLACE "/" "_" _APATH "${ARCHITECTURE_MPI_PATH}")
+            set(VIRTUALENV_INFO_FILE ${_OC_PYTHON_INSTALL_PREFIX}/bindings_${_APATH}_${BTYPE}.py)
+        else ()
+            set(VIRTUALENV_INFO_FILE ${_OC_PYTHON_INSTALL_PREFIX}/bindings.py)
+        endif ()
         getCompilerPathElem(COMPILER)
         string(TOLOWER ${MPI_BUILD_TYPE} MPI_BUILD_TYPE)
         set(LIBRARY_PATH )
@@ -34,7 +41,7 @@ if (IRON_WITH_Python_BINDINGS OR ZINC_WITH_Python_BINDINGS)
             set(IS_VIRTUALENV true)
         endif()
         configure_file(
-            "${OPENCMISS_MODULE_PATH}/Templates/python_virtualenv.in.py"
+            "${MANAGE_MODULE_PATH}/Templates/python_virtualenv.in.py"
             "${VIRTUALENV_INFO_FILE}" 
             @ONLY
         )
@@ -44,7 +51,7 @@ if (IRON_WITH_Python_BINDINGS OR ZINC_WITH_Python_BINDINGS)
     if (CMAKE_HAVE_MULTICONFIG_ENV)
         foreach(BTYPE ${CMAKE_CONFIGURATION_TYPES})
             string(TOLOWER ${BTYPE} BTYPE)
-            set(OC_TARGET_VIRTUALENV ${OPENCMISS_COMPONENTS_INSTALL_PREFIX_MPI_NO_BUILD_TYPE}/${OC_VIRTUALENV_SUBPATH}/${BTYPE})
+            set(OC_TARGET_VIRTUALENV ${OPENCMISS_LIBRARIES_INSTALL_MPI_PREFIX}/${OC_VIRTUALENV_SUBPATH}/${BTYPE})
             genBindingInfoFile(${BTYPE})
         
             # For multiconfig builds, we need to create all the possible virtual environments
@@ -58,9 +65,9 @@ if (IRON_WITH_Python_BINDINGS OR ZINC_WITH_Python_BINDINGS)
         endforeach()
         # Set to the directory without build type - zinc/iron will know if they're in a multiconf-environment
         # and create the correct path for installation within their own cmake logic
-        set(OC_TARGET_VIRTUALENV ${OPENCMISS_COMPONENTS_INSTALL_PREFIX_MPI_NO_BUILD_TYPE}/${OC_VIRTUALENV_SUBPATH})
+        set(OC_TARGET_VIRTUALENV ${OPENCMISS_LIBRARIES_INSTALL_MPI_PREFIX}/${OC_VIRTUALENV_SUBPATH})
     else()
-        set(OC_TARGET_VIRTUALENV ${OPENCMISS_COMPONENTS_INSTALL_PREFIX_MPI}/${OC_VIRTUALENV_SUBPATH})
+        set(OC_TARGET_VIRTUALENV ${OPENCMISS_LIBRARIES_INSTALL_MPI_PREFIX}/${OC_VIRTUALENV_SUBPATH})
         genBindingInfoFile(${CMAKE_BUILD_TYPE})
         
         if (OC_PYTHON_BINDINGS_USE_VIRTUALENV)

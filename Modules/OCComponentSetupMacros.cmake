@@ -173,7 +173,7 @@ function(addSourceManagementTargets COMPONENT_NAME BINARY_DIR SOURCE_DIR)
                 -DMODE=Download
                 -DURL=${${COMPONENT_NAME}_REPO}/archive/${_FILENAME}
                 -DTARGET="${SOURCE_DIR}/${_FILENAME}"
-                -P ${OPENCMISS_MODULE_PATH}/CMakeScripts/ScriptSourceManager.cmake
+                -P ${MANAGE_MODULE_PATH}/Scripts/OCSourceManager.cmake
             COMMENT "Downloading ${COMPONENT_NAME} sources"
         )
         
@@ -196,7 +196,7 @@ function(addSourceManagementTargets COMPONENT_NAME BINARY_DIR SOURCE_DIR)
             -DCOMPONENT=${REPO_NAME}
             -DSRC_DIR=${SOURCE_DIR}
             -DBIN_DIR=${CMAKE_CURRENT_BINARY_DIR}
-            -P ${OPENCMISS_MODULE_PATH}/CMakeScripts/ScriptSourceManager.cmake
+            -P ${MANAGE_MODULE_PATH}/Scripts/OCSourceManager.cmake
         COMMENT "Checking ${COMPONENT_NAME} sources are present"
     )
     set_target_properties(${OC_SM_PREFIX}${COMPONENT_NAME}_sources PROPERTIES FOLDER "Internal")
@@ -347,7 +347,7 @@ endmacro()
 
 function(doSupportStuff NAME SRC BIN DEFS)
     # Write support log file
-    set(SUPPORT_FILE "${OC_SUPPORT_DIR}/${NAME}-buildconfig.txt")
+    set(SUPPORT_FILE "${OPENCMISS_SUPPORT_DIR}/${NAME}-buildconfig.txt")
     string(TIMESTAMP NOW)
     file(WRITE "${SUPPORT_FILE}" "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 @ Automatically generated OpenCMISS support file, ${NOW}
@@ -371,7 +371,7 @@ Configure definitions:
         add_custom_target(${OC_SM_PREFIX}${NAME}_collect_log
             COMMAND ${CMAKE_COMMAND}
                 -DLOG_DIR=${BIN}/${OC_EXTPROJ_STAMP_DIR}
-                -DSUPPORT_DIR=${OC_SUPPORT_DIR} 
+                -DSUPPORT_DIR=${OPENCMISS_SUPPORT_DIR} 
                 -P ${OPENCMISS_MODULE_PATH}/CMakeScripts/OCSupport.cmake
             COMMENT "Support: Collecting ${COMPONENT_NAME} log files"
         )
@@ -386,7 +386,7 @@ Configure definitions:
             -DLOGFILE="${OC_BUILD_LOG}"
             -P ${OPENCMISS_MODULE_PATH}/CMakeScripts/OCSupport.cmake
         COMMENT "Support: Creating ${COMPONENT_NAME} buildlog"             
-        WORKING_DIRECTORY "${OC_SUPPORT_DIR}")
+        WORKING_DIRECTORY "${OPENCMISS_SUPPORT_DIR}")
     add_dependencies(${OC_EP_PREFIX}${NAME} ${OC_SM_PREFIX}${NAME}_build_log)
     set_target_properties(${OC_SM_PREFIX}${NAME}_build_log PROPERTIES FOLDER "Internal")
 endfunction()

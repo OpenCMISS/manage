@@ -92,15 +92,8 @@ enable_testing()
 
 list(APPEND CMAKE_MODULE_PATH
     ${MANAGE_MODULE_PATH}/Modules
+    ${MANAGE_MODULE_PATH}/Scripts
     )
-
-include(OCMiscFunctionsMacros)
-
-# Hide some of the variables in the interface that we don't want to see.
-tidyUpVariables()
-
-# Create a local config file if not exists
-include(OCCreateLocalConfig)
 
 # Pre-check for Python and Swig availability so that bindings will be built automatically (unless explicitly specified)
 find_package(PythonInterp ${PYTHON_VERSION} QUIET)
@@ -114,34 +107,25 @@ else()
     set(OC_PYTHON_PREREQ_FOUND NO)
 endif()
     
-# Load local configuration to allow overrides
-# First try at a given path, then local
-SET(_CONFIG_FOUND NO)
-if (OPENCMISS_CONFIG_DIR)
-    SET(LOCALCONF ${OPENCMISS_CONFIG_DIR}/OpenCMISSLocalConfig.cmake)
-    if (EXISTS ${LOCALCONF})
-        message(STATUS "Applying OpenCMISS local configuration at ${LOCALCONF}...")
-        include(${LOCALCONF})
-        SET(_CONFIG_FOUND YES)
-    endif ()
-endif ()
-SET(_LC_CDIR ${LOCALCONF})
-SET(LOCALCONF ${CMAKE_CURRENT_BINARY_DIR}/OpenCMISSLocalConfig.cmake)
-if (EXISTS ${LOCALCONF} AND NOT _LC_CDIR STREQUAL LOCALCONF)
-    message(STATUS "Applying OpenCMISS local configuration at ${LOCALCONF}...")
-    include(${LOCALCONF})
-    SET(_CONFIG_FOUND YES)
-endif ()
-if (NOT _CONFIG_FOUND)
-    message(STATUS "No local OpenCMISS configuration file present.")
-endif ()
-unset(_LC_CDIR)
-unset(_CONFIG_FOUND)
+# Utilities and external packages
+include(ExternalProject)
+include(OCComponentSetupMacros)
+include(OCArchitecturePathFunctions)
 
-#
-# Start log file for config run
-string(TIMESTAMP NOW "%Y-%m-%d, %H:%M")
-log("Starting configuration in ${CMAKE_CURRENT_BINARY_DIR} at ${NOW}")
+# Define variables used throughout
+include(OCVariables)
+
+# General paths & preps
+include(OCPaths)
+
+# Intrdouce miscellaneous helper functions and macros
+include(OCMiscFunctionsMacros)
+
+# Create a local config file if it does not exist
+include(OCCreateLocalConfig)
+
+# Load configuration files
+include(OpenCMISSConfig)
 
 if (NOT WIN32 OR MINGW)
     if (CMAKE_BUILD_TYPE STREQUAL "")
@@ -150,12 +134,15 @@ if (NOT WIN32 OR MINGW)
     endif()
 endif()
 
-include(ExternalProject)
-include(OCArchitecturePathFunctions)
+# Hide some of the variables in the interface that we don't want to see.
+tidyUpVariables()
+
+# The build system creates a build log in order to ease the support process.
+string(TIMESTAMP NOW "%Y-%m-%d, %H:%M")
+set(OC_BUILD_LOG ${OPENCMISS_SUPPORT_DIR}/configure_builds_${NOW}.log)
+log("Starting configuration in ${CMAKE_CURRENT_BINARY_DIR} at ${NOW}")
 
 ########################################################################
-# Utilities and external packages
-include(OCComponentSetupMacros)
 
 include(OCInstallFindModuleWrappers)
 # Add CMakeModules directory after wrapper module directory (set in above script)
@@ -200,14 +187,14 @@ endif ()
 set(ARCHITECTURE_NO_MPI_PATH .)
 set(ARCHITECTURE_MPI_PATH .)
 if (OC_USE_ARCHITECTURE_PATH)
+    # Extra path segment for single configuration case - will give release/debug/...
+    getBuildTypePathElem(BUILD_TYPE_PATH_ELEM)
     getArchitecturePath(ARCHITECTURE_NO_MPI_PATH ARCHITECTURE_MPI_PATH)
 endif ()
 
-########################################################################
-# General paths & preps
 include(${OPENCMISS_ROOTS_FILE})
-include(OCPaths)
 
+#
 # Setup build of MPI if required
 include(OCBuildMPI)
 
@@ -215,9 +202,6 @@ include(OCBuildMPI)
 #
 # Needs to be after MPI config as the mnemonic is used inside that script, too
 include(OCToolchainFlags)
-
-# Checks for known issues as good as possible
-include(OCToolchainChecks)
 
 ######################
 # The COMMON_PACKAGE_CONFIG_DIR contains the cmake-generated target config files consumed by find_package(... CONFIG).

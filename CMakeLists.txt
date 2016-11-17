@@ -98,6 +98,7 @@ set(ARCHITECTURE_PATH_NO_MPI .)
 set(ARCHITECTURE_PATH_MPI .)
 if (OPENCMISS_USE_ARCHITECTURE_PATH)
     getArchitecturePath(ARCHITECTURE_PATH_NO_MPI ARCHITECTURE_PATH_MPI)
+message(STATUS "ARCHITECTURE_PATH_NO_MPI: ${ARCHITECTURE_PATH_NO_MPI}")
 endif()
 
 # Include the installation configuration.
@@ -105,6 +106,9 @@ include(OpenCMISSInstallationConfig)
 
 # Hide some of the variables in the interface that we don't want to see.
 tidyUpVariables()
+
+# Checks for known issues in toolchain configuration
+include(OCToolchainChecks)
 
 ########################################################################
 # Misc targets for convenience
@@ -115,6 +119,7 @@ getToolchain(CURRENT_TOOLCHAIN)
 set(OPENCMISS_TOOLCHAIN ${CURRENT_TOOLCHAIN} CACHE STRING "Specify the toolchain mnemonic.")
 set(OPENCMISS_MPI ${MPI} CACHE STRING "Specify the MPI mnemonic")
 
+message(STATUS "OPENCMISS_USE_ARCHITECTURE_PATH: ${OPENCMISS_USE_ARCHITECTURE_PATH}")
 if (OPENCMISS_USE_ARCHITECTURE_PATH)
     set(PLURAL_S s)
 else ()
@@ -123,6 +128,11 @@ endif ()
 
 # Variable used in make_config command
 set(CONFIG_PATH ${CMAKE_CURRENT_BINARY_DIR}/config${PLURAL_S}/${ARCHITECTURE_PATH_MPI})
+set(SUPPORT_DIR ${CMAKE_CURRENT_BINARY_DIR}/support)
+
+set(OPENCMISS_CACHE_FILE ${CMAKE_CURRENT_BINARY_DIR}/OpenCMISSCache.cmake)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/Templates/OpenCMISSCache.in.cmake
+    ${OPENCMISS_CACHE_FILE})
 
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/Templates/make_config.in.cmake
     ${CMAKE_CURRENT_BINARY_DIR}/Scripts/make_config.cmake)

@@ -77,7 +77,7 @@ OpenCMISS Support variable dump file, ${NOW}
     endfunction()
 
     # Need to export current variables directly - obviously wont work in called script
-    exportVars("${OC_SUPPORT_DIR}/Variables.txt")
+    exportVars("${OPENCMISS_SUPPORT_DIR}/Variables.txt")
     
     set(_SUPPORT_DEPS )
     if (OC_CREATE_LOGS)
@@ -101,7 +101,7 @@ OpenCMISS Support variable dump file, ${NOW}
         COMMAND ${CMAKE_COMMAND}
             -DCREATE_ZIP=YES
             -DEMAIL=${OC_INSTALL_SUPPORT_EMAIL}
-            -DSUPPORT_DIR=${OC_SUPPORT_DIR}
+            -DSUPPORT_DIR=${OPENCMISS_SUPPORT_DIR}
             -P ${CMAKE_CURRENT_LIST_FILE}
         WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
         COMMENT "Generating support files archive"
