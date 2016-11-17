@@ -50,3 +50,95 @@ if (NOT MPI_FOUND)
                 list(APPEND _MPI_EXTRA_PARAMS --enable-fast=O3,ndebug --disable-error-checking --without-timing --without-mpit-pvars)
             elseif(MPI_BUILD_TYPE STREQUAL Debug)
                 list(APPEND _MPI_EXTRA_PARAMS --disable-fast --enable-g=all)
+                set(MPI_C_FLAGS "${MPI_C_FLAGS} -g3")
+            endif()
+            # Define the MPI compilers that will be used later already - the configuration stage
+            # needs them so that other dependencies with MPI have the correct compilers defined right away.
+            set(MPI_C_COMPILER ${OWN_MPI_INSTALL_DIR}/bin/mpicc)
+            set(MPI_CXX_COMPILER ${OWN_MPI_INSTALL_DIR}/bin/mpicxx)
+            set(MPI_Fortran_COMPILER ${OWN_MPI_INSTALL_DIR}/bin/mpifort)
+        else()
+    	    log("Own build of MPI - ${MPI} not yet implemented" ERROR)
+        endif()
+        
+        set(MPI_HOME ${OWN_MPI_INSTALL_DIR} CACHE STRING "Installation directory of own/local MPI build" FORCE)
+        set(_MPI_SOURCE_DIR ${OPENCMISS_DEPENDENCIES_SOURCE_DIR}/${MPI})
+        set(_MPI_BINARY_DIR ${OPENCMISS_DEPENDENCIES_BINARY_NO_MPI_DIR}/${MPI}/${MPI_BUILD_TYPE_LOWER})
+        set(_MPI_BRANCH v${_MPI_VERSION})
+        
+        log("Configuring build of 'MPI' (${MPI}-${_MPI_VERSION}) in ${_MPI_BINARY_DIR}...")
+        log("Extra MPI build parameters: ${_MPI_EXTRA_PARAMS}" DEBUG)
+        
+        # Dont download again if the target source folder already contains files 
+        file(GLOB _MPI_FILES ${_MPI_SOURCE_DIR}/)
+        set(DOWNLOAD_COMMANDS DOWNLOAD_COMMAND "")
+        if("" STREQUAL "${_MPI_FILES}")
+            set(DOWNLOAD_COMMANDS 
+                DOWNLOAD_DIR ${_MPI_SOURCE_DIR}/src-download
+                URL https://github.com/OpenCMISS-Dependencies/${MPI}/archive/${_MPI_BRANCH}.zip
+                #http://www.open-mpi.org/software/ompi/v1.8/downloads/openmpi-1.8.4.tar.gz
+                #URL_HASH SHA1=22002fc226f55e188e21be0fdc3602f8d024e7ba
+            )
+        endif()
+        
+        include(ProcessorCount)
+        ProcessorCount(NUM_PROCESSORS)
+        if (NUM_PROCESSORS EQUAL 0)
+            set(NUM_PROCESSORS 1)
+        #else()
+        #    MATH(EXPR NUM_PROCESSORS ${NUM_PROCESSORS}+4)
+        endif()
+        
+        # Log settings
+        if (OC_CREATE_LOGS)
+            set(_LOGFLAG 1)
+        else()
+            set(_LOGFLAG 0)
+        endif()
+        
+        ExternalProject_Add(${OC_EP_PREFIX}MPI
+    		PREFIX ${_MPI_BINARY_DIR}
+    		TMP_DIR ${_MPI_BINARY_DIR}/extproj/tmp
+    		STAMP_DIR ${_MPI_BINARY_DIR}/extproj/stamp
+    		
+    		#--Download step--------------
+    		${DOWNLOAD_COMMANDS}
+             
+    		#--Configure step-------------
+    		SOURCE_DIR ${_MPI_SOURCE_DIR}
+    		CONFIGURE_COMMAND ${_MPI_SOURCE_DIR}/configure 
+    		    --prefix ${OWN_MPI_INSTALL_DIR}
+    		    CC=${CMAKE_C_COMPILER}
+    		    CXX=${CMAKE_CXX_COMPILER}
+    		    FC=${CMAKE_Fortran_COMPILER}
+    		    CFLAGS=${MPI_C_FLAGS}
+    		    CXXFLAGS=-fPIC 
+    		    FFLAGS=-fPIC
+    		    ${_MPI_EXTRA_PARAMS}
+    		BINARY_DIR ${_MPI_BINARY_DIR}
+    		
+    		#--Build step-----------------
+    		BUILD_COMMAND make -j${NUM_PROCESSORS} #${BUILD_COMMAND}
+    		
+    		#--Install step---------------
+    		# currently set as extra arg (above), somehow does not work
+    		#INSTALL_DIR ${OPENMPI_INSTALL_DIR}
+    		INSTALL_COMMAND make install #${INSTALL_COMMAND}
+    		
+    		# Logging
+            LOG_CONFIGURE ${_LOGFLAG}
+            LOG_BUILD ${_LOGFLAG}
+            LOG_INSTALL ${_LOGFLAG}
+    		STEP_TARGETS install
+    	)
+    	# Set the forward dependencies of MPI to have it build before the consuming components
+        set(MPI_FWD_DEPS ${OPENCMISS_COMPONENTS_WITHMPI})
+        addDownstreamDependencies(MPI FALSE)
+    else()
+        unset(MPI_HOME CACHE)
+        unset(MPI_HOME)
+        log("MPI (${MPI}) installation support not yet implemented for this platform." ERROR)
+    endif()
+else()
+    log("Found MPI: ${MPI_C_INCLUDE_DIRECTORY} / ${MPI_C_LIBRARIES}" DEBUG)
+endif()

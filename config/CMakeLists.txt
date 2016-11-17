@@ -15,9 +15,6 @@
 #
 # ============== General ================
 #
-# OPENCMISS_ROOT: [Grandparent of the directory containing this file]
-#    Set this to any directory that you want to contain OpenCMISS sources, build, and install trees.
-#
 # EVEL: []|<any value>
 #     If you want to initialize your OpenCMISS installation to developer defaults, define the EVEL variable to any value.
 #     It's not a typo, the command line for this results in -DEVEL=<myvalue> :-)
@@ -52,7 +49,7 @@
 #    The selection "none" will build OpenCMISS without MPI,
 #    which is intended for future use but not implemented yet.
 #
-# MPI_BUILD_TYPE: [RELEASE]|DEBUG|...
+# MPI_BUILD_TYPE: [Release]|Debug|...
 #    The MPI build type can be chosen independently from the OpenCMISS build type.
 #    For debug builds, OpenCMISS will build its own version of the selected (or default) MPI implementation
 #    as the detection of system debug builds is not reliable (yet)
@@ -71,40 +68,36 @@
 cmake_minimum_required(VERSION 3.4.0 FATAL_ERROR)
 
 # Check bare minimum configuration
-# OPENCMISS_MODULE_PATH must be set 
-if (NOT DEFINED OPENCMISS_MODULE_PATH)
-  message(FATAL_ERROR "OPENCMISS_MODULE_PATH is not defined.")
+# OPENCMISS_CMAKE_MODULES_PATH must be set 
+if (NOT DEFINED OPENCMISS_CMAKE_MODULES_PATH)
+  message(FATAL_ERROR "OPENCMISS_CMAKE_MODULES_PATH is not defined.")
 endif ()
-if (NOT EXISTS "${OPENCMISS_MODULE_PATH}/CMakeScripts/OCToolchainCompilers.cmake")
-    message(FATAL_ERROR "'${OPENCMISS_MODULE_PATH}/CMakeScripts/OCToolchainCompilers.cmake' does not exists.  The OpenCMISS CMake modules may not be installed/available.")
-endif ()
-
-# The default opencmiss root is the grandparent directory of "manage"
-if (NOT DEFINED OPENCMISS_ROOT)
-  if (NOT DEFINED OPENCMISS_LIBRARIES_ROOT AND NOT DEFINED OPENCMISS_DEPENDENCIES_ROOT)
-    get_filename_component(OPENCMISS_ROOT "${CMAKE_CURRENT_LIST_DIR}/../.." REALPATH)
-
-    # Make sure OPENCMISS_ROOT is an absolute path.
-    get_filename_component(OPENCMISS_ROOT ${OPENCMISS_ROOT} ABSOLUTE)
-  endif ()
+if (NOT EXISTS "${OPENCMISS_CMAKE_MODULES_PATH}/Modules/OCToolchainCompilers.cmake")
+    message(FATAL_ERROR "'${OPENCMISS_CMAKE_MODULES_PATH}/Modules/OCToolchainCompilers.cmake' does not exists.  The OpenCMISS CMake modules may not be installed/available.")
 endif ()
 
 # Set up include path required at this stage
 list(APPEND CMAKE_MODULE_PATH
-    ${OPENCMISS_MODULE_PATH}/CMakeScripts
-    ${OPENCMISS_MODULE_PATH}/Config)
+    ${OPENCMISS_CMAKE_MODULES_PATH}/Modules
+    )
 
 # Need to set the compilers before any project call
 include(OCToolchainCompilers)
 
-message(STATUS "MPI: ${MPI}")
 ########################################################################
 # Ready to start the "build project"
 project(OpenCMISS VERSION 1.3 LANGUAGES C CXX)
 enable_language(Fortran OPTIONAL)
 enable_testing()
 
+list(APPEND CMAKE_MODULE_PATH
+    ${MANAGE_MODULE_PATH}/Modules
+    )
+
 include(OCMiscFunctionsMacros)
+
+# Hide some of the variables in the interface that we don't want to see.
+tidyUpVariables()
 
 # Create a local config file if not exists
 include(OCCreateLocalConfig)
@@ -152,17 +145,13 @@ log("Starting configuration in ${CMAKE_CURRENT_BINARY_DIR} at ${NOW}")
 
 if (NOT WIN32 OR MINGW)
     if (CMAKE_BUILD_TYPE STREQUAL "")
-        SET(CMAKE_BUILD_TYPE Release)
-        message(STATUS "No CMAKE_BUILD_TYPE has been defined. Using RELEASE.")
+        set(CMAKE_BUILD_TYPE Release CACHE STRING "Choose the type of build, options are: None(CMAKE_CXX_FLAGS or CMAKE_C_FLAGS used) Debug Release RelWithDebInfo MinSizeRel." FORCE)
+        message(STATUS "No CMAKE_BUILD_TYPE has been defined. Using Release.")
     endif()
 endif()
 
 include(ExternalProject)
 include(OCArchitecturePathFunctions)
-
-########################################################################
-# General paths & preps
-include(OCPaths)
 
 ########################################################################
 # Utilities and external packages
@@ -173,7 +162,7 @@ include(OCInstallFindModuleWrappers)
 # This folder is also exported to the install tree upon "make install" and
 # then used within the FindOpenCMISS.cmake module script
 list(APPEND CMAKE_MODULE_PATH
-    ${OPENCMISS_MODULE_PATH}/CMakeModules
+    ${OPENCMISS_CMAKE_MODULES_PATH}/CMakeModules
 )
 
 # No point in building ZINC if there's no OpenGL around
@@ -201,14 +190,26 @@ endif()
 # MPI
 # Unless we said to not have MPI, see that it's available.
 if(MPI STREQUAL none)
-  message(FATAL_ERROR "MPI value of 'none' not yet implemented.  Please spedify an MPI to use.") 
+    message(FATAL_ERROR "MPI value of 'none' not yet implemented.  Please spedify an MPI to use.") 
 else ()
-    include(OCMPIConfig)
+    include(OCDetermineMPI)
 endif ()
 
 ########################################################################
 # Architecture paths
-include(OCPathsArchitecture)
+set(ARCHITECTURE_NO_MPI_PATH .)
+set(ARCHITECTURE_MPI_PATH .)
+if (OC_USE_ARCHITECTURE_PATH)
+    getArchitecturePath(ARCHITECTURE_NO_MPI_PATH ARCHITECTURE_MPI_PATH)
+endif ()
+
+########################################################################
+# General paths & preps
+include(${OPENCMISS_ROOTS_FILE})
+include(OCPaths)
+
+# Setup build of MPI if required
+include(OCBuildMPI)
 
 # Toolchain flags
 #
@@ -216,10 +217,6 @@ include(OCPathsArchitecture)
 include(OCToolchainFlags)
 
 # Checks for known issues as good as possible
-# TODO: move this to the generator script?!
-#if (CMAKE_COMPILER_IS_GNUC AND MPI STREQUAL intel)
-#    message(FATAL_ERROR "Invalid compiler/MPI combination: Cannot build with GNU compiler and Intel MPI.")
-#endif()
 include(OCToolchainChecks)
 
 ######################
@@ -235,14 +232,21 @@ SET(COMMON_PACKAGE_CONFIG_DIR cmake)
 #SET(COMMON_PACKAGE_CONFIG_DIR ../cmake)
 # The path where find_package calls will find the cmake package config files for any opencmiss component
 set(OPENCMISS_PREFIX_PATH
-    "${OPENCMISS_COMPONENTS_INSTALL_PREFIX}/${COMMON_PACKAGE_CONFIG_DIR}" 
-    "${OPENCMISS_COMPONENTS_INSTALL_PREFIX_MPI}/${COMMON_PACKAGE_CONFIG_DIR}"
-)
+    "${OPENCMISS_DEPENDENCIES_INSTALL_NO_MPI_PREFIX}/${COMMON_PACKAGE_CONFIG_DIR}" 
+    "${OPENCMISS_DEPENDENCIES_INSTALL_MPI_PREFIX}/${COMMON_PACKAGE_CONFIG_DIR}"
+    )
 # This is where the libraries will be put.
 set(OPENCMISS_LIBRARY_PATH
-    "${OPENCMISS_COMPONENTS_INSTALL_PREFIX}/lib"
-    "${OPENCMISS_COMPONENTS_INSTALL_PREFIX_MPI}/lib"
-)
+    "${OPENCMISS_DEPENDENCIES_INSTALL_NO_MPI_PREFIX}/lib"
+    "${OPENCMISS_DEPENDENCIES_INSTALL_MPI_PREFIX}/lib"
+    )
+if (NOT "${OPENCMISS_DEPENDENCIES_INSTALL_NO_MPI_PREFIX}" STREQUAL "${OPENCMISS_LIBRARIES_INSTALL_NO_MPI_PREFIX}")
+    list(APPEND OPENCMISS_PREFIX_PATH "${OPENCMISS_LIBRARIES_INSTALL_NO_MPI_PREFIX}/${COMMON_PACKAGE_CONFIG_DIR}")
+    list(APPEND OPENCMISS_PREFIX_PATH "${OPENCMISS_LIBRARIES_INSTALL_MPI_PREFIX}/${COMMON_PACKAGE_CONFIG_DIR}")
+    list(APPEND OPENCMISS_LIBRARY_PATH "${OPENCMISS_LIBRARIES_INSTALL_NO_MPI_PREFIX}/lib")
+    list(APPEND OPENCMISS_LIBRARY_PATH "${OPENCMISS_LIBRARIES_INSTALL_MPI_PREFIX}/lib")
+endif ()
+ 
 # If we have an explicit MPI_HOME, add this to the library path (+/lib)
 if (MPI_HOME)
     list(APPEND OPENCMISS_LIBRARY_PATH "${MPI_HOME}/lib")
@@ -272,7 +276,6 @@ include(OCSupport)
 
 ########################################################################
 # Actual external project configurations
-
 # Dependencies, Iron, ...
 include(OCConfigureComponents)
 
@@ -287,25 +290,12 @@ include(OCPackaging)
 add_subdirectory(tests)
 
 ########################################################################
-# Misc targets for convenience
-include(OCMainTargets)
-
-########################################################################
 # IDE Stuff
 source_group(CMake FILES CMakeLists.txt CMakeCache.txt)
 
 # Print a neat summary
 message(STATUS "@@@@@@@@@@@@@@@@@@@ SUMMARY @@@@@@@@@@@@@@@@@@@@@@@@@")
 message(STATUS "@")
-if (DEFINED OPENCMISS_ROOT)
-  message(STATUS "@ OPENCMISS_ROOT: ${OPENCMISS_ROOT}")
-endif ()
-if (DEFINED OPENCMISS_LIBRARIES_ROOT)
-  message(STATUS "@ OPENCMISS_LIBRARIES_ROOT: ${OPENCMISS_LIBRARIES_ROOT}")
-endif ()
-if (DEFINED OPENCMISS_DEPENDENCIES_ROOT)
-  message(STATUS "@ OPENCMISS_DEPENDENCIES_ROOT: ${OPENCMISS_DEPENDENCIES_ROOT}")
-endif ()
 if (OPENCMISS_SDK_INSTALL_DIR)
     message(STATUS "@ OPENCMISS_SDK_INSTALL_DIR: ${OPENCMISS_SDK_INSTALL_DIR}")
 endif()

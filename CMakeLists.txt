@@ -9,6 +9,9 @@ project(OpenCMISS-Manage VERSION 1.0.0 LANGUAGES C CXX)
 enable_language(Fortran OPTIONAL)
 enable_testing()
 
+# This is the support email for general enquiries and support about building opencmiss using the new CMake system.
+set(OPENCMISS_BUILD_SUPPORT_EMAIL "users@opencmiss.org")
+
 # Determine if the OpenCMISSInstallationConfig should be considered finalised or not.
 if (EXISTS ${CMAKE_CURRENT_BINARY_DIR}/config OR EXISTS ${CMAKE_CURRENT_BINARY_DIR}/configs)
     set(_INSTALLATION_CONFIG_FINALISED TRUE)
@@ -50,7 +53,11 @@ else ()
     endif ()
 endif ()
 
-# OPENCMISS_MODULE_PATH must be set
+if (DEFINED OPENCMISS_DEPENDENCIES_ONLY)
+    set(OC_DEPENDENCIES_ONLY ${OPENCMISS_DEPENDENCIES_ONLY})
+endif ()
+
+# OPENCMISS_CMAKE_MODULES_PATH must be set
 set(OPENCMISS_CMAKE_MODULES_PATH ${OPENCMISS_CMAKE_MODULES_PATH} CACHE PATH "Location of the OpenCMISS CMake modules.")
 
 if (NOT EXISTS "${OPENCMISS_CMAKE_MODULES_PATH}/Modules/OCArchitecturePathFunctions.cmake")
@@ -63,6 +70,8 @@ if (NOT WIN32 OR MINGW)
         message(STATUS "No CMAKE_BUILD_TYPE has been defined. Using Release.")
     endif()
 endif()
+
+set(MANAGE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR})
 
 list(APPEND CMAKE_MODULE_PATH ${OPENCMISS_CMAKE_MODULES_PATH}/Modules)
 
@@ -85,24 +94,28 @@ include(OCDetermineMPI)
 
 ########################################################################
 # Architecture paths
-set(ARCHITECTURE_PATH_NOMPI .)
+set(ARCHITECTURE_PATH_NO_MPI .)
 set(ARCHITECTURE_PATH_MPI .)
-if (OC_USE_ARCHITECTURE_PATH)
-    getArchitecturePath(ARCHITECTURE_PATH_NOMPI ARCHITECTURE_PATH_MPI)
+if (OPENCMISS_USE_ARCHITECTURE_PATH)
+    getArchitecturePath(ARCHITECTURE_PATH_NO_MPI ARCHITECTURE_PATH_MPI)
 endif()
 
-# This includes the configuration, both default and local
-#include(OpenCMISSConfig)
+# Include the installation configuration.
+include(OpenCMISSInstallationConfig)
 
 # Hide some of the variables in the interface that we don't want to see.
 tidyUpVariables()
+
+########################################################################
+# Misc targets for convenience
+# include(OCMainTargets) # TODO: Add this back in
 
 getToolchain(CURRENT_TOOLCHAIN)
 
 set(OPENCMISS_TOOLCHAIN ${CURRENT_TOOLCHAIN} CACHE STRING "Specify the toolchain mnemonic.")
 set(OPENCMISS_MPI ${MPI} CACHE STRING "Specify the MPI mnemonic")
 
-if (OC_USE_ARCHITECTURE_PATH)
+if (OPENCMISS_USE_ARCHITECTURE_PATH)
     set(PLURAL_S s)
 else ()
     set(PLURAL_S)

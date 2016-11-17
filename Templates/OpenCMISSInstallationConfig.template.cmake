@@ -102,6 +102,15 @@ set(OC_DEFAULT_MPI )
 set(OC_DEFAULT_MPI_BUILD_TYPE )
 
 ##
+# OPENCMISS_USE_ARCHITECTURE_PATH
+# -------------------------------
+#
+# Use architecture path to enable multiple configs in the same installation.
+#
+# .. default:: YES
+option(OPENCMISS_USE_ARCHITECTURE_PATH "Use architecture path to enable multiple configs in the same installation." YES)
+
+##
 # OPENCMISS_DEVEL_ALL
 # ------------
 #
