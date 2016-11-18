@@ -414,16 +414,6 @@ foreach(COMPONENT ${OPENCMISS_COMPONENTS})
 endforeach()
 
 ##
-# OC_USE_ARCHITECTURE_PATH
-# ------------------------
-#
-# Controls use of architecture paths. If you will only ever build everything with one toolchain/mpi config,
-# set this to :cmake:`NO`.
-#
-# .. default:: YES
-option(OC_USE_ARCHITECTURE_PATH "Use an architecture path for build and install trees" YES)
-
-##
 # OC_USE_<COMP>
 # -------------
 #

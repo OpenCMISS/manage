@@ -67,7 +67,7 @@ list(APPEND CMAKE_MODULE_PATH ${OPENCMISS_MODULE_PATH})
 #############################################################################
 # Assemble architecture-path dependent search locations
 set(ARCHPATH .)
-if (@OC_USE_ARCHITECTURE_PATH@)
+if (@OPENCMISS_USE_ARCHITECTURE_PATH@)
     include(OCArchitecturePathFunctions)
     getArchitecturePath(_UNUSED ARCHPATH)
 endif()
@@ -109,7 +109,7 @@ foreach(BUILDTYPE_SUFFIX ${_BUILDTYPES})
     endif()
 endforeach()
 if (NOT _FOUND)
-    if (@OC_USE_ARCHITECTURE_PATH@)
+    if (@OPENCMISS_USE_ARCHITECTURE_PATH@)
         set(POSSIBLE_FOLDERS )
         
         macro(_recurse DIR)

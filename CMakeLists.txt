@@ -80,11 +80,25 @@ list(APPEND CMAKE_MODULE_PATH ${CONFIGURED_FILES_DIR})
 if (NOT _INSTALLATION_CONFIG_FINALISED)
     configure_file(${CMAKE_CURRENT_SOURCE_DIR}/Templates/${OPENCMISS_OWN_MPI_CONFIG}.template.cmake ${CONFIGURED_FILES_DIR}/OpenCMISSOwnMPI.cmake @ONLY)
     configure_file(${CMAKE_CURRENT_SOURCE_DIR}/Templates/${OPENCMISS_ROOT_CONFIG}.template.cmake ${CONFIGURED_FILES_DIR}/OpenCMISSRoots.cmake @ONLY)
-    configure_file(${CMAKE_CURRENT_SOURCE_DIR}/Templates/OpenCMISSInstallationConfig.template.cmake ${CONFIGURED_FILES_DIR}/OpenCMISSInstallationConfig.cmake)
 endif ()
 
 include(OCArchitecturePathFunctions)
 include(OCMiscFunctionsMacros)
+
+# Look for an OpenCMISS Developer script
+SET(OC_DEVELOPER_CONFIG ${CMAKE_CURRENT_BINARY_DIR}/OpenCMISSInstallationConfig.cmake)
+set(OC_DEVELOPER NO)
+if (NOT EXISTS ${OC_DEVELOPER_CONFIG})
+    file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/OpenCMISSInstallationConfig.cmake
+        DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+endif ()
+
+message(STATUS "Applying OpenCMISS developer configuration at ${OC_DEVELOPER_CONFIG}...")
+include(${OC_DEVELOPER_CONFIG})
+unset(OC_DEVELOPER_CONFIG)
+# Include the installation configuration.
+#include(OpenCMISSInstallationConfig)
+#set(OPENCMISS_INSTALLATION_CONFIG_FILE ${CMAKE_CURRENT_BINARY_DIR}/ConfiguredFiles/OpenCMISSInstallationConfig.cmake)
 
 # Path for own MPI BUILD?
 include(OpenCMISSOwnMPI)
@@ -98,17 +112,10 @@ set(ARCHITECTURE_PATH_NO_MPI .)
 set(ARCHITECTURE_PATH_MPI .)
 if (OPENCMISS_USE_ARCHITECTURE_PATH)
     getArchitecturePath(ARCHITECTURE_PATH_NO_MPI ARCHITECTURE_PATH_MPI)
-message(STATUS "ARCHITECTURE_PATH_NO_MPI: ${ARCHITECTURE_PATH_NO_MPI}")
 endif()
-
-# Include the installation configuration.
-include(OpenCMISSInstallationConfig)
 
 # Hide some of the variables in the interface that we don't want to see.
 tidyUpVariables()
-
-# Checks for known issues in toolchain configuration
-include(OCToolchainChecks)
 
 ########################################################################
 # Misc targets for convenience
@@ -119,7 +126,9 @@ getToolchain(CURRENT_TOOLCHAIN)
 set(OPENCMISS_TOOLCHAIN ${CURRENT_TOOLCHAIN} CACHE STRING "Specify the toolchain mnemonic.")
 set(OPENCMISS_MPI ${MPI} CACHE STRING "Specify the MPI mnemonic")
 
-message(STATUS "OPENCMISS_USE_ARCHITECTURE_PATH: ${OPENCMISS_USE_ARCHITECTURE_PATH}")
+# Checks for known issues in toolchain configuration
+include(OCToolchainChecks)
+
 if (OPENCMISS_USE_ARCHITECTURE_PATH)
     set(PLURAL_S s)
 else ()
@@ -141,8 +150,20 @@ add_custom_target(make_config
     COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_BINARY_DIR}/Scripts/make_config.cmake
     )
 
-message(STATUS "")
-message(STATUS "OPENCMISS_TOOLCHAIN: ${OPENCMISS_TOOLCHAIN}")
-message(STATUS "OPENCMISS_MPI: ${OPENCMISS_MPI}")
-message(STATUS "ARCHITECTURE_PATH_MPI: ${ARCHITECTURE_PATH_MPI}")
-message(STATUS "")
+add_custom_target(build_config
+    DEPENDS make_config
+    COMMAND ${CMAKE_COMMAND} --build .
+    WORKING_DIRECTORY ${CONFIG_PATH}
+    )
+
+add_custom_target(do_config
+    DEPENDS make_config build_config
+    )
+
+message(STATUS "@@@@@@@@@@@@@@@@@@@ SUMMARY @@@@@@@@@@@@@@@@@@@@@@@@@")
+message(STATUS "@")
+message(STATUS "@ OPENCMISS_TOOLCHAIN: ${OPENCMISS_TOOLCHAIN}")
+message(STATUS "@ OPENCMISS_MPI: ${OPENCMISS_MPI}")
+message(STATUS "@ ARCHITECTURE_PATH_MPI: ${ARCHITECTURE_PATH_MPI}")
+message(STATUS "@ ")
+printmanagenextsteps()

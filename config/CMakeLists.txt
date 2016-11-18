@@ -186,7 +186,7 @@ endif ()
 # Architecture paths
 set(ARCHITECTURE_NO_MPI_PATH .)
 set(ARCHITECTURE_MPI_PATH .)
-if (OC_USE_ARCHITECTURE_PATH)
+if (OPENCMISS_USE_ARCHITECTURE_PATH)
     # Extra path segment for single configuration case - will give release/debug/...
     getBuildTypePathElem(BUILD_TYPE_PATH_ELEM)
     getArchitecturePath(ARCHITECTURE_NO_MPI_PATH ARCHITECTURE_MPI_PATH)

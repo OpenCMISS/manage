@@ -3,16 +3,6 @@ include(OpenCMISSDefaultConfig)
 # This file is separate for documentation structural reasons (sphinx / rst)
 include(OpenCMISSInterComponentConfig)
 
-# Look for an OpenCMISS Developer script
-SET(OC_DEVELOPER_CONFIG ${PROJECT_BINARY_DIR}/OpenCMISSInstallationConfig.cmake)
-set(OC_DEVELOPER NO)
-if (EXISTS ${OC_DEVELOPER_CONFIG})
-    get_filename_component(OC_DEVELOPER_CONFIG ${OC_DEVELOPER_CONFIG} ABSOLUTE)
-    message(STATUS "Applying OpenCMISS developer configuration at ${OC_DEVELOPER_CONFIG}...")
-    include(${OC_DEVELOPER_CONFIG})
-    set(OC_DEVELOPER YES)
-    unset(OC_DEVELOPER_CONFIG)
-endif ()
 # Half hack: The CMAKE_BUILD_TYPE variable is not initialized in the cache if it's "only" set
 # as a variable via cmake script. Consequently, issuing a project() command looks in the cache
 # and finds an uninitialized CMAKE_BUILD_TYPE and uses that, ignoring any set value in LocalConfig/DevelConfig.
