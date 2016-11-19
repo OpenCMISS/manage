@@ -53,12 +53,12 @@ else ()
     endif ()
 endif ()
 
+if (NOT EXISTS "${OPENCMISS_CMAKE_MODULES_PATH}/Modules/Packages/OCArchitecturePathFunctions.cmake")
+    message(FATAL_ERROR "'${OPENCMISS_CMAKE_MODULES_PATH}/Modules/Packages/OCArchitecturePathFunctions.cmake' does not exists.  The OpenCMISS CMake modules may not be installed/available.")
+endif ()
+
 # OPENCMISS_CMAKE_MODULES_PATH must be set
 set(OPENCMISS_CMAKE_MODULES_PATH ${OPENCMISS_CMAKE_MODULES_PATH} CACHE PATH "Location of the OpenCMISS CMake modules.")
-
-if (NOT EXISTS "${OPENCMISS_CMAKE_MODULES_PATH}/Modules/OCArchitecturePathFunctions.cmake")
-    message(FATAL_ERROR "'${OPENCMISS_CMAKE_MODULES_PATH}/Modules/OCArchitecturePathFunctions.cmake' does not exists.  The OpenCMISS CMake modules may not be installed/available.")
-endif ()
 
 if (NOT WIN32 OR MINGW)
     if (CMAKE_BUILD_TYPE STREQUAL "")
@@ -69,7 +69,8 @@ endif()
 
 set(MANAGE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR})
 
-list(APPEND CMAKE_MODULE_PATH ${OPENCMISS_CMAKE_MODULES_PATH}/Modules)
+#list(APPEND CMAKE_MODULE_PATH ${OPENCMISS_CMAKE_MODULES_PATH}/Modules)
+list(APPEND CMAKE_MODULE_PATH ${OPENCMISS_CMAKE_MODULES_PATH}/Modules/Packages)
 
 set(CONFIGURED_FILES_DIR ${CMAKE_CURRENT_BINARY_DIR}/ConfiguredFiles)
 list(APPEND CMAKE_MODULE_PATH ${CONFIGURED_FILES_DIR})
