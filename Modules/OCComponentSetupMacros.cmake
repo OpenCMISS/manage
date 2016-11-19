@@ -173,7 +173,6 @@ function(addSourceManagementTargets COMPONENT_NAME BINARY_DIR SOURCE_DIR)
                 -DMODE=Download
                 -DURL=${${COMPONENT_NAME}_REPO}/archive/${_FILENAME}
                 -DTARGET="${SOURCE_DIR}/${_FILENAME}"
-                -DTARGET_PREFIX=${OC_SM_PREFIX}
                 -P ${MANAGE_MODULE_PATH}/Scripts/OCSourceManager.cmake
             COMMENT "Downloading ${COMPONENT_NAME} sources"
         )
@@ -197,6 +196,7 @@ function(addSourceManagementTargets COMPONENT_NAME BINARY_DIR SOURCE_DIR)
             -DCOMPONENT=${REPO_NAME}
             -DSRC_DIR=${SOURCE_DIR}
             -DBIN_DIR=${CMAKE_CURRENT_BINARY_DIR}
+            -DTARGET_PREFIX=${OC_SM_PREFIX}
             -P ${MANAGE_MODULE_PATH}/Scripts/OCSourceManager.cmake
         COMMENT "Checking ${COMPONENT_NAME} sources are present"
     )
