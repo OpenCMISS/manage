@@ -72,8 +72,8 @@ cmake_minimum_required(VERSION 3.4.0 FATAL_ERROR)
 if (NOT DEFINED OPENCMISS_CMAKE_MODULES_PATH)
   message(FATAL_ERROR "OPENCMISS_CMAKE_MODULES_PATH is not defined.")
 endif ()
-if (NOT EXISTS "${OPENCMISS_CMAKE_MODULES_PATH}/Modules/OCToolchainCompilers.cmake")
-    message(FATAL_ERROR "'${OPENCMISS_CMAKE_MODULES_PATH}/Modules/OCToolchainCompilers.cmake' does not exists.  The OpenCMISS CMake modules may not be installed/available.")
+if (NOT EXISTS "${OPENCMISS_CMAKE_MODULES_PATH}/Modules/Packages/OCToolchainCompilers.cmake")
+    message(FATAL_ERROR "'${OPENCMISS_CMAKE_MODULES_PATH}/Modules/Packages/OCToolchainCompilers.cmake' does not exists.  The OpenCMISS CMake modules may not be installed/available.")
 endif ()
 
 # Set up include path required at this stage
