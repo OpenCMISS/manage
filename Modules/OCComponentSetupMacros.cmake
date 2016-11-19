@@ -258,18 +258,18 @@ function(createExternalProjects COMPONENT_NAME SOURCE_DIR BINARY_DIR DEFS)
         DOWNLOAD_COMMAND ""
         
         #--Configure step-------------
-    CONFIGURE_COMMAND "" # Do nothing remove soon
-        CMAKE_COMMAND "" # ${CMAKE_COMMAND} --no-warn-unused-cli # disables warnings for unused cmdline options
+    # CONFIGURE_COMMAND "" # Do nothing remove soon
+        CMAKE_COMMAND ${CMAKE_COMMAND} --no-warn-unused-cli # disables warnings for unused cmdline options
         SOURCE_DIR ${SOURCE_DIR}
         BINARY_DIR ${BINARY_DIR}
-        CMAKE_ARGS "" # ${DEFS}
+        CMAKE_ARGS "" ${DEFS}
         
         #--Build step-----------------
-        BUILD_COMMAND "" # ${BUILD_COMMAND}
+        BUILD_COMMAND ${BUILD_COMMAND}
         #--Install step---------------
         # currently set as extra arg (above), somehow does not work
         #INSTALL_DIR ${CMAKE_INSTALL_PREFIX} 
-        INSTALL_COMMAND "" # ${INSTALL_COMMAND}
+        INSTALL_COMMAND ${INSTALL_COMMAND}
         # Logging
         LOG_CONFIGURE ${_LOGFLAG}
         LOG_BUILD ${_LOGFLAG}
