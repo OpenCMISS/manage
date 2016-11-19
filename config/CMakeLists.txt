@@ -78,7 +78,10 @@ endif ()
 
 # Set up include path required at this stage
 list(APPEND CMAKE_MODULE_PATH
-    ${OPENCMISS_CMAKE_MODULES_PATH}/Modules
+    ${OPENCMISS_CMAKE_MODULES_PATH}/Modules/Packages
+    )
+list(APPEND OPENCMISS_COMPONENT_MODULE_PATH
+    ${OPENCMISS_CMAKE_MODULES_PATH}/Modules/Packages
     )
 
 # Need to set the compilers before any project call
@@ -149,8 +152,11 @@ include(OCInstallFindModuleWrappers)
 # This folder is also exported to the install tree upon "make install" and
 # then used within the FindOpenCMISS.cmake module script
 list(APPEND CMAKE_MODULE_PATH
-    ${OPENCMISS_CMAKE_MODULES_PATH}/CMakeModules
-)
+    ${OPENCMISS_CMAKE_MODULES_PATH}/Modules
+    )
+list(APPEND OPENCMISS_COMPONENT_MODULE_PATH
+    ${OPENCMISS_CMAKE_MODULES_PATH}/Modules
+    )
 
 # No point in building ZINC if there's no OpenGL around
 find_package(OpenGL QUIET)

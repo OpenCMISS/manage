@@ -6,7 +6,7 @@ SET(COMPONENT_COMMON_DEFS )
 # specially. Therefore CMAKE has a special command LIST_SEPARATOR within the ExternalProject macros
 # See also OCComponentSetupMacros.cmake:144
 set(OC_LIST_SEPARATOR "-<ocm_list_sep>-") # just use anything unlikely to be passed as an actual variable string
-STRING(REPLACE ";" ${OC_LIST_SEPARATOR} CMAKE_MODULE_PATH_ESC "${CMAKE_MODULE_PATH}")
+STRING(REPLACE ";" ${OC_LIST_SEPARATOR} CMAKE_MODULE_PATH_ESC "${OPENCMISS_COMPONENT_MODULE_PATH}")
 STRING(REPLACE ";" ${OC_LIST_SEPARATOR} OPENCMISS_PREFIX_PATH_ESC "${OPENCMISS_PREFIX_PATH}")
 
 LIST(APPEND COMPONENT_COMMON_DEFS

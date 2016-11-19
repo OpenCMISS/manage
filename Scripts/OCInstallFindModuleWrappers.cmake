@@ -52,7 +52,10 @@ endforeach()
 # Add directory to module path
 list(APPEND CMAKE_MODULE_PATH 
     ${OPENCMISS_CMAKE_MODULES_PATH}/FindModuleWrappers
-)
+    )
+list(APPEND OPENCMISS_COMPONENT_MODULE_PATH
+    ${OPENCMISS_CMAKE_MODULES_PATH}/FindModuleWrappers
+    )
 
 # Even though the Wrappers are already at the OpenCMISS install dir,
 # we also use the install command to allow cpack get a hold of them
