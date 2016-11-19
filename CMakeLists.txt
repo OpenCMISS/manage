@@ -118,7 +118,7 @@ tidyUpVariables()
 getToolchain(CURRENT_TOOLCHAIN)
 
 set(OPENCMISS_TOOLCHAIN ${CURRENT_TOOLCHAIN} CACHE STRING "Specify the toolchain mnemonic.")
-set(OPENCMISS_MPI ${MPI} CACHE STRING "Specify the MPI mnemonic")
+set(OPENCMISS_MPI ${OPENCMISS_MPI} CACHE STRING "Specify the MPI mnemonic")
 
 # Checks for known issues in toolchain configuration
 include(OCToolchainChecks)
