@@ -1,4 +1,8 @@
 
+# Don't show the variables in this file in a GUI by making them cache variables, they should be invariant 
+# for configured builds.
+set(OPENCMISS_DEVEL_ALL ${OPENCMISS_DEVEL_ALL})
+
 set(OPENCMISS_USE_ARCHITECTURE_PATH ${OPENCMISS_USE_ARCHITECTURE_PATH})
 
 set(OPENCMISS_ROOTS_FILE ${CONFIGURED_FILES_DIR}/OpenCMISSRoots.cmake)

@@ -18,6 +18,9 @@ include(OpenCMISSInterComponentConfig)
 ######################################################################
 # Postprocessing
 
+# Include the installation configuration
+include(${OPENCMISS_CACHE_FILE})
+
 # Add HDF5 to fortran projects if enabled
 if (HDF5_BUILD_FORTRAN)
   list(APPEND OPENCMISS_COMPONENTS_WITH_Fortran HDF5)
@@ -80,7 +83,7 @@ if (MSVC)
     set(TEST_TARGET_NAME RUN_TESTS)
 endif ()
 
-# Include the installation configuration
+# Include the installation configuration again to stop local changes from being effective
 include(${OPENCMISS_CACHE_FILE})
 
 
