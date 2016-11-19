@@ -53,10 +53,6 @@ else ()
     endif ()
 endif ()
 
-if (DEFINED OPENCMISS_DEPENDENCIES_ONLY)
-    set(OC_DEPENDENCIES_ONLY ${OPENCMISS_DEPENDENCIES_ONLY})
-endif ()
-
 # OPENCMISS_CMAKE_MODULES_PATH must be set
 set(OPENCMISS_CMAKE_MODULES_PATH ${OPENCMISS_CMAKE_MODULES_PATH} CACHE PATH "Location of the OpenCMISS CMake modules.")
 
@@ -96,9 +92,6 @@ endif ()
 message(STATUS "Applying OpenCMISS developer configuration at ${OC_DEVELOPER_CONFIG}...")
 include(${OC_DEVELOPER_CONFIG})
 unset(OC_DEVELOPER_CONFIG)
-# Include the installation configuration.
-#include(OpenCMISSInstallationConfig)
-#set(OPENCMISS_INSTALLATION_CONFIG_FILE ${CMAKE_CURRENT_BINARY_DIR}/ConfiguredFiles/OpenCMISSInstallationConfig.cmake)
 
 # Path for own MPI BUILD?
 include(OpenCMISSOwnMPI)
@@ -133,6 +126,10 @@ if (OPENCMISS_USE_ARCHITECTURE_PATH)
     set(PLURAL_S s)
 else ()
     set(PLURAL_S)
+endif ()
+
+if (DEFINED OPENCMISS_DEPENDENCIES_ONLY)
+    list(APPEND PASS_THROUGH_ARGS -DOC_DEPENDENCIES_ONLY=${OPENCMISS_DEPENDENCIES_ONLY})
 endif ()
 
 # Variable used in make_config command
