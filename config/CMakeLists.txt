@@ -176,7 +176,7 @@ endif()
 
 # MPI
 # Unless we said to not have MPI, see that it's available.
-if(MPI STREQUAL none)
+if(OPENCMISS_MPI STREQUAL none)
     message(FATAL_ERROR "MPI value of 'none' not yet implemented.  Please spedify an MPI to use.") 
 else ()
     include(OCDetermineMPI)
@@ -283,7 +283,7 @@ message(STATUS "@")
 if (OPENCMISS_SDK_INSTALL_DIR)
     message(STATUS "@ OPENCMISS_SDK_INSTALL_DIR: ${OPENCMISS_SDK_INSTALL_DIR}")
 endif()
-message(STATUS "@ MPI implementation: ${MPI}")
+message(STATUS "@ MPI implementation: ${OPENCMISS_MPI}")
 if (MPI_HOME)
     message(STATUS "@ MPI HOME: ${MPI_HOME}")
 endif()
