@@ -13,7 +13,7 @@ if (NOT MPI_FOUND)
         # No shared libs!
         set(_MPI_EXTRA_PARAMS --disable-shared)
         set(MPI_C_FLAGS -fPIC) 
-        if (MPI STREQUAL openmpi)
+        if (OPENCMISS_MPI STREQUAL openmpi)
             # We need to build a static version of MPI so that symbols get pulled into iron
             # Having a shared-version of OpenMPI wont work with Python bindings
             # See http://stackoverflow.com/questions/26901663/error-when-running-openmpi-based-library
@@ -31,7 +31,7 @@ if (NOT MPI_FOUND)
             set(MPI_C_COMPILER ${OWN_MPI_INSTALL_DIR}/bin/mpicc)
             set(MPI_CXX_COMPILER ${OWN_MPI_INSTALL_DIR}/bin/mpicxx)
             set(MPI_Fortran_COMPILER ${OWN_MPI_INSTALL_DIR}/bin/mpifort)
-        elseif (MPI STREQUAL mpich)
+        elseif (OPENCMISS_MPI STREQUAL mpich)
             set(_MPI_VERSION ${MPICH_VERSION})
             if (MPI_BUILD_TYPE STREQUAL Release)
                 list(APPEND _MPI_EXTRA_PARAMS --enable-fast=O3,ndebug --disable-error-checking --without-timing --without-mpit-pvars)
@@ -44,7 +44,7 @@ if (NOT MPI_FOUND)
             set(MPI_C_COMPILER ${OWN_MPI_INSTALL_DIR}/bin/mpicc)
             set(MPI_CXX_COMPILER ${OWN_MPI_INSTALL_DIR}/bin/mpicxx)
             set(MPI_Fortran_COMPILER ${OWN_MPI_INSTALL_DIR}/bin/mpifort)
-        elseif (MPI STREQUAL mvapich2)
+        elseif (OPENCMISS_MPI STREQUAL mvapich2)
             set(_MPI_VERSION ${MVAPICH2_VERSION})
             if (MPI_BUILD_TYPE STREQUAL Release)
                 list(APPEND _MPI_EXTRA_PARAMS --enable-fast=O3,ndebug --disable-error-checking --without-timing --without-mpit-pvars)
@@ -58,15 +58,15 @@ if (NOT MPI_FOUND)
             set(MPI_CXX_COMPILER ${OWN_MPI_INSTALL_DIR}/bin/mpicxx)
             set(MPI_Fortran_COMPILER ${OWN_MPI_INSTALL_DIR}/bin/mpifort)
         else()
-    	    log("Own build of MPI - ${MPI} not yet implemented" ERROR)
+    	    log("Own build of MPI - ${OPENCMISS_MPI} not yet implemented" ERROR)
         endif()
         
-        set(MPI_HOME ${OWN_MPI_INSTALL_DIR} CACHE STRING "Installation directory of own/local MPI build" FORCE)
-        set(_MPI_SOURCE_DIR ${OPENCMISS_DEPENDENCIES_SOURCE_DIR}/${MPI})
-        set(_MPI_BINARY_DIR ${OPENCMISS_DEPENDENCIES_BINARY_NO_MPI_DIR}/${MPI}/${MPI_BUILD_TYPE_LOWER})
+        set(OPENCMISS_MPI_HOME ${OWN_MPI_INSTALL_DIR} CACHE STRING "Installation directory of own/local MPI build" FORCE)
+        set(_MPI_SOURCE_DIR ${OPENCMISS_DEPENDENCIES_SOURCE_DIR}/${OPENCMISS_MPI})
+        set(_MPI_BINARY_DIR ${OPENCMISS_DEPENDENCIES_BINARY_NO_MPI_DIR}/${OPENCMISS_MPI}/${MPI_BUILD_TYPE_LOWER})
         set(_MPI_BRANCH v${_MPI_VERSION})
         
-        log("Configuring build of 'MPI' (${MPI}-${_MPI_VERSION}) in ${_MPI_BINARY_DIR}...")
+        log("Configuring build of 'MPI' (${OPENCMISS_MPI}-${_MPI_VERSION}) in ${_MPI_BINARY_DIR}...")
         log("Extra MPI build parameters: ${_MPI_EXTRA_PARAMS}" DEBUG)
         
         # Dont download again if the target source folder already contains files 
@@ -75,7 +75,7 @@ if (NOT MPI_FOUND)
         if("" STREQUAL "${_MPI_FILES}")
             set(DOWNLOAD_COMMANDS 
                 DOWNLOAD_DIR ${_MPI_SOURCE_DIR}/src-download
-                URL https://github.com/OpenCMISS-Dependencies/${MPI}/archive/${_MPI_BRANCH}.zip
+                URL https://github.com/OpenCMISS-Dependencies/${OPENCMISS_MPI}/archive/${_MPI_BRANCH}.zip
                 #http://www.open-mpi.org/software/ompi/v1.8/downloads/openmpi-1.8.4.tar.gz
                 #URL_HASH SHA1=22002fc226f55e188e21be0fdc3602f8d024e7ba
             )
@@ -96,7 +96,8 @@ if (NOT MPI_FOUND)
             set(_LOGFLAG 0)
         endif()
         
-        ExternalProject_Add(${OC_EP_PREFIX}MPI
+        string(TOUPPER ${OPENCMISS_MPI} OPENCMISS_MPI_COMPONENT)
+        ExternalProject_Add(${OC_EP_PREFIX}${OPENCMISS_MPI_COMPONENT}
     		PREFIX ${_MPI_BINARY_DIR}
     		TMP_DIR ${_MPI_BINARY_DIR}/extproj/tmp
     		STAMP_DIR ${_MPI_BINARY_DIR}/extproj/stamp
@@ -132,12 +133,12 @@ if (NOT MPI_FOUND)
     		STEP_TARGETS install
     	)
     	# Set the forward dependencies of MPI to have it build before the consuming components
-        set(MPI_FWD_DEPS ${OPENCMISS_COMPONENTS_WITHMPI})
-        addDownstreamDependencies(MPI FALSE)
+        set(${OPENCMISS_MPI_COMPONENT}_FWD_DEPS ${OPENCMISS_COMPONENTS_WITHMPI})
+        addDownstreamDependencies(${OPENCMISS_MPI_COMPONENT} FALSE)
     else()
         unset(MPI_HOME CACHE)
         unset(MPI_HOME)
-        log("MPI (${MPI}) installation support not yet implemented for this platform." ERROR)
+        log("MPI (${OPENCMISS_MPI}) installation support not yet implemented for this platform." ERROR)
     endif()
 else()
     log("Found MPI: ${MPI_C_INCLUDE_DIRECTORY} / ${MPI_C_LIBRARIES}" DEBUG)
