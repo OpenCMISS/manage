@@ -133,7 +133,7 @@ if (DEFINED OPENCMISS_DEPENDENCIES_ONLY)
     list(APPEND PASS_THROUGH_ARGS -DOC_DEPENDENCIES_ONLY=${OPENCMISS_DEPENDENCIES_ONLY})
 endif ()
 
-# Variable used in make_config command
+# Variable used in create_config command
 set(CONFIG_PATH ${CMAKE_CURRENT_BINARY_DIR}/config${PLURAL_S}/${ARCHITECTURE_PATH_MPI})
 set(SUPPORT_DIR ${CMAKE_CURRENT_BINARY_DIR}/support)
 
@@ -141,21 +141,21 @@ set(OPENCMISS_CACHE_FILE ${CMAKE_CURRENT_BINARY_DIR}/OpenCMISSCache.cmake)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/Templates/OpenCMISSCache.in.cmake
     ${OPENCMISS_CACHE_FILE})
 
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/Templates/make_config.in.cmake
-    ${CMAKE_CURRENT_BINARY_DIR}/Scripts/make_config.cmake)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/Templates/create_config.in.cmake
+    ${CMAKE_CURRENT_BINARY_DIR}/Scripts/create_config.cmake)
 
-add_custom_target(make_config
-    COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_BINARY_DIR}/Scripts/make_config.cmake
+add_custom_target(create_config
+    COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_BINARY_DIR}/Scripts/create_config.cmake
     )
 
 add_custom_target(build_config
-    DEPENDS make_config
+    DEPENDS create_config
     COMMAND ${CMAKE_COMMAND} --build .
     WORKING_DIRECTORY ${CONFIG_PATH}
     )
 
 add_custom_target(do_config
-    DEPENDS make_config build_config
+    DEPENDS create_config build_config
     )
 
 message(STATUS "@@@@@@@@@@@@@@@@@@@ SUMMARY @@@@@@@@@@@@@@@@@@@@@@@@@")
