@@ -48,10 +48,9 @@ else()
 endif()
 set(BLA_VENDOR @BLA_VENDOR@)
 set(SUPPORT_EMAIL @OC_INSTALL_SUPPORT_EMAIL@)
-# See also OPENCMISS_HAVE_MULTICONFIG_ENV variable in OpenCMISSConfig.cmake
-if (MSVC)
-    set(OPENCMISS_HAVE_MULTICONFIG_ENV TRUE)
-endif()
+
+# Sets OPENCMISS_HAVE_MULTICONFIG_ENV variable
+include(OCMutliConfigEnvironment)
 
 # Set the build type to OpenCMISS default if not explicitly given (and single-config env)
 if (NOT OPENCMISS_HAVE_MULTICONFIG_ENV AND (CMAKE_BUILD_TYPE_INITIALIZED_TO_DEFAULT OR NOT CMAKE_BUILD_TYPE))
