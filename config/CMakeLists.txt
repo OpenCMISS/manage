@@ -185,6 +185,7 @@ endif()
 if(OPENCMISS_MPI STREQUAL none)
     message(FATAL_ERROR "MPI value of 'none' not yet implemented.  Please spedify an MPI to use.") 
 else ()
+    message(STATUS "OPENCMISS_OWN_MPI_INSTALL_BASE: ${OPENCMISS_OWN_MPI_INSTALL_BASE}")
     include(OCDetermineMPI)
 endif ()
 
@@ -192,6 +193,7 @@ endif ()
 # Architecture paths
 # First extra path segment for single configuration case - will give release/debug/...
 getBuildTypePathElem(BUILD_TYPE_PATH_ELEM)
+message(STATUS "BUILD_TYPE_PATH_ELEM: ${BUILD_TYPE_PATH_ELEM}")
 
 # Second architecture path for configuration
 set(ARCHITECTURE_NO_MPI_PATH .)
@@ -202,11 +204,6 @@ endif ()
 
 include(${OPENCMISS_ROOTS_FILE})
 
-message(STATUS "OPENCMISS_DEPENDENCIES_BINARY_NO_MPI_DIR: ${OPENCMISS_DEPENDENCIES_BINARY_NO_MPI_DIR}")
-message(STATUS "OPENCMISS_DEPENDENCIES_INSTALL_NO_MPI_PREFIX: ${OPENCMISS_DEPENDENCIES_INSTALL_NO_MPI_PREFIX}")
-message(STATUS "OWN_MPI_INSTALL_DIR: ${OWN_MPI_INSTALL_DIR}")
-message(STATUS "OPENCMISS_OWN_MPI_INSTALL_BASE: ${OPENCMISS_OWN_MPI_INSTALL_BASE}")
-message(STATUS "OPENCMISS_OWN_MPI_INSTALL_PREFIX: ${OPENCMISS_OWN_MPI_INSTALL_PREFIX}")
 #
 # Setup build of MPI if required
 include(OCBuildMPI)

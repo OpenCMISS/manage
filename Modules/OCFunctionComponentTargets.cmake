@@ -34,7 +34,7 @@ function(addConvenienceTargets COMPONENT_NAME BINARY_DIR SOURCE_DIR)
     string(TOLOWER "${COMPONENT_NAME}" COMPONENT_NAME_LOWER)
     if (NOT MSVC)
         # Add convenience direct-access clean target for component
-        add_custom_target(${COMPONENT_NAME_LOWER}-clean
+        add_custom_target(${OC_BM_PREFIX}${COMPONENT_NAME_LOWER}_clean
             COMMAND ${CMAKE_COMMAND} -E remove -f ${BINARY_DIR}/ep_stamps/*-configure
             COMMAND ${CMAKE_COMMAND} -E touch ${BINARY_DIR}/CMakeCache.txt # force cmake re-run to make sure
             COMMAND ${CMAKE_COMMAND} --build ${BINARY_DIR} --target clean ${CONFIG_ARGS}
@@ -43,8 +43,8 @@ function(addConvenienceTargets COMPONENT_NAME BINARY_DIR SOURCE_DIR)
         
         # Rebuild does not only invoke the clean target but also completely removes the CMakeFiles folder and Cache,
         # forcing a complete re-configuration of the component.
-        add_custom_target(${COMPONENT_NAME_LOWER}-rebuild
-            DEPENDS ${COMPONENT_NAME_LOWER}-clean
+        add_custom_target(${OC_BM_PREFIX}${COMPONENT_NAME_LOWER}_rebuild
+            DEPENDS ${OC_BM_PREFIX}${COMPONENT_NAME_LOWER}_clean
             COMMAND ${CMAKE_COMMAND} -E remove_directory ${BINARY_DIR}/CMakeFiles
             COMMAND ${CMAKE_COMMAND} -E remove -f ${BINARY_DIR}/CMakeCache.txt
             COMMAND ${CMAKE_COMMAND} --build ${CMAKE_CURRENT_BINARY_DIR} --target ${OC_EP_PREFIX}${COMPONENT_NAME} ${CONFIG_ARGS}
@@ -53,31 +53,31 @@ function(addConvenienceTargets COMPONENT_NAME BINARY_DIR SOURCE_DIR)
     endif()
     
     if (GIT_FOUND)
-        add_custom_target(${COMPONENT_NAME_LOWER}-gitstatus
+        add_custom_target(${COMPONENT_NAME_LOWER}_gitstatus
             COMMAND ${GIT_EXECUTABLE} status
             WORKING_DIRECTORY ${SOURCE_DIR}
             COMMENT "Git status report for ${COMPONENT_NAME_LOWER} at ${SOURCE_DIR}"
         )
-        set_target_properties(${COMPONENT_NAME_LOWER}-gitstatus PROPERTIES FOLDER "Git")
+        set_target_properties(${OC_BM_PREFIX}${COMPONENT_NAME_LOWER}_gitstatus PROPERTIES FOLDER "Git")
     endif()
     
     # Add convenience direct-access forced build target for component
     getBuildCommands(_DUMMY INSTALL_COMMAND ${BINARY_DIR} TRUE)
-    add_custom_target(${COMPONENT_NAME_LOWER}
+    add_custom_target(${OC_BM_PREFIX}${COMPONENT_NAME_LOWER}
         COMMAND ${CMAKE_COMMAND} -E remove -f ${BINARY_DIR}/ep_stamps/*-build
         COMMAND ${INSTALL_COMMAND}
     )
-    set_target_properties(${COMPONENT_NAME_LOWER} PROPERTIES FOLDER "${COMPONENT_NAME_LOWER}")
+    set_target_properties(${OC_BM_PREFIX}${COMPONENT_NAME_LOWER} PROPERTIES FOLDER "${COMPONENT_NAME_LOWER}")
     
     if (BUILD_TESTS)
         # Add convenience direct-access test target
-        add_custom_target(${COMPONENT_NAME_LOWER}-test
+        add_custom_target(${OC_BM_PREFIX}${COMPONENT_NAME_LOWER}_test
             COMMAND ${CMAKE_CTEST_COMMAND} -C $<CONFIG> --output-on-failure
             WORKING_DIRECTORY "${BINARY_DIR}"
         )
-        set_target_properties(${COMPONENT_NAME_LOWER}-test PROPERTIES FOLDER "${COMPONENT_NAME_LOWER}")
+        set_target_properties(${OC_BM_PREFIX}${COMPONENT_NAME_LOWER}_test PROPERTIES FOLDER "${COMPONENT_NAME_LOWER}")
         # Add a global test to run the external project's tests
-        add_test(NAME ${COMPONENT_NAME_LOWER}-test 
+        add_test(NAME ${OC_BM_PREFIX}${COMPONENT_NAME_LOWER}_test 
             COMMAND ${CMAKE_CTEST_COMMAND} -C $<CONFIG> --output-on-failure
             WORKING_DIRECTORY "${BINARY_DIR}"
         )

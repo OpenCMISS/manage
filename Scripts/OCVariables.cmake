@@ -65,5 +65,8 @@ set(OPENCMISS_INSTALLATION_SUPPORT_EMAIL FALSE)
 # The prefix for opencmiss source manaagement targets
 set(OC_SM_PREFIX "SM_")
 
+# The prefix for opencmiss build manaagement targets
+set(OC_BM_PREFIX "BM_")
+
 # The prefix for opencmiss dependencies external projects
 set(OC_EP_PREFIX "OC_")
