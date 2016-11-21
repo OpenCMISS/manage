@@ -74,15 +74,6 @@ else ()
     set(OC_KEYTESTS_BRANCH v${OpenCMISS_VERSION})
 endif ()
 
-# This variable checks if we have a multiconfig environment.
-# Needs to be extended for other multiconf like MSVC as we go.
-set(CMAKE_HAVE_MULTICONFIG_ENV NO)
-set(TEST_TARGET_NAME test)
-if (MSVC)
-    set(CMAKE_HAVE_MULTICONFIG_ENV YES)
-    set(TEST_TARGET_NAME RUN_TESTS)
-endif ()
-
 # Include the installation configuration again to stop local changes from being effective
 include(${OPENCMISS_CACHE_FILE})
 

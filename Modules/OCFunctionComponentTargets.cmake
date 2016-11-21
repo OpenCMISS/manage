@@ -27,7 +27,7 @@
 function(addConvenienceTargets COMPONENT_NAME BINARY_DIR SOURCE_DIR)
 
     set(CONFIG_ARGS )
-    if (CMAKE_HAVE_MULTICONFIG_ENV)
+    if (OPENCMISS_HAVE_MULTICONFIG_ENV)
         set(CONFIG_ARGS --config $<CONFIG>)
     endif()
 
