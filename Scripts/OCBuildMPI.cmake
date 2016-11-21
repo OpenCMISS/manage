@@ -62,11 +62,12 @@ if (NOT MPI_FOUND)
         endif()
         
         set(OPENCMISS_MPI_HOME ${OWN_MPI_INSTALL_DIR} CACHE STRING "Installation directory of own/local MPI build" FORCE)
+        string(TOUPPER ${OPENCMISS_MPI} OPENCMISS_MPI_COMPONENT)
         set(_MPI_SOURCE_DIR ${OPENCMISS_DEPENDENCIES_SOURCE_DIR}/${OPENCMISS_MPI})
         set(_MPI_BINARY_DIR ${OPENCMISS_DEPENDENCIES_BINARY_NO_MPI_DIR}/${OPENCMISS_MPI}/${MPI_BUILD_TYPE_LOWER})
         set(_MPI_BRANCH v${_MPI_VERSION})
         
-        log("Configuring build of 'MPI' (${OPENCMISS_MPI}-${_MPI_VERSION}) in ${_MPI_BINARY_DIR}...")
+        log("Configuring build of '${OPENCMISS_MPI_COMPONENT} ${_MPI_VERSION}' in ${_MPI_BINARY_DIR}...")
         log("Extra MPI build parameters: ${_MPI_EXTRA_PARAMS}" DEBUG)
         
         # Dont download again if the target source folder already contains files 
@@ -96,7 +97,6 @@ if (NOT MPI_FOUND)
             set(_LOGFLAG 0)
         endif()
         
-        string(TOUPPER ${OPENCMISS_MPI} OPENCMISS_MPI_COMPONENT)
         ExternalProject_Add(${OC_EP_PREFIX}${OPENCMISS_MPI_COMPONENT}
     		PREFIX ${_MPI_BINARY_DIR}
     		TMP_DIR ${_MPI_BINARY_DIR}/extproj/tmp
