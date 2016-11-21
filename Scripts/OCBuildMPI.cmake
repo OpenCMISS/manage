@@ -97,6 +97,9 @@ if (NOT MPI_FOUND)
             set(_LOGFLAG 0)
         endif()
         
+message(STATUS "OWN_MPI_INSTALL_DIR: ${OWN_MPI_INSTALL_DIR}")
+message(STATUS "OPENCMISS_MPI_HOME: ${OPENCMISS_MPI_HOME}")
+message(STATUS "MPI_Fortran_COMPILER: ${MPI_Fortran_COMPILER}")
         ExternalProject_Add(${OC_EP_PREFIX}${OPENCMISS_MPI_COMPONENT}
     		PREFIX ${_MPI_BINARY_DIR}
     		TMP_DIR ${_MPI_BINARY_DIR}/extproj/tmp
