@@ -117,6 +117,7 @@ include(OCArchitecturePathFunctions)
 
 # Define variables used throughout
 include(OCVariables)
+include(OCMultiConfigEnvironment)
 
 # General paths & preps
 include(OCPaths)
