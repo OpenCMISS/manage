@@ -53,7 +53,7 @@ function(addConvenienceTargets COMPONENT_NAME BINARY_DIR SOURCE_DIR)
     endif()
     
     if (GIT_FOUND)
-        add_custom_target(${COMPONENT_NAME_LOWER}_gitstatus
+        add_custom_target(${OC_BM_PREFIX}${COMPONENT_NAME_LOWER}_gitstatus
             COMMAND ${GIT_EXECUTABLE} status
             WORKING_DIRECTORY ${SOURCE_DIR}
             COMMENT "Git status report for ${COMPONENT_NAME_LOWER} at ${SOURCE_DIR}"
