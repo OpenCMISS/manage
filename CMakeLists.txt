@@ -149,7 +149,6 @@ add_custom_target(create_config
     )
 
 add_custom_target(build_config
-    DEPENDS create_config
     COMMAND ${CMAKE_COMMAND} --build .
     WORKING_DIRECTORY ${CONFIG_PATH}
     )
