@@ -9,6 +9,7 @@
 if (NOT MPI_FOUND)
     
     # This is supported yet only on Unix systems
+message(STATUS "OPENCMISS_DEPENDENCIES_INSTALL_NO_MPI_PREFIX: ${OPENCMISS_DEPENDENCIES_INSTALL_NO_MPI_PREFIX}")
     if (UNIX)
         # No shared libs!
         set(_MPI_EXTRA_PARAMS --disable-shared)
@@ -31,6 +32,7 @@ if (NOT MPI_FOUND)
             set(MPI_C_COMPILER ${OWN_MPI_INSTALL_DIR}/bin/mpicc)
             set(MPI_CXX_COMPILER ${OWN_MPI_INSTALL_DIR}/bin/mpicxx)
             set(MPI_Fortran_COMPILER ${OWN_MPI_INSTALL_DIR}/bin/mpifort)
+message(STATUS "OPENCMISS_DEPENDENCIES_INSTALL_NO_MPI_PREFIX: ${OPENCMISS_DEPENDENCIES_INSTALL_NO_MPI_PREFIX}")
         elseif (OPENCMISS_MPI STREQUAL mpich)
             set(_MPI_VERSION ${MPICH_VERSION})
             if (MPI_BUILD_TYPE STREQUAL Release)
