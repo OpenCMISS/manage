@@ -29,9 +29,9 @@ message(STATUS "OPENCMISS_DEPENDENCIES_INSTALL_NO_MPI_PREFIX: ${OPENCMISS_DEPEND
             endif()
             # Define the MPI compilers that will be used later already - the configuration stage
             # needs them so that other dependencies with MPI have the correct compilers defined right away.
-            set(MPI_C_COMPILER ${OWN_MPI_INSTALL_DIR}/bin/mpicc)
-            set(MPI_CXX_COMPILER ${OWN_MPI_INSTALL_DIR}/bin/mpicxx)
-            set(MPI_Fortran_COMPILER ${OWN_MPI_INSTALL_DIR}/bin/mpifort)
+            set(MPI_C_COMPILER ${OPENCMISS_OWN_MPI_INSTALL_PREFIX}/bin/mpicc)
+            set(MPI_CXX_COMPILER ${OPENCMISS_OWN_MPI_INSTALL_PREFIX}/bin/mpicxx)
+            set(MPI_Fortran_COMPILER ${OPENCMISS_OWN_MPI_INSTALL_PREFIX}/bin/mpifort)
 message(STATUS "OPENCMISS_DEPENDENCIES_INSTALL_NO_MPI_PREFIX: ${OPENCMISS_DEPENDENCIES_INSTALL_NO_MPI_PREFIX}")
         elseif (OPENCMISS_MPI STREQUAL mpich)
             set(_MPI_VERSION ${MPICH_VERSION})
@@ -43,9 +43,9 @@ message(STATUS "OPENCMISS_DEPENDENCIES_INSTALL_NO_MPI_PREFIX: ${OPENCMISS_DEPEND
             endif()
             # Define the MPI compilers that will be used later already - the configuration stage
             # needs them so that other dependencies with MPI have the correct compilers defined right away.
-            set(MPI_C_COMPILER ${OWN_MPI_INSTALL_DIR}/bin/mpicc)
-            set(MPI_CXX_COMPILER ${OWN_MPI_INSTALL_DIR}/bin/mpicxx)
-            set(MPI_Fortran_COMPILER ${OWN_MPI_INSTALL_DIR}/bin/mpifort)
+            set(MPI_C_COMPILER ${OPENCMISS_OWN_MPI_INSTALL_PREFIX}/bin/mpicc)
+            set(MPI_CXX_COMPILER ${OPENCMISS_OWN_MPI_INSTALL_PREFIX}/bin/mpicxx)
+            set(MPI_Fortran_COMPILER ${OPENCMISS_OWN_MPI_INSTALL_PREFIX}/bin/mpifort)
         elseif (OPENCMISS_MPI STREQUAL mvapich2)
             set(_MPI_VERSION ${MVAPICH2_VERSION})
             if (MPI_BUILD_TYPE STREQUAL Release)
@@ -56,14 +56,14 @@ message(STATUS "OPENCMISS_DEPENDENCIES_INSTALL_NO_MPI_PREFIX: ${OPENCMISS_DEPEND
             endif()
             # Define the MPI compilers that will be used later already - the configuration stage
             # needs them so that other dependencies with MPI have the correct compilers defined right away.
-            set(MPI_C_COMPILER ${OWN_MPI_INSTALL_DIR}/bin/mpicc)
-            set(MPI_CXX_COMPILER ${OWN_MPI_INSTALL_DIR}/bin/mpicxx)
-            set(MPI_Fortran_COMPILER ${OWN_MPI_INSTALL_DIR}/bin/mpifort)
+            set(MPI_C_COMPILER ${OPENCMISS_OWN_MPI_INSTALL_PREFIX}/bin/mpicc)
+            set(MPI_CXX_COMPILER ${OPENCMISS_OWN_MPI_INSTALL_PREFIX}/bin/mpicxx)
+            set(MPI_Fortran_COMPILER ${OPENCMISS_OWN_MPI_INSTALL_PREFIX}/bin/mpifort)
         else()
     	    log("Own build of MPI - ${OPENCMISS_MPI} not yet implemented" ERROR)
         endif()
         
-        set(OPENCMISS_MPI_HOME ${OWN_MPI_INSTALL_DIR} CACHE STRING "Installation directory of own/local MPI build" FORCE)
+        set(OPENCMISS_MPI_HOME ${OPENCMISS_OWN_MPI_INSTALL_PREFIX} CACHE STRING "Installation directory of own/local MPI build" FORCE)
         string(TOUPPER ${OPENCMISS_MPI} OPENCMISS_MPI_COMPONENT)
         set(_MPI_SOURCE_DIR ${OPENCMISS_DEPENDENCIES_SOURCE_DIR}/${OPENCMISS_MPI})
         set(_MPI_BINARY_DIR ${OPENCMISS_DEPENDENCIES_BINARY_NO_MPI_DIR}/${OPENCMISS_MPI}/${MPI_BUILD_TYPE_LOWER})
@@ -99,7 +99,7 @@ message(STATUS "OPENCMISS_DEPENDENCIES_INSTALL_NO_MPI_PREFIX: ${OPENCMISS_DEPEND
             set(_LOGFLAG 0)
         endif()
         
-message(STATUS "OWN_MPI_INSTALL_DIR: ${OWN_MPI_INSTALL_DIR}")
+message(STATUS "OPENCMISS_OWN_MPI_INSTALL_PREFIX: ${OPENCMISS_OWN_MPI_INSTALL_PREFIX}")
 message(STATUS "OPENCMISS_MPI_HOME: ${OPENCMISS_MPI_HOME}")
 message(STATUS "MPI_Fortran_COMPILER: ${MPI_Fortran_COMPILER}")
         ExternalProject_Add(${OC_EP_PREFIX}${OPENCMISS_MPI_COMPONENT}
@@ -113,7 +113,7 @@ message(STATUS "MPI_Fortran_COMPILER: ${MPI_Fortran_COMPILER}")
     		#--Configure step-------------
     		SOURCE_DIR ${_MPI_SOURCE_DIR}
     		CONFIGURE_COMMAND ${_MPI_SOURCE_DIR}/configure 
-    		    --prefix ${OWN_MPI_INSTALL_DIR}
+    		    --prefix ${OPENCMISS_OWN_MPI_INSTALL_PREFIX}
     		    CC=${CMAKE_C_COMPILER}
     		    CXX=${CMAKE_CXX_COMPILER}
     		    FC=${CMAKE_Fortran_COMPILER}
