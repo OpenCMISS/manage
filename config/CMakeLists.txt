@@ -49,7 +49,7 @@
 #    The selection "none" will build OpenCMISS without MPI,
 #    which is intended for future use but not implemented yet.
 #
-# MPI_BUILD_TYPE: [Release]|Debug|...
+# OPENCMISS_MPI_BUILD_TYPE: [Release]|Debug|...
 #    The MPI build type can be chosen independently from the OpenCMISS build type.
 #    For debug builds, OpenCMISS will build its own version of the selected (or default) MPI implementation
 #    as the detection of system debug builds is not reliable (yet)

@@ -106,7 +106,7 @@ if (NOT OC_DEFAULT_MPI)
     set(OC_DEFAULT_MPI ${MPI})
 endif()
 if (NOT OC_DEFAULT_MPI_BUILD_TYPE)
-    set(OC_DEFAULT_MPI_BUILD_TYPE ${MPI_BUILD_TYPE})
+    set(OC_DEFAULT_MPI_BUILD_TYPE ${OPENCMISS_MPI_BUILD_TYPE})
 endif()
 
 # There's litte to configure yet, but could become more

@@ -237,7 +237,7 @@ option(GITHUB_USE_SSL "Use SSL connection to (default) GitHub repositories" NO)
 set(INT_TYPE int32 CACHE STRING "OpenCMISS integer type (only used by PASTIX yet)")
 
 ##
-# MPI_BUILD_TYPE
+# OPENCMISS_MPI_BUILD_TYPE
 # --------------
 #
 # For different MPI build types, use this variable.
@@ -249,8 +249,8 @@ set(INT_TYPE int32 CACHE STRING "OpenCMISS integer type (only used by PASTIX yet
 #     :RelWithDebInfo: Optimised build with debug information
 #
 # .. default:: Release
-if (NOT DEFINED MPI_BUILD_TYPE)
-    set(MPI_BUILD_TYPE Release)
+if (NOT DEFINED OPENCMISS_MPI_BUILD_TYPE)
+    set(OPENCMISS_MPI_BUILD_TYPE Release)
 endif()
 
 ##

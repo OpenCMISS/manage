@@ -38,7 +38,7 @@
 ###############
 #set(BUILD_SHARED_LIBS YES)
 #set(CMAKE_BUILD_TYPE Debug)
-#set(MPI_BUILD_TYPE Debug)
+#set(OPENCMISS_MPI_BUILD_TYPE Debug)
 #set(OC_WARN_ALL NO)
 #set(OC_CHECK_ALL NO)
 #set(OC_MULTITHREADING ON)
