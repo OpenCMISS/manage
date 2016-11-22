@@ -25,9 +25,9 @@ if (NOT DEFINED OPENCMISS_ROOT AND NOT _INSTALLATION_CONFIG_FINALISED)
         # Standard installation scenario and the module path can be found relative to this directory
         get_filename_component(OPENCMISS_ROOT "${CMAKE_CURRENT_LIST_DIR}/../.." REALPATH)
     endif ()
-    if (NOT DEFINED OPENCMISS_CMAKE_MODULES_PATH)
+    if (NOT DEFINED OPENCMISS_CMAKE_MODULE_PATH)
         # Standard installation scenario and the module path can be found relative to this directory
-        get_filename_component(OPENCMISS_CMAKE_MODULES_PATH "${CMAKE_CURRENT_LIST_DIR}/../../install/share/cmake" REALPATH) 
+        get_filename_component(OPENCMISS_CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/../../install/share/cmake" REALPATH) 
     endif ()
 endif ()
 
@@ -53,12 +53,12 @@ else ()
     endif ()
 endif ()
 
-if (NOT EXISTS "${OPENCMISS_CMAKE_MODULES_PATH}/Modules/Packages/OCArchitecturePathFunctions.cmake")
-    message(FATAL_ERROR "'${OPENCMISS_CMAKE_MODULES_PATH}/Modules/Packages/OCArchitecturePathFunctions.cmake' does not exists.  The OpenCMISS CMake modules may not be installed/available.")
+if (NOT EXISTS "${OPENCMISS_CMAKE_MODULE_PATH}/Modules/Packages/OCArchitecturePathFunctions.cmake")
+    message(FATAL_ERROR "'${OPENCMISS_CMAKE_MODULE_PATH}/Modules/Packages/OCArchitecturePathFunctions.cmake' does not exists.  The OpenCMISS CMake modules may not be installed/available.")
 endif ()
 
-# OPENCMISS_CMAKE_MODULES_PATH must be set
-set(OPENCMISS_CMAKE_MODULES_PATH ${OPENCMISS_CMAKE_MODULES_PATH} CACHE PATH "Location of the OpenCMISS CMake modules.")
+# OPENCMISS_CMAKE_MODULE_PATH must be set
+set(OPENCMISS_CMAKE_MODULE_PATH ${OPENCMISS_CMAKE_MODULE_PATH} CACHE PATH "Location of the OpenCMISS CMake modules.")
 
 if (NOT WIN32 OR MINGW)
     if (CMAKE_BUILD_TYPE STREQUAL "")
@@ -69,8 +69,8 @@ endif()
 
 set(MANAGE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR})
 
-list(APPEND CMAKE_MODULE_PATH ${OPENCMISS_CMAKE_MODULES_PATH}/Modules)
-list(APPEND CMAKE_MODULE_PATH ${OPENCMISS_CMAKE_MODULES_PATH}/Modules/Packages)
+list(APPEND CMAKE_MODULE_PATH ${OPENCMISS_CMAKE_MODULE_PATH}/Modules)
+list(APPEND CMAKE_MODULE_PATH ${OPENCMISS_CMAKE_MODULE_PATH}/Modules/Packages)
 
 set(CONFIGURED_FILES_DIR ${CMAKE_CURRENT_BINARY_DIR}/ConfiguredFiles)
 list(APPEND CMAKE_MODULE_PATH ${CONFIGURED_FILES_DIR})

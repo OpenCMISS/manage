@@ -32,7 +32,7 @@ foreach(PACKAGE_NAME ${PACKAGES_WITH_TARGETS})
         SET(PACKAGE_CASENAME ${PACKAGE_NAME})
     endif()
 
-    set(FILE ${OPENCMISS_CMAKE_MODULES_PATH}/FindModuleWrappers/Find${PACKAGE_CASENAME}.cmake)
+    set(FILE ${OPENCMISS_CMAKE_MODULE_PATH}/FindModuleWrappers/Find${PACKAGE_CASENAME}.cmake)
     #if(NOT EXISTS ${FILE})
         # Some packages have different target names than their package name
         if (${PACKAGE_NAME}_TARGETNAME)
@@ -51,14 +51,14 @@ endforeach()
 
 # Add directory to module path
 list(APPEND CMAKE_MODULE_PATH 
-    ${OPENCMISS_CMAKE_MODULES_PATH}/FindModuleWrappers
+    ${OPENCMISS_CMAKE_MODULE_PATH}/FindModuleWrappers
     )
 list(APPEND OPENCMISS_COMPONENT_MODULE_PATH
-    ${OPENCMISS_CMAKE_MODULES_PATH}/FindModuleWrappers
+    ${OPENCMISS_CMAKE_MODULE_PATH}/FindModuleWrappers
     )
 
 # Even though the Wrappers are already at the OpenCMISS install dir,
 # we also use the install command to allow cpack get a hold of them
-install(DIRECTORY ${OPENCMISS_CMAKE_MODULES_PATH}/FindModuleWrappers
+install(DIRECTORY ${OPENCMISS_CMAKE_MODULE_PATH}/FindModuleWrappers
     DESTINATION cmake
     COMPONENT DevelopmentSDK)
