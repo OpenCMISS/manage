@@ -78,7 +78,7 @@ include(OCMiscFunctionsMacros)
 include(OCMultiConfigEnvironment)
 
 if (NOT OPENCMISS_HAVE_MULTICONFIG_ENV)
-    set(OPENCMISS_BUILD_TYPE Release CACHE STRING "Choose the type of build to configure, options are: None(CMAKE_CXX_FLAGS or CMAKE_C_FLAGS used) Debug Release RelWithDebInfo MinSizeRel." FORCE)
+    set(OPENCMISS_BUILD_TYPE Release CACHE STRING "Choose the type of build to configure, options are: None(CMAKE_CXX_FLAGS or CMAKE_C_FLAGS used) Debug Release RelWithDebInfo MinSizeRel.")
     set(CMAKE_BUILD_TYPE Release CACHE INTERNAL "Choose the type of build, options are: None(CMAKE_CXX_FLAGS or CMAKE_C_FLAGS used) Debug Release RelWithDebInfo MinSizeRel." FORCE)
     message(STATUS "Setting build type to: ${CMAKE_BUILD_TYPE}")
 endif()
@@ -130,13 +130,15 @@ else ()
     set(PLURAL_S)
 endif ()
 
+set(OPENCMISS_INSTALLATION_CACHE_FILE ${CMAKE_CURRENT_BINARY_DIR}/OpenCMISSCache.cmake)
+
 # All arguments passed to construct the currently specified configuration
 set(CURRENT_CONFIGURATION_ARGS)
 if (DEFINED OPENCMISS_DEPENDENCIES_ONLY)
     list(APPEND CURRENT_CONFIGURATION_ARGS -DOC_DEPENDENCIES_ONLY=${OPENCMISS_DEPENDENCIES_ONLY})
 endif ()
 
-if (OPENCMISS_HAVE_MULTICONFIG_ENV)
+if (NOT OPENCMISS_HAVE_MULTICONFIG_ENV)
     list(APPEND CURRENT_CONFIGURATION_ARGS -DOPENCMISS_BUILD_TYPE=${OPENCMISS_BUILD_TYPE})
 endif ()
 
@@ -150,11 +152,13 @@ list(APPEND CURRENT_CONFIGURATION_ARGS -DMANAGE_MODULE_PATH=${MANAGE_MODULE_PATH
 string(REPLACE ";" " " CONFIGURATION_SETTINGS "${CURRENT_CONFIGURATION_ARGS}")
 # Variable used in create_config command
 set(CONFIG_PATH ${CMAKE_CURRENT_BINARY_DIR}/config${PLURAL_S}/${ARCHITECTURE_PATH_MPI})
+if (NOT OPENCMISS_HAVE_MULTICONFIG_ENV)
+    set(CONFIG_PATH ${CONFIG_PATH}/${OPENCMISS_BUILD_TYPE})
+endif ()
 
 # Variable used in the installtion cache passed to configurations
 set(SUPPORT_DIR ${CMAKE_CURRENT_BINARY_DIR}/support)
 
-set(OPENCMISS_INSTALLATION_CACHE_FILE ${CMAKE_CURRENT_BINARY_DIR}/OpenCMISSCache.cmake)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/Templates/OpenCMISSCache.in.cmake
     ${OPENCMISS_INSTALLATION_CACHE_FILE})
 
@@ -185,6 +189,7 @@ message(STATUS "@ OPENCMISS_TOOLCHAIN: ${OPENCMISS_TOOLCHAIN}")
 message(STATUS "@ OPENCMISS_MPI: ${OPENCMISS_MPI}")
 message(STATUS "@ ARCHITECTURE_PATH_MPI: ${ARCHITECTURE_PATH_MPI}")
 message(STATUS "@ ")
+message(STATUS "@ CONFIG PATH: ${CONFIG_PATH}")
 message(STATUS "@ CONFIGURATION SETTINGS: ${CONFIGURATION_SETTINGS}")
 message(STATUS "@ ")
 printmanagenextsteps()

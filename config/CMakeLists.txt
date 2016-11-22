@@ -132,7 +132,8 @@ include(OCCreateLocalConfig)
 include(OpenCMISSConfig)
 
 if (NOT OPENCMISS_HAVE_MULTICONFIG_ENV)
-    set(OPENCMISS_BUILD_TYPE ${OPENCMISS_DEFAULT_BUILD_TYPE} CACHE STRING "Choose the type of build to configure, options are: None(CMAKE_CXX_FLAGS or CMAKE_C_FLAGS used) Debug Release RelWithDebInfo MinSizeRel." FORCE)
+    # This isn't configurable at this stage it is configured at the config creation time
+    #set(OPENCMISS_BUILD_TYPE CACHE STRING "Choose the type of build to configure, options are: None(CMAKE_CXX_FLAGS or CMAKE_C_FLAGS used) Debug Release RelWithDebInfo MinSizeRel.")
     set(CMAKE_BUILD_TYPE ${OPENCMISS_BUILD_TYPE} CACHE INTERNAL "Internalise CMAKE_BUILD_TYPE manipulate through OPENCMISS_BUILD_TYPE instead." FORCE)
 endif()
 
