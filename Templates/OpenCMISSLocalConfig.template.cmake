@@ -37,11 +37,13 @@
 # BUILD CONTROL
 ###############
 #set(BUILD_SHARED_LIBS YES)
-#set(CMAKE_BUILD_TYPE Debug)
-#set(OPENCMISS_MPI_BUILD_TYPE Debug)
 #set(OC_WARN_ALL NO)
 #set(OC_CHECK_ALL NO)
 #set(OC_MULTITHREADING ON)
+if (NOT OPENCMISS_HAVE_MULTICONFIG_ENV)
+#    set(OPENCMISS_BUILD_TYPE Debug CACHE STRING "Choose the type of build, options are: None(CMAKE_CXX_FLAGS or CMAKE_C_FLAGS used) Debug Release RelWithDebInfo MinSizeRel." FORCE)
+#    set(OPENCMISS_MPI_BUILD_TYPE Debug)
+endif ()
 
 #########################
 # COMPONENT CONFIGURATION

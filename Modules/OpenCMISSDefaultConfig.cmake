@@ -62,7 +62,7 @@ option(BUILD_SHARED_LIBS "Build shared libraries within/for every component" NO)
 # -----------
 #
 # Most OpenCMISS components come with their own test cases and suites. This flag enables all component tests
-# to be build along with the components.
+# to be built along with the components.
 #
 # This does not mean they're run (which you should do, see :ref:`build targets`)
 #
@@ -70,8 +70,8 @@ option(BUILD_SHARED_LIBS "Build shared libraries within/for every component" NO)
 option(BUILD_TESTS "Build OpenCMISS(-components) tests" ON)
 
 ##
-# CMAKE_BUILD_TYPE
-# ----------------
+# OPENCMISS_DEFAULT_BUILD_TYPE
+# ----------------------------
 #
 # For different build types, use this variable.
 # Possible values are (in general)
@@ -81,17 +81,15 @@ option(BUILD_TESTS "Build OpenCMISS(-components) tests" ON)
 #     :MinSizeRel: Optimised build for minimal library/binary size
 #     :RelWithDebInfo: Optimised build with debug information
 #
-# .. cmake-var:: CMAKE_BUILD_TYPE
+# .. cmake-var:: OPENCMISS_DEFAULT_BUILD_TYPE
 # .. default:: Release
-if (NOT DEFINED CMAKE_BUILD_TYPE)
-    set(CMAKE_BUILD_TYPE Release) 
-endif()
+set(OPENCMISS_DEFAULT_BUILD_TYPE Release)
 
 ##
 # CMAKE_DEBUG_POSTFIX
 # -------------------
 #
-# Specifies a postfix for all libraries when build in :cmake:`CMAKE_BUILD_TYPE=DEBUG` 
+# Specifies a postfix for all libraries when build in :cmake:`CMAKE_BUILD_TYPE=Debug`
 #
 # .. cmake-var:: CMAKE_DEBUG_POSTFIX
 # .. default:: d

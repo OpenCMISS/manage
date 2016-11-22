@@ -131,11 +131,9 @@ include(OCCreateLocalConfig)
 # Load configuration files
 include(OpenCMISSConfig)
 
-if (NOT WIN32 OR MINGW)
-    if (CMAKE_BUILD_TYPE STREQUAL "")
-        set(CMAKE_BUILD_TYPE Release CACHE STRING "Choose the type of build, options are: None(CMAKE_CXX_FLAGS or CMAKE_C_FLAGS used) Debug Release RelWithDebInfo MinSizeRel." FORCE)
-        message(STATUS "No CMAKE_BUILD_TYPE has been defined. Using Release.")
-    endif()
+if (NOT OPENCMISS_HAVE_MULTICONFIG_ENV)
+    set(OPENCMISS_BUILD_TYPE ${OPENCMISS_DEFAULT_BUILD_TYPE} CACHE STRING "Choose the type of build to configure, options are: None(CMAKE_CXX_FLAGS or CMAKE_C_FLAGS used) Debug Release RelWithDebInfo MinSizeRel." FORCE)
+    set(CMAKE_BUILD_TYPE ${OPENCMISS_BUILD_TYPE} CACHE INTERNAL "Internalise CMAKE_BUILD_TYPE manipulate through OPENCMISS_BUILD_TYPE instead." FORCE)
 endif()
 
 # Hide some of the variables in the interface that we don't want to see.

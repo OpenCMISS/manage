@@ -19,7 +19,7 @@ include(OpenCMISSInterComponentConfig)
 # Postprocessing
 
 # Include the installation configuration
-include(${OPENCMISS_CACHE_FILE})
+include(${OPENCMISS_INSTALLATION_CACHE_FILE})
 
 # Add HDF5 to fortran projects if enabled
 if (HDF5_BUILD_FORTRAN)
@@ -75,6 +75,6 @@ else ()
 endif ()
 
 # Include the installation configuration again to stop local changes from being effective
-include(${OPENCMISS_CACHE_FILE})
+include(${OPENCMISS_INSTALLATION_CACHE_FILE})
 
 

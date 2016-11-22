@@ -60,12 +60,6 @@ endif ()
 # OPENCMISS_CMAKE_MODULE_PATH must be set
 set(OPENCMISS_CMAKE_MODULE_PATH ${OPENCMISS_CMAKE_MODULE_PATH} CACHE PATH "Location of the OpenCMISS CMake modules.")
 
-if (NOT WIN32 OR MINGW)
-    if (CMAKE_BUILD_TYPE STREQUAL "")
-        set(CMAKE_BUILD_TYPE Release CACHE STRING "Choose the type of build, options are: None(CMAKE_CXX_FLAGS or CMAKE_C_FLAGS used) Debug Release RelWithDebInfo MinSizeRel." FORCE)
-        message(STATUS "No CMAKE_BUILD_TYPE has been defined. Using Release.")
-    endif()
-endif()
 
 set(MANAGE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR})
 
@@ -81,18 +75,25 @@ endif ()
 
 include(OCArchitecturePathFunctions)
 include(OCMiscFunctionsMacros)
+include(OCMultiConfigEnvironment)
+
+if (NOT OPENCMISS_HAVE_MULTICONFIG_ENV)
+    set(OPENCMISS_BUILD_TYPE Release CACHE STRING "Choose the type of build to configure, options are: None(CMAKE_CXX_FLAGS or CMAKE_C_FLAGS used) Debug Release RelWithDebInfo MinSizeRel." FORCE)
+    set(CMAKE_BUILD_TYPE Release CACHE INTERNAL "Choose the type of build, options are: None(CMAKE_CXX_FLAGS or CMAKE_C_FLAGS used) Debug Release RelWithDebInfo MinSizeRel." FORCE)
+    message(STATUS "Setting build type to: ${CMAKE_BUILD_TYPE}")
+endif()
 
 # Look for an OpenCMISS Developer script
-SET(OC_DEVELOPER_CONFIG ${CMAKE_CURRENT_BINARY_DIR}/OpenCMISSInstallationConfig.cmake)
+SET(OC_INSTALLATION_CONFIG ${CMAKE_CURRENT_BINARY_DIR}/OpenCMISSInstallationConfig.cmake)
 set(OC_DEVELOPER NO)
-if (NOT EXISTS ${OC_DEVELOPER_CONFIG})
+if (NOT EXISTS ${OC_INSTALLATION_CONFIG})
     file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/OpenCMISSInstallationConfig.cmake
         DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 endif ()
 
-message(STATUS "Applying OpenCMISS developer configuration at ${OC_DEVELOPER_CONFIG}...")
-include(${OC_DEVELOPER_CONFIG})
-unset(OC_DEVELOPER_CONFIG)
+message(STATUS "Applying OpenCMISS installation configuration at ${OC_INSTALLATION_CONFIG}...")
+include(${OC_INSTALLATION_CONFIG})
+unset(OC_INSTALLATION_CONFIG)
 
 # Path for own MPI BUILD?
 include(OpenCMISSOwnMPI)
@@ -129,17 +130,32 @@ else ()
     set(PLURAL_S)
 endif ()
 
+# All arguments passed to construct the currently specified configuration
+set(CURRENT_CONFIGURATION_ARGS)
 if (DEFINED OPENCMISS_DEPENDENCIES_ONLY)
-    list(APPEND PASS_THROUGH_ARGS -DOC_DEPENDENCIES_ONLY=${OPENCMISS_DEPENDENCIES_ONLY})
+    list(APPEND CURRENT_CONFIGURATION_ARGS -DOC_DEPENDENCIES_ONLY=${OPENCMISS_DEPENDENCIES_ONLY})
 endif ()
+
+if (OPENCMISS_HAVE_MULTICONFIG_ENV)
+    list(APPEND CURRENT_CONFIGURATION_ARGS -DOPENCMISS_BUILD_TYPE=${OPENCMISS_BUILD_TYPE})
+endif ()
+
+list(APPEND CURRENT_CONFIGURATION_ARGS -DTOOLCHAIN=${OPENCMISS_TOOLCHAIN})
+list(APPEND CURRENT_CONFIGURATION_ARGS -DOPENCMISS_MPI=${OPENCMISS_MPI})
+list(APPEND CURRENT_CONFIGURATION_ARGS -DOPENCMISS_OWN_MPI_INSTALL_BASE=${OPENCMISS_OWN_MPI_INSTALL_BASE})
+list(APPEND CURRENT_CONFIGURATION_ARGS -DOPENCMISS_INSTALLATION_CACHE_FILE=${OPENCMISS_INSTALLATION_CACHE_FILE})
+list(APPEND CURRENT_CONFIGURATION_ARGS -DOPENCMISS_CMAKE_MODULE_PATH=${OPENCMISS_CMAKE_MODULE_PATH})
+list(APPEND CURRENT_CONFIGURATION_ARGS -DMANAGE_MODULE_PATH=${MANAGE_MODULE_PATH})
 
 # Variable used in create_config command
 set(CONFIG_PATH ${CMAKE_CURRENT_BINARY_DIR}/config${PLURAL_S}/${ARCHITECTURE_PATH_MPI})
+
+# Variable used in the installtion cache passed to configurations
 set(SUPPORT_DIR ${CMAKE_CURRENT_BINARY_DIR}/support)
 
-set(OPENCMISS_CACHE_FILE ${CMAKE_CURRENT_BINARY_DIR}/OpenCMISSCache.cmake)
+set(OPENCMISS_INSTALLATION_CACHE_FILE ${CMAKE_CURRENT_BINARY_DIR}/OpenCMISSCache.cmake)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/Templates/OpenCMISSCache.in.cmake
-    ${OPENCMISS_CACHE_FILE})
+    ${OPENCMISS_INSTALLATION_CACHE_FILE})
 
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/Templates/create_config.in.cmake
     ${CMAKE_CURRENT_BINARY_DIR}/Scripts/create_config.cmake)
@@ -148,8 +164,13 @@ add_custom_target(create_config
     COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_BINARY_DIR}/Scripts/create_config.cmake
     )
 
+set(BUILD_CONFIG_COMMAND ${CMAKE_COMMAND} --build .)
+if (OPENCMISS_HAVE_MULTICONFIG_ENV)
+    list(APPEND BUILD_CONFIG_COMMAND --config $<CONFIG>)
+endif ()
+
 add_custom_target(build_config
-    COMMAND ${CMAKE_COMMAND} --build .
+    COMMAND ${BUILD_CONFIG_COMMAND}
     WORKING_DIRECTORY ${CONFIG_PATH}
     )
 
@@ -162,5 +183,7 @@ message(STATUS "@")
 message(STATUS "@ OPENCMISS_TOOLCHAIN: ${OPENCMISS_TOOLCHAIN}")
 message(STATUS "@ OPENCMISS_MPI: ${OPENCMISS_MPI}")
 message(STATUS "@ ARCHITECTURE_PATH_MPI: ${ARCHITECTURE_PATH_MPI}")
+message(STATUS "@ ")
+message(STATUS "@ CONFIGURATION SETTINGS: ${CURRENT_CONFIGURATION_ARGS}")
 message(STATUS "@ ")
 printmanagenextsteps()
