@@ -5,9 +5,9 @@
 # The key tests are a selected set of tests available from the OpenCMISS main libaries
 # and some dependencies. 
 #
-# Depending on the effective configuration and component selection, a suitable selection of the following examples is build and run:
+# Depending on the effective configuration and component selection, a suitable selection of the following examples is built and run:
 #
-#    :Iron-Fortran: Run whenever Iron is build. See :var:`OC_USE_IRON`.
+#    :Iron-Fortran: Run whenever Iron is built. See :var:`OC_USE_IRON`.
 #
 #      - ClassicalField_Laplace
 #      - ClassicalField_AnalyticLaplace
@@ -15,34 +15,34 @@
 #      - FiniteElasticity_Cantilever
 #      - LinearElasticity_Extension
 #
-#    :Iron-C: Run when the C bindings for Iron are build.
+#    :Iron-C: Run when the C bindings for Iron are built.
 #      See the :ref:`IRON_WITH_C_BINDINGS <intercomponent>` variable.
 #    
 #      - C_Bindings_ComplexMesh
 #
-#    :Iron-Python: Run when the Python bindings for Iron are build.
+#    :Iron-Python: Run when the Python bindings for Iron are built.
 #      See the :ref:`IRON_WITH_Python_BINDINGS <intercomponent>` variable.
 #  
 #      - Python_Bindings_Import
 #      - Python_Bindings_Cantilever
 #
-#    :Iron-CellML: Tests CellML models through Iron. Build when 
-#      Iron and CellML are build, see :var:`OC_USE_<COMP>`.
+#    :Iron-CellML: Tests CellML models through Iron. Built when
+#      Iron and CellML are built, see :var:`OC_USE_<COMP>`.
 #      Iron with CellML is enabled, see :ref:`IRON_WITH_CELLML <intercomponent>`.
 #
 #      - CellML Model Integration
 #
 #    :Iron-FieldML: Classical field static advection diffusion with FieldML. Run when
-#      Iron and FieldML-API are build, see :var:`OC_USE_<COMP>`.
+#      Iron and FieldML-API are built, see :var:`OC_USE_<COMP>`.
 #      Iron with FieldML is enabled, see :ref:`IRON_WITH_FIELDML <intercomponent>`.
 #
 #      - StaticAdvectionDiffusion_FieldML
 #
-#    :Zinc-API: Run whenever Zinc is build, see :var:`OC_USE_ZINC`.
+#    :Zinc-API: Run whenever Zinc is built, see :var:`OC_USE_ZINC`.
 #
 #      - APITest_*
 #
-#    :Zinc-Python: Run whenever Python bindings for Zinc are build.
+#    :Zinc-Python: Run whenever Python bindings for Zinc are built.
 #      See the :ref:`ZINC_WITH_Python_BINDINGS <intercomponent>` variable.
 #
 #      - Python_Bindings_*
