@@ -17,7 +17,7 @@ try:
         if os.path.isfile(item) and item.startswith("bindings_") and item.endswith('.py'):
             module_name = item[:-3]
             module = importlib.import_module(module_name)
-            virtualenvs.extend(module.virtualenvs)
+            virtualenvs.append(module.info)
             
 except Exception as e:
     print('boom')
