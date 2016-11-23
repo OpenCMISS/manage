@@ -156,6 +156,11 @@ if (NOT OPENCMISS_HAVE_MULTICONFIG_ENV)
     set(CONFIG_PATH ${CONFIG_PATH}/${OPENCMISS_BUILD_TYPE})
 endif ()
 
+add_custom_target(usage ALL
+    COMMAND ${CMAKE_COMMAND} -E echo "Perhaps try targets: create_config, build_config, do_config or help. For other options read the documentation."
+    VERBATIM
+    )
+
 # Variable used in the installtion cache passed to configurations
 set(SUPPORT_DIR ${CMAKE_CURRENT_BINARY_DIR}/support)
 
