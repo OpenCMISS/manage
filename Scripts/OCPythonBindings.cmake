@@ -25,10 +25,13 @@ if (IRON_WITH_Python_BINDINGS OR ZINC_WITH_Python_BINDINGS)
         string(TOLOWER ${BTYPE} BTYPE)
         if (OPENCMISS_USE_ARCHITECTURE_PATH)
             string(REPLACE "/" "_" _APATH "${ARCHITECTURE_MPI_PATH}")
+            string(REPLACE "." "_" _APATH "${_APATH}")
+            string(REPLACE "-" "_" _APATH "${_APATH}")
             set(VIRTUALENV_INFO_FILE ${_OC_PYTHON_INSTALL_PREFIX}/bindings_${_APATH}_${BTYPE}.py)
         else ()
             set(VIRTUALENV_INFO_FILE ${_OC_PYTHON_INSTALL_PREFIX}/bindings.py)
         endif ()
+        set(VIRTUALENV_OPENCMISS_FILE ${_OC_PYTHON_INSTALL_PREFIX}/opencmiss.py)
         getCompilerPathElem(COMPILER)
         string(TOLOWER ${OPENCMISS_MPI_BUILD_TYPE} OPENCMISS_MPI_BUILD_TYPE)
         set(LIBRARY_PATH )
@@ -39,12 +42,21 @@ if (IRON_WITH_Python_BINDINGS OR ZINC_WITH_Python_BINDINGS)
         set(IS_VIRTUALENV false)
         if (OC_PYTHON_BINDINGS_USE_VIRTUALENV)
             set(IS_VIRTUALENV true)
+            set(_SCRIPT_DIR bin)
+            if (WIN32)
+                set(_SCRIPT_DIR Scripts)
+            endif ()
+            set(ACTIVATE_SCRIPT ${OPENCMISS_LIBRARIES_INSTALL_MPI_PREFIX}/${OC_VIRTUALENV_SUBPATH}/${_SCRIPT_DIR}/activate)
         endif()
         configure_file(
             "${MANAGE_MODULE_PATH}/Templates/python_virtualenv.in.py"
             "${VIRTUALENV_INFO_FILE}" 
             @ONLY
         )
+        configure_file(
+            "${MANAGE_MODULE_PATH}/Templates/opencmiss.bindings.in.py"
+            "${VIRTUALENV_OPENCMISS_FILE}" COPYONLY)
+
     endfunction()
     
     set(VENV_CREATION_COMMANDS )
