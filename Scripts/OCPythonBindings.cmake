@@ -31,7 +31,7 @@ if (IRON_WITH_Python_BINDINGS OR ZINC_WITH_Python_BINDINGS)
         else ()
             set(VIRTUALENV_INFO_FILE ${_OC_PYTHON_INSTALL_PREFIX}/bindings.py)
         endif ()
-        set(VIRTUALENV_OPENCMISS_FILE ${_OC_PYTHON_INSTALL_PREFIX}/opencmiss.py)
+        set(VIRTUALENV_OPENCMISS_LIBRARIES_FILE ${_OC_PYTHON_INSTALL_PREFIX}/opencmisslibraries.py)
         getCompilerPathElem(COMPILER)
         string(TOLOWER ${OPENCMISS_MPI_BUILD_TYPE} OPENCMISS_MPI_BUILD_TYPE)
         set(LIBRARY_PATH )
@@ -55,7 +55,7 @@ if (IRON_WITH_Python_BINDINGS OR ZINC_WITH_Python_BINDINGS)
         )
         configure_file(
             "${MANAGE_MODULE_PATH}/Templates/opencmiss.bindings.in.py"
-            "${VIRTUALENV_OPENCMISS_FILE}" COPYONLY)
+            "${VIRTUALENV_OPENCMISS_LIBRARIES_FILE}" COPYONLY)
 
     endfunction()
     

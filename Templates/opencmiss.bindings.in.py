@@ -14,7 +14,7 @@ os.chdir(info_file_dir)
 try:
     sys.path.append(info_file_dir)
     for item in os.listdir(info_file_dir):
-        if os.path.isfile(item) and item.startswith("bindings_") and item.endswith('.py'):
+        if os.path.isfile(item) and item.startswith("bindings") and item.endswith('.py'):
             module_name = item[:-3]
             module = importlib.import_module(module_name)
             virtualenvs.append(module.info)
