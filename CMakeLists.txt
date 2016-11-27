@@ -170,8 +170,20 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/Templates/OpenCMISSCache.in.cmake
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/Templates/create_config.in.cmake
     ${CMAKE_CURRENT_BINARY_DIR}/Scripts/create_config.cmake)
 
-add_custom_target(create_config
+if (NOT EXISTS ${CMAKE_CURRENT_BINARY_DIR}/stamp)
+    file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/stamp)
+endif ()
+
+set(CREATE_CONFIG_STAMP_FILE ${CMAKE_CURRENT_BINARY_DIR}/stamp/create_config.stamp)
+set(BUILD_CONFIG_STAMP_FILE ${CMAKE_CURRENT_BINARY_DIR}/stamp/build_config.stamp)
+
+add_custom_command(OUTPUT ${CREATE_CONFIG_STAMP_FILE}
     COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_BINARY_DIR}/Scripts/create_config.cmake
+    COMMAND ${CMAKE_COMMAND} -E touch ${CMAKE_CURRENT_BINARY_DIR}/stamp/create_config.stamp
+    )
+
+add_custom_target(create_config
+    DEPENDS ${CREATE_CONFIG_STAMP_FILE}
     )
 
 set(BUILD_CONFIG_COMMAND ${CMAKE_COMMAND} --build .)
@@ -179,14 +191,24 @@ if (OPENCMISS_HAVE_MULTICONFIG_ENV)
     list(APPEND BUILD_CONFIG_COMMAND --config $<CONFIG>)
 endif ()
 
-add_custom_target(build_config
+add_custom_command(OUTPUT ${BUILD_CONFIG_STAMP_FILE}
+    DEPENDS ${CREATE_CONFIG_STAMP_FILE}
     COMMAND ${BUILD_CONFIG_COMMAND}
+    COMMAND ${CMAKE_COMMAND} -E touch ${BUILD_CONFIG_STAMP_FILE}
     WORKING_DIRECTORY ${CONFIG_PATH}
+    )
+
+add_custom_target(build_config
+    DEPENDS ${BUILD_CONFIG_STAMP_FILE}
     )
 
 add_custom_target(do_config
     DEPENDS create_config build_config
     )
+
+if (EXISTS ${CREATE_CONFIG_STAMP_FILE})
+    file(REMOVE ${CREATE_CONFIG_STAMP_FILE})
+endif ()
 
 message(STATUS "@@@@@@@@@@@@@@@@@@@ SUMMARY @@@@@@@@@@@@@@@@@@@@@@@@@")
 message(STATUS "@")
