@@ -13,7 +13,7 @@ enable_testing()
 set(OPENCMISS_BUILD_SUPPORT_EMAIL "users@opencmiss.org")
 
 # Determine if the OpenCMISSInstallationConfig should be considered finalised or not.
-if (EXISTS ${CMAKE_CURRENT_BINARY_DIR}/config OR EXISTS ${CMAKE_CURRENT_BINARY_DIR}/configs)
+if (EXISTS "${CMAKE_CURRENT_BINARY_DIR}/config" OR EXISTS "${CMAKE_CURRENT_BINARY_DIR}/configs")
     set(_INSTALLATION_CONFIG_FINALISED TRUE)
 else ()
     set(_INSTALLATION_CONFIG_FINALISED FALSE)
@@ -35,7 +35,7 @@ if (DEFINED OPENCMISS_ROOT)
     if (_INSTALLATION_CONFIG_FINALISED)
         unset(OPENCMISS_ROOT CACHE)
     else ()
-        set(OPENCMISS_ROOT ${OPENCMISS_ROOT} CACHE PATH "Root location for building OpenCMISS from source.")
+        set(OPENCMISS_ROOT "${OPENCMISS_ROOT}" CACHE PATH "Root location for building OpenCMISS from source.")
         set(OPENCMISS_ROOT_CONFIG OpenCMISSRoot)
         set(OPENCMISS_OWN_MPI_CONFIG OpenCMISSOwnMPIRoot)
     endif ()
@@ -45,9 +45,9 @@ else ()
         unset(OPENCMISS_DEPENDENCIES_ROOT CACHE)
         unset(OPENCMISS_CMAKE_MODULES_ROOT CACHE)
     else ()
-        set(OPENCMISS_LIBRARIES_ROOT ${OPENCMISS_LIBRARIES_ROOT} CACHE PATH "Root location for building OpenCMISS libraries from source.")
-        set(OPENCMISS_DEPENDENCIES_ROOT ${OPENCMISS_DEPENDENCIES_ROOT} CACHE PATH "Root location for building OpenCMISS dependencies from source.")
-        set(OPENCMISS_CMAKE_MODULES_ROOT ${OPENCMISS_CMAKE_MODULES_ROOT} CACHE PATH "Root location for building OpenCMISS cmake modules from source.")
+        set(OPENCMISS_LIBRARIES_ROOT "${OPENCMISS_LIBRARIES_ROOT}" CACHE PATH "Root location for building OpenCMISS libraries from source.")
+        set(OPENCMISS_DEPENDENCIES_ROOT "${OPENCMISS_DEPENDENCIES_ROOT}" CACHE PATH "Root location for building OpenCMISS dependencies from source.")
+        set(OPENCMISS_CMAKE_MODULES_ROOT "${OPENCMISS_CMAKE_MODULES_ROOT}" CACHE PATH "Root location for building OpenCMISS cmake modules from source.")
         set(OPENCMISS_ROOT_CONFIG OpenCMISSIndependentRoots)
         set(OPENCMISS_OWN_MPI_CONFIG OpenCMISSOwnMPIIndependentRoots)
     endif ()
@@ -58,19 +58,19 @@ if (NOT EXISTS "${OPENCMISS_CMAKE_MODULE_PATH}/Modules/Packages/OCArchitecturePa
 endif ()
 
 # OPENCMISS_CMAKE_MODULE_PATH must be set
-set(OPENCMISS_CMAKE_MODULE_PATH ${OPENCMISS_CMAKE_MODULE_PATH} CACHE PATH "Location of the OpenCMISS CMake modules.")
+set(OPENCMISS_CMAKE_MODULE_PATH "${OPENCMISS_CMAKE_MODULE_PATH}" CACHE PATH "Location of the OpenCMISS CMake modules.")
 
 
-set(MANAGE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR})
+set(MANAGE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}")
 
-list(APPEND CMAKE_MODULE_PATH ${OPENCMISS_CMAKE_MODULE_PATH}/Modules)
-list(APPEND CMAKE_MODULE_PATH ${OPENCMISS_CMAKE_MODULE_PATH}/Modules/Packages)
+list(APPEND CMAKE_MODULE_PATH "${OPENCMISS_CMAKE_MODULE_PATH}/Modules")
+list(APPEND CMAKE_MODULE_PATH "${OPENCMISS_CMAKE_MODULE_PATH}/Modules/Packages")
 
-set(CONFIGURED_FILES_DIR ${CMAKE_CURRENT_BINARY_DIR}/ConfiguredFiles)
-list(APPEND CMAKE_MODULE_PATH ${CONFIGURED_FILES_DIR})
+set(CONFIGURED_FILES_DIR "${CMAKE_CURRENT_BINARY_DIR}/ConfiguredFiles")
+list(APPEND CMAKE_MODULE_PATH "${CONFIGURED_FILES_DIR}")
 if (NOT _INSTALLATION_CONFIG_FINALISED)
-    configure_file(${CMAKE_CURRENT_SOURCE_DIR}/Templates/${OPENCMISS_OWN_MPI_CONFIG}.template.cmake ${CONFIGURED_FILES_DIR}/OpenCMISSOwnMPI.cmake @ONLY)
-    configure_file(${CMAKE_CURRENT_SOURCE_DIR}/Templates/${OPENCMISS_ROOT_CONFIG}.template.cmake ${CONFIGURED_FILES_DIR}/OpenCMISSRoots.cmake @ONLY)
+    configure_file("${CMAKE_CURRENT_SOURCE_DIR}/Templates/${OPENCMISS_OWN_MPI_CONFIG}.template.cmake" "${CONFIGURED_FILES_DIR}/OpenCMISSOwnMPI.cmake" @ONLY)
+    configure_file("${CMAKE_CURRENT_SOURCE_DIR}/Templates/${OPENCMISS_ROOT_CONFIG}.template.cmake" "${CONFIGURED_FILES_DIR}/OpenCMISSRoots.cmake" @ONLY)
 endif ()
 
 include(OCArchitecturePathFunctions)
@@ -94,15 +94,15 @@ if (NOT OPENCMISS_HAVE_MULTICONFIG_ENV)
 endif()
 
 # Look for an OpenCMISS Developer script
-SET(OC_INSTALLATION_CONFIG ${CMAKE_CURRENT_BINARY_DIR}/OpenCMISSInstallationConfig.cmake)
+SET(OC_INSTALLATION_CONFIG "${CMAKE_CURRENT_BINARY_DIR}/OpenCMISSInstallationConfig.cmake")
 set(OC_DEVELOPER NO)
-if (NOT EXISTS ${OC_INSTALLATION_CONFIG})
-    file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/OpenCMISSInstallationConfig.cmake
-        DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+if (NOT EXISTS "${OC_INSTALLATION_CONFIG}")
+    file(COPY "${CMAKE_CURRENT_SOURCE_DIR}/OpenCMISSInstallationConfig.cmake"
+        DESTINATION "${CMAKE_CURRENT_BINARY_DIR}")
 endif ()
 
 message(STATUS "Applying OpenCMISS installation configuration at ${OC_INSTALLATION_CONFIG}...")
-include(${OC_INSTALLATION_CONFIG})
+include("${OC_INSTALLATION_CONFIG}")
 unset(OC_INSTALLATION_CONFIG)
 
 # Path for own MPI BUILD?
@@ -140,12 +140,12 @@ else ()
     set(PLURAL_S)
 endif ()
 
-set(OPENCMISS_INSTALLATION_CACHE_FILE ${CMAKE_CURRENT_BINARY_DIR}/OpenCMISSCache.cmake)
+set(OPENCMISS_INSTALLATION_CACHE_FILE "${CMAKE_CURRENT_BINARY_DIR}/OpenCMISSCache.cmake")
 
 # All arguments passed to construct the currently specified configuration
 set(CURRENT_CONFIGURATION_ARGS)
 if (DEFINED OPENCMISS_DEPENDENCIES_ONLY)
-    list(APPEND CURRENT_CONFIGURATION_ARGS -DOC_DEPENDENCIES_ONLY=${OPENCMISS_DEPENDENCIES_ONLY})
+    list(APPEND CURRENT_CONFIGURATION_ARGS -DOC_DEPENDENCIES_ONLY="${OPENCMISS_DEPENDENCIES_ONLY}")
 endif ()
 
 if (NOT OPENCMISS_HAVE_MULTICONFIG_ENV)
@@ -154,71 +154,72 @@ endif ()
 
 list(APPEND CURRENT_CONFIGURATION_ARGS -DTOOLCHAIN=${OPENCMISS_TOOLCHAIN})
 list(APPEND CURRENT_CONFIGURATION_ARGS -DOPENCMISS_MPI=${OPENCMISS_MPI})
-list(APPEND CURRENT_CONFIGURATION_ARGS -DOPENCMISS_OWN_MPI_INSTALL_BASE=${OPENCMISS_OWN_MPI_INSTALL_BASE})
-list(APPEND CURRENT_CONFIGURATION_ARGS -DOPENCMISS_INSTALLATION_CACHE_FILE=${OPENCMISS_INSTALLATION_CACHE_FILE})
-list(APPEND CURRENT_CONFIGURATION_ARGS -DOPENCMISS_CMAKE_MODULE_PATH=${OPENCMISS_CMAKE_MODULE_PATH})
-list(APPEND CURRENT_CONFIGURATION_ARGS -DMANAGE_MODULE_PATH=${MANAGE_MODULE_PATH})
+list(APPEND CURRENT_CONFIGURATION_ARGS -DOPENCMISS_OWN_MPI_INSTALL_BASE="${OPENCMISS_OWN_MPI_INSTALL_BASE}")
+list(APPEND CURRENT_CONFIGURATION_ARGS -DOPENCMISS_INSTALLATION_CACHE_FILE="${OPENCMISS_INSTALLATION_CACHE_FILE}")
+list(APPEND CURRENT_CONFIGURATION_ARGS -DOPENCMISS_CMAKE_MODULE_PATH="${OPENCMISS_CMAKE_MODULE_PATH}")
+list(APPEND CURRENT_CONFIGURATION_ARGS -DMANAGE_MODULE_PATH="${MANAGE_MODULE_PATH}")
 
 string(REPLACE ";" " " CONFIGURATION_SETTINGS "${CURRENT_CONFIGURATION_ARGS}")
 # Variable used in create_config command
-set(CONFIG_PATH ${CMAKE_CURRENT_BINARY_DIR}/config${PLURAL_S}/${ARCHITECTURE_PATH_MPI})
+set(CONFIG_PATH "${CMAKE_CURRENT_BINARY_DIR}/config${PLURAL_S}/${ARCHITECTURE_PATH_MPI}")
 if (NOT OPENCMISS_HAVE_MULTICONFIG_ENV)
-    set(CONFIG_PATH ${CONFIG_PATH}/${OPENCMISS_BUILD_TYPE})
+    set(CONFIG_PATH "${CONFIG_PATH}/${OPENCMISS_BUILD_TYPE}")
 endif ()
+set(CREATE_CONFIG_STAMP_FILE "${CONFIG_PATH}/stamp/create_config.stamp")
+set(BUILD_CONFIG_STAMP_FILE "${CONFIG_PATH}/stamp/build_config.stamp")
 
 add_custom_target(usage ALL
-    COMMAND ${CMAKE_COMMAND} -E echo "Perhaps try targets: create_config, build_config, do_config or help. For other options read the documentation."
+    COMMAND "${CMAKE_COMMAND}" -E echo "Perhaps try targets: create_config, build_config, do_config or help. For other options read the documentation."
     VERBATIM
     )
 
 # Variable used in the installtion cache passed to configurations
-set(SUPPORT_DIR ${CMAKE_CURRENT_BINARY_DIR}/support)
+set(SUPPORT_DIR "${CMAKE_CURRENT_BINARY_DIR}/support")
 # Indirection for configuring variable in create_config.in.cmake
 set(DOLLAR_SYMBOL $)
 
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/Templates/OpenCMISSCache.in.cmake
-    ${OPENCMISS_INSTALLATION_CACHE_FILE})
+configure_file("${CMAKE_CURRENT_SOURCE_DIR}/Templates/OpenCMISSCache.in.cmake"
+    "${OPENCMISS_INSTALLATION_CACHE_FILE}")
 
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/Templates/create_config.in.cmake
-    ${CMAKE_CURRENT_BINARY_DIR}/Scripts/create_config.cmake)
+configure_file("${CMAKE_CURRENT_SOURCE_DIR}/Templates/create_config.in.cmake"
+    "${CMAKE_CURRENT_BINARY_DIR}/Scripts/create_config.cmake")
 
-if (NOT EXISTS ${CMAKE_CURRENT_BINARY_DIR}/stamp)
-    file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/stamp)
+if (NOT EXISTS "${CONFIG_PATH}/stamp")
+    file(MAKE_DIRECTORY "${CONFIG_PATH}/stamp")
 endif ()
 
-set(CREATE_CONFIG_STAMP_FILE ${CMAKE_CURRENT_BINARY_DIR}/stamp/create_config.stamp)
-set(BUILD_CONFIG_STAMP_FILE ${CMAKE_CURRENT_BINARY_DIR}/stamp/build_config.stamp)
 
-add_custom_command(OUTPUT ${CREATE_CONFIG_STAMP_FILE}
-    COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_BINARY_DIR}/Scripts/create_config.cmake
+add_custom_command(OUTPUT "${CREATE_CONFIG_STAMP_FILE}"
+    COMMAND "${CMAKE_COMMAND}" -P "${CMAKE_CURRENT_BINARY_DIR}/Scripts/create_config.cmake"
     )
 
 add_custom_target(create_config
-    DEPENDS ${CREATE_CONFIG_STAMP_FILE}
+    DEPENDS "${CREATE_CONFIG_STAMP_FILE}"
     )
 
-set(BUILD_CONFIG_COMMAND ${CMAKE_COMMAND} --build .)
+set(BUILD_CONFIG_COMMAND "${CMAKE_COMMAND}" --build .)
 if (OPENCMISS_HAVE_MULTICONFIG_ENV)
     list(APPEND BUILD_CONFIG_COMMAND --config $<CONFIG>)
 endif ()
 
-add_custom_command(OUTPUT ${BUILD_CONFIG_STAMP_FILE}
-    DEPENDS ${CREATE_CONFIG_STAMP_FILE}
-    COMMAND ${BUILD_CONFIG_COMMAND}
-    COMMAND ${CMAKE_COMMAND} -E touch ${BUILD_CONFIG_STAMP_FILE}
-    WORKING_DIRECTORY ${CONFIG_PATH}
+add_custom_command(OUTPUT "${BUILD_CONFIG_STAMP_FILE}"
+    DEPENDS "${CREATE_CONFIG_STAMP_FILE}"
+    COMMAND "${CMAKE_COMMAND}" -P "${CMAKE_CURRENT_BINARY_DIR}/Scripts/build_config.cmake"
+    COMMAND "${BUILD_CONFIG_COMMAND}"
+    COMMAND "${CMAKE_COMMAND}" -E touch "${BUILD_CONFIG_STAMP_FILE}"
+    WORKING_DIRECTORY "${CONFIG_PATH}"
     )
 
 add_custom_target(build_config
-    DEPENDS ${BUILD_CONFIG_STAMP_FILE}
+    DEPENDS "${BUILD_CONFIG_STAMP_FILE}"
     )
 
 add_custom_target(do_config
     DEPENDS create_config build_config
     )
 
-if (EXISTS ${CREATE_CONFIG_STAMP_FILE})
-    file(REMOVE ${CREATE_CONFIG_STAMP_FILE})
+if (EXISTS "${CREATE_CONFIG_STAMP_FILE}")
+    file(REMOVE "${CREATE_CONFIG_STAMP_FILE}")
 endif ()
 
 message(STATUS "@")
