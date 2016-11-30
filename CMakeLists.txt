@@ -173,6 +173,8 @@ add_custom_target(usage ALL
 
 # Variable used in the installtion cache passed to configurations
 set(SUPPORT_DIR ${CMAKE_CURRENT_BINARY_DIR}/support)
+# Indirection for configuring variable in create_config.in.cmake
+set(DOLLAR_SYMBOL $)
 
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/Templates/OpenCMISSCache.in.cmake
     ${OPENCMISS_INSTALLATION_CACHE_FILE})
@@ -189,7 +191,6 @@ set(BUILD_CONFIG_STAMP_FILE ${CMAKE_CURRENT_BINARY_DIR}/stamp/build_config.stamp
 
 add_custom_command(OUTPUT ${CREATE_CONFIG_STAMP_FILE}
     COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_BINARY_DIR}/Scripts/create_config.cmake
-    COMMAND ${CMAKE_COMMAND} -E touch ${CMAKE_CURRENT_BINARY_DIR}/stamp/create_config.stamp
     )
 
 add_custom_target(create_config
@@ -220,13 +221,15 @@ if (EXISTS ${CREATE_CONFIG_STAMP_FILE})
     file(REMOVE ${CREATE_CONFIG_STAMP_FILE})
 endif ()
 
-message(STATUS "@@@@@@@@@@@@@@@@@@@ SUMMARY @@@@@@@@@@@@@@@@@@@@@@@@@")
+message(STATUS "@@@@@@@@@@@@@@@@@@@@@ SUMMARY @@@@@@@@@@@@@@@@@@@@@@@")
 message(STATUS "@")
 message(STATUS "@ OPENCMISS_TOOLCHAIN: ${OPENCMISS_TOOLCHAIN}")
 message(STATUS "@ OPENCMISS_MPI: ${OPENCMISS_MPI}")
 message(STATUS "@ ARCHITECTURE_PATH_MPI: ${ARCHITECTURE_PATH_MPI}")
-message(STATUS "@ ")
+message(STATUS "@")
 message(STATUS "@ CONFIG PATH: ${CONFIG_PATH}")
 message(STATUS "@ CONFIGURATION SETTINGS: ${CONFIGURATION_SETTINGS}")
-message(STATUS "@ ")
+message(STATUS "@")
+message(STATUS "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@")
+message(STATUS "@")
 printmanagenextsteps()
