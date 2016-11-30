@@ -89,7 +89,7 @@ include(OCToolchainCompilers)
 
 ########################################################################
 # Ready to start the "build project"
-project(OpenCMISS VERSION 1.3 LANGUAGES C CXX)
+project(OpenCMISS-Manage-Configuration VERSION 1.3 LANGUAGES C CXX)
 enable_language(Fortran OPTIONAL)
 enable_testing()
 
