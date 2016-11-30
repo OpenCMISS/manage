@@ -221,6 +221,7 @@ if (EXISTS ${CREATE_CONFIG_STAMP_FILE})
     file(REMOVE ${CREATE_CONFIG_STAMP_FILE})
 endif ()
 
+message(STATUS "@")
 message(STATUS "@@@@@@@@@@@@@@@@@@@@@ SUMMARY @@@@@@@@@@@@@@@@@@@@@@@")
 message(STATUS "@")
 message(STATUS "@ OPENCMISS_TOOLCHAIN: ${OPENCMISS_TOOLCHAIN}")
