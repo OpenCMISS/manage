@@ -258,7 +258,7 @@ function(createExternalProjects COMPONENT_NAME SOURCE_DIR BINARY_DIR DEFS)
         DOWNLOAD_COMMAND ""
         
         #--Configure step-------------
-    # CONFIGURE_COMMAND "" # Do nothing remove soon
+        # CONFIGURE_COMMAND "" # Do nothing remove soon
         CMAKE_COMMAND ${CMAKE_COMMAND} --no-warn-unused-cli # disables warnings for unused cmdline options
         SOURCE_DIR ${SOURCE_DIR}
         BINARY_DIR ${BINARY_DIR}
