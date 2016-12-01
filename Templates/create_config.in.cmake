@@ -1,4 +1,7 @@
-make_directory("${CONFIG_PATH}")
+if (NOT EXISTS "${CONFIG_PATH}")
+    make_directory("${CONFIG_PATH}")
+endif ()
+
 execute_process(
     COMMAND "${CMAKE_COMMAND}" -G "${CMAKE_GENERATOR}" ${CONFIGURATION_SETTINGS} "${CMAKE_CURRENT_SOURCE_DIR}/config"
     WORKING_DIRECTORY "${CONFIG_PATH}"

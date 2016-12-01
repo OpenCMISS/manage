@@ -193,6 +193,7 @@ if (OPENCMISS_HAVE_MULTICONFIG_ENV)
 endif ()
 
 add_custom_command(OUTPUT "${CREATE_CONFIG_STAMP_FILE}"
+    DEPENDS "${CMAKE_CURRENT_BINARY_DIR}/Scripts/create_config.cmake"
     COMMAND "${CMAKE_COMMAND}" -P "${CMAKE_CURRENT_BINARY_DIR}/Scripts/create_config.cmake"
     )
 
