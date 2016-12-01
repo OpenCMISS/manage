@@ -49,8 +49,9 @@ foreach(COMPONENT ${OPENCMISS_COMPONENTS})
     elseif (OC_COMPONENTS_SYSTEM STREQUAL ALL)
         set(OC_SYSTEM_${COMPONENT} ON)
     endif ()
-    # Force "devel" branches for each component of DEVEL_ALL is set
-    if (OPENCMISS_DEVEL_ALL)
+    # Set "devel" branches for each component if DEVEL_ALL is set,
+    # but don't override any specified component branches.
+    if (OPENCMISS_DEVEL_ALL AND NOT ${COMPONENT}_BRANCH)
         set(${COMPONENT}_BRANCH devel)
     endif ()
     # Set all individual components build types to shared if the global BUILD_SHARED_LIBS is set
@@ -58,15 +59,16 @@ foreach(COMPONENT ${OPENCMISS_COMPONENTS})
         set(${COMPONENT}_SHARED ON)
     endif ()    
     if (NOT COMPONENT STREQUAL MPI) # Dont show that for MPI - have different implementations
-    	string(SUBSTRING "${COMPONENT}                  " 0 12 COMPONENT_FIXED_SIZE)
-    	string(SUBSTRING "${OC_USE_${COMPONENT}}       " 0 3 OC_USE_FIXED_SIZE)
-    	string(SUBSTRING "${OC_SYSTEM_${COMPONENT}}    " 0 3 OC_SYSTEM_FIXED_SIZE)
-    	string(SUBSTRING "${${COMPONENT}_VERSION}       " 0 7 OC_VERSION_FIXED_SIZE)
-    	string(SUBSTRING "${${COMPONENT}_SHARED}        " 0 3 OC_SHARED_FIXED_SIZE)
-    	# ${COMPONENT}_BRANCH is as good as version (this is what is effectively checked out) and will also display "devel" correctly
+        string(SUBSTRING "${COMPONENT}                  " 0 12 COMPONENT_FIXED_SIZE)
+        string(SUBSTRING "${OC_USE_${COMPONENT}}       " 0 3 OC_USE_FIXED_SIZE)
+        string(SUBSTRING "${OC_SYSTEM_${COMPONENT}}    " 0 3 OC_SYSTEM_FIXED_SIZE)
+        string(SUBSTRING "${${COMPONENT}_VERSION}       " 0 7 OC_VERSION_FIXED_SIZE)
+        string(SUBSTRING "${${COMPONENT}_SHARED}        " 0 3 OC_SHARED_FIXED_SIZE)
+        # ${COMPONENT}_BRANCH is as good as version (this is what is effectively checked out) and will also display "devel" correctly
         message(STATUS "OpenCMISS component ${COMPONENT_FIXED_SIZE}: Use ${OC_USE_FIXED_SIZE}, System search ${OC_SYSTEM_FIXED_SIZE}, Shared: ${OC_SHARED_FIXED_SIZE}, Version '${OC_VERSION_FIXED_SIZE}', Branch '${${COMPONENT}_BRANCH}')")
     endif ()
 endforeach()
+
 if (OPENCMISS_DEVEL_ALL)
     set(EXAMPLES_BRANCH devel)
     set(OC_KEYTESTS_BRANCH devel)
