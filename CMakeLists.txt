@@ -178,6 +178,11 @@ set(SUPPORT_DIR "${CMAKE_CURRENT_BINARY_DIR}/support")
 # Indirection for configuring variable in create_config.in.cmake
 set(DOLLAR_SYMBOL $)
 
+set(BUILD_CONFIG_COMMAND "${CMAKE_COMMAND}" --build .)
+if (OPENCMISS_HAVE_MULTICONFIG_ENV)
+    list(APPEND BUILD_CONFIG_COMMAND --config $<CONFIG>)
+endif ()
+
 configure_file("${CMAKE_CURRENT_SOURCE_DIR}/Templates/OpenCMISSCache.in.cmake"
     "${OPENCMISS_INSTALLATION_CACHE_FILE}")
 
@@ -186,11 +191,6 @@ configure_file("${CMAKE_CURRENT_SOURCE_DIR}/Templates/create_config.in.cmake"
 
 configure_file("${CMAKE_CURRENT_SOURCE_DIR}/Templates/build_config.in.cmake"
     "${CMAKE_CURRENT_BINARY_DIR}/Scripts/build_config.cmake")
-
-set(BUILD_CONFIG_COMMAND "${CMAKE_COMMAND}" --build .)
-if (OPENCMISS_HAVE_MULTICONFIG_ENV)
-    list(APPEND BUILD_CONFIG_COMMAND --config $<CONFIG>)
-endif ()
 
 add_custom_command(OUTPUT "${CREATE_CONFIG_STAMP_FILE}"
     DEPENDS "${CMAKE_CURRENT_BINARY_DIR}/Scripts/create_config.cmake"
