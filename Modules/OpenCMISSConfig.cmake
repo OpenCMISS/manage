@@ -49,7 +49,7 @@ foreach(COMPONENT ${OPENCMISS_COMPONENTS})
     # but don't override any specified component branches.
     if (OPENCMISS_DEVEL_ALL AND NOT ${COMPONENT}_BRANCH)
         set(${COMPONENT}_BRANCH devel)
-    else if (NOT ${COMPONENT}_BRANCH)
+    elseif (NOT ${COMPONENT}_BRANCH)
         # Set default version number branch unless e.g. IRON_BRANCH is specified
         set(${COMPONENT}_BRANCH "v${${COMPONENT}_VERSION}")
     endif ()
