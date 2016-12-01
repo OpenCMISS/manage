@@ -7,9 +7,9 @@ execute_process(
 
 if ("${DOLLAR_SYMBOL}{RESULT}" STREQUAL "0")
     exucute_process(
-        COMMAND "${CMAKE_COMMAND}" -E touch "${CMAKE_CURRENT_BINARY_DIR}/stamp/create_config.stamp"
+        COMMAND "${CMAKE_COMMAND}" -E touch "${CONFIG_PATH}/stamp/create_config.stamp"
         )
-    set(RESULT_MESSAGE "Configuration created: ${CONFIG_PATH}")
+    set(RESULT_MESSAGE "Configuration successful: ${CONFIG_PATH}")
 else ()
     set(RESULT_MESSAGE "Failed to create configuration")
 endif ()
