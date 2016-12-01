@@ -446,34 +446,6 @@ endforeach()
 option(OC_WARN_ALL "Compiler flags choices - all warnings on" YES)
 
 ##
-# OPENCMISS_<part>_INSTALL_DIR
-# ----------------------
-#
-# The root directory where all libraries, include files and cmake config files for *ALL* architectures will be installed.
-# For details on the architecture path used within :cmake:`OPENCMISS_<part>_INSTALL_DIR`, see :ref:`archpaths`.
-#
-# .. caution::
-#
-#    *Developers only* Take care whether you specify this variable in the :ref:`local configuration <localconf>` or the 
-#    :ref:`developer configuration <develconf>` file. With local configuration, you can specify *different* install roots for
-#    each architecture (if desired). Placing it in the developer config takes precedence over all local configurations and
-#    hence determines a global installation root for all build configurations.  
-#
-# .. default:: `"<OPENCMISS_ROOT>/install"`
-if (DEFINED OPENCMISS_ROOT)
-#  set(OPENCMISS_LIBRARIES_INSTALL_DIR "${OPENCMISS_ROOT}/install")
-#  set(OPENCMISS_DEPENDENCIES_INSTALL_DIR "${OPENCMISS_ROOT}/install")
-#  set(OPENCMISS_UTILITIES_INSTALL_DIR "${OPENCMISS_ROOT}/install")
-#  set(OPENCMISS_FIND_MODULES_INSTALL_DIR "${OPENCMISS_ROOT}/install")
-else ()
-# If OPENCMISS_ROOT is not defined then the independent variants are set
-#  set(OPENCMISS_LIBRARIES_INSTALL_DIR "${OPENCMISS_LIBRARIES_ROOT}/install")
-#  set(OPENCMISS_DEPENDENCIES_INSTALL_DIR "${OPENCMISS_DEPENDENCIES_ROOT}/install")
-#  set(OPENCMISS_UTILITIES_INSTALL_DIR "${OPENCMISS_UTILITIES_ROOT}/install")
-#  set(OPENCMISS_FIND_MODULES_INSTALL_DIR "${OPENCMISS_FIND_MODULES_ROOT}")
-endif ()
-
-##
 # .. _`sdk_install_dir_var`:
 #
 # OPENCMISS_SDK_INSTALL_DIR

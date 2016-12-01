@@ -5,7 +5,7 @@ execute_process(
     )
 
 if ("${DOLLAR_SYMBOL}{RESULT}" STREQUAL "0")
-    exucute_process(
+    execute_process(
         COMMAND "${CMAKE_COMMAND}" -E touch "${CONFIG_PATH}/stamp/build_config.stamp"
         )
     set(RESULT_MESSAGE "Build successful: ${CONFIG_PATH}")

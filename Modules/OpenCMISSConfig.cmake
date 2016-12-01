@@ -33,10 +33,6 @@ if (OC_DEPENDENCIES_ONLY)
     set(OC_USE_ZINC OFF)
 endif ()
 foreach(COMPONENT ${OPENCMISS_COMPONENTS})
-    # Set default version number branch unless e.g. IRON_BRANCH is specified
-    if (NOT ${COMPONENT}_BRANCH)
-        set(${COMPONENT}_BRANCH "v${${COMPONENT}_VERSION}")
-    endif ()
     
     # Force mandatory ones to be switched on
     if (${COMPONENT} IN_LIST OC_MANDATORY_COMPONENTS)
@@ -53,6 +49,9 @@ foreach(COMPONENT ${OPENCMISS_COMPONENTS})
     # but don't override any specified component branches.
     if (OPENCMISS_DEVEL_ALL AND NOT ${COMPONENT}_BRANCH)
         set(${COMPONENT}_BRANCH devel)
+    else if (NOT ${COMPONENT}_BRANCH)
+        # Set default version number branch unless e.g. IRON_BRANCH is specified
+        set(${COMPONENT}_BRANCH "v${${COMPONENT}_VERSION}")
     endif ()
     # Set all individual components build types to shared if the global BUILD_SHARED_LIBS is set
     if (BUILD_SHARED_LIBS)
