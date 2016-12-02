@@ -131,6 +131,51 @@ getToolchain(CURRENT_TOOLCHAIN)
 set(OPENCMISS_TOOLCHAIN ${CURRENT_TOOLCHAIN} CACHE STRING "Specify the toolchain mnemonic.")
 set(OPENCMISS_MPI ${OPENCMISS_MPI} CACHE STRING "Specify the MPI mnemonic")
 
+function(GET_COMPILER_PATH_FOR_TOOLCHAIN TOOLCHAIN_MNEMONIC VAR_NAME)
+
+    set(OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/CompilerPath/")
+    file(MAKE_DIRECTORY "${OUTPUT_DIRECTORY}")
+    set(OUTPUT_FILENAME "${OUTPUT_DIRECTORY}/output.txt")
+    execute_process(
+        COMMAND "${CMAKE_COMMAND}" -G "${CMAKE_GENERATOR}" -DOPENCMISS_TOOLCHAIN=${TOOLCHAIN_MNEMONIC} -DOPENCMISS_CMAKE_MODULE_PATH=${OPENCMISS_CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/ArchPath/"
+        WORKING_DIRECTORY "${OUTPUT_DIRECTORY}"
+        RESULT_VARIABLE RESULT
+        OUTPUT_FILE "${OUTPUT_FILENAME}"
+        ERROR_FILE "${OUTPUT_FILENAME}"
+        )
+
+    if ("${RESULT}" STREQUAL "0")
+        file(STRINGS "${OUTPUT_FILENAME}" OUTPUT_CONTENTS)
+
+        foreach(line ${OUTPUT_CONTENTS})
+            if ("${line}" MATCHES "COMPILER_PATH=*")
+                string(SUBSTRING "${line}" 14 -1 CREATED_COMPILER_PATH)
+                set(${VAR_NAME} ${CREATED_COMPILER_PATH} PARENT_SCOPE)
+            endif ()
+        endforeach()
+        file(REMOVE_RECURSE "${OUTPUT_DIRECTORY}")
+    else ()
+        message(STATUS "Things have gone pear shaped.")
+        set(${VAR_NAME} "<error>" PARENT_SCOPE)
+    endif ()
+endfunction()
+
+message(STATUS "Back here: ${COMPILER_PATH_CREATED}")
+
+set(ARCHITECTURE_PATH_MPI .)
+if (OPENCMISS_USE_ARCHITECTURE_PATH)
+    # Get the system part
+    getSystemPartArchitecturePath(SYSTEM_PART)
+
+    # Get the compiler part
+    get_compiler_path_for_toolchain(${OPENCMISS_TOOLCHAIN} COMPILER_PART)
+
+    # Get the MPI Part
+    getMPIPartArchitecturePath(MPI_PART)
+
+    set(ARCHITECTURE_PATH_MPI ${SYSTEM_PART}/${COMPILER_PART}/${MPI_PART})
+endif()
+
 # Checks for known issues in toolchain configuration
 include(OCToolchainChecks)
 
