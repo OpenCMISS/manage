@@ -22,17 +22,8 @@ include(OCToolchainCompilers)
 project(OpenCMISS-Manage-Configuration VERSION 1.3 LANGUAGES C CXX)
 enable_language(Fortran OPTIONAL)
 
-# Dummy functions
-function(log)
-endfunction()
-
-function(capitalise)
-endfunction()
-
-include(OCDetermineMPI)
-
 include(OCArchitecturePathFunctions)
 
-getArchitecturePath(ARCHITECTURE_NO_MPI_PATH ARCHITECTURE_MPI_PATH)
+getCompilerPartArchitecturePath(COMPILER_PART)
 
-message("ARCHITECTURE_PATH=${ARCHITECTURE_MPI_PATH}")
+message("COMPILER_PART=${COMPILER_PART}")
