@@ -57,7 +57,7 @@ if (OC_USE_ZLIB OR OC_USE_ZINC OR OC_DEPENDENCIES_ONLY)
             SCOTCH PTSCOTCH 
             MUMPS LIBXML2 HDF5 FIELDML-API
             IRON CSIM LLVM CELLML PNG
-            TIFF GDCM-ABI)
+            TIFF GDCM-ABI FREETYPE)
         addAndConfigureLocalComponent(ZLIB)
     endif ()
 endif ()
@@ -90,7 +90,7 @@ endif ()
 if (OC_USE_BZIP2 OR OC_USE_ZINC OR OC_DEPENDENCIES_ONLY)
     find_package(BZIP2 ${BZIP2_VERSION} QUIET)
     if (NOT BZIP2_FOUND)
-        SET(BZIP2_FWD_DEPS SCOTCH PTSCOTCH GDCM-ABI IMAGEMAGICK)
+        SET(BZIP2_FWD_DEPS SCOTCH PTSCOTCH GDCM-ABI IMAGEMAGICK FREETYPE)
         addAndConfigureLocalComponent(BZIP2)
     endif ()
 endif ()
