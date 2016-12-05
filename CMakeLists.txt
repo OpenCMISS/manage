@@ -111,14 +111,6 @@ include(OpenCMISSOwnMPI)
 include(OCToolchainCompilers)
 include(OCDetermineMPI)
 
-########################################################################
-# Architecture paths
-set(ARCHITECTURE_PATH_NO_MPI .)
-set(ARCHITECTURE_PATH_MPI .)
-if (OPENCMISS_USE_ARCHITECTURE_PATH)
-    getArchitecturePath(ARCHITECTURE_PATH_NO_MPI ARCHITECTURE_PATH_MPI)
-endif()
-
 # Hide some of the variables in the interface that we don't want to see.
 tidyUpVariables()
 
@@ -161,7 +153,7 @@ function(GET_COMPILER_PATH_FOR_TOOLCHAIN TOOLCHAIN_MNEMONIC VAR_NAME)
 endfunction()
 
 
-set(ARCHITECTURE_PATH_MPI .)
+set(ARCHITECTURE_PATH_MPI)
 if (OPENCMISS_USE_ARCHITECTURE_PATH)
     # Get the system part
     getSystemPartArchitecturePath(SYSTEM_PART)
@@ -172,7 +164,7 @@ if (OPENCMISS_USE_ARCHITECTURE_PATH)
     # Get the MPI Part
     getMPIPartArchitecturePath(MPI_PART)
 
-    set(ARCHITECTURE_PATH_MPI ${SYSTEM_PART}/${COMPILER_PART}/${MPI_PART})
+    set(ARCHITECTURE_PATH_MPI /${SYSTEM_PART}/${COMPILER_PART}/${MPI_PART})
 endif()
 
 # Checks for known issues in toolchain configuration
@@ -205,7 +197,7 @@ list(APPEND CURRENT_CONFIGURATION_ARGS -DMANAGE_MODULE_PATH=${MANAGE_MODULE_PATH
 
 string(REPLACE ";" " " CONFIGURATION_SETTINGS "${CURRENT_CONFIGURATION_ARGS}")
 # Variable used in create_config command
-set(CONFIG_PATH "${CMAKE_CURRENT_BINARY_DIR}/config${PLURAL_S}/${ARCHITECTURE_PATH_MPI}")
+set(CONFIG_PATH "${CMAKE_CURRENT_BINARY_DIR}/config${PLURAL_S}${ARCHITECTURE_PATH_MPI}")
 if (NOT OPENCMISS_HAVE_MULTICONFIG_ENV)
     set(CONFIG_PATH "${CONFIG_PATH}/${OPENCMISS_BUILD_TYPE}")
 endif ()

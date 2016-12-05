@@ -67,8 +67,8 @@ function(addAndConfigureLocalComponent COMPONENT_NAME)
     # so that the local FindMPI uses that
     if(${COMPONENT_NAME} IN_LIST OPENCMISS_COMPONENTS_WITHMPI)
         # Pass on settings and take care to undefine them if no longer used at this level
-        if (MPI)
-            list(APPEND COMPONENT_DEFS -DMPI=${MPI})
+        if (OPENCMISS_MPI)
+            list(APPEND COMPONENT_DEFS -DMPI=${OPENCMISS_MPI})
         else()
             list(APPEND COMPONENT_DEFS -UMPI)
         endif()
