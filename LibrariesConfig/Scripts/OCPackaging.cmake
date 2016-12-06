@@ -57,17 +57,17 @@ set(PACKAGE_TYPE "opencmiss")
 set(PACKAGE_NAME_BASE "OpenCMISS_${OpenCMISS_VERSION}")
 set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "OpenCMISS Summary")
 set(INSTALL_QUADS 
-    "${IRON_BINARY_DIR}" "Iron Runtime" Runtime "/${ARCHITECTURE_PATH_MPI}"
-    "${IRON_BINARY_DIR}" "Iron C bindings" CBindings "/${ARCHITECTURE_PATH_MPI}"
-    "${IRON_BINARY_DIR}" "Iron Python bindings" PythonBindings "/${ARCHITECTURE_PATH_MPI}"
-    "${ZINC_BINARY_DIR}" "Zinc Runtime" Runtime "/${ARCHITECTURE_PATH_MPI}"
-    "${ZINC_BINARY_DIR}" "Zinc Python bindings" PythonBindings "/${ARCHITECTURE_PATH}"
+    "${IRON_BINARY_DIR}" "Iron Runtime" Runtime "${ARCHITECTURE_MPI_PATH}"
+    "${IRON_BINARY_DIR}" "Iron C bindings" CBindings "${ARCHITECTURE_MPI_PATH}"
+    "${IRON_BINARY_DIR}" "Iron Python bindings" PythonBindings "${ARCHITECTURE_MPI_PATH}"
+    "${ZINC_BINARY_DIR}" "Zinc Runtime" Runtime "${ARCHITECTURE_MPI_PATH}"
+    "${ZINC_BINARY_DIR}" "Zinc Python bindings" PythonBindings "${ARCHITECTURE_NO_MPI_PATH}"
     "${PROJECT_BINARY_DIR}" "OpenCMISS Runtime files" Runtime /
 )
 # This component is a install step that bundles dependent DLLs into the binary directory.
 if (WIN32)
     list(APPEND INSTALL_QUADS
-        "${IRON_BINARY_DIR}" "OpenCMISS dependance DLLs" Redist "/${ARCHITECTURE_PATH_MPI}"
+        "${IRON_BINARY_DIR}" "OpenCMISS dependance DLLs" Redist "${ARCHITECTURE_MPI_PATH}"
     )
 endif()
 CREATE_PACKAGING_TARGET()
@@ -78,8 +78,8 @@ set(PACKAGE_TYPE "usersdk")
 set(PACKAGE_NAME_BASE "OpenCMISS_${OpenCMISS_VERSION}_UserSDK")
 set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "OpenCMISS User SDK Summary")
 list(APPEND INSTALL_QUADS 
-    "${IRON_BINARY_DIR}" "Iron Development" Development "/${ARCHITECTURE_PATH_MPI}"
-    "${ZINC_BINARY_DIR}" "Zinc Development" Development "/${ARCHITECTURE_PATH}"
+    "${IRON_BINARY_DIR}" "Iron Development" Development "${ARCHITECTURE_MPI_PATH}"
+    "${ZINC_BINARY_DIR}" "Zinc Development" Development "${ARCHITECTURE_NO_MPI_PATH}"
     "${PROJECT_BINARY_DIR}" "OpenCMISS Development" Development /
     "${PROJECT_BINARY_DIR}" "Additional User SDK files" UserSDK /
 )
@@ -98,9 +98,9 @@ set(INSTALL_QUADS
 foreach(COMP ${_OC_SELECTED_COMPONENTS})
     if (NOT COMP STREQUAL IRON AND NOT COMP STREQUAL ZINC)
         if (${COMP} IN_LIST OPENCMISS_COMPONENTS_WITHMPI)
-            list(APPEND INSTALL_QUADS "${${COMP}_BINARY_DIR}" ${COMP} ALL "/${ARCHITECTURE_PATH_MPI}")
+            list(APPEND INSTALL_QUADS "${${COMP}_BINARY_DIR}" ${COMP} ALL "${ARCHITECTURE_MPI_PATH}")
         else()
-            list(APPEND INSTALL_QUADS "${${COMP}_BINARY_DIR}" ${COMP} ALL "/${ARCHITECTURE_PATH}")
+            list(APPEND INSTALL_QUADS "${${COMP}_BINARY_DIR}" ${COMP} ALL "${ARCHITECTURE_NO_MPI_PATH}")
         endif()
     endif()
 endforeach()

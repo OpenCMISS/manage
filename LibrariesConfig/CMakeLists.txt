@@ -196,8 +196,8 @@ getBuildTypePathElem(BUILD_TYPE_PATH_ELEM)
 message(STATUS "BUILD_TYPE_PATH_ELEM: ${BUILD_TYPE_PATH_ELEM}")
 
 # Second architecture path for configuration passed in through command line
-set(ARCHITECTURE_NO_MPI_PATH ${ARCH_PATH_NO_MPI})
-set(ARCHITECTURE_MPI_PATH ${ARCH_PATH_MPI})
+set(ARCHITECTURE_NO_MPI_PATH ${ARCH_NO_MPI_PATH})
+set(ARCHITECTURE_MPI_PATH ${ARCH_MPI_PATH})
 
 include(${OPENCMISS_ROOTS_FILE})
 
