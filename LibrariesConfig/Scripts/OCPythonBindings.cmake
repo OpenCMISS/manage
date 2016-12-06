@@ -49,12 +49,12 @@ if (IRON_WITH_Python_BINDINGS OR ZINC_WITH_Python_BINDINGS)
             set(ACTIVATE_SCRIPT ${OPENCMISS_LIBRARIES_INSTALL_MPI_PREFIX}/${OC_VIRTUALENV_SUBPATH}/${_SCRIPT_DIR}/activate)
         endif()
         configure_file(
-            "${MANAGE_MODULE_PATH}/Templates/python_virtualenv.in.py"
+            "${CMAKE_CURRENT_SOURCE_DIR}/Templates/python_virtualenv.in.py"
             "${VIRTUALENV_INFO_FILE}" 
             @ONLY
         )
         configure_file(
-            "${MANAGE_MODULE_PATH}/Templates/opencmiss.bindings.in.py"
+            "${CMAKE_CURRENT_SOURCE_DIR}/Templates/opencmiss.bindings.in.py"
             "${VIRTUALENV_OPENCMISS_LIBRARIES_FILE}" COPYONLY)
 
     endfunction()

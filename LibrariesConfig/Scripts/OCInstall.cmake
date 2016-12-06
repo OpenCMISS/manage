@@ -110,7 +110,7 @@ if (NOT OC_DEFAULT_MPI_BUILD_TYPE)
 endif()
 
 # There's litte to configure yet, but could become more
-configure_file(${MANAGE_MODULE_PATH}/Templates/opencmiss-config.cmake
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/Templates/opencmiss-config.cmake
  ${CMAKE_CURRENT_BINARY_DIR}/export/opencmiss-config.cmake @ONLY
 )
 # Version file
@@ -139,7 +139,7 @@ endif()
 # Additional User SDK files
 set(USERSDK_RESOURCE_DIR Resources)
 # Add the OpenCMISS.cmake file to the UserSDK - it is a tool to help find the correct installation paths.
-install(FILES ${MANAGE_MODULE_PATH}/Packaging/OpenCMISS.cmake
+install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/Packaging/OpenCMISS.cmake
     DESTINATION ${USERSDK_RESOURCE_DIR} COMPONENT UserSDK)
     
 # Add the OpenCMISS.cmake file to the UserSDK - it is a tool to help find the correct installation paths.

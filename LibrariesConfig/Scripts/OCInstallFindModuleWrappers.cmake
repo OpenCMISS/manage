@@ -45,7 +45,7 @@ foreach(PACKAGE_NAME ${PACKAGES_WITH_TARGETS})
         string(REPLACE "-" "_" _HLP ${PACKAGE_TARGET})
         set(MESSAGE "my_stupid_package_dependent_message_function_${_HLP}")
         set(DEBUG_MESSAGE "my_stupid_package_dependent_message_function_debug_${_HLP}")
-        configure_file("${MANAGE_MODULE_PATH}/Templates/FindXXX.template.cmake" "${FILE}" @ONLY)
+        configure_file("${CMAKE_CURRENT_SOURCE_DIR}/Templates/FindXXX.template.cmake" "${FILE}" @ONLY)
     #endif()
 endforeach()
 
