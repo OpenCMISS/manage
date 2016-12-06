@@ -94,8 +94,8 @@ enable_language(Fortran OPTIONAL)
 enable_testing()
 
 list(APPEND CMAKE_MODULE_PATH
-    ${MANAGE_MODULE_PATH}/Modules
-    ${MANAGE_MODULE_PATH}/Scripts
+    ${CMAKE_CURRENT_SOURCE_DIR}/Modules
+    ${CMAKE_CURRENT_SOURCE_DIR}/Scripts
     )
 
 # Pre-check for Python and Swig availability so that bindings will be built automatically (unless explicitly specified)
@@ -195,12 +195,9 @@ endif ()
 getBuildTypePathElem(BUILD_TYPE_PATH_ELEM)
 message(STATUS "BUILD_TYPE_PATH_ELEM: ${BUILD_TYPE_PATH_ELEM}")
 
-# Second architecture path for configuration
-set(ARCHITECTURE_NO_MPI_PATH .)
-set(ARCHITECTURE_MPI_PATH .)
-if (OPENCMISS_USE_ARCHITECTURE_PATH)
-    getArchitecturePath(ARCHITECTURE_NO_MPI_PATH ARCHITECTURE_MPI_PATH)
-endif ()
+# Second architecture path for configuration passed in through command line
+set(ARCHITECTURE_NO_MPI_PATH ${ARCH_PATH_NO_MPI})
+set(ARCHITECTURE_MPI_PATH ${ARCH_PATH_MPI})
 
 include(${OPENCMISS_ROOTS_FILE})
 
@@ -249,7 +246,7 @@ endif()
 ######################
 # Checks if conditions for a sdk/central installation of opencmiss are given and augments the prefix path
 # by a matching remote one
-# If the according remote directory does not exist or any package is not build there, it will be built
+# If the according remote directory does not exist or any package is not built there, it will be built
 # locally.
 include(OCCheckSDKInstallation)
 
