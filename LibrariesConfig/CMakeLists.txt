@@ -258,10 +258,6 @@ include(OCCollectComponentDefinitions)
 SET(_OC_SELECTED_COMPONENTS )
 
 ########################################################################
-# Python binding stuff
-include(OCPythonBindings)
-
-########################################################################
 # Support - get help!
 include(OCSupport)
 
