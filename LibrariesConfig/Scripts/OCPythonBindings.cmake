@@ -16,9 +16,18 @@ if (IRON_WITH_Python_BINDINGS OR ZINC_WITH_Python_BINDINGS)
         endif()
         set(OC_VIRTUALENV_SUBPATH "virtual_environments")
     endif()
-    
+
+    set(VIRTUALENV_OPENCMISS_LIBRARIES_FILE ${_OC_PYTHON_INSTALL_PREFIX}/opencmisslibraries.py)
+    # Technically this should be configured into the build directory and installed
+    configure_file(
+        "${CMAKE_CURRENT_SOURCE_DIR}/Templates/opencmiss.bindings.in.py"
+        "${VIRTUALENV_OPENCMISS_LIBRARIES_FILE}" COPYONLY
+    )
+
+    # Compiler variable used inside configured file
+    getCompilerPartArchitecturePath(COMPILER)
+
     function(genBindingInfoFile BTYPE)
-        # _OC_PYTHON_INSTALL_PREFIX is defined in OCPaths.cmake
         if (NOT EXISTS "${_OC_PYTHON_INSTALL_PREFIX}")
           file(MAKE_DIRECTORY ${_OC_PYTHON_INSTALL_PREFIX})
         endif ()
@@ -27,12 +36,11 @@ if (IRON_WITH_Python_BINDINGS OR ZINC_WITH_Python_BINDINGS)
             string(REPLACE "/" "_" _APATH "${ARCHITECTURE_MPI_PATH}")
             string(REPLACE "." "_" _APATH "${_APATH}")
             string(REPLACE "-" "_" _APATH "${_APATH}")
+            set(VIRTUALENV_INFO_FILE_STEM "${_OC_PYTHON_INSTALL_PREFIX}/bindings_${_APATH}_")
             set(VIRTUALENV_INFO_FILE ${_OC_PYTHON_INSTALL_PREFIX}/bindings_${_APATH}_${BTYPE}.py)
         else ()
-            set(VIRTUALENV_INFO_FILE ${_OC_PYTHON_INSTALL_PREFIX}/bindings.py)
+            set(VIRTUALENV_INFO_FILE ${_OC_PYTHON_INSTALL_PREFIX}/bindings_${BTYPE}.py)
         endif ()
-        set(VIRTUALENV_OPENCMISS_LIBRARIES_FILE ${_OC_PYTHON_INSTALL_PREFIX}/opencmisslibraries.py)
-        getCompilerPartArchitecturePath(COMPILER)
         string(TOLOWER ${OPENCMISS_MPI_BUILD_TYPE} OPENCMISS_MPI_BUILD_TYPE)
         set(LIBRARY_PATH )
         foreach(_PATH ${OPENCMISS_LIBRARY_PATH})
@@ -47,16 +55,15 @@ if (IRON_WITH_Python_BINDINGS OR ZINC_WITH_Python_BINDINGS)
                 set(_SCRIPT_DIR Scripts)
             endif ()
             set(ACTIVATE_SCRIPT ${OPENCMISS_LIBRARIES_INSTALL_MPI_PREFIX}/${OC_VIRTUALENV_SUBPATH}/${_SCRIPT_DIR}/activate)
+            if (WIN32)
+                file(TO_NATIVE_PATH "${ACTIVATE_SCRIPT}" ACTIVATE_SCRIPT)
+            endif ()
         endif()
         configure_file(
             "${CMAKE_CURRENT_SOURCE_DIR}/Templates/python_virtualenv.in.py"
             "${VIRTUALENV_INFO_FILE}" 
             @ONLY
         )
-        configure_file(
-            "${CMAKE_CURRENT_SOURCE_DIR}/Templates/opencmiss.bindings.in.py"
-            "${VIRTUALENV_OPENCMISS_LIBRARIES_FILE}" COPYONLY)
-
     endfunction()
     
     set(VENV_CREATION_COMMANDS )
@@ -84,6 +91,7 @@ if (IRON_WITH_Python_BINDINGS OR ZINC_WITH_Python_BINDINGS)
         
         if (OC_PYTHON_BINDINGS_USE_VIRTUALENV)
             set(VENV_CREATION_COMMANDS COMMAND ${VIRTUALENV_EXECUTABLE} --system-site-packages "${OC_TARGET_VIRTUALENV}")
+            set(VENV_BINDING_INFO_COMMAND COMMAND "${CMAKE_COMMAND}" -E copy_if_different ""
         endif()
     endif()
     
