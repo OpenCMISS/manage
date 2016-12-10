@@ -108,7 +108,7 @@ The detection is done simply via looking if the according folder contains a :pat
 This is far from ideal, but a quick way to see what’s working and what not.
 
 .. This adds in the buildlog documentation
-.. cmake-source:: ../../CMakeScripts/OCMiscFunctionsMacros.cmake
+.. cmake-source:: ../../CMakeScripts/OCMiscFunctions.cmake
 
 .. _`keytests`:
 

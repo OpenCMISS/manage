@@ -109,7 +109,9 @@ if (PYTHONINTERP_FOUND AND PYTHONLIBS_FOUND AND SWIG_FOUND)
 else()
     set(OC_PYTHON_PREREQ_FOUND NO)
 endif()
-    
+
+set_property(GLOBAL PROPERTY USE_FOLDERS ON)
+
 # Utilities and external packages
 include(ExternalProject)
 include(OCComponentSetupMacros)
@@ -123,7 +125,7 @@ include(OCMultiConfigEnvironment)
 include(OCPaths)
 
 # Intrdouce miscellaneous helper functions and macros
-include(OCMiscFunctionsMacros)
+include(OCMiscFunctions)
 
 # Create a local config file if it does not exist
 include(OCCreateLocalConfig)
@@ -210,6 +212,10 @@ include(OCBuildMPI)
 # Needs to be after MPI config as the mnemonic is used inside that script, too
 include(OCToolchainFlags)
 
+#
+# Set virtualenv install prefix
+set(OCL_VIRTUALENV_INSTALL_PREFIX "${OPENCMISS_LIBRARIES_INSTALL_MPI_PREFIX}/virtual_environments")
+
 ######################
 # The COMMON_PACKAGE_CONFIG_DIR contains the cmake-generated target config files consumed by find_package(... CONFIG).
 # Those are "usually" placed under the lib/ folders of the installation tree, however, the OpenCMISS build system
@@ -267,7 +273,7 @@ include(OCSupport)
 include(OCConfigureComponents)
 
 ########################################################################
-# Installation and support
+# Installation and packaging
 include(OCInstall)
 include(OCPackaging)
 
@@ -296,4 +302,22 @@ endif()
 message(STATUS "@")
 printnextsteps()
 
+function(printnextsteps)
+    message(STATUS "@@@@@@@@@@@@@@@@@@@ NEXT STEPS @@@@@@@@@@@@@@@@@@@@@@")
+    message(STATUS "@")
+    message(STATUS "@ - Change ${OPENCMISS_LOCALCONFIG} according to your setup/needs")
+    if (DEFINED EVIL)
+        message(STATUS "@ - Change ${CMAKE_CURRENT_SOURCE_DIR}/OpenCMISSInstallationConfig.cmake according to your developing setup/needs (Overrides anything in OpenCMISSLocalConfig!)")
+    endif()
+    message(STATUS "@ - Build the 'opencmiss' target (e.g. '${CMAKE_MAKE_PROGRAM} opencmiss') to start the build process")
+    message(STATUS "@")
+    message(STATUS "@ Having trouble? Follow the galaxy hitchhiker's advice:")
+    message(STATUS "@ DONT PANIC ... and:")
+    message(STATUS "@ - Refer to http://staging.opencmiss.org/documentation/cmake/docs/config/index.html for customization instructions")
+    message(STATUS "@ - Build the 'support' target to get help! (e.g. '${CMAKE_MAKE_PROGRAM} support')")
+    message(STATUS "@")
+    message(STATUS "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@")
+endfunction()
+
 log("Finished configuration in ${CMAKE_CURRENT_BINARY_DIR}")
+

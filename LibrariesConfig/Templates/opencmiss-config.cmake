@@ -249,7 +249,7 @@ unset(BUILDTYPE_SUFFIX)
 #################################################################################
 # Extra functions to use within CMake-enabled OpenCMISS applications and examples
 
- # Composes a native PATH-compatible variable to use for DLL/SO finding.
+# Composes a native PATH-compatible variable to use for DLL/SO finding.
 # Each extra argument is assumed a path to add. Added in the order specified.
 function(get_library_path OUTPUT_VARIABLE)
     if (WIN32)
