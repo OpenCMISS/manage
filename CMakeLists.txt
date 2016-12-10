@@ -277,7 +277,7 @@ message(STATUS "@ CONFIGURATION SETTINGS: ${CONFIGURATION_SETTINGS}")
 message(STATUS "@")
 message(STATUS "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@")
 message(STATUS "@")
-printinextsteps()
+printnextsteps()
 
 function(printnextsteps)
     message(STATUS "@")
