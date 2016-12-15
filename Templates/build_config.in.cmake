@@ -1,4 +1,5 @@
 execute_process(
+    COMMAND "${CMAKE_COMMAND}" -E remove "${CONFIG_PATH}/stamp/build_config.stamp"
     COMMAND ${BUILD_CONFIG_COMMAND}
     WORKING_DIRECTORY "${CONFIG_PATH}"
     RESULT_VARIABLE RESULT
