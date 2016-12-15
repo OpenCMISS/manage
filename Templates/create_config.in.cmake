@@ -10,6 +10,7 @@ execute_process(
 
 if ("${DOLLAR_SYMBOL}{RESULT}" STREQUAL "0")
     execute_process(
+        COMMAND "${CMAKE_COMMAND}" -E make_directory "${CONFIG_PATH}/stamp"
         COMMAND "${CMAKE_COMMAND}" -E touch "${CONFIG_PATH}/stamp/create_config.stamp"
         )
     set(RESULT_MESSAGE "Configuration successful: ${CONFIG_PATH}")

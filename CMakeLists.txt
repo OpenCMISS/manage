@@ -249,17 +249,17 @@ add_custom_target(create_config
     )
 
 add_custom_command(OUTPUT "${BUILD_CONFIG_STAMP_FILE}"
-    DEPENDS "${CREATE_CONFIG_STAMP_FILE}"
     COMMAND "${CMAKE_COMMAND}" -P "${CMAKE_CURRENT_BINARY_DIR}/Scripts/build_config.cmake"
     )
 
 add_custom_target(build_config
     DEPENDS "${BUILD_CONFIG_STAMP_FILE}"
     )
+add_dependencies(build_config create_config)
 
 add_custom_target(do_config
-    DEPENDS create_config build_config
     )
+add_dependencies(do_config create_config build_config)
 
 if (EXISTS "${CREATE_CONFIG_STAMP_FILE}")
     file(REMOVE "${CREATE_CONFIG_STAMP_FILE}")
