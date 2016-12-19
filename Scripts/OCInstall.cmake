@@ -69,10 +69,10 @@ set(EXPORT_VARS
 )
 
 # Add the build type if on single-config platform
-if (DEFINED CMAKE_BUILD_TYPE AND NOT "" STREQUAL CMAKE_BUILD_TYPE)
+if (NOT OPENCMISS_HAVE_MULTICONFIG_ENV)
     set(OPENCMISS_BUILD_TYPE ${CMAKE_BUILD_TYPE})
     list(APPEND EXPORT_VARS OPENCMISS_BUILD_TYPE)
-endif()
+endif ()
 
 # Export component info
 foreach(COMPONENT ${OPENCMISS_COMPONENTS})

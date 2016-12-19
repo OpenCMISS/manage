@@ -3,6 +3,8 @@ if (NOT EXISTS "${CONFIG_PATH}")
 endif ()
 
 execute_process(
+    COMMAND "${CMAKE_COMMAND}" -E remove "${DOLLAR_SYMBOL}{STAMP_FILE}"
+    COMMAND "${CMAKE_COMMAND}" -E remove "${DOLLAR_SYMBOL}{BUILD_STAMP_FILE}"
     COMMAND "${CMAKE_COMMAND}" -G "${CMAKE_GENERATOR}" ${CONFIGURATION_SETTINGS} "${CMAKE_CURRENT_SOURCE_DIR}/LibrariesConfig"
     WORKING_DIRECTORY "${CONFIG_PATH}"
     RESULT_VARIABLE RESULT
@@ -11,7 +13,7 @@ execute_process(
 if ("${DOLLAR_SYMBOL}{RESULT}" STREQUAL "0")
     execute_process(
         COMMAND "${CMAKE_COMMAND}" -E make_directory "${CONFIG_PATH}/stamp"
-        COMMAND "${CMAKE_COMMAND}" -E touch "${CONFIG_PATH}/stamp/create_config.stamp"
+        COMMAND "${CMAKE_COMMAND}" -E touch "${DOLLAR_SYMBOL}{STAMP_FILE}"
         )
     set(RESULT_MESSAGE "Configuration successful: ${CONFIG_PATH}")
 else ()

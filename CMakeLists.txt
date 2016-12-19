@@ -9,6 +9,10 @@ project(OpenCMISS-Manage VERSION 1.0.0 LANGUAGES C CXX)
 enable_language(Fortran OPTIONAL)
 enable_testing()
 
+set(OpenCMISS_MAJOR_VERSION 0)
+set(OpenCMISS_MINOR_VERSION 1)
+set(OpenCMISS_PATCH_VERSION 0)
+set(OpenCMISS_VERSION ${OpenCMISS_MAJOR_VERSION}.${OpenCMISS_MINOR_VERSION}.${OpenCMISS_PATCH_VERSION})
 # This is the support email for general enquiries and support about building opencmiss using the new CMake system.
 set(OPENCMISS_BUILD_SUPPORT_EMAIL "users@opencmiss.org")
 
@@ -60,6 +64,7 @@ endif ()
 # OPENCMISS_CMAKE_MODULE_PATH must be set
 set(OPENCMISS_CMAKE_MODULE_PATH "${OPENCMISS_CMAKE_MODULE_PATH}" CACHE PATH "Location of the OpenCMISS CMake modules.")
 
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/Scripts")
 list(APPEND CMAKE_MODULE_PATH "${OPENCMISS_CMAKE_MODULE_PATH}/Modules")
 list(APPEND CMAKE_MODULE_PATH "${OPENCMISS_CMAKE_MODULE_PATH}/Modules/OpenCMISS")
 
@@ -73,6 +78,7 @@ endif ()
 include(OCArchitecturePathFunctions)
 include(OCMiscFunctions)
 include(OCMultiConfigEnvironment)
+include(OpenCMISSRoots)
 
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
@@ -154,27 +160,28 @@ function(GET_COMPILER_PATH_FOR_TOOLCHAIN TOOLCHAIN_MNEMONIC VAR_NAME)
 endfunction()
 
 
-set(ARCHITECTURE_MPI_PATH)
-set(ARCHITECTURE_NO_MPI_PATH)
-if (OPENCMISS_USE_ARCHITECTURE_PATH)
-    # Get the system part
-    getSystemPartArchitecturePath(SYSTEM_PART)
+# Get the system part
+getSystemPartArchitecturePath(SYSTEM_PART)
 
-    # Get the compiler part
-    get_compiler_path_for_toolchain(${OPENCMISS_TOOLCHAIN} COMPILER_PART)
+# Get the compiler part
+get_compiler_path_for_toolchain(${OPENCMISS_TOOLCHAIN} COMPILER_PART)
 
-    # Get the MPI Part
-    getMPIPartArchitecturePath(MPI_PART)
+# Get the MPI Part
+getMPIPartArchitecturePath(MPI_PART)
 
-    # User part
-    if (OPENCMISS_USER_PATH_ARCHITECTURE_PATH)
-        file(TO_CMAKE_PATH OPENCMISS_USER_PATH_ARCHITECTURE_PATH_WITH_SLASH ${OPENCMISS_USER_PATH_ARCHITECTURE_PATH})
-        if (NOT "OPENCMISS_USER_PATH_ARCHITECTURE_PATH_WITH_SLASH" MATCHES "^/")
-            set(OPENCMISS_USER_PATH_ARCHITECTURE_PATH_WITH_SLASH /${OPENCMISS_USER_PATH_ARCHITECTURE_PATH_WITH_SLASH})
-        endif ()
+# User part
+if (OPENCMISS_USER_PATH_ARCHITECTURE_PATH)
+    file(TO_CMAKE_PATH OPENCMISS_USER_PATH_ARCHITECTURE_PATH_WITH_SLASH ${OPENCMISS_USER_PATH_ARCHITECTURE_PATH})
+    if (NOT "OPENCMISS_USER_PATH_ARCHITECTURE_PATH_WITH_SLASH" MATCHES "^/")
+        set(OPENCMISS_USER_PATH_ARCHITECTURE_PATH_WITH_SLASH /${OPENCMISS_USER_PATH_ARCHITECTURE_PATH_WITH_SLASH})
     endif ()
-    set(ARCHITECTURE_MPI_PATH /${SYSTEM_PART}/${COMPILER_PART}${OPENCMISS_USER_PATH_ARCHITECTURE_PATH_WITH_SLASH}/${MPI_PART})
-    set(ARCHITECTURE_NO_MPI_PATH /${SYSTEM_PART}/${COMPILER_PART}${OPENCMISS_USER_PATH_ARCHITECTURE_PATH_WITH_SLASH}/no_mpi)
+endif ()
+set(ARCHITECTURE_MPI_PATH /${SYSTEM_PART}/${COMPILER_PART}${OPENCMISS_USER_PATH_ARCHITECTURE_PATH_WITH_SLASH}/${MPI_PART})
+set(ARCHITECTURE_NO_MPI_PATH /${SYSTEM_PART}/${COMPILER_PART}${OPENCMISS_USER_PATH_ARCHITECTURE_PATH_WITH_SLASH}/no_mpi)
+
+if (OPENCMISS_USE_ARCHITECTURE_PATH)
+    set(ACTIVE_ARCHITECTURE_MPI_PATH ${ARCHITECTURE_MPI_PATH})
+    set(ACTIVE_ARCHITECTURE_NO_MPI_PATH ${ARCHITECTURE_NO_MPI_PATH})
 endif()
 
 # Checks for known issues in toolchain configuration
@@ -203,31 +210,45 @@ list(APPEND CURRENT_CONFIGURATION_ARGS -DOPENCMISS_MPI=${OPENCMISS_MPI})
 list(APPEND CURRENT_CONFIGURATION_ARGS -DOPENCMISS_OWN_MPI_INSTALL_BASE=${OPENCMISS_OWN_MPI_INSTALL_BASE})
 list(APPEND CURRENT_CONFIGURATION_ARGS -DOPENCMISS_INSTALLATION_CACHE_FILE=${OPENCMISS_INSTALLATION_CACHE_FILE})
 list(APPEND CURRENT_CONFIGURATION_ARGS -DOPENCMISS_CMAKE_MODULE_PATH=${OPENCMISS_CMAKE_MODULE_PATH})
-list(APPEND CURRENT_CONFIGURATION_ARGS -DARCH_MPI_PATH=${ARCHITECTURE_MPI_PATH})
-list(APPEND CURRENT_CONFIGURATION_ARGS -DARCH_NO_MPI_PATH=${ARCHITECTURE_NO_MPI_PATH})
+list(APPEND CURRENT_CONFIGURATION_ARGS -DARCH_MPI_PATH=${ACTIVE_ARCHITECTURE_MPI_PATH})
+list(APPEND CURRENT_CONFIGURATION_ARGS -DARCH_NO_MPI_PATH=${ACTIVE_ARCHITECTURE_NO_MPI_PATH})
 
 string(REPLACE ";" " " CONFIGURATION_SETTINGS "${CURRENT_CONFIGURATION_ARGS}")
 # Variable used in create_config command
-set(CONFIG_PATH "${CMAKE_CURRENT_BINARY_DIR}/config${PLURAL_S}${ARCHITECTURE_MPI_PATH}")
+set(CONFIG_PATH "${CMAKE_CURRENT_BINARY_DIR}/config${PLURAL_S}${ACTIVE_ARCHITECTURE_MPI_PATH}")
 if (NOT OPENCMISS_HAVE_MULTICONFIG_ENV)
     set(CONFIG_PATH "${CONFIG_PATH}/${OPENCMISS_BUILD_TYPE}")
 endif ()
 set(CREATE_CONFIG_STAMP_FILE "${CONFIG_PATH}/stamp/create_config.stamp")
-set(BUILD_CONFIG_STAMP_FILE "${CONFIG_PATH}/stamp/build_config.stamp")
-
 add_custom_target(usage ALL
     COMMAND "${CMAKE_COMMAND}" -E echo "Perhaps try targets: create_config, build_config, do_config or help. For other options read the documentation."
     VERBATIM
-    )
+)
 
 # Variable used in the installtion cache passed to configurations
 set(SUPPORT_DIR "${CMAKE_CURRENT_BINARY_DIR}/support")
 # Indirection for configuring variable in create_config.in.cmake
 set(DOLLAR_SYMBOL $)
 
+# Installation of general opencmiss configuration helper scripts.
+# TODO: Come back and make this install config work.
+#include(OCInstall)
+
+# Packaging, creating SDKs etc.
+include(OCPackaging)
+
 set(BUILD_CONFIG_COMMAND "${CMAKE_COMMAND}" --build .)
 if (OPENCMISS_HAVE_MULTICONFIG_ENV)
-    list(APPEND BUILD_CONFIG_COMMAND --config Release)
+    list(APPEND BUILD_CONFIG_COMMAND --config $<CONFIG>)
+    set(BUILD_CONFIG_STAMP_FILES)
+    foreach(_possible_config ${CMAKE_CONFIGURATION_TYPES})
+        list(APPEND BUILD_CONFIG_STAMP_FILES "${CONFIG_PATH}/${_possible_config}/stamp/build_config.stamp")
+    endforeach()
+    set(BUILD_CONFIG_STAMP_FILE "${CONFIG_PATH}/$<CONFIG>/stamp/build_config.stamp")
+else ()
+    set(BUILD_CONFIG_STAMP_FILE "${CONFIG_PATH}/stamp/build_config.stamp")
+    set(BUILD_CONFIG_STAMP_FILES ${BUILD_CONFIG_STAMP_FILE})
+    string(TOLOWER ${OPENCMISS_BUILD_TYPE} SINGLE_CONFIG_BUILD_TYPE)
 endif ()
 
 configure_file("${CMAKE_CURRENT_SOURCE_DIR}/Templates/OpenCMISSCache.in.cmake"
@@ -241,19 +262,21 @@ configure_file("${CMAKE_CURRENT_SOURCE_DIR}/Templates/build_config.in.cmake"
 
 add_custom_command(OUTPUT "${CREATE_CONFIG_STAMP_FILE}"
     DEPENDS "${CMAKE_CURRENT_BINARY_DIR}/Scripts/create_config.cmake"
-    COMMAND "${CMAKE_COMMAND}" -P "${CMAKE_CURRENT_BINARY_DIR}/Scripts/create_config.cmake"
+    COMMAND "${CMAKE_COMMAND}" -DSTAMP_FILE="${CREATE_CONFIG_STAMP_FILE}" -DBUILD_STAMP_FILE="${BUILD_CONFIG_STAMP_FILE}" -P "${CMAKE_CURRENT_BINARY_DIR}/Scripts/create_config.cmake"
     )
 
 add_custom_target(create_config
     DEPENDS "${CREATE_CONFIG_STAMP_FILE}"
     )
 
-add_custom_command(OUTPUT "${BUILD_CONFIG_STAMP_FILE}"
-    COMMAND "${CMAKE_COMMAND}" -P "${CMAKE_CURRENT_BINARY_DIR}/Scripts/build_config.cmake"
+string(REPLACE ";" "-<semi-colon>-" BUILD_CONFIG_COMMAND_TMP "${BUILD_CONFIG_COMMAND}")
+add_custom_command(OUTPUT "${BUILD_CONFIG_STAMP_FILES}"
+    DEPENDS "${CMAKE_CURRENT_BINARY_DIR}/Scripts/build_config.cmake"
+    COMMAND "${CMAKE_COMMAND}" -DBUILD_COMMAND="${BUILD_CONFIG_COMMAND_TMP}" -DSTAMP_FILE="${BUILD_CONFIG_STAMP_FILE}" -P "${CMAKE_CURRENT_BINARY_DIR}/Scripts/build_config.cmake"
     )
 
 add_custom_target(build_config
-    DEPENDS "${BUILD_CONFIG_STAMP_FILE}"
+    DEPENDS "${BUILD_CONFIG_STAMP_FILES}"
     )
 add_dependencies(build_config create_config)
 
@@ -270,7 +293,7 @@ message(STATUS "@@@@@@@@@@@@@@@@@@@@@ SUMMARY @@@@@@@@@@@@@@@@@@@@@@@")
 message(STATUS "@")
 message(STATUS "@ OPENCMISS_TOOLCHAIN: ${OPENCMISS_TOOLCHAIN}")
 message(STATUS "@ OPENCMISS_MPI: ${OPENCMISS_MPI}")
-message(STATUS "@ ARCHITECTURE_MPI_PATH: ${ARCHITECTURE_MPI_PATH}")
+message(STATUS "@ ACTIVE_ARCHITECTURE_MPI_PATH: ${ACTIVE_ARCHITECTURE_MPI_PATH}")
 message(STATUS "@")
 message(STATUS "@ CONFIG PATH: ${CONFIG_PATH}")
 message(STATUS "@ CONFIGURATION SETTINGS: ${CONFIGURATION_SETTINGS}")

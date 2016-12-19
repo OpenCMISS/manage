@@ -273,11 +273,6 @@ include(OCSupport)
 include(OCConfigureComponents)
 
 ########################################################################
-# Installation and packaging
-include(OCInstall)
-include(OCPackaging)
-
-########################################################################
 # Testing
 # Need to enable testing in order for any add_test calls (see OCComponentSetupMacros) to work
 add_subdirectory(tests)
@@ -286,19 +281,30 @@ add_subdirectory(tests)
 # IDE Stuff
 source_group(CMake FILES CMakeLists.txt CMakeCache.txt)
 
+if ("${CMAKE_SIZEOF_VOID_P}" STREQUAL "8")
+    set(BUILD_ARCH 64)
+else ()
+    set(BUILD_ARCH 32)
+endif ()
+
+set(BUILD_CONFIG_FILE "${CMAKE_CURRENT_BINARY_DIR}/stamp/build.config")
+configure_file("${CMAKE_CURRENT_SOURCE_DIR}/Templates/build.in.config"
+    ${BUILD_CONFIG_FILE}
+)
+
 # Print a neat summary
 message(STATUS "@@@@@@@@@@@@@@@@@@@ SUMMARY @@@@@@@@@@@@@@@@@@@@@@@@@")
 message(STATUS "@")
 if (OPENCMISS_SDK_INSTALL_DIR)
     message(STATUS "@ OPENCMISS_SDK_INSTALL_DIR: ${OPENCMISS_SDK_INSTALL_DIR}")
-endif()
+endif ()
 message(STATUS "@ MPI implementation: ${OPENCMISS_MPI}")
 if (MPI_HOME)
     message(STATUS "@ MPI HOME: ${MPI_HOME}")
-endif()
+endif ()
 if (TOOLCHAIN)
     message(STATUS "@ TOOLCHAIN: ${TOOLCHAIN}")
-endif()
+endif ()
 message(STATUS "@")
 message(STATUS "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@")
 message(STATUS "@")
