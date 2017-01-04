@@ -343,7 +343,7 @@ if (OC_USE_IRON OR OC_DEPENDENCIES_ONLY)
                 USE_LAPACK=${SUNDIALS_USE_LAPACK}
                 BLAS_VERSION=${BLAS_VERSION}
                 LAPACK_VERSION=${LAPACK_VERSION})
-        ndif ()
+        endif ()
     endif ()
     
     # Pastix 5.2.2.16

@@ -51,7 +51,7 @@ include(CheckFortranCompilerFlag)
 #    SET(CMAKE_${lang}_FLAGS "-m${ABI} ${CMAKE_${lang}_FLAGS}")
 #endforeach()
 
-if (CMAKE_COMPILER_IS_GNUC OR CMAKE_C_COMPILER_ID STREQUAL "GNU" OR MINGW)
+if (CMAKE_COMPILER_IS_GNUC OR "${CMAKE_C_COMPILER_ID}" STREQUAL "GNU" OR MINGW)
     # ABI Flag -m$(ABI)
     
     # These flags are set by CMake by default anyways.
@@ -88,7 +88,7 @@ if (CMAKE_COMPILER_IS_GNUC OR CMAKE_C_COMPILER_ID STREQUAL "GNU" OR MINGW)
         addFlag("-fcheck=all" Fortran DEBUG)
     endif()
     
-elseif (CMAKE_C_COMPILER_ID STREQUAL "Intel" OR CMAKE_CXX_COMPILER_ID STREQUAL "Intel")
+elseif ("${CMAKE_C_COMPILER_ID}" STREQUAL "Intel" OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel")
     # ABI Flag -m$(ABI)
     
     # CMake default anyways
@@ -105,7 +105,12 @@ elseif (CMAKE_C_COMPILER_ID STREQUAL "Intel" OR CMAKE_CXX_COMPILER_ID STREQUAL "
     
     # Release
 #    addFlagAll("-fast" RELEASE)
-    
+    # Release - needed for Intel Parallel Studio 2017+
+    addFlagAll("-fPIE" Fortran RELEASE)
+
+    # Release - added for vector optimisation
+    addFlagAll("-xAVX" RELEASE)
+
     # Debug
     addFlagAll("-traceback" DEBUG)
     if (OC_WARN_ALL)
@@ -161,7 +166,7 @@ endif()
 # For intel MPI we need to add the skip flags to avoid SEEK_GET/SEEK_END definition errors
 # See https://software.intel.com/en-us/articles/intel-cluster-toolkit-for-linux-error-when-compiling-c-aps-using-intel-mpi-library-compilation-driver-mpiicpc
 # or google @#error "SEEK_SET is #defined but must not be for the C++ binding of MPI. Include mpi.h before stdio.h"@ 
-if(MPI STREQUAL intel)
+if(OPENCMISS_MPI STREQUAL intel)
     addFlagAll("-DMPICH_IGNORE_CXX_SEEK") # -DMPICH_SKIP_MPICXX
 endif()
 

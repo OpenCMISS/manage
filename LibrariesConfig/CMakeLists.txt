@@ -98,8 +98,6 @@ list(APPEND OPENCMISS_COMPONENT_MODULE_PATH
 
 # Need to set the compilers before any project call
 include(OCToolchainCompilers)
-# Set any instrumentation options before any project call
-include(OCInstrumentation)
 
 ########################################################################
 # Ready to start the "build project"
