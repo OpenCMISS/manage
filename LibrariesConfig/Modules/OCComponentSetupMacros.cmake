@@ -91,6 +91,22 @@ function(addAndConfigureLocalComponent COMPONENT_NAME)
                     # Also specify the MPI_ versions so that FindMPI is faster (checks them directly)
                     -DMPI_${lang}_COMPILER=${MPI_${lang}_COMPILER}
                 )
+                # Define compiler flags
+                if (CMAKE_${lang}_FLAGS)
+                    SET(MPI_CMAKE_FLAGS "${CMAKE_${lang}_FLAGS} ${OC_MPI_ONLY_${lang}_FLAGS}")
+                    LIST(APPEND COMPONENT_DEFS
+                        -DCMAKE_${lang}_FLAGS=${MPI_CMAKE_FLAGS}
+                    )
+                endif()
+                # Also forward build-type specific flags
+                foreach(BUILDTYPE RELEASE DEBUG)
+                    if (CMAKE_${lang}_FLAGS_${BUILDTYPE})
+                        SET(MPI_CMAKE_FLAGS_${BUILDTYPE} "${CMAKE_${lang}_FLAGS_${BUILDTYPE}} ${OC_MPI_ONLY_${lang}_FLAGS_${BUILDTYPE}}")
+                        LIST(APPEND COMPONENT_DEFS
+                            -DCMAKE_${lang}_FLAGS_${BUILDTYPE}=${MPI_CMAKE_FLAGS_${BUILDTYPE}}
+                        )
+                    endif()
+                endforeach()
             endif()
         endforeach()
     else()
@@ -99,6 +115,20 @@ function(addAndConfigureLocalComponent COMPONENT_NAME)
             list(APPEND COMPONENT_DEFS
                 -DCMAKE_${lang}_COMPILER=${CMAKE_${lang}_COMPILER}
             )
+            # Define compiler flags
+            if (CMAKE_${lang}_FLAGS)
+                LIST(APPEND COMPONENT_DEFS
+                    -DCMAKE_${lang}_FLAGS=${CMAKE_${lang}_FLAGS}
+                )
+            endif()
+            # Also forward build-type specific flags
+            foreach(BUILDTYPE RELEASE DEBUG)
+                if (CMAKE_${lang}_FLAGS_${BUILDTYPE})
+                    LIST(APPEND COMPONENT_DEFS
+                        -DCMAKE_${lang}_FLAGS_${BUILDTYPE}=${CMAKE_${lang}_FLAGS_${BUILDTYPE}}
+                    )
+                endif()
+            endforeach()
         endforeach()
     endif()
 

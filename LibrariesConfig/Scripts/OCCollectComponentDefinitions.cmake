@@ -30,28 +30,6 @@ if (NOT OPENCMISS_HAVE_MULTICONFIG_ENV)
     list(APPEND COMPONENT_COMMON_DEFS -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE})
 endif ()
 
-# Add compilers and flags
-foreach(lang C CXX Fortran)
-    # Define flags
-    if (CMAKE_${lang}_FLAGS)
-        LIST(APPEND COMPONENT_COMMON_DEFS
-            -DCMAKE_${lang}_FLAGS=${CMAKE_${lang}_FLAGS}
-        )
-    endif()
-    # Also forward build-type specific flags
-    foreach(BUILDTYPE RELEASE DEBUG)
-        if (CMAKE_${lang}_FLAGS_${BUILDTYPE})
-            LIST(APPEND COMPONENT_COMMON_DEFS
-                -DCMAKE_${lang}_FLAGS_${BUILDTYPE}=${CMAKE_${lang}_FLAGS_${BUILDTYPE}}
-            )
-        endif()
-    endforeach()
-    # Note: we dont define the compilers in the COMPONENT_COMMON_DEFS any more,
-    # as the OCComponentSetupMacros re-defines the compilers if MPI wrappers
-    # are found. To make the definitions list less confusing we'll completely leave
-    # out compiler definitions here and just define them in the OCComponentSetupMacros#addAndConfigureLocalComponent
-endforeach()
-
 # Pass on local lookup flags (consumed by find_package calls)
 foreach(COMP ${OPENCMISS_COMPONENTS})
     LIST(APPEND COMPONENT_COMMON_DEFS 

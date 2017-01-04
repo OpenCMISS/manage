@@ -66,9 +66,16 @@ endif ()
 # libxml2
 find_package(LibXml2 ${LIBXML2_VERSION} QUIET)
 if (NOT LIBXML2_FOUND)
-    SET(LIBXML2_FWD_DEPS CSIM LLVM FIELDML-API CELLML LIBCELLML ITK)
+    set(LIBXML2_FWD_DEPS CSIM LLVM FIELDML-API CELLML LIBCELLML ITK)
+    foreach(dependency IN_LIST ZLIB)
+        if (LIBXML2_WITH_${dependency} AND OC_USE_${dependency})
+            set(LIBXML2_USE_${dependency} ON)
+        else ()
+            set(LIBXML2_USE_${dependency} OFF)
+        endif ()
+    endforeach()
     addAndConfigureLocalComponent(LIBXML2
-        WITH_ZLIB=${LIBXML2_WITH_ZLIB}
+        WITH_ZLIB=${LIBXML2_USE_ZLIB}
         ZLIB_VERSION=${ZLIB_VERSION}
     )
 endif ()
@@ -109,13 +116,21 @@ if (OC_USE_HDF5)
 
     find_package(HDF5 ${HDF5_VERSION} QUIET)
     if (NOT HDF5_FOUND)
-        SET(HDF5_FWD_DEPS FIELDML-API)
+        set(HDF5_FWD_DEPS FIELDML-API)
+        foreach(dependency IN_LIST MPI;SZIP;ZLIB)
+            if (HDF5_WITH_${dependency} AND OC_USE_${dependency})
+                set(HDF5_USE_${dependency} ON)
+            else ()
+                set(HDF5_USE_${dependency} OFF)
+            endif ()
+        endforeach()
+
         addAndConfigureLocalComponent(HDF5
             HDF5_VERSION=${HDF5_VERSION}
-            HDF5_WITH_MPI=${HDF5_WITH_MPI}
-            WITH_SZIP=${HDF5_WITH_SZIP}
+            HDF5_WITH_MPI=${HDF5_USE_MPI}
+            WITH_SZIP=${HDF5_USE_SZIP}
             SZIP_VERSION=${SZIP_VERSION}
-            WITH_ZLIB=${HDF5_WITH_ZLIB}
+            WITH_ZLIB=${HDF5_USE_ZLIB}
             ZLIB_VERSION=${ZLIB_VERSION}
             HDF5_BUILD_FORTRAN=${HDF5_BUILD_FORTRAN}
         )
@@ -125,12 +140,22 @@ endif ()
 # Fieldml
 find_package(FIELDML-API ${FIELDML-API_VERSION} QUIET)
 if (NOT FIELDML-API_FOUND)
-    SET(FIELDML-API_FWD_DEPS ZINC IRON)
+    set(FIELDML-API_FWD_DEPS ZINC IRON)
+    if (FIELDML-API_WITH_HDF5 AND OC_USE_HDF5)
+        set(FIELDML-API_USE_HDF5 ON)
+    else ()
+        set(FIELDML-API_USE_HDF5 OFF)
+    endif ()
+    if (HDF5_WITH_MPI AND OC_USE_MPI)
+        set(HDF5_USE_MPI ON)
+    else ()
+        set(HDF5_USE_MPI OFF)
+    endif ()
     addAndConfigureLocalComponent(FIELDML-API
         LIBXML2_VERSION=${LIBXML2_VERSION}
-        USE_HDF5=${FIELDML-API_WITH_HDF5}
+        USE_HDF5=${FIELDML-API_USE_HDF5}
         HDF5_VERSION=${HDF5_VERSION}
-        HDF5_WITH_MPI=${HDF5_WITH_MPI}
+        HDF5_WITH_MPI=${HDF5_USE_MPI}
         JAVA_BINDINGS=${FIELDML-API_WITH_JAVA_BINDINGS}
         FORTRAN_BINDINGS=${FIELDML-API_WITH_FORTRAN_BINDINGS}
     )
@@ -145,24 +170,40 @@ if (OC_USE_IRON OR OC_DEPENDENCIES_ONLY)
     if (OC_USE_PTSCOTCH)
         find_package(PTSCOTCH ${PTSCOTCH_VERSION} QUIET)
         if (NOT PTSCOTCH_FOUND)
-            SET(SCOTCH_FWD_DEPS PASTIX PETSC MUMPS IRON)
+            set(SCOTCH_FWD_DEPS PASTIX PETSC MUMPS IRON)
+            foreach(dependency IN_LIST BZIP2;ZLIB)
+                if (SCOTCH_WITH_${dependency} AND OC_USE_${dependency})
+                    set(SCOTCH_USE_${dependency} ON)
+                else ()
+                    set(SCOTCH_USE_${dependency} OFF)
+                endif ()
+            endforeach()
+
             addAndConfigureLocalComponent(SCOTCH
                 BUILD_PTSCOTCH=YES
-                USE_ZLIB=${SCOTCH_WITH_ZLIB}
+                USE_ZLIB=${SCOTCH_USE_ZLIB}
                 ZLIB_VERSION=${ZLIB_VERSION}
-                USE_BZ2=${SCOTCH_WITH_BZIP2}
+                USE_BZ2=${SCOTCH_USE_BZIP2}
                 BZIP2_VERSION=${BZIP2_VERSION}
                 USE_THREADS=${SCOTCH_USE_THREADS})
         endif ()
     elseif (OC_USE_SCOTCH)
         find_package(SCOTCH ${SCOTCH_VERSION} QUIET)
         if (NOT SCOTCH_FOUND)
-            SET(PTSCOTCH_FWD_DEPS PASTIX PETSC MUMPS IRON)
+            set(PTSCOTCH_FWD_DEPS PASTIX PETSC MUMPS IRON)
+            foreach(dependency IN_LIST BZIP2;ZLIB)
+                if (SCOTCH_WITH_${dependency} AND OC_USE_${dependency})
+                    set(SCOTCH_USE_${dependency} ON)
+                else ()
+                    set(SCOTCH_USE_${dependency} OFF)
+                endif ()
+            endforeach()
+
             addAndConfigureLocalComponent(SCOTCH
                 BUILD_PTSCOTCH=NO
-                USE_ZLIB=${SCOTCH_WITH_ZLIB}
+                USE_ZLIB=${SCOTCH_USE_ZLIB}
                 ZLIB_VERSION=${ZLIB_VERSION}
-                USE_BZ2=${SCOTCH_WITH_BZIP2}
+                USE_BZ2=${SCOTCH_USE_BZIP2}
                 BZIP2_VERSION=${BZIP2_VERSION}
                 USE_THREADS=${SCOTCH_USE_THREADS})
         endif ()
@@ -204,11 +245,19 @@ if (OC_USE_IRON OR OC_DEPENDENCIES_ONLY)
         find_package(MUMPS ${MUMPS_VERSION} QUIET)
         if (NOT MUMPS_FOUND)
             SET(MUMPS_FWD_DEPS PETSC IRON)
+            foreach(dependency IN_LIST METIS;PARMETIS;PTSCOTCH;SCOTCH)
+                if (MUMPS_WITH_${dependency} AND OC_USE_${dependency})
+                    set(MUMPS_USE_${dependency} ON)
+                else ()
+                    set(MUMPS_USE_${dependency} OFF)
+                endif ()
+            endforeach()
+
             addAndConfigureLocalComponent(MUMPS
-                USE_SCOTCH=${MUMPS_WITH_SCOTCH}
-                USE_PTSCOTCH=${MUMPS_WITH_PTSCOTCH}
-                USE_PARMETIS=${MUMPS_WITH_PARMETIS}
-                USE_METIS=${MUMPS_WITH_METIS}
+                USE_SCOTCH=${MUMPS_USE_SCOTCH}
+                USE_PTSCOTCH=${MUMPS_USE_PTSCOTCH}
+                USE_PARMETIS=${MUMPS_USE_PARMETIS}
+                USE_METIS=${MUMPS_USE_METIS}
                 PTSCOTCH_VERSION=${PTSCOTCH_VERSION}
                 SCOTCH_VERSION=${SCOTCH_VERSION}
                 PARMETIS_VERSION=${PARMETIS_VERSION}
@@ -258,12 +307,20 @@ if (OC_USE_IRON OR OC_DEPENDENCIES_ONLY)
     if (OC_USE_SUPERLU_DIST)
         find_package(SUPERLU_DIST ${SUPERLU_DIST_VERSION} QUIET)
         if (NOT SUPERLU_DIST_FOUND)
-            SET(SUPERLU_DIST_FWD_DEPS PETSC IRON)
+            set(SUPERLU_DIST_FWD_DEPS PETSC IRON)
+            foreach(dependency IN_LIST METIS;PARMETIS)
+                if (SUPERLU_DIST_WITH_${dependency} AND OC_USE_${dependency})
+                    set(SUPERLU_DIST_USE_${dependency} ON)
+                else ()
+                    set(SUPERLU_DIST_USE_${dependency} OFF)
+                endif ()
+            endforeach()
+
             addAndConfigureLocalComponent(SUPERLU_DIST
                 BLAS_VERSION=${BLAS_VERSION}
-                USE_PARMETIS=${SUPERLU_DIST_WITH_PARMETIS}
+                USE_PARMETIS=${SUPERLU_DIST_USE_PARMETIS}
                 PARMETIS_VERSION=${PARMETIS_VERSION}
-                USE_METIS=${SUPERLU_DIST_WITH_METIS}
+                USE_METIS=${SUPERLU_DIST_USE_METIS}
                 METIS_VERSION=${METIS_VERSION}
             )
         endif ()
@@ -273,19 +330,35 @@ if (OC_USE_IRON OR OC_DEPENDENCIES_ONLY)
     if (OC_USE_SUNDIALS)
         find_package(SUNDIALS ${SUNDIALS_VERSION} QUIET)
         if (NOT SUNDIALS_FOUND)
-            SET(SUNDIALS_FWD_DEPS CSIM PETSC IRON)
+            set(SUNDIALS_FWD_DEPS CSIM PETSC IRON)
+            foreach(dependency IN_LIST LAPACK)
+                if (SUNDIALS_WITH_${dependency} AND OC_USE_${dependency})
+                    set(SUNDIALS_USE_${dependency} ON)
+                else ()
+                    set(SUNDIALS_USE_${dependency} OFF)
+                endif ()
+            endforeach()
+
             addAndConfigureLocalComponent(SUNDIALS
-                USE_LAPACK=${SUNDIALS_WITH_LAPACK}
+                USE_LAPACK=${SUNDIALS_USE_LAPACK}
                 BLAS_VERSION=${BLAS_VERSION}
                 LAPACK_VERSION=${LAPACK_VERSION})
-        endif ()
+        ndif ()
     endif ()
     
     # Pastix 5.2.2.16
     if (OC_USE_PASTIX)
         find_package(PASTIX ${PASTIX_VERSION} QUIET)
         if (NOT PASTIX_FOUND)
-            SET(PASTIX_FWD_DEPS PETSC IRON)
+            set(PASTIX_FWD_DEPS PETSC IRON)
+            foreach(dependency IN_LIST METIS;PTSCOTCH)
+                if (PASTIX_WITH_${dependency} AND OC_USE_${dependency})
+                    set(PASTIX_USE_${dependency} ON)
+                else ()
+                    set(PASTIX_USE_${dependency} OFF)
+                endif ()
+            endforeach()
+
             addAndConfigureLocalComponent(PASTIX
                 BLAS_VERSION=${BLAS_VERSION}
                 USE_THREADS=${PASTIX_USE_THREADS}
@@ -310,27 +383,35 @@ if (OC_USE_IRON OR OC_DEPENDENCIES_ONLY)
     if (OC_USE_PETSC)
         find_package(PETSC ${PETSC_VERSION} QUIET)
         if (NOT PETSC_FOUND)
-            SET(PETSC_FWD_DEPS SLEPC IRON)
+            set(PETSC_FWD_DEPS SLEPC IRON)
+            foreach(dependency IN_LIST HYPRE;MUMPS;PARMETIS;PASTIX;PTSCOTCH;SCALAPACK;SUITESPARSE;SUPERLU;SUPERLU_DIST;SUNDIALS)
+                if(PETSC_WITH_${dependency} AND OC_USE_${dependency})
+                    set(PETSC_USE_${dependency} ON)
+                else()
+                    set(PETSC_USE_${dependency} OFF)
+                endif()
+            endforeach()
+
             addAndConfigureLocalComponent(PETSC
-                USE_PASTIX=${PETSC_WITH_PASTIX}
+                USE_PASTIX=${PETSC_USE_PASTIX}
                 PASTIX_VERSION=${PASTIX_VERSION}
-                USE_MUMPS=${PETSC_WITH_MUMPS}
+                USE_MUMPS=${PETSC_USE_MUMPS}
                 MUMPS_VERSION=${MUMPS_VERSION}
-                USE_SUITESPARSE=${PETSC_WITH_SUITESPARSE}
+                USE_SUITESPARSE=${PETSC_USE_SUITESPARSE}
                 SUITESPARSE_VERSION=${SUITESPARSE_VERSION}
-                USE_SCALAPACK=${PETSC_WITH_SCALAPACK}
+                USE_SCALAPACK=${PETSC_USE_SCALAPACK}
                 SCALAPACK_VERSION=${SCALAPACK_VERSION}
-                USE_PTSCOTCH=${PETSC_WITH_PTSCOTCH}
+                USE_PTSCOTCH=${PETSC_USE_PTSCOTCH}
                 PTSCOTCH_VERSION=${PTSCOTCH_VERSION}
-                USE_SUPERLU=${PETSC_WITH_SUPERLU}
+                USE_SUPERLU=${PETSC_USE_SUPERLU}
                 SUPERLU_VERSION=${SUPERLU_VERSION}
-                USE_SUNDIALS=${PETSC_WITH_SUNDIALS}
+                USE_SUNDIALS=${PETSC_USE_SUNDIALS}
                 SUNDIALS_VERSION=${SUNDIALS_VERSION}
-                USE_HYPRE=${PETSC_WITH_HYPRE}
+                USE_HYPRE=${PETSC_USE_HYPRE}
                 HYPRE_VERSION=${HYPRE_VERSION}
-                USE_SUPERLU_DIST=${PETSC_WITH_SUPERLU_DIST}
+                USE_SUPERLU_DIST=${PETSC_USE_SUPERLU_DIST}
                 SUPERLU_DIST_VERSION=${SUPERLU_DIST_VERSION}
-                USE_PARMETIS=${PETSC_WITH_PARMETIS}
+                USE_PARMETIS=${PETSC_USE_PARMETIS}
                 PARMETIS_VERSION=${PARMETIS_VERSION}
                 BLAS_VERSION=${BLAS_VERSION}
                 LAPACK_VERSION=${LAPACK_VERSION}
@@ -342,27 +423,35 @@ if (OC_USE_IRON OR OC_DEPENDENCIES_ONLY)
     if (OC_USE_SLEPC)
         find_package(SLEPC ${SLEPC_VERSION} QUIET)
         if (NOT SLEPC_FOUND)
-            SET(SLEPC_FWD_DEPS IRON)
+            set(SLEPC_FWD_DEPS IRON)
+            foreach(dependency IN_LIST HYPRE;MUMPS;PARMETIS;PASTIX;PTSCOTCH;SCALAPACK;SUITESPARSE;SUPERLU;SUPERLU_DIST;SUNDIALS)
+                if(PETSC_WITH_${dependency} AND OC_USE_${dependency})
+                    set(PETSC_USE_${dependency} ON)
+                else()
+                    set(PETSC_USE_${dependency} OFF)
+                endif()
+            endforeach()
+
             addAndConfigureLocalComponent(SLEPC
-                USE_PASTIX=${PETSC_WITH_PASTIX}
+                USE_PASTIX=${PETSC_USE_PASTIX}
                 PASTIX_VERSION=${PASTIX_VERSION}
-                USE_MUMPS=${PETSC_WITH_MUMPS}
+                USE_MUMPS=${PETSC_USE_MUMPS}
                 MUMPS_VERSION=${MUMPS_VERSION}
-                USE_SUITESPARSE=${PETSC_WITH_SUITESPARSE}
+                USE_SUITESPARSE=${PETSC_USE_SUITESPARSE}
                 SUITESPARSE_VERSION=${SUITESPARSE_VERSION}
-                USE_SCALAPACK=${PETSC_WITH_SCALAPACK}
+                USE_SCALAPACK=${PETSC_USE_SCALAPACK}
                 SCALAPACK_VERSION=${SCALAPACK_VERSION}
-                USE_PTSCOTCH=${PETSC_WITH_PTSCOTCH}
+                USE_PTSCOTCH=${PETSC_USE_PTSCOTCH}
                 PTSCOTCH_VERSION=${PTSCOTCH_VERSION}
-                USE_SUPERLU=${PETSC_WITH_SUPERLU}
+                USE_SUPERLU=${PETSC_USE_SUPERLU}
                 SUPERLU_VERSION=${SUPERLU_VERSION}
-                USE_SUNDIALS=${PETSC_WITH_SUNDIALS}
+                USE_SUNDIALS=${PETSC_USE_SUNDIALS}
                 SUNDIALS_VERSION=${SUNDIALS_VERSION}
-                USE_HYPRE=${PETSC_WITH_HYPRE}
+                USE_HYPRE=${PETSC_USE_HYPRE}
                 HYPRE_VERSION=${HYPRE_VERSION}
-                USE_SUPERLU_DIST=${PETSC_WITH_SUPERLU_DIST}
+                USE_SUPERLU_DIST=${PETSC_USE_SUPERLU_DIST}
                 SUPERLU_DIST_VERSION=${SUPERLU_DIST_VERSION}
-                USE_PARMETIS=${PETSC_WITH_PARMETIS}
+                USE_PARMETIS=${PETSC_USE_PARMETIS}
                 PARMETIS_VERSION=${PARMETIS_VERSION}
             )
         endif ()
@@ -380,12 +469,20 @@ if (OC_USE_IRON OR OC_DEPENDENCIES_ONLY)
     if (OC_USE_CELLML)
         find_package(CELLML ${CELLML_VERSION} QUIET)
         if (NOT CELLML_FOUND)
-            SET(CELLML_FWD_DEPS IRON)
+            set(CELLML_FWD_DEPS IRON)
+            foreach(dependency IN_LIST CSIM)
+                if(CELLML_WITH_${dependency} AND OC_USE_${dependency})
+                    set(CELLML_USE_${dependency} ON)
+                else()
+                    set(CELLML_USE_${dependency} OFF)
+                endif()
+            endforeach()
+
             addAndConfigureLocalComponent(CELLML
                 LIBXML2_VERSION=${LIBXML2_VERSION}
                 CSIM_VERSION=${CSIM_VERSION}
                 LIBCELLML_VERSION=${LIBCELLML_VERSION}
-                CELLML_USE_CSIM=${CELLML_WITH_CSIM})
+                CELLML_USE_CSIM=${CELLML_USE_CSIM})
         endif ()
     endif ()
 
@@ -427,21 +524,29 @@ if (OC_USE_IRON OR OC_DEPENDENCIES_ONLY)
     if (NOT OC_DEPENDENCIES_ONLY)
         set(SUBGROUP_PATH .)
         set(GITHUB_ORGANIZATION OpenCMISS)
+        foreach(dependency IN_LIST CELLML;FIELDML-API;HYPRE;MUMPS;PETSC;SCALAPACK;SUNDIALS)
+            if(IRON_WITH_${dependency} AND OC_USE_${dependency})
+                set(IRON_USE_${dependency} ON)
+            else()
+                set(IRON_USE_${dependency} OFF)
+            endif()
+        endforeach()
+
         addAndConfigureLocalComponent(IRON
-            WITH_CELLML=${IRON_WITH_CELLML}
+            WITH_CELLML=${IRON_USE_CELLML}
             CELLML_VERSION=${CELLML_VERSION}
             LIBCELLML_VERSION=${LIBCELLML_VERSION}
-            WITH_FIELDML=${IRON_WITH_FIELDML}
+            WITH_FIELDML=${IRON_USE_FIELDML-API}
             FIELDML-API_VERSION=${FIELDML-API_VERSION} 
-            WITH_HYPRE=${IRON_WITH_HYPRE}
+            WITH_HYPRE=${IRON_USE_HYPRE}
             HYPRE_VERSION=${HYPRE_VERSION}
-            WITH_SUNDIALS=${IRON_WITH_SUNDIALS}
+            WITH_SUNDIALS=${IRON_USE_SUNDIALS}
             SUNDIALS_VERSION=${SUNDIALS_VERSION}
-            WITH_MUMPS=${IRON_WITH_MUMPS}
+            WITH_MUMPS=${IRON_USE_MUMPS}
             MUMPS_VERSION=${MUMPS_VERSION}
-            WITH_SCALAPACK=${IRON_WITH_SCALAPACK}
+            WITH_SCALAPACK=${IRON_USE_SCALAPACK}
             SCALAPACK_VERSION=${SCALAPACK_VERSION}
-            WITH_PETSC=${IRON_WITH_PETSC}
+            WITH_PETSC=${IRON_USE_PETSC}
             PETSC_VERSION=${PETSC_VERSION}
             WITH_PROFILING=${OC_PROFILING}
             WITH_C_BINDINGS=${IRON_WITH_C_BINDINGS}
@@ -449,9 +554,6 @@ if (OC_USE_IRON OR OC_DEPENDENCIES_ONLY)
             FE_VIRTUALENV_INSTALL_PREFIX=${OCL_VIRTUALENV_INSTALL_PREFIX}
             FE_USE_VIRTUALENV=${OC_PYTHON_BINDINGS_USE_VIRTUALENV}
         )
-        #if (OC_PYTHON_BINDINGS_USE_VIRTUALENV)
-        #    add_dependencies(${OC_EP_PREFIX}IRON virtualenv_install)
-        #endif ()
     endif ()
 endif ()
 
@@ -523,8 +625,16 @@ if (OC_USE_ZINC OR (OPENGL_FOUND AND OC_DEPENDENCIES_ONLY))
         find_package(OPTPP ${OPTPP_VERSION} QUIET)
         if (NOT OPTPP_FOUND)
             set(OPTPP_FWD_DEPS ZINC)
+            foreach(dependency IN_LIST BLAS)
+                if(OPTPP_WITH_${dependency} AND OC_USE_${dependency})
+                    set(OPTPP_USE_${dependency} ON)
+                else()
+                    set(OPTPP_USE_${dependency} OFF)
+                endif()
+            endforeach()
+
             addAndConfigureLocalComponent(OPTPP
-                USE_EXTERNAL_BLAS=${OPTPP_WITH_BLAS}
+                USE_EXTERNAL_BLAS=${OPTPP_USE_BLAS}
                 BLAS_VERSION=${BLAS_VERSION}
                 LAPACK_VERSION=${LAPACK_VERSION})
         endif ()

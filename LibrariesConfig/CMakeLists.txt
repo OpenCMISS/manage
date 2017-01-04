@@ -62,6 +62,18 @@
 #    Further, you can specify an explicit mpi compiler wrapper (full path or just the binary name) for each language,
 #    where <lang> can be each of "C","CXX" or "Fortran".
 #    This can be used independently of (but possibly with) the MPI_HOME setting.
+#
+# =========== Instrumentation ===========
+#
+# INSTRUMENTATION: |[none]|scorep|vtune
+#    Specify any code instrumentation systems for use in performance analysis.
+#
+#    none  : no instrumentation
+#    scorep: score-p instrumentation
+#    vtune : Intel vtune instrumentation (only available with Intel compilers)
+#    Note that this variable will be used case-insensitive.
+#    If no instrumentation is specified none will be used as the default.
+#
 
 ########################################################
 # If your cmake is older than 3.4 - goodbye. 
@@ -86,6 +98,8 @@ list(APPEND OPENCMISS_COMPONENT_MODULE_PATH
 
 # Need to set the compilers before any project call
 include(OCToolchainCompilers)
+# Set any instrumentation options before any project call
+include(OCInstrumentation)
 
 ########################################################################
 # Ready to start the "build project"
