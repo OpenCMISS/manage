@@ -674,8 +674,9 @@ if (OC_USE_ZINC OR (OPENGL_FOUND AND OC_DEPENDENCIES_ONLY))
             set(GDCM-ABI_FWD_DEPS ZINC ITK IMAGEMAGICK)
             # Make EXPAT and UUID platform dependent?
             addAndConfigureLocalComponent(GDCM-ABI
-                GDCM-ABI_USE_SYSTEM_ZLIB=ON
-                GDCM-ABI_USE_SYSTEM_EXPAT=ON
+                GDCM_INSTALL_PACKAGE_DIR=${OPENCMISS_DEPENDENCIES_INSTALL_NO_MPI_PREFIX}/${COMMON_PACKAGE_CONFIG_DIR}
+                GDCM_USE_SYSTEM_ZLIB=ON
+                GDCM_USE_SYSTEM_EXPAT=ON
             )
         endif ()
     endif ()
