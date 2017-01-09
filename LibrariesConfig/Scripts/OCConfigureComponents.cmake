@@ -674,8 +674,9 @@ if (OC_USE_ZINC OR (OPENGL_FOUND AND OC_DEPENDENCIES_ONLY))
             set(GDCM-ABI_FWD_DEPS ZINC ITK IMAGEMAGICK)
             # Make EXPAT and UUID platform dependent?
             addAndConfigureLocalComponent(GDCM-ABI
-                GDCM-ABI_USE_SYSTEM_ZLIB=ON
-                GDCM-ABI_USE_SYSTEM_EXPAT=ON
+                GDCM_INSTALL_PACKAGE_DIR=${COMMON_PACKAGE_CONFIG_DIR}
+                GDCM_USE_SYSTEM_ZLIB=ON
+                GDCM_USE_SYSTEM_EXPAT=ON
             )
         endif ()
     endif ()
@@ -714,6 +715,7 @@ if (OC_USE_ZINC OR (OPENGL_FOUND AND OC_DEPENDENCIES_ONLY))
                 JPEG_VERSION=${JPEG_VERSION}
                 # TIFF_VERSION=${TIFF_VERSION}
                 LIBXML2_VERSION=${LIBXML2_VERSION}
+                GDCM-ABI_VERSION=${GDCM-ABI_VERSION}
             )
         endif ()
     endif ()
