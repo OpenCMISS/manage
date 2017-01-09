@@ -21,6 +21,30 @@ include(OpenCMISSInterComponentConfig)
 # Include the installation configuration
 include(${OPENCMISS_INSTALLATION_CACHE_FILE})
 
+# Load local configuration to allow overrides
+# First try at a given path, then local
+SET(_CONFIG_FOUND NO)
+if(OPENCMISS_CONFIG_DIR)
+    SET(LOCALCONF ${OPENCMISS_CONFIG_DIR}/OpenCMISSLocalConfig.cmake)
+    if(EXISTS ${LOCALCONF})
+        message(STATUS "Applying OpenCMISS local configuration at ${LOCALCONF}...")
+        include(${LOCALCONF})
+        SET(_CONFIG_FOUND YES)   
+    endif()
+endif()
+SET(_LC_CDIR ${LOCALCONF})
+SET(LOCALCONF ${CMAKE_CURRENT_BINARY_DIR}/OpenCMISSLocalConfig.cmake)
+if(EXISTS ${LOCALCONF} AND NOT _LC_CDIR STREQUAL LOCALCONF)
+    message(STATUS "Applying OpenCMISS local configuration at ${LOCALCONF}...")
+    include(${LOCALCONF})
+    SET(_CONFIG_FOUND YES)   
+endif()
+if (NOT _CONFIG_FOUND)
+    message(STATUS "No local OpenCMISS configuration file present.")
+endif()
+unset(_LC_CDIR)
+unset(_CONFIG_FOUND)
+
 # Add HDF5 to fortran projects if enabled
 if (HDF5_BUILD_FORTRAN)
   list(APPEND OPENCMISS_COMPONENTS_WITH_Fortran HDF5)
