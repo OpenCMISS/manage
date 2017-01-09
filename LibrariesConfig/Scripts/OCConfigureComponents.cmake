@@ -703,15 +703,16 @@ if (OC_USE_ZINC OR (OPENGL_FOUND AND OC_DEPENDENCIES_ONLY))
                 ITK_BUILD_TESTING=OFF
                 ITK_BUILD_EXAMPLES=OFF
                 ITK_USE_SYSTEM_PNG=ON
-                ITK_USE_SYSTEM_TIFF=ON
+                ITK_USE_SYSTEM_TIFF=OFF # ITK now uses bigtiff, which is different from tiff
+                ITK_USE_SYSTEM_JPEG=ON
                 ITK_USE_SYSTEM_LIBXML2=ON
                 ITK_USE_SYSTEM_ZLIB=ON
-                ITK_USE_SYSTEM_GDCM-ABI=OFF
+                ITK_USE_SYSTEM_GDCM=ON
                 ITK_USE_KWSTYLE=OFF
                 ZLIB_VERSION=${ZLIB_VERSION}
                 PNG_VERSION=${PNG_VERSION}
                 JPEG_VERSION=${JPEG_VERSION}
-                TIFF_VERSION=${TIFF_VERSION}
+                # TIFF_VERSION=${TIFF_VERSION}
                 LIBXML2_VERSION=${LIBXML2_VERSION}
             )
         endif ()
