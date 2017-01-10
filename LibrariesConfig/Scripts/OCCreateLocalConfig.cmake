@@ -1,9 +1,7 @@
-# Make sure a localconfig file exists
-set(OPENCMISS_LOCALCONFIG ${PROJECT_BINARY_DIR}/OpenCMISSLocalConfig.cmake)
-set(_OC_LOCALCONFIG_CREATED NO)
-if (NOT EXISTS ${OPENCMISS_LOCALCONFIG})
+set(_OC_LOCAL_CONFIG_CREATED NO)
+if (NOT EXISTS ${OPENCMISS_LOCAL_CONFIG})
     log("Creating OpenCMISSLocalConfig file in ${PROJECT_BINARY_DIR}")
-    set(_OC_LOCALCONFIG_CREATED YES)
+    set(_OC_LOCAL_CONFIG_CREATED YES)
     SET(OC_USE_SYSTEM_FLAGS )
     SET(OC_USE_FLAGS )
     if (WIN32)
@@ -30,14 +28,14 @@ if (NOT EXISTS ${OPENCMISS_LOCALCONFIG})
         set(OC_USE_SYSTEM_FLAGS "${OC_USE_SYSTEM_FLAGS}#set(OC_SYSTEM_${COMPONENT} ${_VALUE})${_NL}")
     endforeach()
     configure_file(${CMAKE_CURRENT_SOURCE_DIR}/Templates/OpenCMISSLocalConfig.template.cmake
-        ${OPENCMISS_LOCALCONFIG})
+        ${OPENCMISS_LOCAL_CONFIG})
     unset(OC_USE_SYSTEM_FLAGS)
     unset(OC_USE_FLAGS)
     
     if (OPENCMISS_SDK_INSTALL_DIR)
         get_filename_component(OPENCMISS_SDK_INSTALL_DIR "${OPENCMISS_SDK_INSTALL_DIR}" ABSOLUTE)
         if (EXISTS "${OPENCMISS_SDK_INSTALL_DIR}")
-            file(APPEND "${OPENCMISS_LOCALCONFIG}" "set(OPENCMISS_SDK_INSTALL_DIR \"${OPENCMISS_SDK_INSTALL_DIR}\")${_NL}"
+            file(APPEND "${OPENCMISS_LOCAL_CONFIG}" "set(OPENCMISS_SDK_INSTALL_DIR \"${OPENCMISS_SDK_INSTALL_DIR}\")${_NL}"
             )
         else()
             log("Remote installation directory not found: ${OPENCMISS_SDK_INSTALL_DIR}" ERROR)
@@ -46,10 +44,10 @@ if (NOT EXISTS ${OPENCMISS_LOCALCONFIG})
     
     # Extra development part - allows to set localconfig variables directly
     if (DEFINED DIRECT_VARS)
-        file(APPEND "${OPENCMISS_LOCALCONFIG}" "# Directly forwarded variables:${_NL}"
+        file(APPEND "${OPENCMISS_LOCAL_CONFIG}" "# Directly forwarded variables:${_NL}"
         )
         foreach(VARNAME ${DIRECT_VARS})
-            file(APPEND "${OPENCMISS_LOCALCONFIG}" "set(${VARNAME} ${${VARNAME}})${_NL}"
+            file(APPEND "${OPENCMISS_LOCAL_CONFIG}" "set(${VARNAME} ${${VARNAME}})${_NL}"
             )
         endforeach()
     endif()

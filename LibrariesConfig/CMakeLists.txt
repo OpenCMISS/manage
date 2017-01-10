@@ -139,6 +139,13 @@ include(OCPaths)
 # Intrdouce miscellaneous helper functions and macros
 include(OCMiscFunctions)
 
+set(OPENCMISS_CONFIG_DIR ${OPENCMISS_CONFIG_DIR} CACHE PATH "Location of OpenCMISSLocalConfig.cmake to use for this configuration.")
+if (OPENCMISS_HAVE_MULTICONFIG_ENV)
+    set(OPENCMISS_LOCAL_CONFIG ${PROJECT_BINARY_DIR}/OpenCMISSLocalConfig.cmake)
+else ()
+    set(OPENCMISS_LOCAL_CONFIG ${PROJECT_BINARY_DIR}/../OpenCMISSLocalConfig.cmake)
+endif ()
+
 # Create a local config file if it does not exist
 include(OCCreateLocalConfig)
 
@@ -323,7 +330,7 @@ message(STATUS "@")
 message(STATUS "@")
 message(STATUS "@@@@@@@@@@@@@@@@@@@ NEXT STEPS @@@@@@@@@@@@@@@@@@@@@@")
 message(STATUS "@")
-message(STATUS "@ - Change ${OPENCMISS_LOCALCONFIG} according to your setup/needs")
+message(STATUS "@ - Change ${OPENCMISS_LOCAL_CONFIG} according to your setup/needs")
 if (DEFINED EVIL)
     message(STATUS "@ - Change ${CMAKE_CURRENT_SOURCE_DIR}/OpenCMISSInstallationConfig.cmake according to your developing setup/needs (Overrides anything in OpenCMISSLocalConfig!)")
 endif()
