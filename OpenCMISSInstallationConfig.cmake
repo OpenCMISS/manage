@@ -60,16 +60,6 @@
 set(GITHUB_USERNAME )
 
 ##
-# GITHUB_USE_SSL
-# --------------
-#
-# If enabled, ssl connections like git@github.com/username are used instead of https access.
-# Requires public key registration with github but wont require to enter the password (for push) every time.
-# 
-# .. default:: NO
-set(GITHUB_USE_SSL NO)
-
-##
 # OC_CLEAN_REBUILDS_COMPONENTS
 # ----------------------------
 #
