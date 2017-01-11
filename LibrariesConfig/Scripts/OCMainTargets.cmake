@@ -58,9 +58,9 @@ add_custom_target(reset
     COMMAND ${CMAKE_COMMAND} -E remove_directory "${OPENCMISS_COMPONENTS_INSTALL_PREFIX_NO_BUILD_TYPE}"
     COMMAND ${CMAKE_COMMAND} -E remove_directory "${OPENCMISS_COMPONENTS_BINARY_DIR}"
     COMMAND ${CMAKE_COMMAND} -E remove "${OC_BUILD_LOG}"
-    COMMAND ${CMAKE_COMMAND} -E copy ${OPENCMISS_LOCALCONFIG} ../backup_localconfig.tmp
+    COMMAND ${CMAKE_COMMAND} -E copy ${OPENCMISS_LOCAL_CONFIG} ../backup_localconfig.tmp
     COMMAND ${CMAKE_COMMAND} -E remove -f ${PROJECT_BINARY_DIR}/*
-    COMMAND ${CMAKE_COMMAND} -E copy ../backup_localconfig.tmp ${OPENCMISS_LOCALCONFIG}
+    COMMAND ${CMAKE_COMMAND} -E copy ../backup_localconfig.tmp ${OPENCMISS_LOCAL_CONFIG}
     COMMAND ${CMAKE_COMMAND} -E remove -f ../backup_localconfig.tmp
     COMMENT "Removing directories:
         ->${OPENCMISS_COMPONENTS_INSTALL_PREFIX_NO_BUILD_TYPE}
@@ -132,9 +132,9 @@ endif ()
 add_custom_target(utter_destruction
     ${_REMOVE_BUILD_COMMAND}
     ${_REMOVE_INSTALL_COMMAND}
-    COMMAND ${CMAKE_COMMAND} -E copy ${OPENCMISS_LOCALCONFIG} ../backup_localconfig.tmp
+    COMMAND ${CMAKE_COMMAND} -E copy ${OPENCMISS_LOCAL_CONFIG} ../backup_localconfig.tmp
     COMMAND ${CMAKE_COMMAND} -E remove -f ${PROJECT_BINARY_DIR}/*
-    COMMAND ${CMAKE_COMMAND} -E copy ../backup_localconfig.tmp ${OPENCMISS_LOCALCONFIG}
+    COMMAND ${CMAKE_COMMAND} -E copy ../backup_localconfig.tmp ${OPENCMISS_LOCAL_CONFIG}
     COMMAND ${CMAKE_COMMAND} -E remove -f ../backup_localconfig.tmp
     COMMENT "BAM! Deleting build & install folders. Only keeping OpenCMISSLocalConfig"
 )

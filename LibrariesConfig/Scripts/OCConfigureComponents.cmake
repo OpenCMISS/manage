@@ -686,6 +686,7 @@ if (OC_USE_ZINC OR (OPENGL_FOUND AND OC_DEPENDENCIES_ONLY))
         if (NOT IMAGEMAGICK_FOUND)
             set(IMAGEMAGICK_FWD_DEPS ZINC)
             addAndConfigureLocalComponent(IMAGEMAGICK
+                IMAGEMAGICK_WITH_MAGICKPP=OFF
                 ZLIB_VERSION=${ZLIB_VERSION}
                 LIBXML2_VERSION=${LIBXML2_VERSION}
                 BZIP2_VERSION=${BZIP2_VERSION}
@@ -704,7 +705,8 @@ if (OC_USE_ZINC OR (OPENGL_FOUND AND OC_DEPENDENCIES_ONLY))
                 ITK_BUILD_TESTING=OFF
                 ITK_BUILD_EXAMPLES=OFF
                 ITK_USE_SYSTEM_PNG=ON
-                ITK_USE_SYSTEM_TIFF=ON
+                ITK_USE_SYSTEM_TIFF=OFF # ITK now uses bigtiff, which is different from tiff
+                ITK_USE_SYSTEM_JPEG=ON
                 ITK_USE_SYSTEM_LIBXML2=ON
                 ITK_USE_SYSTEM_ZLIB=ON
                 ITK_USE_SYSTEM_GDCM=ON
@@ -712,7 +714,7 @@ if (OC_USE_ZINC OR (OPENGL_FOUND AND OC_DEPENDENCIES_ONLY))
                 ZLIB_VERSION=${ZLIB_VERSION}
                 PNG_VERSION=${PNG_VERSION}
                 JPEG_VERSION=${JPEG_VERSION}
-                TIFF_VERSION=${TIFF_VERSION}
+                # TIFF_VERSION=${TIFF_VERSION}
                 LIBXML2_VERSION=${LIBXML2_VERSION}
                 GDCM-ABI_VERSION=${GDCM-ABI_VERSION}
             )

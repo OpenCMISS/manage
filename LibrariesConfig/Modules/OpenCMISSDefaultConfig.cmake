@@ -216,15 +216,6 @@ set(ZINC_VERSION 3.1)
 option(DISABLE_GIT "Do not use Git to obtain and manage sources" NO)
 
 ##
-# GITHUB_USE_SSL
-# --------------
-#
-# Use SSL connection to (default) GitHub repositories
-#
-# .. default:: NO
-option(GITHUB_USE_SSL "Use SSL connection to (default) GitHub repositories" NO)
-
-##
 # INT_TYPE
 # --------
 #
