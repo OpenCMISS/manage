@@ -152,7 +152,7 @@ if (NOT OPENCMISS_HAVE_MULTICONFIG_ENV)
 endif()
 
 # Hide some of the variables in the interface that we don't want to see.
-tidyUpVariables()
+tidy_gui_variables()
 
 # The build system creates a build log in order to ease the support process.
 string(TIMESTAMP NOW "%Y-%m-%d, %H:%M")

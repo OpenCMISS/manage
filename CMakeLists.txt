@@ -119,7 +119,7 @@ include(OCToolchainCompilers)
 include(OCDetermineMPI)
 
 # Hide some of the variables in the interface that we don't want to see.
-tidyUpVariables()
+tidy_gui_variables()
 
 ########################################################################
 # Misc targets for convenience
