@@ -644,10 +644,11 @@ if (OC_USE_ZINC OR (OPENGL_FOUND AND OC_DEPENDENCIES_ONLY))
     if (OC_USE_PNG)
         find_package(PNG ${LIBPNG_VERSION} QUIET)
         if (NOT PNG_FOUND)
-            set(PNG_FWD_DEPS ZINC ITK IMAGEMAGICK PNG)
+            set(PNG_FWD_DEPS ZINC ITK IMAGEMAGICK)
             addAndConfigureLocalComponent(PNG
                 PNG_NO_CONSOLE_IO=OFF
                 PNG_NO_STDIO=OFF
+                PNG_SHARED=OFF
                 ZLIB_VERSION=${ZLIB_VERSION}
             )
         endif ()
@@ -673,10 +674,15 @@ if (OC_USE_ZINC OR (OPENGL_FOUND AND OC_DEPENDENCIES_ONLY))
         if (NOT GDCM-ABI_FOUND)
             set(GDCM-ABI_FWD_DEPS ZINC ITK IMAGEMAGICK)
             # Make EXPAT and UUID platform dependent?
+            if (MSVC)
+                set(GDCM_USE_SYSTEM_EXPAT OFF)
+            else ()
+                set(GDCM_USE_SYSTEM_EXPAT OFF)
+            endif ()
             addAndConfigureLocalComponent(GDCM-ABI
                 GDCM_INSTALL_PACKAGE_DIR=${COMMON_PACKAGE_CONFIG_DIR}
                 GDCM_USE_SYSTEM_ZLIB=ON
-                GDCM_USE_SYSTEM_EXPAT=ON
+                GDCM_USE_SYSTEM_EXPAT=${GDCM_USE_SYSTEM_EXPAT}
             )
         endif ()
     endif ()
