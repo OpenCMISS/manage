@@ -116,7 +116,7 @@ if (OC_USE_HDF5)
 
     find_package(HDF5 ${HDF5_VERSION} QUIET)
     if (NOT HDF5_FOUND)
-        set(HDF5_FWD_DEPS FIELDML-API)
+        set(HDF5_FWD_DEPS FIELDML-API ITK)
         foreach(dependency IN_LIST MPI;SZIP;ZLIB)
             if (HDF5_WITH_${dependency} AND OC_USE_${dependency})
                 set(HDF5_USE_${dependency} ON)
@@ -136,6 +136,11 @@ if (OC_USE_HDF5)
         )
     endif ()
 endif ()
+if (HDF5_WITH_MPI AND OC_USE_MPI)
+    set(HDF5_USE_MPI ON)
+else ()
+    set(HDF5_USE_MPI OFF)
+endif ()
 
 # Fieldml
 find_package(FIELDML-API ${FIELDML-API_VERSION} QUIET)
@@ -145,11 +150,6 @@ if (NOT FIELDML-API_FOUND)
         set(FIELDML-API_USE_HDF5 ON)
     else ()
         set(FIELDML-API_USE_HDF5 OFF)
-    endif ()
-    if (HDF5_WITH_MPI AND OC_USE_MPI)
-        set(HDF5_USE_MPI ON)
-    else ()
-        set(HDF5_USE_MPI OFF)
     endif ()
     addAndConfigureLocalComponent(FIELDML-API
         LIBXML2_VERSION=${LIBXML2_VERSION}
@@ -706,10 +706,14 @@ if (OC_USE_ZINC OR (OPENGL_FOUND AND OC_DEPENDENCIES_ONLY))
     if (OC_USE_ITK)
         find_package(ITK ${ITK_VERSION} QUIET)
         if (NOT ITK_FOUND)
+            if (MSVC)
+                set(HDF5_SETTINGS ITK_USE_SYSTEM_HDF5=ON HDF5_VERSION=${HDF5_VERSION} HDF5_ENABLE_PARALLEL=${HDF5_USE_MPI})
+            endif ()
             set(ITK_FWD_DEPS ZINC)
             addAndConfigureLocalComponent(ITK
                 ITK_BUILD_TESTING=OFF
                 ITK_BUILD_EXAMPLES=OFF
+                ${HDF5_SETTINGS}
                 ITK_USE_SYSTEM_PNG=ON
                 ITK_USE_SYSTEM_TIFF=OFF # ITK now uses bigtiff, which is different from tiff
                 ITK_USE_SYSTEM_JPEG=ON
