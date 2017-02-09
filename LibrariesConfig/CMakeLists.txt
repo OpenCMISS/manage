@@ -136,7 +136,7 @@ include(OCMultiConfigEnvironment)
 # General paths & preps
 include(OCPaths)
 
-# Intrdouce miscellaneous helper functions and macros
+# Introduce miscellaneous helper functions and macros
 include(OCMiscFunctions)
 
 set(OPENCMISS_CONFIG_DIR ${OPENCMISS_CONFIG_DIR} CACHE PATH "Location of OpenCMISSLocalConfig.cmake to use for this configuration.")
@@ -156,7 +156,7 @@ if (NOT OPENCMISS_HAVE_MULTICONFIG_ENV)
     # This isn't configurable at this stage it is configured at the config creation time
     #set(OPENCMISS_BUILD_TYPE CACHE STRING "Choose the type of build to configure, options are: None(CMAKE_CXX_FLAGS or CMAKE_C_FLAGS used) Debug Release RelWithDebInfo MinSizeRel.")
     set(CMAKE_BUILD_TYPE ${OPENCMISS_BUILD_TYPE} CACHE INTERNAL "Internalise CMAKE_BUILD_TYPE manipulate through OPENCMISS_BUILD_TYPE instead." FORCE)
-endif()
+endif ()
 
 # Hide some of the variables in the interface that we don't want to see.
 tidy_gui_variables()
@@ -204,7 +204,7 @@ endif()
 # MPI
 # Unless we said to not have MPI, see that it's available.
 if(OPENCMISS_MPI STREQUAL none)
-    message(FATAL_ERROR "MPI value of 'none' not yet implemented.  Please spedify an MPI to use.") 
+    message(FATAL_ERROR "MPI value of 'none' not yet implemented.  Please specify an MPI to use.") 
 else ()
     message(STATUS "OPENCMISS_OWN_MPI_INSTALL_BASE: ${OPENCMISS_OWN_MPI_INSTALL_BASE}")
     include(OCDetermineMPI)
@@ -312,6 +312,7 @@ configure_file("${CMAKE_CURRENT_SOURCE_DIR}/Templates/build.in.config"
 )
 
 # Print a neat summary
+message(STATUS "@")
 message(STATUS "@@@@@@@@@@@@@@@@@@@ SUMMARY @@@@@@@@@@@@@@@@@@@@@@@@@")
 message(STATUS "@")
 if (OPENCMISS_SDK_INSTALL_DIR)
