@@ -133,6 +133,7 @@ if (OC_USE_HDF5)
             WITH_ZLIB=${HDF5_USE_ZLIB}
             ZLIB_VERSION=${ZLIB_VERSION}
             HDF5_BUILD_FORTRAN=${HDF5_BUILD_FORTRAN}
+            HDF5_BUILD_EXAMPLES=OFF
         )
     endif ()
 endif ()
@@ -710,9 +711,11 @@ if (OC_USE_ZINC OR (OPENGL_FOUND AND OC_DEPENDENCIES_ONLY))
                 set(HDF5_SETTINGS ITK_USE_SYSTEM_HDF5=ON HDF5_VERSION=${HDF5_VERSION} HDF5_ENABLE_PARALLEL=${HDF5_USE_MPI})
             endif ()
             set(ITK_FWD_DEPS ZINC)
+            message(STATUS "ITK_INSTALL_PACKAGE_DIR=${COMMON_PACKAGE_CONFIG_DIR}")
             addAndConfigureLocalComponent(ITK
                 ITK_BUILD_TESTING=OFF
                 ITK_BUILD_EXAMPLES=OFF
+                ITK_INSTALL_PACKAGE_DIR=${COMMON_PACKAGE_CONFIG_DIR}
                 ${HDF5_SETTINGS}
                 ITK_USE_SYSTEM_PNG=ON
                 ITK_USE_SYSTEM_TIFF=OFF # ITK now uses bigtiff, which is different from tiff

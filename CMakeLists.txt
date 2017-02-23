@@ -239,6 +239,11 @@ set(DOLLAR_SYMBOL $)
 # Packaging, creating SDKs etc.
 include(OCPackaging)
 
+########################################################################
+# Create source management targets and download commands
+# Iron, Zinc, Dependencies, ...
+add_subdirectory(SourceManagement)
+
 set(BUILD_CONFIG_COMMAND "${CMAKE_COMMAND}" --build .)
 if (OPENCMISS_HAVE_MULTICONFIG_ENV)
     list(APPEND BUILD_CONFIG_COMMAND --config $<CONFIG>)
