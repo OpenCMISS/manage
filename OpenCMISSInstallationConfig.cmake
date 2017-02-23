@@ -77,8 +77,8 @@ set(OC_CLEAN_REBUILDS_COMPONENTS YES)
 #
 # If unspecified, this will always be set to the version used for the latest build.
 #
-# .. default:: <empty>
-set(OC_DEFAULT_MPI )
+# .. default:: mpich
+set(OC_DEFAULT_MPI mpich)
 
 ##
 # OC_DEFAULT_MPI_BUILD_TYPE

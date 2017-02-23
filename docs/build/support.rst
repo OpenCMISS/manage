@@ -4,6 +4,7 @@
 -------------
 Build support
 -------------
+
 Having a smoothly working build is what we aim to provide for you.
 Yet, facing all those different systems, there are still situations where stuff goes wrong.
 
@@ -37,6 +38,7 @@ See the :ref:`sdk installations` section.
 ---------------
 Troubleshooting
 ---------------
+
 This section is intended to be used as first place of collection for common errors and mishaps
 
    Im getting errors from CMake claiming “You have changed variables that require your cache to be deleted [...]
