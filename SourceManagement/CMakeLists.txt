@@ -1,7 +1,7 @@
 
 
 ########################################################################################################################
-function(addSourceManagementTargets COMPONENT_NAME BINARY_DIR SOURCE_DIR)
+function(addSourceManagementTargets COMPONENT_NAME SOURCE_DIR)
     # Convention: github repo is the lowercase equivalent of the component name
     string(TOLOWER ${COMPONENT_NAME} REPO_NAME)
 
@@ -33,7 +33,8 @@ function(addSourceManagementTargets COMPONENT_NAME BINARY_DIR SOURCE_DIR)
             DEPENDS ${OC_SM_PREFIX}${COMPONENT_NAME}_sources
             COMMAND ${GIT_EXECUTABLE} pull
             COMMAND ${GIT_EXECUTABLE} checkout ${${COMPONENT_NAME}_BRANCH}
-            COMMAND ${CMAKE_COMMAND} -E remove -f ${BINARY_DIR}/${OC_EXTPROJ_STAMP_DIR}/*-build
+            # We can't have this here which binary dir should we be removing the stamp files from?
+            # COMMAND ${CMAKE_COMMAND} -E remove -f ${BINARY_DIR}/${OC_EXTPROJ_STAMP_DIR}/*-build
             COMMENT "Updating ${COMPONENT_NAME} sources"
             WORKING_DIRECTORY "${SOURCE_DIR}"
         )
@@ -58,7 +59,8 @@ function(addSourceManagementTargets COMPONENT_NAME BINARY_DIR SOURCE_DIR)
         # For tarballs, update is the same as download!
         add_custom_target(${OC_SM_PREFIX}${REPO_NAME}_update
             DEPENDS ${OC_SM_PREFIX}${REPO_NAME}_download
-            COMMAND ${CMAKE_COMMAND} -E remove -f ${BINARY_DIR}/${OC_EXTPROJ_STAMP_DIR}/*-build
+            # We can't have this here which binary dir should we be removing the stamp files from?
+            # COMMAND ${CMAKE_COMMAND} -E remove -f ${BINARY_DIR}/${OC_EXTPROJ_STAMP_DIR}/*-build
             COMMENT "Updating ${COMPONENT_NAME} sources"
         )
     endif()
@@ -91,14 +93,35 @@ function(addSourceManagementTargets COMPONENT_NAME BINARY_DIR SOURCE_DIR)
 endfunction()
 
 
-set(COMMON_DEPENDENCIES ZLIB LIBXML2 LAPACK BZIP2 SZIP HDF5 FIELDML-API)
+set(COMMON_DEPENDENCIES GTEST ZLIB LIBXML2 LAPACK BZIP2 SZIP HDF5 FIELDML-API)
 set(IRON_DEPENDENCIES SCOTCH PLAPACK SCALAPACK PARMETIS MUMPS SUITESPARSE SUPERLU HYPRE SUPERLU_DIST SUNDIALS PASTIX SOWING PETSC SLEPC LIBCELLML CELLML LLVM CLANG CSIM)
 set(ZINC_DEPENDENCIES JPEG NETGEN FREETYPE FTGL GLEW OPTPP PNG TIFF GDCM-ABI IMAGEMAGICK ITK)
 
 set(ALL_SOURCE_COMPONENTS IRON ZINC ${IRON_DEPENDENCIES} ${ZINC_DEPENDENCIES} ${COMMON_DEPENDENCIES})
 
+##############################################################
+# Compute directories
+message(STATUS "OPENCMISS_LIBRARIES_SOURCE_DIR: ${OPENCMISS_LIBRARIES_SOURCE_DIR}")
+message(STATUS "OPENCMISS_DEPENDENCIES_SOURCE_DIR: ${OPENCMISS_DEPENDENCIES_SOURCE_DIR}")
+message(STATUS "GITHUB_USERNAME: ${GITHUB_USERNAME}")
+message(STATUS "GITHUB_ORGANIZATION: ${GITHUB_ORGANIZATION}")
+
+# GITHUB_ORGANIZATION: For the default source locations, we use the OpenCMISS github organizations to group the components sources.
+#                      Those are used to both clone the git repo in development mode or generate the path to the zipped source file on github. 
 foreach (COMPONENT_NAME ALL_SOURCE_COMPONENTS)
-    addSourceManagementTargets(${COMPONENT_NAME} ${BINARY_DIR} ${SOURCE_DIR})
+    string(TOLOWER ${COMPONENT_NAME} FOLDER_NAME)
+    if (COMPONENT_NAME STREQUAL "IRON" OR COMPONENT_NAME STREQUAL "ZINC")
+        set(COMPONENT_SOURCE_DIR "${OPENCMISS_LIBRARIES_SOURCE_DIR}/${FOLDER_NAME}")
+        set(GITHUB_ORGANIZATION OpenCMISS)
+    else ()
+        set(COMPONENT_SOURCE_DIR "${OPENCMISS_DEPENDENCIES_SOURCE_DIR}/${FOLDER_NAME}")
+        if (COMPONENT_NAME STREQUAL "GTEST")
+            set(GITHUB_ORGANIZATION OpenCMISS-Utilities)
+        else ()
+            set(GITHUB_ORGANIZATION OpenCMISS-Dependencies)
+        endif ()
+    endif ()
+    addSourceManagementTargets(${COMPONENT_NAME} ${COMPONENT_SOURCE_DIR})
 endforeach ()
 
 

@@ -7,8 +7,6 @@
 # The main macro is addAndConfigureLocalComponent defined in OCComponentSetupMacros.cmake.
 # Its behaviour is controlled (despite the direct argument) by
 # SUBGROUP_PATH: Determines a grouping folder to sort components into.
-# GITHUB_ORGANIZATION: For the default source locations, we use the OpenCMISS github organizations to group the components sources.
-#                      Those are used to both clone the git repo in development mode or generate the path to the zipped source file on github. 
 
 # ================================================================
 # Utils 
@@ -22,7 +20,6 @@ if (OC_USE_GTEST AND (BUILD_TESTS OR OC_BUILD_ZINC_TESTS))
     if (NOT GTEST_FOUND)
         set(GTEST_FWD_DEPS LLVM CSIM ZINC)
         set(SUBGROUP_PATH utilities)
-        set(GITHUB_ORGANIZATION OpenCMISS-Utilities)
         addAndConfigureLocalComponent(GTEST
             gtest_force_shared_crt=YES
         )
@@ -39,7 +36,6 @@ endif ()
 
 # Affects the addAndConfigureLocalComponent macro
 set(SUBGROUP_PATH dependencies)
-set(GITHUB_ORGANIZATION OpenCMISS-Dependencies)
 
 # Note: The following order for all packages has to be in their interdependency order,
 # i.e. mumps may need scotch so scotch has to be processed first on order to be added to the
@@ -524,7 +520,6 @@ if (OC_USE_IRON OR OC_DEPENDENCIES_ONLY)
 
     if (NOT OC_DEPENDENCIES_ONLY)
         set(SUBGROUP_PATH .)
-        set(GITHUB_ORGANIZATION OpenCMISS)
         foreach(dependency IN_LIST CELLML;FIELDML-API;HYPRE;MUMPS;PETSC;SCALAPACK;SUNDIALS)
             if(IRON_WITH_${dependency} AND OC_USE_${dependency})
                 set(IRON_USE_${dependency} ON)
@@ -560,7 +555,6 @@ endif ()
 
 if (OC_USE_ZINC OR (OPENGL_FOUND AND OC_DEPENDENCIES_ONLY))
     set(SUBGROUP_PATH dependencies)
-    set(GITHUB_ORGANIZATION OpenCMISS-Dependencies)
     
     # jpeg
     if (OC_USE_JPEG)
@@ -741,7 +735,6 @@ if (OC_USE_ZINC OR (OPENGL_FOUND AND OC_DEPENDENCIES_ONLY))
             set(ZINC_BUILD_TESTS TRUE)
         endif ()
         set(SUBGROUP_PATH .)
-        set(GITHUB_ORGANIZATION OpenCMISS)
         addAndConfigureLocalComponent(ZINC
             ZINC_BUILD_TESTS=${ZINC_BUILD_TESTS}}
             ZINC_BUILD_PYTHON_BINDINGS=${ZINC_WITH_Python_BINDINGS}

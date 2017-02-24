@@ -15,9 +15,9 @@ function(addAndConfigureLocalComponent COMPONENT_NAME)
     ##############################################################
     # Compute directories
     if (COMPONENT_NAME STREQUAL "IRON" OR COMPONENT_NAME STREQUAL "ZINC")
-        set(COMPONENT_SOURCE "${OPENCMISS_LIBRARIES_SOURCE_DIR}/${FOLDER_NAME}")
+        set(COMPONENT_SOURCE_DIR "${OPENCMISS_LIBRARIES_SOURCE_DIR}/${FOLDER_NAME}")
     else ()
-        set(COMPONENT_SOURCE "${OPENCMISS_DEPENDENCIES_SOURCE_DIR}/${FOLDER_NAME}")
+        set(COMPONENT_SOURCE_DIR "${OPENCMISS_DEPENDENCIES_SOURCE_DIR}/${FOLDER_NAME}")
     endif ()
 
     # Check which build dir is required - depending on whether this component can be built against mpi
@@ -142,10 +142,10 @@ function(addAndConfigureLocalComponent COMPONENT_NAME)
     # Create actual external projects
 
     # Create the external projects
-    createExternalProjects(${COMPONENT_NAME} "${COMPONENT_SOURCE}" "${COMPONENT_BUILD_DIR}" "${COMPONENT_DEFS}")
+    createExternalProjects(${COMPONENT_NAME} "${COMPONENT_SOURCE_DIR}" "${COMPONENT_BUILD_DIR}" "${COMPONENT_DEFS}")
 
     # Create some convenience targets like clean, update etc
-    addConvenienceTargets(${COMPONENT_NAME} "${COMPONENT_BUILD_DIR}" "${COMPONENT_SOURCE}")
+    addConvenienceTargets(${COMPONENT_NAME} "${COMPONENT_BUILD_DIR}" "${COMPONENT_SOURCE_DIR}")
 
     # Add the dependency information for other downstream packages that might use this one
     addDownstreamDependencies(${COMPONENT_NAME} TRUE)
