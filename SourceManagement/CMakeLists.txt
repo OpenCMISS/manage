@@ -122,6 +122,10 @@ foreach (COMPONENT_NAME ALL_SOURCE_COMPONENTS)
         endif ()
     endif ()
     addSourceManagementTargets(${COMPONENT_NAME} ${COMPONENT_SOURCE_DIR})
+    
+    list(APPEND COMPONENT_SOURCE_TARGETS ${OC_SM_PREFIX}${COMPONENT_NAME}_sources)
 endforeach ()
+
+
 
 

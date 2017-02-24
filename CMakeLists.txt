@@ -267,6 +267,10 @@ configure_file("${CMAKE_CURRENT_SOURCE_DIR}/Templates/create_config.in.cmake"
 configure_file("${CMAKE_CURRENT_SOURCE_DIR}/Templates/build_config.in.cmake"
     "${CMAKE_CURRENT_BINARY_DIR}/Scripts/build_config.cmake")
 
+add_custom_target(get_sources
+    DEPENDS ${COMPONENT_SOURCE_TARGETS}
+    )
+
 add_custom_command(OUTPUT "${CREATE_CONFIG_STAMP_FILE}"
     DEPENDS "${CMAKE_CURRENT_BINARY_DIR}/Scripts/create_config.cmake"
     COMMAND "${CMAKE_COMMAND}" -DSTAMP_FILE="${CREATE_CONFIG_STAMP_FILE}" -DBUILD_STAMP_FILE="${BUILD_CONFIG_STAMP_FILE}" -P "${CMAKE_CURRENT_BINARY_DIR}/Scripts/create_config.cmake"
@@ -275,6 +279,7 @@ add_custom_command(OUTPUT "${CREATE_CONFIG_STAMP_FILE}"
 add_custom_target(create_config
     DEPENDS "${CREATE_CONFIG_STAMP_FILE}"
     )
+add_dependencies(create_config get_sources)
 
 string(REPLACE ";" "-<semi-colon>-" BUILD_CONFIG_COMMAND_TMP "${BUILD_CONFIG_COMMAND}")
 add_custom_command(OUTPUT "${BUILD_CONFIG_STAMP_FILES}"
