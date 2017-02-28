@@ -21,6 +21,7 @@ if (OC_USE_GTEST AND (BUILD_TESTS OR OC_BUILD_ZINC_TESTS))
         set(GTEST_FWD_DEPS LLVM CSIM ZINC)
         set(SUBGROUP_PATH utilities)
         addAndConfigureLocalComponent(GTEST
+            BUILD_TESTS=OFF
             gtest_force_shared_crt=YES
         )
     endif ()
@@ -122,6 +123,7 @@ if (OC_USE_HDF5)
         endforeach()
 
         addAndConfigureLocalComponent(HDF5
+            BUILD_TESTS=${BUILD_TESTS}
             HDF5_VERSION=${HDF5_VERSION}
             HDF5_WITH_MPI=${HDF5_USE_MPI}
             WITH_SZIP=${HDF5_USE_SZIP}
@@ -149,6 +151,7 @@ if (NOT FIELDML-API_FOUND)
         set(FIELDML-API_USE_HDF5 OFF)
     endif ()
     addAndConfigureLocalComponent(FIELDML-API
+        BUILD_TESTS=${BUILD_TESTS}
         LIBXML2_VERSION=${LIBXML2_VERSION}
         USE_HDF5=${FIELDML-API_USE_HDF5}
         HDF5_VERSION=${HDF5_VERSION}
@@ -178,6 +181,7 @@ if (OC_USE_IRON OR OC_DEPENDENCIES_ONLY)
 
             addAndConfigureLocalComponent(SCOTCH
                 BUILD_PTSCOTCH=YES
+                BUILD_TESTS=${BUILD_TESTS}
                 USE_ZLIB=${SCOTCH_USE_ZLIB}
                 ZLIB_VERSION=${ZLIB_VERSION}
                 USE_BZ2=${SCOTCH_USE_BZIP2}
@@ -197,6 +201,7 @@ if (OC_USE_IRON OR OC_DEPENDENCIES_ONLY)
             endforeach()
 
             addAndConfigureLocalComponent(SCOTCH
+                BUILD_TESTS=${BUILD_TESTS}
                 BUILD_PTSCOTCH=NO
                 USE_ZLIB=${SCOTCH_USE_ZLIB}
                 ZLIB_VERSION=${ZLIB_VERSION}
@@ -212,6 +217,7 @@ if (OC_USE_IRON OR OC_DEPENDENCIES_ONLY)
         if (NOT PLAPACK_FOUND)
             SET(PLAPACK_FWD_DEPS IRON)
             addAndConfigureLocalComponent(PLAPACK
+                BUILD_TESTS=${BUILD_TESTS}
                 BLAS_VERSION=${BLAS_VERSION}
                 LAPACK_VERSION=${LAPACK_VERSION})
         endif ()
@@ -223,6 +229,7 @@ if (OC_USE_IRON OR OC_DEPENDENCIES_ONLY)
         if (NOT SCALAPACK_FOUND)
             SET(SCALAPACK_FWD_DEPS MUMPS PETSC IRON)
             addAndConfigureLocalComponent(SCALAPACK
+                BUILD_TESTS=${BUILD_TESTS}
                 BLAS_VERSION=${BLAS_VERSION}
                 LAPACK_VERSION=${LAPACK_VERSION}
                 BUILD_PRECISION=${BUILD_PRECISION})
@@ -234,7 +241,8 @@ if (OC_USE_IRON OR OC_DEPENDENCIES_ONLY)
         find_package(PARMETIS ${PARMETIS_VERSION} QUIET)
         if (NOT PARMETIS_FOUND)
             SET(PARMETIS_FWD_DEPS MUMPS SUITESPARSE SUPERLU_DIST PASTIX IRON)
-            addAndConfigureLocalComponent(PARMETIS)
+            addAndConfigureLocalComponent(PARMETIS
+                BUILD_TESTS=${BUILD_TESTS})
         endif ()
     endif ()
     
@@ -252,6 +260,7 @@ if (OC_USE_IRON OR OC_DEPENDENCIES_ONLY)
             endforeach()
 
             addAndConfigureLocalComponent(MUMPS
+                BUILD_TESTS=${BUILD_TESTS}
                 USE_SCOTCH=${MUMPS_USE_SCOTCH}
                 USE_PTSCOTCH=${MUMPS_USE_PTSCOTCH}
                 USE_PARMETIS=${MUMPS_USE_PARMETIS}
@@ -275,6 +284,7 @@ if (OC_USE_IRON OR OC_DEPENDENCIES_ONLY)
             SET(SUITESPARSE_FWD_DEPS PETSC IRON)
             addAndConfigureLocalComponent(SUITESPARSE
                 BUILD_PRECISION=${BUILD_PRECISION}
+                BUILD_TESTS=${BUILD_TESTS}
                 BLAS_VERSION=${BLAS_VERSION}
                 LAPACK_VERSION=${LAPACK_VERSION}
                 METIS_VERSION=${METIS_VERSION})
@@ -288,6 +298,7 @@ if (OC_USE_IRON OR OC_DEPENDENCIES_ONLY)
             SET(SUPERLU_FWD_DEPS PETSC IRON HYPRE)
             addAndConfigureLocalComponent(SUPERLU
                 BUILD_PRECISION=${BUILD_PRECISION}
+                BUILD_TESTS=${BUILD_TESTS}
                 BLAS_VERSION=${BLAS_VERSION}
                 LAPACK_VERSION=${LAPACK_VERSION})
         endif ()
@@ -299,6 +310,7 @@ if (OC_USE_IRON OR OC_DEPENDENCIES_ONLY)
         if (NOT HYPRE_FOUND)
             SET(HYPRE_FWD_DEPS PETSC IRON)
             addAndConfigureLocalComponent(HYPRE
+                BUILD_TESTS=${BUILD_TESTS}
                 BLAS_VERSION=${BLAS_VERSION}
                 LAPACK_VERSION=${LAPACK_VERSION})
         endif ()
@@ -319,6 +331,7 @@ if (OC_USE_IRON OR OC_DEPENDENCIES_ONLY)
 
             addAndConfigureLocalComponent(SUPERLU_DIST
                 BUILD_PRECISION=${BUILD_PRECISION}
+                BUILD_TESTS=${BUILD_TESTS}
                 BLAS_VERSION=${BLAS_VERSION}
                 USE_PARMETIS=${SUPERLU_DIST_USE_PARMETIS}
                 PARMETIS_VERSION=${PARMETIS_VERSION}
@@ -343,6 +356,7 @@ if (OC_USE_IRON OR OC_DEPENDENCIES_ONLY)
 
             addAndConfigureLocalComponent(SUNDIALS
                 BUILD_PRECISION=${BUILD_PRECISION}
+                BUILD_TESTS=${BUILD_TESTS}
                 USE_LAPACK=${SUNDIALS_USE_LAPACK}
                 BLAS_VERSION=${BLAS_VERSION}
                 LAPACK_VERSION=${LAPACK_VERSION})
@@ -364,6 +378,7 @@ if (OC_USE_IRON OR OC_DEPENDENCIES_ONLY)
 
             addAndConfigureLocalComponent(PASTIX
                 BUILD_PRECISION=${BUILD_PRECISION}
+                BUILD_TESTS=${BUILD_TESTS}
                 BLAS_VERSION=${BLAS_VERSION}
                 USE_THREADS=${PASTIX_USE_THREADS}
                 USE_METIS=${PASTIX_USE_METIS}
@@ -397,6 +412,7 @@ if (OC_USE_IRON OR OC_DEPENDENCIES_ONLY)
             endforeach()
 
             addAndConfigureLocalComponent(PETSC
+                BUILD_TESTS=${BUILD_TESTS}
                 USE_PASTIX=${PETSC_USE_PASTIX}
                 PASTIX_VERSION=${PASTIX_VERSION}
                 USE_MUMPS=${PETSC_USE_MUMPS}
@@ -437,6 +453,7 @@ if (OC_USE_IRON OR OC_DEPENDENCIES_ONLY)
             endforeach()
 
             addAndConfigureLocalComponent(SLEPC
+                BUILD_TESTS=${BUILD_TESTS}
                 USE_PASTIX=${PETSC_USE_PASTIX}
                 PASTIX_VERSION=${PASTIX_VERSION}
                 USE_MUMPS=${PETSC_USE_MUMPS}
@@ -483,6 +500,7 @@ if (OC_USE_IRON OR OC_DEPENDENCIES_ONLY)
             endforeach()
 
             addAndConfigureLocalComponent(CELLML
+                BUILD_TESTS=${BUILD_TESTS}
                 LIBXML2_VERSION=${LIBXML2_VERSION}
                 CSIM_VERSION=${CSIM_VERSION}
                 LIBCELLML_VERSION=${LIBCELLML_VERSION}
@@ -536,6 +554,7 @@ if (OC_USE_IRON OR OC_DEPENDENCIES_ONLY)
         endforeach()
 
         addAndConfigureLocalComponent(IRON
+            BUILD_TESTS=${BUILD_TESTS}
             WITH_CELLML=${IRON_USE_CELLML}
             CELLML_VERSION=${CELLML_VERSION}
             LIBCELLML_VERSION=${LIBCELLML_VERSION}
