@@ -14,6 +14,12 @@
 #   we probably also dont need the release/debug versions here. we'll see what logic we need to extract from the build macros script
 # ================================================================ 
 
+# BLAS vendor
+# If set, propagate it to any component so that the correct libraries are used.
+if (BLA_VENDOR)
+    set(BLA_VENDOR_CONFIG BLA_VENDOR=${BLA_VENDOR})
+endif()
+
 # gTest
 if (OC_USE_GTEST AND (BUILD_TESTS OR OC_BUILD_ZINC_TESTS))
     find_package(GTEST ${GTEST_VERSION} QUIET)
@@ -218,6 +224,7 @@ if (OC_USE_IRON OR OC_DEPENDENCIES_ONLY)
             SET(PLAPACK_FWD_DEPS IRON)
             addAndConfigureLocalComponent(PLAPACK
                 FORTRAN_MANGLING=${FORTRAN_MANGLING}
+                ${BLA_VENDOR_CONFIG}
                 BUILD_TESTS=${BUILD_TESTS}
                 BLAS_VERSION=${BLAS_VERSION}
                 LAPACK_VERSION=${LAPACK_VERSION})
@@ -231,6 +238,7 @@ if (OC_USE_IRON OR OC_DEPENDENCIES_ONLY)
             SET(SCALAPACK_FWD_DEPS MUMPS PETSC IRON)
             addAndConfigureLocalComponent(SCALAPACK
                 BUILD_TESTS=${BUILD_TESTS}
+                ${BLA_VENDOR_CONFIG}
                 FORTRAN_MANGLING=${FORTRAN_MANGLING}
                 BLAS_VERSION=${BLAS_VERSION}
                 LAPACK_VERSION=${LAPACK_VERSION}
@@ -264,6 +272,7 @@ if (OC_USE_IRON OR OC_DEPENDENCIES_ONLY)
             addAndConfigureLocalComponent(MUMPS
                 BUILD_TESTS=${BUILD_TESTS}
                 FORTRAN_MANGLING=${FORTRAN_MANGLING}
+                ${BLA_VENDOR_CONFIG}
                 USE_SCOTCH=${MUMPS_USE_SCOTCH}
                 USE_PTSCOTCH=${MUMPS_USE_PTSCOTCH}
                 USE_PARMETIS=${MUMPS_USE_PARMETIS}
@@ -289,6 +298,7 @@ if (OC_USE_IRON OR OC_DEPENDENCIES_ONLY)
                 BUILD_PRECISION=${BUILD_PRECISION}
                 BUILD_TESTS=${BUILD_TESTS}
                 FORTRAN_MANGLING=${FORTRAN_MANGLING}
+                ${BLA_VENDOR_CONFIG}
                 BLAS_VERSION=${BLAS_VERSION}
                 LAPACK_VERSION=${LAPACK_VERSION}
                 METIS_VERSION=${METIS_VERSION})
@@ -304,6 +314,7 @@ if (OC_USE_IRON OR OC_DEPENDENCIES_ONLY)
                 BUILD_PRECISION=${BUILD_PRECISION}
                 BUILD_TESTS=${BUILD_TESTS}
                 FORTRAN_MANGLING=${FORTRAN_MANGLING}
+                ${BLA_VENDOR_CONFIG}
                 BLAS_VERSION=${BLAS_VERSION}
                 LAPACK_VERSION=${LAPACK_VERSION})
         endif ()
@@ -316,6 +327,7 @@ if (OC_USE_IRON OR OC_DEPENDENCIES_ONLY)
             SET(HYPRE_FWD_DEPS PETSC IRON)
             addAndConfigureLocalComponent(HYPRE
                 BUILD_TESTS=${BUILD_TESTS}
+                ${BLA_VENDOR_CONFIG}
                 BLAS_VERSION=${BLAS_VERSION}
                 LAPACK_VERSION=${LAPACK_VERSION})
         endif ()
@@ -338,6 +350,7 @@ if (OC_USE_IRON OR OC_DEPENDENCIES_ONLY)
                 BUILD_PRECISION=${BUILD_PRECISION}
                 BUILD_TESTS=${BUILD_TESTS}
                 FORTRAN_MANGLING=${FORTRAN_MANGLING}
+                ${BLA_VENDOR_CONFIG}
                 BLAS_VERSION=${BLAS_VERSION}
                 USE_PARMETIS=${SUPERLU_DIST_USE_PARMETIS}
                 PARMETIS_VERSION=${PARMETIS_VERSION}
@@ -363,6 +376,7 @@ if (OC_USE_IRON OR OC_DEPENDENCIES_ONLY)
             addAndConfigureLocalComponent(SUNDIALS
                 BUILD_PRECISION=${BUILD_PRECISION}
                 BUILD_TESTS=${BUILD_TESTS}
+                ${BLA_VENDOR_CONFIG}
                 USE_LAPACK=${SUNDIALS_USE_LAPACK}
                 BLAS_VERSION=${BLAS_VERSION}
                 LAPACK_VERSION=${LAPACK_VERSION})
@@ -386,6 +400,7 @@ if (OC_USE_IRON OR OC_DEPENDENCIES_ONLY)
                 BUILD_PRECISION=${BUILD_PRECISION}
                 BUILD_TESTS=${BUILD_TESTS}
                 INT_TYPE=${INT_TYPE}
+                ${BLA_VENDOR_CONFIG}
                 BLAS_VERSION=${BLAS_VERSION}
                 USE_THREADS=${PASTIX_USE_THREADS}
                 USE_METIS=${PASTIX_USE_METIS}
@@ -421,6 +436,7 @@ if (OC_USE_IRON OR OC_DEPENDENCIES_ONLY)
             addAndConfigureLocalComponent(PETSC
                 BUILD_TESTS=${BUILD_TESTS}
                 FORTRAN_MANGLING=${FORTRAN_MANGLING}
+                ${BLA_VENDOR_CONFIG}
                 USE_PASTIX=${PETSC_USE_PASTIX}
                 PASTIX_VERSION=${PASTIX_VERSION}
                 USE_MUMPS=${PETSC_USE_MUMPS}
@@ -664,6 +680,7 @@ if (OC_USE_ZINC OR (OPENGL_FOUND AND OC_DEPENDENCIES_ONLY))
 
             addAndConfigureLocalComponent(OPTPP
                 USE_EXTERNAL_BLAS=${OPTPP_USE_BLAS}
+                ${BLA_VENDOR_CONFIG}
                 BLAS_VERSION=${BLAS_VERSION}
                 LAPACK_VERSION=${LAPACK_VERSION})
         endif ()
