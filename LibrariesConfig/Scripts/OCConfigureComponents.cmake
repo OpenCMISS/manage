@@ -385,6 +385,7 @@ if (OC_USE_IRON OR OC_DEPENDENCIES_ONLY)
             addAndConfigureLocalComponent(PASTIX
                 BUILD_PRECISION=${BUILD_PRECISION}
                 BUILD_TESTS=${BUILD_TESTS}
+                INT_TYPE=${INT_TYPE}
                 BLAS_VERSION=${BLAS_VERSION}
                 USE_THREADS=${PASTIX_USE_THREADS}
                 USE_METIS=${PASTIX_USE_METIS}
