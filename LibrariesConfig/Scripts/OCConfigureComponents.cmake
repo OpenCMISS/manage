@@ -224,7 +224,8 @@ if (OC_USE_IRON OR OC_DEPENDENCIES_ONLY)
             SET(SCALAPACK_FWD_DEPS MUMPS PETSC IRON)
             addAndConfigureLocalComponent(SCALAPACK
                 BLAS_VERSION=${BLAS_VERSION}
-                LAPACK_VERSION=${LAPACK_VERSION})
+                LAPACK_VERSION=${LAPACK_VERSION}
+                BUILD_PRECISION=${BUILD_PRECISION})
         endif ()
     endif ()
     
@@ -259,6 +260,7 @@ if (OC_USE_IRON OR OC_DEPENDENCIES_ONLY)
                 SCOTCH_VERSION=${SCOTCH_VERSION}
                 PARMETIS_VERSION=${PARMETIS_VERSION}
                 METIS_VERSION=${METIS_VERSION}
+                BUILD_PRECISION=${BUILD_PRECISION}
                 BLAS_VERSION=${BLAS_VERSION}
                 LAPACK_VERSION=${LAPACK_VERSION}
                 SCALAPACK_VERSION=${SCALAPACK_VERSION}
@@ -272,6 +274,7 @@ if (OC_USE_IRON OR OC_DEPENDENCIES_ONLY)
         if (NOT SUITESPARSE_FOUND)
             SET(SUITESPARSE_FWD_DEPS PETSC IRON)
             addAndConfigureLocalComponent(SUITESPARSE
+                BUILD_PRECISION=${BUILD_PRECISION}
                 BLAS_VERSION=${BLAS_VERSION}
                 LAPACK_VERSION=${LAPACK_VERSION}
                 METIS_VERSION=${METIS_VERSION})
@@ -284,6 +287,7 @@ if (OC_USE_IRON OR OC_DEPENDENCIES_ONLY)
         if (NOT SUPERLU_FOUND)
             SET(SUPERLU_FWD_DEPS PETSC IRON HYPRE)
             addAndConfigureLocalComponent(SUPERLU
+                BUILD_PRECISION=${BUILD_PRECISION}
                 BLAS_VERSION=${BLAS_VERSION}
                 LAPACK_VERSION=${LAPACK_VERSION})
         endif ()
@@ -314,6 +318,7 @@ if (OC_USE_IRON OR OC_DEPENDENCIES_ONLY)
             endforeach()
 
             addAndConfigureLocalComponent(SUPERLU_DIST
+                BUILD_PRECISION=${BUILD_PRECISION}
                 BLAS_VERSION=${BLAS_VERSION}
                 USE_PARMETIS=${SUPERLU_DIST_USE_PARMETIS}
                 PARMETIS_VERSION=${PARMETIS_VERSION}
@@ -337,6 +342,7 @@ if (OC_USE_IRON OR OC_DEPENDENCIES_ONLY)
             endforeach()
 
             addAndConfigureLocalComponent(SUNDIALS
+                BUILD_PRECISION=${BUILD_PRECISION}
                 USE_LAPACK=${SUNDIALS_USE_LAPACK}
                 BLAS_VERSION=${BLAS_VERSION}
                 LAPACK_VERSION=${LAPACK_VERSION})
@@ -357,6 +363,7 @@ if (OC_USE_IRON OR OC_DEPENDENCIES_ONLY)
             endforeach()
 
             addAndConfigureLocalComponent(PASTIX
+                BUILD_PRECISION=${BUILD_PRECISION}
                 BLAS_VERSION=${BLAS_VERSION}
                 USE_THREADS=${PASTIX_USE_THREADS}
                 USE_METIS=${PASTIX_USE_METIS}
