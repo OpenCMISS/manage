@@ -98,10 +98,10 @@ endif ()
 if (NOT OPENCMISS_HAVE_MULTICONFIG_ENV)
     set(OPENCMISS_BUILD_TYPE Release CACHE STRING "Choose the type of build to configure, options are: None(CMAKE_CXX_FLAGS or CMAKE_C_FLAGS used) Debug Release RelWithDebInfo MinSizeRel.")
     set(CMAKE_BUILD_TYPE Release CACHE INTERNAL "Choose the type of build, options are: None(CMAKE_CXX_FLAGS or CMAKE_C_FLAGS used) Debug Release RelWithDebInfo MinSizeRel." FORCE)
-    message(STATUS "Setting build type to: ${CMAKE_BUILD_TYPE}")
+    #message(STATUS "Setting build type to: ${CMAKE_BUILD_TYPE}")
 endif()
 
-# Look for an OpenCMISS Developer script
+# Look for an OpenCMISS installation file
 SET(OC_INSTALLATION_CONFIG "${CMAKE_CURRENT_BINARY_DIR}/OpenCMISSInstallationConfig.cmake")
 set(OC_DEVELOPER NO)
 if (NOT EXISTS "${OC_INSTALLATION_CONFIG}")
@@ -165,7 +165,6 @@ endfunction()
 
 # Get the compiler part
 get_compiler_path_for_toolchain(${OPENCMISS_TOOLCHAIN} COMPILER_PART)
-
 getArchitecturePathGivenCompilerPart(${COMPILER_PART} ARCHITECTURE_NO_MPI_PATH ARCHITECTURE_MPI_PATH)
 #set(ARCHITECTURE_MPI_PATH /${SYSTEM_PART}/${COMPILER_PART}${OPENCMISS_USER_PART_ARCHITECTURE_PATH_WITH_SLASH}/${MPI_PART})
 #set(ARCHITECTURE_NO_MPI_PATH /${SYSTEM_PART}/${COMPILER_PART}${OPENCMISS_USER_PART_ARCHITECTURE_PATH_WITH_SLASH}/no_mpi)
@@ -209,13 +208,14 @@ get_property(ENABLED_LANGUAGES GLOBAL PROPERTY ENABLED_LANGUAGES)
 if ("${OPENCMISS_INSTRUMENTATION}" STREQUAL "scorep")
     foreach(_lang C CXX Fortran)
        if (_lang IN_LIST ENABLED_LANGUAGES)
-	   string(CONCAT TEMP_${_lang}_COMPILER "scorep-" "${CMAKE_${_lang}_COMPILER}")
+       string(CONCAT TEMP_${_lang}_COMPILER "scorep-" "${CMAKE_${_lang}_COMPILER}")
            list(APPEND CURRENT_CONFIGURATION_ARGS -DCMAKE_${_lang}_COMPILER=${TEMP_${_lang}_COMPILER})
        endif ()
     endforeach()
 endif ()
 
 string(REPLACE ";" " " CONFIGURATION_SETTINGS "${CURRENT_CONFIGURATION_ARGS}")
+message(STATUS "CONFIGURATION_SETTINGS: ${CONFIGURATION_SETTINGS}")
 # Variable used in create_config command
 set(CONFIG_PATH "${CMAKE_CURRENT_BINARY_DIR}/config${PLURAL_S}${ACTIVE_ARCHITECTURE_MPI_PATH}")
 if (NOT OPENCMISS_HAVE_MULTICONFIG_ENV)
@@ -266,10 +266,6 @@ configure_file("${CMAKE_CURRENT_SOURCE_DIR}/Templates/create_config.in.cmake"
 
 configure_file("${CMAKE_CURRENT_SOURCE_DIR}/Templates/build_config.in.cmake"
     "${CMAKE_CURRENT_BINARY_DIR}/Scripts/build_config.cmake")
-
-add_custom_target(get_sources
-    DEPENDS ${COMPONENT_SOURCE_TARGETS}
-    )
 
 add_custom_command(OUTPUT "${CREATE_CONFIG_STAMP_FILE}"
     DEPENDS "${CMAKE_CURRENT_BINARY_DIR}/Scripts/create_config.cmake"

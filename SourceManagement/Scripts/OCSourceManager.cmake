@@ -8,7 +8,7 @@ if (MODE STREQUAL "Check")
     # Passed variables are: SRC_DIR, BIN_DIR, TARGET_PREFIX and COMPONENT
     if (NOT EXISTS "${SRC_DIR}/CMakeLists.txt")
         execute_process(
-	    COMMAND ${CMAKE_COMMAND} -E make_directory "${SRC_DIR}"
+         COMMAND ${CMAKE_COMMAND} -E make_directory "${SRC_DIR}"
             COMMAND ${CMAKE_COMMAND} --build "${BIN_DIR}" --target ${TARGET_PREFIX}${COMPONENT}_download
             RESULT_VARIABLE RES
             ERROR_VARIABLE ERR
