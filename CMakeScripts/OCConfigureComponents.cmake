@@ -518,6 +518,7 @@ if (OC_USE_ZINC OR (OPENGL_FOUND AND OC_DEPENDENCIES_ONLY))
     if (OC_USE_OPTPP)
         find_package(OPTPP ${OPTPP_VERSION} QUIET)
         if (NOT OPTPP_FOUND)
+            set(OPTPP_FWD_DEPS ZINC)
             addAndConfigureLocalComponent(OPTPP
                 USE_EXTERNAL_BLAS=${OPTPP_WITH_BLAS}
                 BLAS_VERSION=${BLAS_VERSION}
