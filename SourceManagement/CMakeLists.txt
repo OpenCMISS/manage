@@ -70,7 +70,7 @@ function(addSourceManagementTargets COMPONENT_NAME SOURCE_DIR)
     # Add extra target that makes sure the source files are being present
     # Triggers build of ${OC_SM_PREFIX}${REPO_NAME}_download if the directory does not exist or 
     # no CMakeLists.txt is found in the target source directory.
-    add_custom_target(${OC_SM_PREFIX}${COMPONENT_NAME}_sources
+    add_custom_target(${OC_SM_PREFIX}${REPO_NAME}_sources
         COMMAND ${CMAKE_COMMAND}
             -DMODE=Check
             -DCOMPONENT=${REPO_NAME}
@@ -80,7 +80,7 @@ function(addSourceManagementTargets COMPONENT_NAME SOURCE_DIR)
             -P ${CMAKE_CURRENT_SOURCE_DIR}/Scripts/OCSourceManager.cmake
         COMMENT "Checking ${COMPONENT_NAME} sources are present"
     )
-    set_target_properties(${OC_SM_PREFIX}${COMPONENT_NAME}_sources PROPERTIES FOLDER "Internal")
+    set_target_properties(${OC_SM_PREFIX}${REPO_NAME}_sources PROPERTIES FOLDER "Internal")
 
     add_custom_target(${OC_SM_PREFIX}${REPO_NAME}_update_force
         COMMAND ${CMAKE_COMMAND} -E remove_directory "${SOURCE_DIR}"
@@ -96,20 +96,32 @@ endfunction()
 set(COMMON_DEPENDENCIES GTEST ZLIB LIBXML2 LAPACK BZIP2 SZIP HDF5 FIELDML-API)
 set(IRON_DEPENDENCIES SCOTCH PLAPACK SCALAPACK PARMETIS MUMPS SUITESPARSE SUPERLU HYPRE SUPERLU_DIST SUNDIALS PASTIX SOWING PETSC SLEPC LIBCELLML CELLML LLVM CLANG CSIM)
 set(ZINC_DEPENDENCIES JPEG NETGEN FREETYPE FTGL GLEW OPTPP PNG TIFF GDCM-ABI IMAGEMAGICK ITK)
+set(IRON_MPI_FALLBACKS MPICH OPENMPI MVAPICH2)
 
-set(ALL_SOURCE_COMPONENTS IRON ZINC ${IRON_DEPENDENCIES} ${ZINC_DEPENDENCIES} ${COMMON_DEPENDENCIES})
+set(ALL_SOURCE_COMPONENTS IRON ZINC ${IRON_DEPENDENCIES} ${ZINC_DEPENDENCIES} ${IRON_MPI_FALLBACKS} ${COMMON_DEPENDENCIES})
 
-##############################################################
-# Compute directories
-message(STATUS "OPENCMISS_LIBRARIES_SOURCE_DIR: ${OPENCMISS_LIBRARIES_SOURCE_DIR}")
-message(STATUS "OPENCMISS_DEPENDENCIES_SOURCE_DIR: ${OPENCMISS_DEPENDENCIES_SOURCE_DIR}")
-message(STATUS "GITHUB_USERNAME: ${GITHUB_USERNAME}")
-message(STATUS "GITHUB_ORGANIZATION: ${GITHUB_ORGANIZATION}")
+# Git is used by default to clone source repositories, unless disabled
+if (NOT DISABLE_GIT)
+    find_package(Git)
+    if (NOT GIT_FOUND)
+        message(STATUS "ATTENTION: Could not find Git. Falling back to download sources as .zip files.")
+    endif()
+endif()
 
 # GITHUB_ORGANIZATION: For the default source locations, we use the OpenCMISS github organizations to group the components sources.
 #                      Those are used to both clone the git repo in development mode or generate the path to the zipped source file on github. 
-foreach (COMPONENT_NAME ALL_SOURCE_COMPONENTS)
+foreach (COMPONENT_NAME ${ALL_SOURCE_COMPONENTS})
     string(TOLOWER ${COMPONENT_NAME} FOLDER_NAME)
+    # Set "devel" branches for each component if DEVEL_ALL is set,
+    # but don't override any specified component branches.
+    if (OPENCMISS_DEVEL_ALL AND NOT ${COMPONENT_NAME}_BRANCH)
+        set(${COMPONENT_NAME}_BRANCH devel)
+    elseif (NOT ${COMPONENT_NAME}_BRANCH)
+        # Set default version number branch unless e.g. IRON_BRANCH is specified
+        set(${COMPONENT_NAME}_BRANCH "v${${COMPONENT_NAME}_VERSION}")
+    endif ()
+    ##############################################################
+    # Compute directories
     if (COMPONENT_NAME STREQUAL "IRON" OR COMPONENT_NAME STREQUAL "ZINC")
         set(COMPONENT_SOURCE_DIR "${OPENCMISS_LIBRARIES_SOURCE_DIR}/${FOLDER_NAME}")
         set(GITHUB_ORGANIZATION OpenCMISS)
@@ -126,6 +138,8 @@ foreach (COMPONENT_NAME ALL_SOURCE_COMPONENTS)
     list(APPEND COMPONENT_SOURCE_TARGETS ${OC_SM_PREFIX}${COMPONENT_NAME}_sources)
 endforeach ()
 
-
+add_custom_target(get_sources
+    DEPENDS ${COMPONENT_SOURCE_TARGETS}
+    )
 
 

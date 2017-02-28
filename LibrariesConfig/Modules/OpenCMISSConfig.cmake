@@ -69,14 +69,6 @@ foreach(COMPONENT ${OPENCMISS_COMPONENTS})
     elseif (OC_COMPONENTS_SYSTEM STREQUAL ALL)
         set(OC_SYSTEM_${COMPONENT} ON)
     endif ()
-    # Set "devel" branches for each component if DEVEL_ALL is set,
-    # but don't override any specified component branches.
-    if (OPENCMISS_DEVEL_ALL AND NOT ${COMPONENT}_BRANCH)
-        set(${COMPONENT}_BRANCH devel)
-    elseif (NOT ${COMPONENT}_BRANCH)
-        # Set default version number branch unless e.g. IRON_BRANCH is specified
-        set(${COMPONENT}_BRANCH "v${${COMPONENT}_VERSION}")
-    endif ()
     # Set all individual components build types to shared if the global BUILD_SHARED_LIBS is set
     if (BUILD_SHARED_LIBS)
         set(${COMPONENT}_SHARED ON)
