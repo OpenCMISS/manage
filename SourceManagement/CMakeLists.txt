@@ -90,6 +90,7 @@ function(addSourceManagementTargets COMPONENT_NAME SOURCE_DIR)
     )
     set_target_properties(${OC_SM_PREFIX}${REPO_NAME}_update_force PROPERTIES FOLDER "Source management")
 
+    set(SOURCE_MANAGEMENT_TARGET ${OC_SM_PREFIX}${REPO_NAME}_sources PARENT_SCOPE)
 endfunction()
 
 
@@ -135,7 +136,7 @@ foreach (COMPONENT_NAME ${ALL_SOURCE_COMPONENTS})
     endif ()
     addSourceManagementTargets(${COMPONENT_NAME} ${COMPONENT_SOURCE_DIR})
     
-    list(APPEND COMPONENT_SOURCE_TARGETS ${OC_SM_PREFIX}${COMPONENT_NAME}_sources)
+    list(APPEND COMPONENT_SOURCE_TARGETS ${SOURCE_MANAGEMENT_TARGET})
 endforeach ()
 
 add_custom_target(get_sources
