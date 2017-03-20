@@ -16,6 +16,7 @@ list(APPEND CMAKE_MODULE_PATH
 
 # Need to set the compilers before any project call
 include(OCToolchainCompilers)
+setCMakeCompilersForToolchain(${TOOLCHAIN})
 
 ########################################################################
 # Ready to start the "build project"

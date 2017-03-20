@@ -21,7 +21,7 @@
 #
 # ============== Toolchain ==============
 # 
-# TOOLCHAIN: []|gnu|clang|mingw|intel|ibm
+# OPENCMISS_TOOLCHAIN: []|gnu|clang|mingw|intel|ibm
 #    Usually you dont need to tell CMake which compilers to use.
 #    If you change compilers here, YOU SHOULD KNOW WHY!!!
 #
@@ -42,7 +42,7 @@
 #
 # ============== MPI ====================
 #
-# MPI: []|mpich|mpich2|openmpi|mvapich2|intel|none
+# OPENCMISS_MPI: []|mpich|mpich2|openmpi|mvapich2|intel|none
 #    MPI is a crucial part of OpenCMISS and defaults to be used.
 #    You should not have to specify a specific MPI implementation, as CMake will find your system default automatically.
 #     
@@ -98,7 +98,7 @@ list(APPEND OPENCMISS_COMPONENT_MODULE_PATH
 
 # Need to set the compilers before any project call
 include(OCToolchainCompilers)
-
+setCMakeCompilersForToolchain(${OPENCMISS_TOOLCHAIN})
 ########################################################################
 # Ready to start the "build project"
 project(OpenCMISS-Manage-Configuration VERSION 1.3 LANGUAGES C CXX)
@@ -114,6 +114,7 @@ list(APPEND CMAKE_MODULE_PATH
 find_package(PythonInterp ${PYTHON_VERSION} QUIET)
 find_package(PythonLibs QUIET)
 find_package(SWIG QUIET)
+message(STATUS "SWIG_EXECUTABLE: ${SWIG_EXECUTABLE}")
 if (PYTHONINTERP_FOUND AND PYTHONLIBS_FOUND AND SWIG_FOUND)
     set(OC_PYTHON_PREREQ_FOUND YES)
     # Already check for the virtualenv - this is the default way if found.
@@ -322,8 +323,8 @@ message(STATUS "@ MPI implementation: ${OPENCMISS_MPI}")
 if (MPI_HOME)
     message(STATUS "@ MPI HOME: ${MPI_HOME}")
 endif ()
-if (TOOLCHAIN)
-    message(STATUS "@ TOOLCHAIN: ${TOOLCHAIN}")
+if (OPENCMISS_TOOLCHAIN)
+    message(STATUS "@ TOOLCHAIN: ${OPENCMISS_TOOLCHAIN}")
 endif ()
 message(STATUS "@")
 message(STATUS "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@")
