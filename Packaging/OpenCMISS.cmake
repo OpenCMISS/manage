@@ -79,10 +79,11 @@ if(OPENCMISS_INSTALL_DIR)
     # Use the OpenCMISS scripts to also allow choosing a separate toolchain
     # This file is located at the opencmiss installation rather than the local example
     # as it avoids file replication and makes maintenance much easier
-    if (TOOLCHAIN)
+    if (OPENCMISS_TOOLCHAIN)
         set(_OCTC ${OPENCMISS_INSTALL_DIR}/cmake/OCToolchainCompilers.cmake)
         if (EXISTS "${_OCTC}")
             include(${_OCTC})
+			setCMakeCompilersForToolchain(${OPENCMISS_TOOLCHAIN})
         else()
             message(WARNING "TOOLCHAIN specified but OpenCMISS config script could not be found at ${_OCTC}. Trying CMake defaults.")
         endif()

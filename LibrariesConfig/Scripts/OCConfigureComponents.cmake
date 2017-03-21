@@ -511,27 +511,6 @@ if (OC_USE_IRON OR OC_DEPENDENCIES_ONLY)
         endif ()
     endif ()
     
-    if (OC_USE_CELLML)
-        find_package(CELLML ${CELLML_VERSION} QUIET)
-        if (NOT CELLML_FOUND)
-            set(CELLML_FWD_DEPS IRON)
-            foreach(dependency IN_LIST CSIM)
-                if(CELLML_WITH_${dependency} AND OC_USE_${dependency})
-                    set(CELLML_USE_${dependency} ON)
-                else()
-                    set(CELLML_USE_${dependency} OFF)
-                endif()
-            endforeach()
-
-            addAndConfigureLocalComponent(CELLML
-                BUILD_TESTS=${BUILD_TESTS}
-                LIBXML2_VERSION=${LIBXML2_VERSION}
-                CSIM_VERSION=${CSIM_VERSION}
-                LIBCELLML_VERSION=${LIBCELLML_VERSION}
-                CELLML_USE_CSIM=${CELLML_USE_CSIM})
-        endif ()
-    endif ()
-
     if (OC_USE_CSIM)
         if (OC_USE_LLVM)
             find_package(LLVM ${LLVM_VERSION} QUIET)
@@ -555,7 +534,7 @@ if (OC_USE_IRON OR OC_DEPENDENCIES_ONLY)
         
         find_package(CSIM ${CSIM_VERSION} QUIET)
         if (NOT CSIM_FOUND)
-            SET(CSIM_FWD_DEPS IRON)
+            SET(CSIM_FWD_DEPS IRON CELLML)
             addAndConfigureLocalComponent(CSIM
                 LLVM_VERSION=${LLVM_VERSION}
                 CLANG_VERSION=${CLANG_VERSION}
@@ -564,6 +543,27 @@ if (OC_USE_IRON OR OC_DEPENDENCIES_ONLY)
                 LIBXML2_VERSION=${LIBXML2_VERSION}
                 ZLIB_VERSION=${ZLIB_VERSION}
             )
+        endif ()
+    endif ()
+
+    if (OC_USE_CELLML)
+        find_package(CELLML ${CELLML_VERSION} QUIET)
+        if (NOT CELLML_FOUND)
+            set(CELLML_FWD_DEPS IRON)
+            foreach(dependency IN_LIST CSIM)
+                if(CELLML_WITH_${dependency} AND OC_USE_${dependency})
+                    set(CELLML_USE_${dependency} ON)
+                else()
+                    set(CELLML_USE_${dependency} OFF)
+                endif()
+            endforeach()
+
+            addAndConfigureLocalComponent(CELLML
+                BUILD_TESTS=${BUILD_TESTS}
+                LIBXML2_VERSION=${LIBXML2_VERSION}
+                CSIM_VERSION=${CSIM_VERSION}
+                LIBCELLML_VERSION=${LIBCELLML_VERSION}
+                CELLML_USE_CSIM=${CELLML_USE_CSIM})
         endif ()
     endif ()
 
