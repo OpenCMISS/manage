@@ -311,7 +311,7 @@ endforeach()
 # -------------
 #
 # For every OpenCMISS component, this flag determines if the respective component is to be used by the build environment.
-# This means it's searched for at configuration stage and build if not found.
+# This means it's searched for at configuration stage and built if not found.
 #
 # The list of possible components can be found in the :cmake:`OPENCMISS_COMPONENTS` variable in :path:`<manage>/Config/Variables.cmake`.
 #
