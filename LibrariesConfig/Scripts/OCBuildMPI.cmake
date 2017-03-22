@@ -6,7 +6,7 @@
 # But we will always have the MPI mnemonic set if we reach here.
 # **Always** include OCDetermineMPI before this file.
 #
-if (NOT MPI_FOUND)
+if (NOT MPI_FOUND AND OPENCMISS_BUILD_OWN_MPI)
     
     # This is supported yet only on Unix systems
 message(STATUS "OPENCMISS_DEPENDENCIES_INSTALL_NO_MPI_PREFIX: ${OPENCMISS_DEPENDENCIES_INSTALL_NO_MPI_PREFIX}")
@@ -146,6 +146,9 @@ message(STATUS "MPI_Fortran_COMPILER: ${MPI_Fortran_COMPILER}")
         unset(MPI_HOME)
         log("MPI (${OPENCMISS_MPI}) installation support not yet implemented for this platform." ERROR)
     endif()
-else()
+elseif (NOT FOUND_MPI AND NOT OPENCMISS_BUILD_OWN_MPI)
+    set(OPENCMISS_MPI none CACHE STRING "Not using MPI." FORCE)
+    log("No MPI found and own build not requested setting MPI to: ${OPENCMISS_MPI}")
+else ()
     log("Found MPI: ${MPI_C_INCLUDE_DIRECTORY} / ${MPI_C_LIBRARIES}" DEBUG)
-endif()
+endif ()
