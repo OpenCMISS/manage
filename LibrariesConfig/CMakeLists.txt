@@ -204,10 +204,7 @@ endif()
 
 # MPI
 # Unless we said to not have MPI, see that it's available.
-if(OPENCMISS_MPI STREQUAL none)
-    message(FATAL_ERROR "MPI value of 'none' not yet implemented.  Please specify an MPI to use.") 
-else ()
-    message(STATUS "OPENCMISS_OWN_MPI_INSTALL_BASE: ${OPENCMISS_OWN_MPI_INSTALL_BASE}")
+if (NOT OPENCMISS_MPI STREQUAL none)
     include(OCDetermineMPI)
 endif ()
 
@@ -226,7 +223,9 @@ include(${OPENCMISS_ROOTS_FILE})
 #
 # Setup build of MPI if required
 include(OCBuildMPI)
-
+if (OPENCMISS_MPI STREQUAL none)
+    set(OC_USE_MPI FALSE)
+endif ()
 # Toolchain flags
 #
 # Needs to be after MPI config as the mnemonic is used inside that script, too

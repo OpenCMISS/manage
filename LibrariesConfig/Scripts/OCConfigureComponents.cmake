@@ -378,6 +378,7 @@ if (OC_USE_IRON OR OC_DEPENDENCIES_ONLY)
                 BUILD_TESTS=${BUILD_TESTS}
                 ${BLA_VENDOR_CONFIG}
                 USE_LAPACK=${SUNDIALS_USE_LAPACK}
+                USE_MPI=${OC_USE_MPI}
                 BLAS_VERSION=${BLAS_VERSION}
                 LAPACK_VERSION=${LAPACK_VERSION})
         endif ()
