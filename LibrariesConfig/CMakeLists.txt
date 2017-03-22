@@ -163,7 +163,7 @@ endif ()
 tidy_gui_variables()
 
 # The build system creates a build log in order to ease the support process.
-string(TIMESTAMP NOW "%Y-%m-%d, %H:%M")
+string(TIMESTAMP NOW "%Y-%m-%d_%H-%M")
 set(OC_BUILD_LOG ${OPENCMISS_SUPPORT_DIR}/configure_builds_${NOW}.log)
 log("Starting configuration in ${CMAKE_CURRENT_BINARY_DIR} at ${NOW}")
 
