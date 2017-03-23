@@ -564,7 +564,7 @@ if (OC_USE_IRON OR OC_DEPENDENCIES_ONLY)
                 LIBXML2_VERSION=${LIBXML2_VERSION}
                 CSIM_VERSION=${CSIM_VERSION}
                 LIBCELLML_VERSION=${LIBCELLML_VERSION}
-                CELLML_USE_CSIM=${CELLML_USE_CSIM})
+                CELLML_USE_CSIM=${CELLML_WITH_CSIM})
         endif ()
     endif ()
 
