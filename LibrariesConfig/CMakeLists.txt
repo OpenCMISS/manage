@@ -204,7 +204,9 @@ endif()
 
 # MPI
 # Unless we said to not have MPI, see that it's available.
-if (NOT OPENCMISS_MPI STREQUAL none)
+if (OPENCMISS_MPI STREQUAL none)
+    # Do nothing.
+else ()
     include(OCDetermineMPI)
 endif ()
 
