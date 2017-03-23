@@ -225,7 +225,10 @@ include(${OPENCMISS_ROOTS_FILE})
 include(OCBuildMPI)
 if (OPENCMISS_MPI STREQUAL none)
     set(OC_USE_MPI FALSE)
+else ()
+    set(OC_USE_MPI TRUE)
 endif ()
+
 # Toolchain flags
 #
 # Needs to be after MPI config as the mnemonic is used inside that script, too
