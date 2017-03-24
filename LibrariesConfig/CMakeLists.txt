@@ -87,6 +87,7 @@ endif ()
 if (NOT EXISTS "${OPENCMISS_CMAKE_MODULE_PATH}/Modules/OpenCMISS/OCToolchainCompilers.cmake")
     message(FATAL_ERROR "'${OPENCMISS_CMAKE_MODULE_PATH}/Modules/OpenCMISS/OCToolchainCompilers.cmake' does not exists.  The OpenCMISS CMake modules may not be installed/available.")
 endif ()
+set(OPENCMISS_CMAKE_MODULE_PATH "${OPENCMISS_CMAKE_MODULE_PATH}" CACHE INTERNAL "Internalise the module path so that it is available for CMake GUIs." FORCE)
 
 # Set up include path required at this stage
 list(APPEND CMAKE_MODULE_PATH
@@ -95,6 +96,11 @@ list(APPEND CMAKE_MODULE_PATH
 list(APPEND OPENCMISS_COMPONENT_MODULE_PATH
     ${OPENCMISS_CMAKE_MODULE_PATH}/Modules/OpenCMISS
     )
+
+if (NOT DEFINED OPENCMISS_TOOLCHAIN)
+    message(FATAL_ERROR "OPENCMISS_TOOLCHAIN is not defined.")
+endif ()
+set(OPENCMISS_TOOLCHAIN ${OPENCMISS_TOOLCHAIN} CACHE INTERNAL "Internalise the toolchain so that it is available for CMake GUIs." FORCE)
 
 # Need to set the compilers before any project call
 include(OCToolchainCompilers)
