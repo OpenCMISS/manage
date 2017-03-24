@@ -114,7 +114,10 @@ enable_testing()
 list(APPEND CMAKE_MODULE_PATH
     ${CMAKE_CURRENT_SOURCE_DIR}/Modules
     ${CMAKE_CURRENT_SOURCE_DIR}/Scripts
-    )
+)
+
+# Internalise some variables
+set(OPENCMISS_INSTALLATION_CACHE_FILE "${OPENCMISS_INSTALLATION_CACHE_FILE}" CACHE INTERNAL "Internalise location of cache file." FORCE)
 
 # Pre-check for Python and Swig availability so that bindings will be built automatically (unless explicitly specified)
 find_package(PythonInterp ${PYTHON_VERSION} QUIET)
