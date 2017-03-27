@@ -114,7 +114,18 @@ list(APPEND CMAKE_MODULE_PATH
 find_package(PythonInterp ${PYTHON_VERSION} QUIET)
 find_package(PythonLibs QUIET)
 find_package(SWIG QUIET)
-message(STATUS "SWIG_EXECUTABLE: ${SWIG_EXECUTABLE}")
+
+if (SWIG_FOUND)
+	message(STATUS "Language bindings are possible.")
+	if (PYTHONLIBS_FOUND)
+		message(STATUS "Python Language bindings are possible.")
+	else ()
+		message(STATUS "Python library development files not found.  No Python language bindings will be created.")
+	endif ()
+else ()
+	message(STATUS "SWIG not found. It is not possible to create any language bindings.")
+endif ()
+
 if (PYTHONINTERP_FOUND AND PYTHONLIBS_FOUND AND SWIG_FOUND)
     set(OC_PYTHON_PREREQ_FOUND YES)
     # Already check for the virtualenv - this is the default way if found.
@@ -153,7 +164,9 @@ include(OCCreateLocalConfig)
 # Load configuration files
 include(OpenCMISSConfig)
 
-if (NOT OPENCMISS_HAVE_MULTICONFIG_ENV)
+if (OPENCMISS_HAVE_MULTICONFIG_ENV)
+	mark_as_advanced(CMAKE_CONFIGURATION_TYPES)
+else ()
     # This isn't configurable at this stage it is configured at the config creation time
     #set(OPENCMISS_BUILD_TYPE CACHE STRING "Choose the type of build to configure, options are: None(CMAKE_CXX_FLAGS or CMAKE_C_FLAGS used) Debug Release RelWithDebInfo MinSizeRel.")
     set(CMAKE_BUILD_TYPE ${OPENCMISS_BUILD_TYPE} CACHE INTERNAL "Internalise CMAKE_BUILD_TYPE manipulate through OPENCMISS_BUILD_TYPE instead." FORCE)
