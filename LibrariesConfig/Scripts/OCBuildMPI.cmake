@@ -6,7 +6,7 @@
 # But we will always have the MPI mnemonic set if we reach here.
 # **Always** include OCDetermineMPI before this file.
 #
-if (NOT MPI_FOUND)
+if (NOT MPI_FOUND AND OPENCMISS_BUILD_OWN_MPI)
     
     # This is supported yet only on Unix systems
 message(STATUS "OPENCMISS_DEPENDENCIES_INSTALL_NO_MPI_PREFIX: ${OPENCMISS_DEPENDENCIES_INSTALL_NO_MPI_PREFIX}")
@@ -60,7 +60,7 @@ message(STATUS "OPENCMISS_DEPENDENCIES_INSTALL_NO_MPI_PREFIX: ${OPENCMISS_DEPEND
             set(MPI_CXX_COMPILER ${OPENCMISS_OWN_MPI_INSTALL_PREFIX}/bin/mpicxx)
             set(MPI_Fortran_COMPILER ${OPENCMISS_OWN_MPI_INSTALL_PREFIX}/bin/mpifort)
         else()
-    	    log("Own build of MPI - ${OPENCMISS_MPI} not yet implemented" ERROR)
+            log("Own build of MPI - ${OPENCMISS_MPI} not yet implemented" ERROR)
         endif()
         
         set(OPENCMISS_MPI_HOME ${OPENCMISS_OWN_MPI_INSTALL_PREFIX} CACHE STRING "Installation directory of own/local MPI build" FORCE)
@@ -103,41 +103,42 @@ message(STATUS "OPENCMISS_OWN_MPI_INSTALL_PREFIX: ${OPENCMISS_OWN_MPI_INSTALL_PR
 message(STATUS "OPENCMISS_MPI_HOME: ${OPENCMISS_MPI_HOME}")
 message(STATUS "MPI_Fortran_COMPILER: ${MPI_Fortran_COMPILER}")
         ExternalProject_Add(${OC_EP_PREFIX}${OPENCMISS_MPI_COMPONENT}
-    		PREFIX ${_MPI_BINARY_DIR}
-    		TMP_DIR ${_MPI_BINARY_DIR}/extproj/tmp
-    		STAMP_DIR ${_MPI_BINARY_DIR}/extproj/stamp
-    		
-    		#--Download step--------------
-    		${DOWNLOAD_COMMANDS}
-             
-    		#--Configure step-------------
-    		SOURCE_DIR ${_MPI_SOURCE_DIR}
-    		CONFIGURE_COMMAND ${_MPI_SOURCE_DIR}/configure 
-    		    --prefix ${OPENCMISS_OWN_MPI_INSTALL_PREFIX}
-    		    CC=${CMAKE_C_COMPILER}
-    		    CXX=${CMAKE_CXX_COMPILER}
-    		    FC=${CMAKE_Fortran_COMPILER}
-    		    CFLAGS=${MPI_C_FLAGS}
-    		    CXXFLAGS=-fPIC 
-    		    FFLAGS=-fPIC
-    		    ${_MPI_EXTRA_PARAMS}
-    		BINARY_DIR ${_MPI_BINARY_DIR}
-    		
-    		#--Build step-----------------
-    		BUILD_COMMAND make -j${NUM_PROCESSORS} #${BUILD_COMMAND}
-    		
-    		#--Install step---------------
-    		# currently set as extra arg (above), somehow does not work
-    		#INSTALL_DIR ${OPENMPI_INSTALL_DIR}
-    		INSTALL_COMMAND make install #${INSTALL_COMMAND}
-    		
-    		# Logging
+            PREFIX ${_MPI_BINARY_DIR}
+            TMP_DIR ${_MPI_BINARY_DIR}/extproj/tmp
+            STAMP_DIR ${_MPI_BINARY_DIR}/extproj/stamp
+
+            #--Download step--------------
+            # ${DOWNLOAD_COMMANDS}
+            DOWNLOAD_COMMAND ""
+
+            #--Configure step-------------
+            SOURCE_DIR ${_MPI_SOURCE_DIR}
+            CONFIGURE_COMMAND ${_MPI_SOURCE_DIR}/configure
+                --prefix ${OPENCMISS_OWN_MPI_INSTALL_PREFIX}
+                CC=${CMAKE_C_COMPILER}
+                CXX=${CMAKE_CXX_COMPILER}
+                FC=${CMAKE_Fortran_COMPILER}
+                CFLAGS=${MPI_C_FLAGS}
+                CXXFLAGS=-fPIC
+                FFLAGS=-fPIC
+                ${_MPI_EXTRA_PARAMS}
+            BINARY_DIR ${_MPI_BINARY_DIR}
+
+            #--Build step-----------------
+            BUILD_COMMAND make -j${NUM_PROCESSORS} #${BUILD_COMMAND}
+
+            #--Install step---------------
+            # currently set as extra arg (above), somehow does not work
+            #INSTALL_DIR ${OPENMPI_INSTALL_DIR}
+            INSTALL_COMMAND make install #${INSTALL_COMMAND}
+
+            # Logging
             LOG_CONFIGURE ${_LOGFLAG}
             LOG_BUILD ${_LOGFLAG}
             LOG_INSTALL ${_LOGFLAG}
-    		STEP_TARGETS install
-    	)
-    	# Set the forward dependencies of MPI to have it build before the consuming components
+            STEP_TARGETS install
+        )
+        # Set the forward dependencies of MPI to have it build before the consuming components
         set(${OPENCMISS_MPI_COMPONENT}_FWD_DEPS ${OPENCMISS_COMPONENTS_WITHMPI})
         addDownstreamDependencies(${OPENCMISS_MPI_COMPONENT} FALSE)
     else()
@@ -145,6 +146,9 @@ message(STATUS "MPI_Fortran_COMPILER: ${MPI_Fortran_COMPILER}")
         unset(MPI_HOME)
         log("MPI (${OPENCMISS_MPI}) installation support not yet implemented for this platform." ERROR)
     endif()
-else()
+elseif (NOT MPI_FOUND AND NOT OPENCMISS_BUILD_OWN_MPI)
+    set(OPENCMISS_MPI none CACHE STRING "Not using MPI." FORCE)
+    log("No MPI found and own build not requested setting MPI to: ${OPENCMISS_MPI}")
+else ()
     log("Found MPI: ${MPI_C_INCLUDE_DIRECTORY} / ${MPI_C_LIBRARIES}" DEBUG)
-endif()
+endif ()

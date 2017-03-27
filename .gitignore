@@ -34,3 +34,5 @@ CMakeLists.txt.user
 .pydevproject
 .project
 
+# OS X System Files
+.DS_Store

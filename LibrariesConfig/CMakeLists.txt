@@ -87,6 +87,7 @@ endif ()
 if (NOT EXISTS "${OPENCMISS_CMAKE_MODULE_PATH}/Modules/OpenCMISS/OCToolchainCompilers.cmake")
     message(FATAL_ERROR "'${OPENCMISS_CMAKE_MODULE_PATH}/Modules/OpenCMISS/OCToolchainCompilers.cmake' does not exists.  The OpenCMISS CMake modules may not be installed/available.")
 endif ()
+set(OPENCMISS_CMAKE_MODULE_PATH "${OPENCMISS_CMAKE_MODULE_PATH}" CACHE INTERNAL "Internalise the module path so that it is available for CMake GUIs." FORCE)
 
 # Set up include path required at this stage
 list(APPEND CMAKE_MODULE_PATH
@@ -95,6 +96,11 @@ list(APPEND CMAKE_MODULE_PATH
 list(APPEND OPENCMISS_COMPONENT_MODULE_PATH
     ${OPENCMISS_CMAKE_MODULE_PATH}/Modules/OpenCMISS
     )
+
+if (NOT DEFINED OPENCMISS_TOOLCHAIN)
+    message(FATAL_ERROR "OPENCMISS_TOOLCHAIN is not defined.")
+endif ()
+set(OPENCMISS_TOOLCHAIN ${OPENCMISS_TOOLCHAIN} CACHE INTERNAL "Internalise the toolchain so that it is available for CMake GUIs." FORCE)
 
 # Need to set the compilers before any project call
 include(OCToolchainCompilers)
@@ -108,7 +114,10 @@ enable_testing()
 list(APPEND CMAKE_MODULE_PATH
     ${CMAKE_CURRENT_SOURCE_DIR}/Modules
     ${CMAKE_CURRENT_SOURCE_DIR}/Scripts
-    )
+)
+
+# Internalise some variables
+set(OPENCMISS_INSTALLATION_CACHE_FILE "${OPENCMISS_INSTALLATION_CACHE_FILE}" CACHE INTERNAL "Internalise location of cache file." FORCE)
 
 # Pre-check for Python and Swig availability so that bindings will be built automatically (unless explicitly specified)
 find_package(PythonInterp ${PYTHON_VERSION} QUIET)
@@ -176,7 +185,7 @@ endif ()
 tidy_gui_variables()
 
 # The build system creates a build log in order to ease the support process.
-string(TIMESTAMP NOW "%Y-%m-%d, %H:%M")
+string(TIMESTAMP NOW "%Y-%m-%d_%H-%M")
 set(OC_BUILD_LOG ${OPENCMISS_SUPPORT_DIR}/configure_builds_${NOW}.log)
 log("Starting configuration in ${CMAKE_CURRENT_BINARY_DIR} at ${NOW}")
 
@@ -217,10 +226,9 @@ endif()
 
 # MPI
 # Unless we said to not have MPI, see that it's available.
-if(OPENCMISS_MPI STREQUAL none)
-    message(FATAL_ERROR "MPI value of 'none' not yet implemented.  Please specify an MPI to use.") 
+if (OPENCMISS_MPI STREQUAL none)
+    # Do nothing.
 else ()
-    message(STATUS "OPENCMISS_OWN_MPI_INSTALL_BASE: ${OPENCMISS_OWN_MPI_INSTALL_BASE}")
     include(OCDetermineMPI)
 endif ()
 
@@ -239,6 +247,11 @@ include(${OPENCMISS_ROOTS_FILE})
 #
 # Setup build of MPI if required
 include(OCBuildMPI)
+if (OPENCMISS_MPI STREQUAL none)
+    set(OC_USE_MPI FALSE)
+else ()
+    set(OC_USE_MPI TRUE)
+endif ()
 
 # Toolchain flags
 #

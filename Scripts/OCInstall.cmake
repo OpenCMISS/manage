@@ -70,7 +70,7 @@ set(EXPORT_VARS
 
 # Add the build type if on single-config platform
 if (NOT OPENCMISS_HAVE_MULTICONFIG_ENV)
-    set(OPENCMISS_BUILD_TYPE ${CMAKE_BUILD_TYPE})
+    #set(OPENCMISS_BUILD_TYPE ${CMAKE_BUILD_TYPE}) Already set.
     list(APPEND EXPORT_VARS OPENCMISS_BUILD_TYPE)
 endif ()
 

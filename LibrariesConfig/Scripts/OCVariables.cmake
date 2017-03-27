@@ -29,7 +29,7 @@ set(OPENCMISS_COMPONENTS_WITH_Fortran CELLML HYPRE LAPACK PASTIX
 # Components that require Fortran 90 support.
 # Can be verified using the (internal) CMAKE_Fortran_COMPILER_SUPPORTS_F90 flag.
 #
-# Hypre has a fortran 90 example, which is not included in the examples build by default as of now. 
+# Hypre has a fortran 90 example, which is not included in the examples built by default as of now. 
 set(OPENCMISS_COMPONENTS_WITH_F90 CELLML PASTIX SOWING PETSC SUPERLU_DIST IRON)
 
 # The opencmiss components that are looked for on the local system instead of building it
@@ -42,7 +42,9 @@ set(OPENCMISS_COMPONENTS_SHARED_BY_DEFAULT IRON ZINC)
 
 # Disabled components - added but not compiling
 # SCOTCH is disabled as PTSCOTCH is usually used.
-set(OPENCMISS_COMPONENTS_DISABLED_BY_DEFAULT CSIM LLVM SCOTCH CLANG)
+# Now using CSIM and LLVM/CLANG for cellml code generation.
+set(OPENCMISS_COMPONENTS_DISABLED_BY_DEFAULT SCOTCH)
+#set(OPENCMISS_COMPONENTS_DISABLED_BY_DEFAULT CSIM LLVM SCOTCH CLANG)
 #set(OPENCMISS_COMPONENTS_DISABLED_BY_DEFAULT BLAS LAPACK PLAPACK SCALAPACK PARMETIS SUITESPARSE MUMPS SUPERLU SUPERLU_DIST SUNDIALS SCOTCH SOWING PASTIX HYPRE PETSC LIBCELLML CELLML SLEPC BZIP2 SZIP HDF5 FIELDML-API LIBXML2 IRON CSIM LLVM GTEST)
 if (MINGW)
     # On windows the gtest builds currently fail - not crucial
