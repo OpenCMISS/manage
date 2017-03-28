@@ -19,8 +19,10 @@
 
 ##
 #    CELLML_WITH_CSIM : YES
-#        Load CellML models through CSim
-option(CELLML_WITH_CSIM "Load CellML models through CSim" YES)
+#        Load CellML models through CSim (Only available on systems with compilers with C++11 support).
+if (OC_CAN_BUILD_LLVM)
+    option(CELLML_WITH_CSIM "Load CellML models through CSim" YES)
+endif ()
 
 ##
 #    FIELDML-API_WITH_HDF5 : NO

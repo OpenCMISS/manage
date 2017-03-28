@@ -147,6 +147,7 @@ set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
 # Utilities and external packages
 include(ExternalProject)
+include(OCEnvironmentChecks)
 include(OCComponentSetupMacros)
 include(OCArchitecturePathFunctions)
 
