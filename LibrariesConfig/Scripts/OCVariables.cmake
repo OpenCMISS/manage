@@ -43,7 +43,7 @@ set(OPENCMISS_COMPONENTS_SHARED_BY_DEFAULT IRON ZINC)
 # Disabled components - added but not compiling
 # SCOTCH is disabled as PTSCOTCH is usually used.
 # Now using CSIM and LLVM/CLANG for cellml code generation.
-if (OC_CAN_BUILD_CSIM)
+if (OC_CAN_BUILD_LLVM)
     set(OPENCMISS_COMPONENTS_DISABLED_BY_DEFAULT SCOTCH)
 else ()
     set(OPENCMISS_COMPONENTS_DISABLED_BY_DEFAULT CSIM LLVM SCOTCH CLANG)
