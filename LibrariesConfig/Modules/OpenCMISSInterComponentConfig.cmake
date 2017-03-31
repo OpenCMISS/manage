@@ -33,7 +33,7 @@ endif ()
 #        Build Fortran bindings for FieldML
 option(FIELDML-API_WITH_HDF5 "Enable FieldML HDF5 support" NO)
 option(FIELDML-API_WITH_JAVA_BINDINGS "Build Java bindings for FieldML" NO)
-option(FIELDML-API_WITH_FORTRAN_BINDINGS "Build Fortran bindings for FieldML" YES)
+option(FIELDML-API_WITH_FORTRAN_BINDINGS "Build Fortran bindings for FieldML" ${OC_FORTRAN_IS_ENABLED})
 
 ##
 #    HDF5_WITH_MPI : YES
