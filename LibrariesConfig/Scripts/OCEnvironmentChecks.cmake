@@ -12,7 +12,7 @@ else ()
     set(OC_CAN_BUILD_LLVM TRUE)
 endif ()
 
-if ("Fortran" IN_LIST ENABLED_LANGUAGES)
+if (CMAKE_Fortran_COMPILER)
     set(OC_FORTRAN_IS_ENABLED TRUE)
 else ()
     set(OC_FORTRAN_IS_ENABLED FALSE)
