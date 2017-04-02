@@ -48,7 +48,6 @@ else()
     
     # Remove all paths resolving to this one here so that recursive calls wont search here again
     set(_ORIGINAL_CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH})
-    set(_READDME )
     get_filename_component(_THIS_DIRECTORY ${CMAKE_CURRENT_LIST_FILE} DIRECTORY)
     foreach(_ENTRY ${_ORIGINAL_CMAKE_MODULE_PATH})
         get_filename_component(_ENTRY_ABSOLUTE ${_ENTRY} ABSOLUTE)
