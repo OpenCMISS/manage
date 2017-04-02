@@ -87,7 +87,7 @@ else()
     # Restore the current module path
     # This needs to be done BEFORE any calls in CONFIG find mode - if the found config has our
     # xxx-config-dependencies, which in turn might be allowed as system lookup, the FindModuleWrapper dir
-    # is missing and stuff breaks. Too a while to figure out the problem as you might guess ;-)
+    # is missing and stuff breaks. Took a while to figure out the problem as you might guess ;-)
     # Scenario discovered on Michael Sprenger's Ubuntu 10 system with 
     # OC_SYSTEM_ZLIB=YES and found, OC_SYSTEM_LIBXML2=ON but not found. This broke the CELLML-build as
     # the wrapper call for LIBXML removed the wrapper dir from the module path, then found libxml2 in config mode,
