@@ -52,8 +52,8 @@ option(HDF5_BUILD_FORTRAN "Build Fortran interface for HDF5" NO)
 ##
 #    IRON_WITH_CELLML : YES
 #        Have Iron use CellML
-#    IRON_WITH_FIELDML : YES
-#        Have Iron use FieldML
+#    IRON_WITH_FIELDML-API : YES
+#        Have Iron use FieldML API
 #    IRON_WITH_HYPRE : YES
 #        Have Iron use Hypre
 #    IRON_WITH_SUNDIALS : YES
@@ -70,7 +70,7 @@ option(HDF5_BUILD_FORTRAN "Build Fortran interface for HDF5" NO)
 #        Build Iron-Python bindings. This setting is automatically enabled if the build system
 #        finds local Python(-libraries) and Swig. 
 option(IRON_WITH_CELLML "Have Iron use CellML" YES)
-option(IRON_WITH_FIELDML "Have Iron use FieldML" YES)
+option(IRON_WITH_FIELDML-API "Have Iron use FieldML API" YES)
 option(IRON_WITH_HYPRE "Have Iron use Hypre" YES)
 option(IRON_WITH_SUNDIALS "Have Iron use Sundials" YES)
 option(IRON_WITH_MUMPS "Have Iron use MUMPS" YES)
