@@ -14,7 +14,10 @@ endif ()
 
 set(OC_ACTIVE_LANGUAGES)
 foreach(_lang C CXX Fortran)
-    if (CMAKE_${_lang}_COMPILER)
+    # As we have already set the CMAKE_${_lang}_COMPILER in our mnemonics test we look
+    # at the CMAKE_${_lang}_COMPILER_ID variable to see if the compiler is properly defined.
+    # Note: We could also check that the compiler is an actual executable as an alternative.
+    if (NOT CMAKE_${_lang}_COMPILER_ID STREQUAL "")
         list(APPEND OC_ACTIVE_LANGUAGES ${_lang})
     endif ()
 endforeach()
