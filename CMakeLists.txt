@@ -5,16 +5,16 @@ cmake_minimum_required(VERSION 3.4.0 FATAL_ERROR)
 
 ########################################################################
 # Ready to start the "build project"
-project(OpenCMISS-Manage VERSION 1.0.0 LANGUAGES C CXX)
+project(OpenCMISS-Manage VERSION 1.3.0 LANGUAGES C CXX)
 enable_language(Fortran OPTIONAL)
 enable_testing()
 
 mark_as_advanced(CMAKE_INSTALL_PREFIX)
 
-set(OpenCMISS_MAJOR_VERSION 0)
-set(OpenCMISS_MINOR_VERSION 1)
-set(OpenCMISS_PATCH_VERSION 0)
-set(OpenCMISS_VERSION ${OpenCMISS_MAJOR_VERSION}.${OpenCMISS_MINOR_VERSION}.${OpenCMISS_PATCH_VERSION})
+set(OpenCMISSLibs_MAJOR_VERSION ${PROJECT_VERSION_MAJOR})
+set(OpenCMISSLibs_MINOR_VERSION ${PROJECT_VERSION_MINOR})
+set(OpenCMISSLibs_PATCH_VERSION ${PROJECT_VERSION_PATCH})
+set(OpenCMISSLibs_VERSION ${OpenCMISSLibs_MAJOR_VERSION}.${OpenCMISSLibs_MINOR_VERSION}.${OpenCMISSLibs_PATCH_VERSION})
 # This is the support email for general enquiries and support about building opencmiss using the new CMake system.
 set(OPENCMISS_BUILD_SUPPORT_EMAIL "users@opencmiss.org")
 
@@ -211,6 +211,7 @@ list(APPEND CURRENT_CONFIGURATION_ARGS -DOPENCMISS_INSTALLATION_CACHE_FILE=${OPE
 list(APPEND CURRENT_CONFIGURATION_ARGS -DOPENCMISS_CMAKE_MODULE_PATH=${OPENCMISS_CMAKE_MODULE_PATH})
 list(APPEND CURRENT_CONFIGURATION_ARGS -DARCH_MPI_PATH=${ACTIVE_ARCHITECTURE_MPI_PATH})
 list(APPEND CURRENT_CONFIGURATION_ARGS -DARCH_NO_MPI_PATH=${ACTIVE_ARCHITECTURE_NO_MPI_PATH})
+list(APPEND CURRENT_CONFIGURATION_ARGS -DOpenCMISSLibs_VERSION=${OpenCMISSLibs_VERSION})
 
 if ("${OPENCMISS_INSTRUMENTATION}" STREQUAL "scorep")
     foreach(_lang C CXX Fortran)
@@ -238,10 +239,6 @@ add_custom_target(usage ALL
 set(SUPPORT_DIR "${CMAKE_CURRENT_BINARY_DIR}/support")
 # Indirection for configuring variable in create_config.in.cmake
 set(DOLLAR_SYMBOL $)
-
-# Installation of general opencmiss configuration helper scripts.
-# TODO: Come back and make this install config work.
-#include(OCInstall)
 
 # Packaging, creating SDKs etc.
 include(OCPackaging)

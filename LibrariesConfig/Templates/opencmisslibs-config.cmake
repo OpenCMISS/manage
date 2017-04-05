@@ -1,10 +1,10 @@
-# Provides the necessary logic to find an OpenCMISS installation.
+# Provides the necessary logic to find an OpenCMISS libraries installation.
 #
-# Provides the target "opencmiss" that can be consumed like
-# target_link_libraries(mytarget [PRIVATE|PUBLIC] opencmiss)
+# Provides the target "opencmisslibs" that can be consumed like
+# target_link_libraries(mytarget [PRIVATE|PUBLIC] opencmisslibs)
 #
 # Developer note:
-# This script essentially defines an INTERFACE target opencmiss which is
+# This script essentially defines an INTERFACE target opencmisslibs which is
 # then poulated with all the top level libraries configured in OpenCMISS.
 
 # Make sure we have a sufficient cmake version before doing anything else
@@ -17,10 +17,10 @@ get_filename_component(_OPENCMISS_IMPORT_PREFIX "${CMAKE_CURRENT_LIST_FILE}" DIR
 # Helper functions
 # Debug verbose helper
 function(messaged TEXT)
-    #message(STATUS "OpenCMISS (${_OPENCMISS_IMPORT_PREFIX}/opencmiss-config.cmake): ${TEXT}")
+    #message(STATUS "OpenCMISS Libraries (${_OPENCMISS_IMPORT_PREFIX}/opencmisslibs-config.cmake): ${TEXT}")
 endfunction()
 function(messageo TEXT)
-    message(STATUS "OpenCMISS: ${TEXT}")
+    message(STATUS "OpenCMISS Libraries: ${TEXT}")
 endfunction()
 function(toAbsolutePaths LIST_VARNAME)
     set(RES )
@@ -32,22 +32,27 @@ function(toAbsolutePaths LIST_VARNAME)
 endfunction()
 
 #############################################################################
-# Initialize defaults - currently taken from latest OpenCMISS build (this file is replaced for each arch)
-if (MPI)
-    string(TOLOWER ${MPI} MPI)
+# Initialize defaults - currently taken from latest OpenCMISS libraries build (this file is replaced for each arch)
+if (OPENCMISS_MPI)
+    string(TOLOWER ${OPENCMISS_MPI} OPENCMISS_MPI)
 else()
-    set(MPI @OC_DEFAULT_MPI@)
-    messageo("No MPI specified. Attempting to use OpenCMISS default '${MPI}'")
+    set(OPENCMISS_MPI @OC_DEFAULT_MPI@)
+    messageo("No MPI specified. Attempting to use OpenCMISS libraries default '${OPENCMISS_MPI}'")
 endif()
 if (DEFINED OPENCMISS_MPI_BUILD_TYPE)
     # Don't want an uppercase OPENCMISS_MPI_BUILD_TYPE testing without manipulation for now.
     #string(TOUPPER "${OPENCMISS_MPI_BUILD_TYPE}" OPENCMISS_MPI_BUILD_TYPE)
 else()
     set(OPENCMISS_MPI_BUILD_TYPE @OC_DEFAULT_MPI_BUILD_TYPE@)
-    messageo("No OPENCMISS_MPI_BUILD_TYPE specified. Attempting to use OpenCMISS default MPI build type '@OC_DEFAULT_MPI_BUILD_TYPE@'")
+    messageo("No OPENCMISS_MPI_BUILD_TYPE specified. Attempting to use OpenCMISS libraries default MPI build type '@OC_DEFAULT_MPI_BUILD_TYPE@'")
 endif()
 set(BLA_VENDOR @BLA_VENDOR@)
-set(SUPPORT_EMAIL @OC_INSTALL_SUPPORT_EMAIL@)
+set(SUPPORT_EMAIL @OPENCMISS_INSTALLATION_SUPPORT_EMAIL@)
+
+# Append the OpenCMISS module path to the current patd
+set(OPENCMISS_MODULE_PATH @OPENCMISS_MODULE_PATH_EXPORT@)
+toAbsolutePaths(OPENCMISS_MODULE_PATH)
+list(APPEND CMAKE_MODULE_PATH ${OPENCMISS_MODULE_PATH})
 
 # Sets OPENCMISS_HAVE_MULTICONFIG_ENV variable
 include(OCMutliConfigEnvironment)
@@ -58,11 +63,6 @@ if (NOT OPENCMISS_HAVE_MULTICONFIG_ENV AND (CMAKE_BUILD_TYPE_INITIALIZED_TO_DEFA
     messageo("No build type specified. Using OpenCMISS default type @CMAKE_BUILD_TYPE@")
 endif()
 
-# Append the OpenCMISS module path to the current path
-set(OPENCMISS_MODULE_PATH @OPENCMISS_MODULE_PATH_EXPORT@)
-toAbsolutePaths(OPENCMISS_MODULE_PATH)
-list(APPEND CMAKE_MODULE_PATH ${OPENCMISS_MODULE_PATH})
-
 #############################################################################
 # Assemble architecture-path dependent search locations
 set(ARCHPATH .)
@@ -72,12 +72,12 @@ if (@OPENCMISS_USE_ARCHITECTURE_PATH@)
 endif()
 
 # This is the order we look for opencmiss installations for a given build type.
-# 1. Use OPENCMISS_BUILD_TYPE: This can be explicitly set to use a specific build type of OpenCMISS to link against
+# 1. Use OPENCMISS_BUILD_TYPE: This can be explicitly set to use a specific build type of OpenCMISS libraries to link against
 # 2. Use the CMAKE_BUILD_TYPE: Match the current build type
 # 3. Release: If nothing else is given, use RELEASE
 # 4. Debug: In case only the debug variant has been built, fall back to that
 if (NOT OPENCMISS_BUILD_TYPE)
-    messageo("No OpenCMISS build type specified. Trying to match ${CMAKE_BUILD_TYPE} first.")
+    messageo("No OpenCMISS libraries build type specified. Trying to match ${CMAKE_BUILD_TYPE} first.")
 endif()
 # No build-type dependent installation subfolders for multiconfig installations
 if (OPENCMISS_HAVE_MULTICONFIG_ENV)
@@ -141,7 +141,7 @@ if (NOT _FOUND)
     else()
         set(msg "Please check your local settings. Unfortunately, the remote installation guy did not supply a contact eMail adress\nTrack him down, tell your worries and remind him to put in his eMail!")
     endif()
-    message(FATAL_ERROR "Could not find a matching OpenCMISS installation. Please check your compiler, MPI, build type etc. choices!\n${msg}")
+    message(FATAL_ERROR "Could not find a matching OpenCMISS libraries installation. Please check your compiler, MPI, build type etc. choices!\n${msg}")
 endif()
 
 # Include the build info
@@ -182,29 +182,29 @@ set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 ###########################################################################
 # Convenience targets
 #
-# Add the opencmiss library (INTERFACE type is new since 3.0)
-add_library(opencmiss INTERFACE)
+# Add the opencmisslibs library (INTERFACE type is new since 3.0)
+add_library(opencmisslibs INTERFACE)
 
 # Avoid cases where people write Iron/iron/IRON 
 set(_TMP)
-foreach(_ENTRY ${OpenCMISS_FIND_COMPONENTS})
+foreach(_ENTRY ${OpenCMISSLibs_FIND_COMPONENTS})
     string(TOLOWER ${_ENTRY} _ENTRY)
     list(APPEND _TMP ${_ENTRY})
 endforeach()
-set(OpenCMISS_FIND_COMPONENTS ${_TMP})
+set(OpenCMISSLibs_FIND_COMPONENTS ${_TMP})
 unset(_TMP)
 unset(_ENTRY)
 
-if(iron IN_LIST OpenCMISS_FIND_COMPONENTS)
+if(iron IN_LIST OpenCMISSLibs_FIND_COMPONENTS)
     # Add top level libraries of OpenCMISS framework if configured
     message(STATUS "Looking for OpenCMISS-Iron ...")
     find_package(IRON ${IRON_VERSION} QUIET)
     if (IRON_FOUND)
-        target_link_libraries(opencmiss INTERFACE iron)
+        target_link_libraries(opencmisslibs INTERFACE iron)
         
         # Add the C bindings target if built
         if (TARGET iron_c)
-            target_link_libraries(opencmiss INTERFACE iron_c)
+            target_link_libraries(opencmisslibs INTERFACE iron_c)
         endif()
         
         ###########################################################################
@@ -212,9 +212,9 @@ if(iron IN_LIST OpenCMISS_FIND_COMPONENTS)
         # respects the MPI settings exported in the OpenCMISS context
         # OPENCMISS_MPI_VERSION is set there, too
         find_package(MPI ${OPENCMISS_MPI_VERSION} REQUIRED)
-        # Convenience: linking against opencmiss will automatically import the correct MPI settings here.
+        # Convenience: linking against opencmisslibs will automatically import the correct MPI settings here.
         # See FindMPI.cmake for declaration of 'mpi' target
-        target_link_libraries(opencmiss INTERFACE mpi)
+        target_link_libraries(opencmisslibs INTERFACE mpi)
         
         # On some platforms (windows), we do not have the mpi.mod file or it could not be compatible for inclusion
         # This variable is set by the FindMPI.cmake module in OPENCMISS_INSTALL_DIR/cmake/OpenCMISSExtraFindModules
@@ -224,18 +224,18 @@ if(iron IN_LIST OpenCMISS_FIND_COMPONENTS)
         
         message(STATUS "Looking for OpenCMISS-Iron ... Success")
     else()
-        message(FATAL_ERROR "OpenCMISS installation at ${_OPENCMISS_IMPORT_PREFIX} does not contain Iron")
+        message(FATAL_ERROR "OpenCMISS libraries installation at ${_OPENCMISS_IMPORT_PREFIX} does not contain Iron")
     endif()
 endif()
 
-if(zinc IN_LIST OpenCMISS_FIND_COMPONENTS)
+if(zinc IN_LIST OpenCMISSLibs_FIND_COMPONENTS)
     message(STATUS "Looking for OpenCMISS-Zinc ...")
     find_package(ZINC ${ZINC_VERSION} QUIET)
     if (ZINC_FOUND)
-        target_link_libraries(opencmiss INTERFACE zinc)
+        target_link_libraries(opencmisslibs INTERFACE zinc)
         message(STATUS "Looking for OpenCMISS-Zinc ... Success")
     else()
-        message(FATAL_ERROR "OpenCMISS installation at ${_OPENCMISS_IMPORT_PREFIX} does not contain Zinc")
+        message(FATAL_ERROR "OpenCMISS libraries installation at ${_OPENCMISS_IMPORT_PREFIX} does not contain Zinc")
     endif()
 endif()
 
@@ -246,53 +246,3 @@ unset(_OPENCMISS_IMPORT_PREFIX)
 unset(_SEARCHED)
 unset(BUILDTYPE_SUFFIX)
 
-#################################################################################
-# Extra functions to use within CMake-enabled OpenCMISS applications and examples
-
-# Composes a native PATH-compatible variable to use for DLL/SO finding.
-# Each extra argument is assumed a path to add. Added in the order specified.
-function(get_library_path OUTPUT_VARIABLE)
-    if (WIN32)
-        set(PSEP "\\;")
-        #set(HAVE_MULTICONFIG_ENV YES)
-        set(LD_VARNAME "PATH")
-    elseif(APPLE)
-        set(LD_VARNAME "DYLD_LIBRARY_PATH")
-        set(PSEP ":")
-    elseif(UNIX)
-        set(LD_VARNAME "LD_LIBRARY_PATH")
-        set(PSEP ":")
-    else()
-        message(WARNING "get_library_path not implemented for '${CMAKE_HOST_SYSTEM}'")
-    endif()
-    # Load system environment - on windows its separated by semicolon, so we need to protect those 
-    string(REPLACE ";" "\\;" LD_PATH "$ENV{${LD_VARNAME}}")
-    foreach(_PATH ${ARGN})
-        # For now: We dont have /Release or /Debug subfolders in any installed/packaged structure.
-        #if (HAVE_MULTICONFIG_ENV)
-        #    file(TO_NATIVE_PATH "${_PATH}/$<CONFIG>" _PATH)
-        #else()
-            file(TO_NATIVE_PATH "${_PATH}" _PATH)
-        #endif()
-        set(LD_PATH "${_PATH}${PSEP}${LD_PATH}")
-    endforeach()
-    set(${OUTPUT_VARIABLE} "${LD_VARNAME}=${LD_PATH}" PARENT_SCOPE)
-endfunction()
-
-# Convenience function to add the currently found OpenCMISS runtime environment to any
-# test using OpenCMISS libraries
-# Intended use is the OpenCMISS User SDK.
-function(add_opencmiss_environment TESTNAME)
-    get_library_path(PATH_DEFINITION "${OPENCMISS_INSTALL_DIR_ARCHPATH}/bin")
-    messaged("Setting environment for test ${TESTNAME}: ${LD_PATH}")
-    # Set up the correct environment for the test
-    # See https://cmake.org/pipermail/cmake/2009-May/029464.html
-    get_test_property(${TESTNAME} ENVIRONMENT EXISTING_TEST_ENV)
-    if (EXISTING_TEST_ENV)
-        set_tests_properties(${TESTNAME} PROPERTIES
-            ENVIRONMENT "${EXISTING_TEST_ENV};${PATH_DEFINITION}")
-    else()
-        set_tests_properties(${TESTNAME} PROPERTIES
-            ENVIRONMENT "${PATH_DEFINITION}")
-    endif()
-endfunction()

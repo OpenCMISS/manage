@@ -51,7 +51,7 @@ As the use is different depending on the intended API, please see the appropriat
 Using the Fortran API or C bindings
 ===================================
 
-We recommend to use CMake_ to develop OpenCMISS applications (OpenCMISS itself is built by CMake), of which you need version 3.4 or newer.
+We recommend to use CMake_ to develop OpenCMISS applications (OpenCMISS itself is built by CMake), of which you need version 3.4.0 or newer.
 Instructions for other ways of using the installed SDK libraries in your development environment will be `added later`_.
 Essentially, all you need to do is add the :path:`Resources/OpenCMISS.cmake` file from the SDK installation directory to your example project
 and include that *before* you issue the :cmake:`project(..)` command. After your project command, you can use the :cmake:`find_package(OpenCMISS ..)`
@@ -62,12 +62,12 @@ An exemplary :path:`CMakeLists.txt` could look like::
    
    include(./OpenCMISS.cmake)
    
-   cmake_minimum_required(VERSION 3.4)
+   cmake_minimum_required(VERSION 3.4.0)
    project(MyOpenCMISSApplication LANGUAGES C Fortran)
    
    [...]
    
-   find_package(OpenCMISS <VERSION> REQUIRED COMPONENTS [Iron|Zinc] CONFIG)
+   find_package(OpenCMISSLibs <VERSION> REQUIRED COMPONENTS [Iron|Zinc] CONFIG)
    
 This will look for an OpenCMISS package information, which is contained in your User SDK installation. 
 It will also verify that the found User SDK in fact matches your locally configure toolchain and mpi choice.

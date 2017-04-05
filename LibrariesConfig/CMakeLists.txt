@@ -107,7 +107,8 @@ include(OCToolchainCompilers)
 setCMakeCompilersForToolchain(${OPENCMISS_TOOLCHAIN})
 ########################################################################
 # Ready to start the "build project"
-project(OpenCMISS-Manage-Configuration VERSION 1.3 LANGUAGES C CXX)
+# It is intended that this version number is kept in sync with the OpenCMISS-Manage project.
+project(OpenCMISS-Manage-Configuration VERSION 1.3.0 LANGUAGES C CXX)
 enable_language(Fortran OPTIONAL)
 enable_testing()
 
@@ -127,7 +128,7 @@ find_package(SWIG QUIET)
 if (SWIG_FOUND)
 	message(STATUS "Language bindings are possible.")
 	if (PYTHONLIBS_FOUND)
-		message(STATUS "Python Language bindings are possible.")
+		message(STATUS "Python language bindings are possible.")
 	else ()
 		message(STATUS "Python library development files not found.  No Python language bindings will be created.")
 	endif ()
@@ -165,7 +166,7 @@ set(OPENCMISS_CONFIG_DIR ${OPENCMISS_CONFIG_DIR} CACHE PATH "Location of OpenCMI
 if (OPENCMISS_HAVE_MULTICONFIG_ENV)
     set(OPENCMISS_LOCAL_CONFIG ${PROJECT_BINARY_DIR}/OpenCMISSLocalConfig.cmake)
 else ()
-    set(OPENCMISS_LOCAL_CONFIG ${PROJECT_BINARY_DIR}/../OpenCMISSLocalConfig.cmake)
+    get_filename_component(OPENCMISS_LOCAL_CONFIG "${PROJECT_BINARY_DIR}/../OpenCMISSLocalConfig.cmake" ABSOLUTE)
 endif ()
 
 # Create a local config file if it does not exist
@@ -245,6 +246,8 @@ set(ARCHITECTURE_MPI_PATH ${ARCH_MPI_PATH})
 
 include(${OPENCMISS_ROOTS_FILE})
 
+include(OCComponentsReport)
+
 #
 # Setup build of MPI if required
 include(OCBuildMPI)
@@ -322,7 +325,12 @@ include(OCConfigureComponents)
 ########################################################################
 # Testing
 # Need to enable testing in order for any add_test calls (see OCComponentSetupMacros) to work
-add_subdirectory(tests)
+add_subdirectory(Tests)
+
+# Installation of general opencmiss configuration helper scripts.
+# TODO: Come back and make this install config work.
+# Requires variable defined in Tests/OCExamplesTests.cmake
+include(OCInstall)
 
 ########################################################################
 # IDE Stuff
@@ -341,7 +349,7 @@ configure_file("${CMAKE_CURRENT_SOURCE_DIR}/Templates/build.in.config"
 
 # Print a neat summary
 message(STATUS "@")
-message(STATUS "@@@@@@@@@@@@@@@@@@@ SUMMARY @@@@@@@@@@@@@@@@@@@@@@@@@")
+message(STATUS "@@@@@@@@@@@@@@@@@@@@@@ SUMMARY @@@@@@@@@@@@@@@@@@@@@@")
 message(STATUS "@")
 if (OPENCMISS_SDK_INSTALL_DIR)
     message(STATUS "@ OPENCMISS_SDK_INSTALL_DIR: ${OPENCMISS_SDK_INSTALL_DIR}")
@@ -360,9 +368,6 @@ message(STATUS "@")
 message(STATUS "@@@@@@@@@@@@@@@@@@@ NEXT STEPS @@@@@@@@@@@@@@@@@@@@@@")
 message(STATUS "@")
 message(STATUS "@ - Change ${OPENCMISS_LOCAL_CONFIG} according to your setup/needs")
-if (DEFINED EVIL)
-    message(STATUS "@ - Change ${CMAKE_CURRENT_SOURCE_DIR}/OpenCMISSInstallationConfig.cmake according to your developing setup/needs (Overrides anything in OpenCMISSLocalConfig!)")
-endif()
 message(STATUS "@ - Build the 'opencmiss' target (e.g. '${CMAKE_MAKE_PROGRAM} opencmiss') to start the build process")
 message(STATUS "@")
 message(STATUS "@ Having trouble? Follow the galaxy hitchhiker's advice:")

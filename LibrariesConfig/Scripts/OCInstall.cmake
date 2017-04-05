@@ -1,7 +1,11 @@
 ########################################################################
 # Installation stuff - create & export config files
 #
+message(STATUS "============== OCINSTALL ================")
+message(STATUS "ARCHITECTURE_MPI_PATH: ${ARCHITECTURE_MPI_PATH}")
+message(STATUS "OPENCMISS_LIBRARIES_INSTALL_MPI_PREFIX: ${OPENCMISS_LIBRARIES_INSTALL_MPI_PREFIX}")
 string(REPLACE "${ARCHITECTURE_MPI_PATH}" "" OPENCMISS_EXPORT_INSTALL_PREFIX ${OPENCMISS_LIBRARIES_INSTALL_MPI_PREFIX})
+message(STATUS "OPENCMISS_EXPORT_INSTALL_PREFIX: ${OPENCMISS_EXPORT_INSTALL_PREFIX}")
 set(CMAKE_INSTALL_PREFIX "${OPENCMISS_EXPORT_INSTALL_PREFIX}")
 if (ARCHITECTURE_MPI_PATH)
     set(INSTALL_PATH_MPI ${ARCHITECTURE_MPI_PATH})
@@ -50,20 +54,32 @@ endfunction()
 
 # Create a copy to not destroy the original (its being used somewhere later maybe)
 set(OPENCMISS_PREFIX_PATH_IMPORT ${OPENCMISS_PREFIX_PATH})
+message(STATUS "_OPENCMISS_PREFIX_PATH_IMPORT: ${_OPENCMISS_PREFIX_PATH_IMPORT}")
+message(STATUS "OPENCMISS_PREFIX_PATH_IMPORT: ${OPENCMISS_PREFIX_PATH_IMPORT}")
+message(STATUS "OPENCMISS_DEPENDENCIES_INSTALL_MPI_PREFIX: ${OPENCMISS_DEPENDENCIES_INSTALL_MPI_PREFIX}")
 relativizePathList(OPENCMISS_PREFIX_PATH_IMPORT "${OPENCMISS_DEPENDENCIES_INSTALL_MPI_PREFIX}" _OPENCMISS_CONTEXT_IMPORT_PREFIX)
+message(STATUS "_OPENCMISS_PREFIX_PATH_IMPORT: ${_OPENCMISS_PREFIX_PATH_IMPORT}")
+message(STATUS "OPENCMISS_PREFIX_PATH_IMPORT: ${OPENCMISS_PREFIX_PATH_IMPORT}")
 set(OPENCMISS_LIBRARY_PATH_IMPORT ${OPENCMISS_LIBRARY_PATH})
+message(STATUS "OPENCMISS_LIBRARY_PATH_IMPORT: ${OPENCMISS_LIBRARY_PATH_IMPORT}")
 relativizePathList(OPENCMISS_LIBRARY_PATH_IMPORT "${OPENCMISS_DEPENDENCIES_INSTALL_MPI_PREFIX}" _OPENCMISS_CONTEXT_IMPORT_PREFIX)
+message(STATUS "OPENCMISS_LIBRARY_PATH_IMPORT: ${OPENCMISS_LIBRARY_PATH_IMPORT}")
 
 # Introduce prefixed variants of the MPI variables - enables to check against them
 #set(OPENCMISS_MPI ${MPI})
+message(STATUS "OPENCMISS_MPI: ${OPENCMISS_MPI}")
+message(STATUS "OPENCMISS_MPI_HOME: ${OPENCMISS_MPI_HOME}")
 set(OPENCMISS_MPI_HOME "${MPI_HOME}")
+message(STATUS "OPENCMISS_MPI_HOME: ${OPENCMISS_MPI_HOME}")
+message(STATUS "OPENCMISS_MPI_VERSION: ${OPENCMISS_MPI_VERSION}")
 set(OPENCMISS_MPI_VERSION "${MPI_VERSION}")
+message(STATUS "OPENCMISS_MPI_VERSION: ${OPENCMISS_MPI_VERSION}")
 set(EXPORT_VARS
     OPENCMISS_PREFIX_PATH_IMPORT
     OPENCMISS_LIBRARY_PATH_IMPORT
     OPENCMISS_MPI
     OPENCMISS_MPI_HOME
-    MPI_VERSION
+    OPENCMISS_MPI_VERSION
     BLA_VENDOR
     #FORTRAN_MANGLING
 )
@@ -85,6 +101,7 @@ endforeach()
 set(OPENCMISS_CONTEXT ${CMAKE_CURRENT_BINARY_DIR}/export/context.cmake)
 do_export(${OPENCMISS_CONTEXT} "${EXPORT_VARS}")
 
+message(STATUS "INSTALL_PATH_MPI: ${INSTALL_PATH_MPI}")
 # Install it
 install(
     FILES ${OPENCMISS_CONTEXT}
@@ -96,8 +113,11 @@ unset(EXPORT_VARS)
 ###########################################################################################
 # Create opencmiss-config.cmake
 
+message(STATUS "CMAKE_MODULE_PATH: ${CMAKE_MODULE_PATH}")
 set(OPENCMISS_MODULE_PATH_EXPORT
     ${OPENCMISS_CMAKE_MODULE_PATH}/FindModuleWrappers
+    ${OPENCMISS_CMAKE_MODULE_PATH}/Modules
+    ${OPENCMISS_CMAKE_MODULE_PATH}/Modules/OpenCMISS
     ${OPENCMISS_EXPORT_INSTALL_PREFIX}/cmake)
 relativizePathList(OPENCMISS_MODULE_PATH_EXPORT "${OPENCMISS_EXPORT_INSTALL_PREFIX}" _OPENCMISS_IMPORT_PREFIX)
 
@@ -114,18 +134,19 @@ if (NOT OC_DEFAULT_MPI_BUILD_TYPE)
 endif()
 
 # There's litte to configure yet, but could become more
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/Templates/opencmiss-config.cmake
- ${CMAKE_CURRENT_BINARY_DIR}/export/opencmiss-config.cmake @ONLY
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/Templates/opencmisslibs-config.cmake
+    ${CMAKE_CURRENT_BINARY_DIR}/export/opencmisslibs-config.cmake @ONLY
 )
+
 # Version file
 include(CMakePackageConfigHelpers)
 WRITE_BASIC_PACKAGE_VERSION_FILE(
-    ${CMAKE_CURRENT_BINARY_DIR}/export/opencmiss-config-version.cmake
+    ${CMAKE_CURRENT_BINARY_DIR}/export/opencmisslibs-config-version.cmake
     COMPATIBILITY AnyNewerVersion
 )
 install(
-    FILES ${CMAKE_CURRENT_BINARY_DIR}/export/opencmiss-config.cmake
-        ${CMAKE_CURRENT_BINARY_DIR}/export/opencmiss-config-version.cmake
+    FILES ${CMAKE_CURRENT_BINARY_DIR}/export/opencmisslibs-config.cmake
+        ${CMAKE_CURRENT_BINARY_DIR}/export/opencmisslibs-config-version.cmake
     DESTINATION .
     COMPONENT Development
 )
@@ -143,20 +164,24 @@ endif()
 # Additional User SDK files
 set(USERSDK_RESOURCE_DIR Resources)
 # Add the OpenCMISS.cmake file to the UserSDK - it is a tool to help find the correct installation paths.
-install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/Packaging/OpenCMISS.cmake
+install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/Packaging/OpenCMISSLibs.cmake
     DESTINATION ${USERSDK_RESOURCE_DIR} COMPONENT UserSDK)
     
-# Add the OpenCMISS.cmake file to the UserSDK - it is a tool to help find the correct installation paths.
-set(_VERSION_BRANCH v${OpenCMISS_VERSION})
+message(STATUS "OpenCMISSLibs_VERSION: v${OpenCMISSLibs_VERSION}")
 if (OPENCMISS_DEVEL_ALL)
     set(_VERSION_BRANCH devel)
-endif()
+else ()
+    set(_VERSION_BRANCH v${OpenCMISSLibs_VERSION})
+endif ()
 if(NOT EXISTS ${CMAKE_INSTALL_PREFIX}/${USERSDK_RESOURCE_DIR}/Examples)
-    install(CODE "
-       file(MAKE_DIRECTORY \"\${CMAKE_INSTALL_PREFIX}/${USERSDK_RESOURCE_DIR}/Examples\")
-       execute_process(COMMAND ${GIT_EXECUTABLE} clone -b ${_VERSION_BRANCH} https://github.com/OpenCMISS-Examples/classicalfield_laplace_simple
-           WORKING_DIRECTORY \"\${CMAKE_INSTALL_PREFIX}/${USERSDK_RESOURCE_DIR}/Examples\")
-       "
-       COMPONENT UserSDK)
+    foreach(_test_example ${OC_TEST_EXAMPLES})
+        install(CODE "
+           file(MAKE_DIRECTORY \"\${CMAKE_INSTALL_PREFIX}/${USERSDK_RESOURCE_DIR}/Examples\")
+           execute_process(COMMAND ${GIT_EXECUTABLE} clone -b ${_VERSION_BRANCH} https://github.com/OpenCMISS-Examples/${_test_example}
+               WORKING_DIRECTORY \"\${CMAKE_INSTALL_PREFIX}/${USERSDK_RESOURCE_DIR}/Examples\")
+           "
+           COMPONENT UserSDK)
+    endforeach()
 endif()
 unset(_VERSION_BRANCH)
+message(STATUS "============== OCINSTALL ================")

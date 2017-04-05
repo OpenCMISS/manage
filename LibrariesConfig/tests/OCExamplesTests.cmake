@@ -27,7 +27,7 @@ foreach(example_name ${OC_TEST_EXAMPLES})
         list(APPEND DEFS -DTOOLCHAIN=${TOOLCHAIN})
     endif()
     
-    set(${example_name}_BRANCH ${OC_KEYTESTS_BRANCH})
+    set(${example_name}_BRANCH ${OC_EXAMPLES_BRANCH})
     createExternalProjects(${example_name} "${SRC_DIR}" "${BIN_DIR}" "${DEFS}")
 
     # Dont build with the main build, as installation of OpenCMISS has not been done by then.
