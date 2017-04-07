@@ -129,7 +129,7 @@ if (OC_USE_HDF5)
         endforeach()
 
         addAndConfigureLocalComponent(HDF5
-            BUILD_TESTS=${BUILD_TESTS}
+            BUILD_TESTS=OFF
             HDF5_VERSION=${HDF5_VERSION}
             HDF5_WITH_MPI=${HDF5_USE_MPI}
             WITH_SZIP=${HDF5_USE_SZIP}
