@@ -112,6 +112,8 @@ project(OpenCMISS-Manage-Configuration VERSION 1.3.0 LANGUAGES C CXX)
 enable_language(Fortran OPTIONAL)
 enable_testing()
 
+set(CMAKE_INSTALL_PREFIX /georges/house) # Can't point this somewhere sensible as it is used later on when finding modules.
+
 list(APPEND CMAKE_MODULE_PATH
     ${CMAKE_CURRENT_SOURCE_DIR}/Modules
     ${CMAKE_CURRENT_SOURCE_DIR}/Scripts
