@@ -611,7 +611,7 @@ if (OC_USE_ZINC OR (OPENGL_FOUND AND OC_DEPENDENCIES_ONLY))
     if (OC_USE_JPEG)
         find_package(JPEG ${JPEG_VERSION} QUIET)
         if (NOT JPEG_FOUND)
-            set(JPEG_FWD_DEPS ZINC TIFF GDCM-ABI IMAGEMAGICK)
+            set(JPEG_FWD_DEPS ZINC TIFF GDCM-ABI IMAGEMAGICK ITK)
             addAndConfigureLocalComponent(JPEG
                 JPEG_BUILD_CJPEG=OFF
                 JPEG_BUILD_DJPEG=OFF
