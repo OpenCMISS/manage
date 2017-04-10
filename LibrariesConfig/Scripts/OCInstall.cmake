@@ -147,7 +147,7 @@ WRITE_BASIC_PACKAGE_VERSION_FILE(
 install(
     FILES ${CMAKE_CURRENT_BINARY_DIR}/export/opencmisslibs-config.cmake
         ${CMAKE_CURRENT_BINARY_DIR}/export/opencmisslibs-config-version.cmake
-    DESTINATION .
+    DESTINATION ${COMMON_PACKAGE_CONFIG_DIR}
     COMPONENT Development
 )
 
@@ -163,9 +163,11 @@ endif()
 
 # Additional User SDK files
 set(USERSDK_RESOURCE_DIR Resources)
-# Add the OpenCMISS.cmake file to the UserSDK - it is a tool to help find the correct installation paths.
-install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/Packaging/OpenCMISSLibs.cmake
-    DESTINATION ${USERSDK_RESOURCE_DIR} COMPONENT UserSDK)
+# Add the OpenCMISSLibs.cmake file to the UserSDK - it is a tool to help find the correct installation paths.
+# May reintroduce this concept if there is a need, we may have created an alternative which renders this irrelevant.
+#install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/Packaging/OpenCMISSLibs.cmake
+#    DESTINATION ${COMMON_PACKAGE_CONFIG_DIR}
+#    COMPONENT UserSDK)
     
 message(STATUS "OpenCMISSLibs_VERSION: v${OpenCMISSLibs_VERSION}")
 if (OPENCMISS_DEVEL_ALL)
