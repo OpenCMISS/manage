@@ -250,7 +250,7 @@ include(OCPackaging)
 # Iron, Zinc, Dependencies, ...
 add_subdirectory(SourceManagement)
 
-set(BUILD_CONFIG_COMMAND "${CMAKE_COMMAND}" --build .)
+set(BUILD_CONFIG_COMMAND "${CMAKE_COMMAND}" --build . --target install)
 if (OPENCMISS_HAVE_MULTICONFIG_ENV)
     list(APPEND BUILD_CONFIG_COMMAND --config $<CONFIG>)
 #    set(BUILD_CONFIG_STAMP_FILES)
