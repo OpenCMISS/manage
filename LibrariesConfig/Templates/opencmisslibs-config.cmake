@@ -12,6 +12,7 @@ cmake_minimum_required(VERSION @OPENCMISS_CMAKE_MIN_VERSION@ FATAL_ERROR)
 
 # Compute the installation prefix relative to this file. It might be a mounted location or whatever.
 get_filename_component(_OPENCMISS_IMPORT_PREFIX "${CMAKE_CURRENT_LIST_FILE}" DIRECTORY)
+get_filename_component(_OPENCMISS_IMPORT_PREFIX "${_OPENCMISS_IMPORT_PREFIX}" DIRECTORY)
 
 #############################################################################
 # Helper functions
@@ -55,7 +56,7 @@ toAbsolutePaths(OPENCMISS_MODULE_PATH)
 list(APPEND CMAKE_MODULE_PATH ${OPENCMISS_MODULE_PATH})
 
 # Sets OPENCMISS_HAVE_MULTICONFIG_ENV variable
-include(OCMutliConfigEnvironment)
+include(OCMultiConfigEnvironment)
 
 # Set the build type to OpenCMISS default if not explicitly given (and single-config env)
 if (NOT OPENCMISS_HAVE_MULTICONFIG_ENV AND (CMAKE_BUILD_TYPE_INITIALIZED_TO_DEFAULT OR NOT CMAKE_BUILD_TYPE))
