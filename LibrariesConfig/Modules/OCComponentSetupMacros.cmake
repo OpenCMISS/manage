@@ -138,9 +138,6 @@ function(addAndConfigureLocalComponent COMPONENT_NAME)
     endforeach()
     log("OpenCMISS component ${COMPONENT_NAME} extra args:\n${COMPONENT_DEFS}" DEBUG)
 
-    ##############################################################
-    # Create actual external projects
-
     # Create the external projects
     createExternalProjects(${COMPONENT_NAME} "${COMPONENT_SOURCE_DIR}" "${COMPONENT_BUILD_DIR}" "${COMPONENT_DEFS}")
 
@@ -323,7 +320,7 @@ Configure definitions:
             -DBUILD_STAMP=YES 
             -DCOMPONENT_NAME=${NAME}
             -DLOGFILE="${OC_BUILD_LOG}"
-            -P ${CMAKE_CURRENT_SOURCE_DIR}/Scripts/OCSupport.cmake
+            -P ${PROJECT_SOURCE_DIR}/Scripts/OCSupport.cmake
         COMMENT "Support: Creating ${COMPONENT_NAME} buildlog"             
         WORKING_DIRECTORY "${OPENCMISS_SUPPORT_DIR}")
     add_dependencies(${OC_EP_PREFIX}${NAME} ${OC_SM_PREFIX}${NAME}_build_log)

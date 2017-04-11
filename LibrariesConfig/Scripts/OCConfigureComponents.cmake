@@ -48,10 +48,6 @@ set(SUBGROUP_PATH dependencies)
 # i.e. mumps may need scotch so scotch has to be processed first on order to be added to the
 # external project dependencies list of any following package
 
-message(STATUS "OC_USE_IRON: ${OC_USE_IRON}")
-message(STATUS "OC_USE_ZINC: ${OC_USE_ZINC}")
-message(STATUS "OC_DEPENDENCIES_ONLY: ${OC_DEPENDENCIES_ONLY}")
-
 # zLIB
 if (OC_USE_ZLIB OR OC_USE_ZINC OR OC_DEPENDENCIES_ONLY)
     find_package(ZLIB ${ZLIB_VERSION} QUIET)

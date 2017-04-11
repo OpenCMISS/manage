@@ -329,6 +329,11 @@ include(OCConfigureComponents)
 # Need to enable testing in order for any add_test calls (see OCComponentSetupMacros) to work
 add_subdirectory(Tests)
 
+########################################################################
+# Examples
+# Need to enable testing in order for any add_test calls (see OCComponentSetupMacros) to work
+add_subdirectory(Examples)
+
 # Installation of general opencmiss configuration helper scripts.
 # TODO: Come back and make this install config work.
 # Requires variable defined in Tests/OCExamplesTests.cmake

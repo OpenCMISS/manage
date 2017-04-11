@@ -201,6 +201,10 @@ set(CSIM_VERSION 1.0)
 set(IRON_VERSION 0.6.0)
 set(ZINC_VERSION 3.1)
 
+# Examples
+set(_BASE_EXAMPLE_VERSION 1.3)
+set(classicalfield_laplace_simple_VERSION ${_BASE_EXAMPLE_VERSION})
+
 # DISABLE_GIT
 # -----------
 #
