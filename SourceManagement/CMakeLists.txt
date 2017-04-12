@@ -114,10 +114,10 @@ endif()
 #                      Those are used to both clone the git repo in development mode or generate the path to the zipped source file on github. 
 foreach (COMPONENT_NAME ${ALL_SOURCE_COMPONENTS})
     string(TOLOWER ${COMPONENT_NAME} FOLDER_NAME)
-    # Set "devel" branches for each component if DEVEL_ALL is set,
+    # Set "develop" branches for each component if DEVEL_ALL is set,
     # but don't override any specified component branches.
     if (OPENCMISS_DEVEL_ALL AND NOT ${COMPONENT_NAME}_BRANCH)
-        set(${COMPONENT_NAME}_BRANCH devel)
+        set(${COMPONENT_NAME}_BRANCH develop)
     elseif (NOT ${COMPONENT_NAME}_BRANCH)
         # Set default version number branch unless e.g. IRON_BRANCH is specified
         set(${COMPONENT_NAME}_BRANCH "v${${COMPONENT_NAME}_VERSION}")

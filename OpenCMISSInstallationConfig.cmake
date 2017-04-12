@@ -104,7 +104,7 @@ option(OPENCMISS_USE_ARCHITECTURE_PATH "Use architecture path to enable multiple
 # OPENCMISS_DEVEL_ALL
 # ------------
 #
-# Override any local variable and have CMake download/checkout the "devel" branch of any components repository
+# Override any local variable and have CMake download/checkout the "develop" branch of any components repository
 #
 # See also: `<COMP>_DEVEL`_
 #
@@ -189,11 +189,8 @@ set(ITK_VERSION 3.20.0)
 
 # MPI
 set(OPENMPI_VERSION 1.8.4) #1.8.4, 1.10.0 (unstable, does fail on e.g. ASES/Stuttgart)
-set(OPENMPI_BRANCH v${OPENMPI_VERSION}) # No devel branch at this time
 set(MPICH_VERSION 3.1.3)
-set(MPICH_BRANCH v${MPICH_VERSION}) # No devel branch at this time
 set(MVAPICH2_VERSION 2.1)
-set(MVAPICH2_BRANCH v${MVAPICH2_VERSION}) # No devel branch at this time
 
 # Own components
 set(CELLML_VERSION 1.0) # any will do, not used

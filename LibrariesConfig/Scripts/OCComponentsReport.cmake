@@ -30,7 +30,7 @@ foreach(COMPONENT ${OPENCMISS_COMPONENTS})
         string(SUBSTRING "${OC_SYSTEM_${COMPONENT}}    " 0 3 OC_SYSTEM_FIXED_SIZE)
         # string(SUBSTRING "${${COMPONENT}_VERSION}       " 0 7 OC_VERSION_FIXED_SIZE) now using the branch from the git repository only
         string(SUBSTRING "${${COMPONENT}_SHARED}        " 0 3 OC_SHARED_FIXED_SIZE)
-        # ${COMPONENT}_BRANCH is as good as version (this is what is effectively checked out) and will also display "devel" correctly
+        # ${COMPONENT}_BRANCH is as good as version (this is what is effectively checked out) and will also display "develop" correctly
         message(STATUS "OpenCMISS component ${COMPONENT_FIXED_SIZE}: Use ${OC_USE_FIXED_SIZE}, System search ${OC_SYSTEM_FIXED_SIZE}, Shared: ${OC_SHARED_FIXED_SIZE}, Branch '${${COMPONENT}_BRANCH}')")
     endif ()
 endforeach()

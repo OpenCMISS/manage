@@ -178,7 +178,7 @@ set(USERSDK_RESOURCE_DIR Resources)
     
 message(STATUS "OpenCMISSLibs_VERSION: v${OpenCMISSLibs_VERSION}")
 if (OPENCMISS_DEVEL_ALL)
-    set(_VERSION_BRANCH devel)
+    set(_VERSION_BRANCH develop)
 else ()
     set(_VERSION_BRANCH v${OpenCMISSLibs_VERSION})
 endif ()

@@ -36,7 +36,7 @@ Example directory layout and cmake invocation::
    you cannot have two different source versions (e.g. branches) for any component for two or
    more different architectures.
    For example, you cannot have the current release version of IRON within a build using
-   Intel MPI and the devel version of IRON with OpenMPI.
+   Intel MPI and the develop version of IRON with OpenMPI.
    To solve this, you need two different OpenCMISS root installations.
 
 .. _`archpaths`:
