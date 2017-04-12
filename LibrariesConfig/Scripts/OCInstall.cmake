@@ -177,7 +177,7 @@ set(USERSDK_RESOURCE_DIR Resources)
 #    COMPONENT UserSDK)
     
 message(STATUS "OpenCMISSLibs_VERSION: v${OpenCMISSLibs_VERSION}")
-if (OPENCMISS_DEVEL_ALL)
+if (OPENCMISS_DEVELOP_ALL)
     set(_VERSION_BRANCH develop)
 else ()
     set(_VERSION_BRANCH v${OpenCMISSLibs_VERSION})

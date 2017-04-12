@@ -24,7 +24,7 @@
 # At first, a flag :var:`<COMPNAME>_DEVEL` must be set in order to notify the setup that
 # this component (Iron, Zinc, any dependency) should be under development.
 #
-# See also: `OPENCMISS_DEVEL_ALL`_.
+# See also: `OPENCMISS_DEVELOP_ALL`_.
 #
 # .. default:: NO
 
@@ -101,15 +101,15 @@ set(OC_DEFAULT_MPI_BUILD_TYPE )
 option(OPENCMISS_USE_ARCHITECTURE_PATH "Use architecture path to enable multiple configs in the same installation." YES)
 
 ##
-# OPENCMISS_DEVEL_ALL
-# ------------
+# OPENCMISS_DEVELOP_ALL
+# ---------------------
 #
 # Override any local variable and have CMake download/checkout the "develop" branch of any components repository
 #
 # See also: `<COMP>_DEVEL`_
 #
 # .. default:: NO
-option(OPENCMISS_DEVEL_ALL "Download/checkout development branches of all components of the OpenCMISS build." NO)
+option(OPENCMISS_DEVELOP_ALL "Download/checkout development branches of all components of the OpenCMISS build." NO)
 
 ##
 # OPENCMISS_INSTALLATION_SUPPORT_EMAIL

@@ -1,7 +1,7 @@
 
 # Don't show the variables in this file in a GUI by making them cache variables, they should be invariant 
 # for configured builds.
-set(OPENCMISS_DEVEL_ALL ${OPENCMISS_DEVEL_ALL})
+set(OPENCMISS_DEVELOP_ALL ${OPENCMISS_DEVELOP_ALL})
 
 set(OPENCMISS_USE_ARCHITECTURE_PATH ${OPENCMISS_USE_ARCHITECTURE_PATH})
 
