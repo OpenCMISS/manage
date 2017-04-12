@@ -57,13 +57,14 @@ endif ()
 
 #############################################################################
 # Assemble architecture-path dependent search locations
-set(ARCHPATH .)
+set(ARCHPATH /.)
+set(ARCHPATHNOMPI /.)
 if (@OPENCMISS_USE_ARCHITECTURE_PATH@)
     include(OCArchitecturePathFunctions)
-    getArchitecturePath(_UNUSED ARCHPATH)
+    getArchitecturePath(ARCHPATHNOMPI ARCHPATH)
 endif()
 
-set(_CONTEXT_PATH "${_OPENCMISS_IMPORT_PREFIX}/${ARCHPATH}")
+set(_CONTEXT_PATH "${_OPENCMISS_IMPORT_PREFIX}${ARCHPATHNOMPI}")
     
 # Include the context settings info
 include(${_CONTEXT_PATH}/context.cmake)
@@ -79,6 +80,7 @@ endif ()
 # Add the prefix path so the config files can be found
 toAbsolutePaths(CONTEXT_OPENCMISS_PREFIX_PATH_IMPORT)
 list(APPEND CMAKE_PREFIX_PATH ${CONTEXT_OPENCMISS_PREFIX_PATH_IMPORT})
+set(OPENCMISS_MPI_BUILD_TYPE ${CONTEXT_OPENCMISS_MPI_BUILD_TYPE})
 
 messaged("CMAKE_MODULE_PATH=${CMAKE_MODULE_PATH}\nCMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}")
 
