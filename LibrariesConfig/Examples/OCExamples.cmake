@@ -6,7 +6,7 @@ if (OPENCMISS_EXAMPLES_SOURCE_DIR)
 
     set(_FT_EX_EP )
     foreach(example_name ${OC_TEST_EXAMPLES})
-        set(BIN_DIR "${OPENCMISS_EXAMPLES_BINARY_MPI_DIR}/${example_name}")
+        set(BIN_DIR "${OPENCMISS_EXAMPLES_BINARY_MPI_DIR}/${example_name}/${BUILD_TYPE_PATH_ELEM}")
         set(SRC_DIR "${OPENCMISS_EXAMPLES_SOURCE_DIR}/${example_name}")
         set(INSTALL_DIR ${OPENCMISS_EXAMPLES_INSTALL_MPI_PREFIX})
         # Set correct paths
