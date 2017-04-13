@@ -64,7 +64,7 @@ if (WIN32)
     
     #set(CPACK_NSIS_MUI_FINISHPAGE_RUN Neon)
 elseif(APPLE)
-    #todo
+    set(CPACK_GENERATOR "TGZ")
 elseif(UNIX)
     set(CPACK_GENERATOR "TGZ")
 endif()

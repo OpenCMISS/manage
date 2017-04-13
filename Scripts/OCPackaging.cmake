@@ -44,9 +44,6 @@ function(DIRECTORY_LIST result curdir)
     set(${result} ${dirlist} PARENT_SCOPE)
 endfunction()
 
-# List directories in "${CMAKE_CURRENT_BINARY_DIR}/config(s)" that contain a build_config.stamp file.
-set(CONFIG_BASE_DIR "${CMAKE_CURRENT_BINARY_DIR}/config${PLURAL_S}")
-
 macro(CREATE_PACKAGING_TARGET)    
     configure_file(
         "${CMAKE_CURRENT_SOURCE_DIR}/Templates/CPackProject.template.cmake"
@@ -55,7 +52,7 @@ macro(CREATE_PACKAGING_TARGET)
     )
     file(MAKE_DIRECTORY "${OC_PACKAGE_ROOT}/${PACKAGE_TYPE}/build")
     add_custom_target(package_${PACKAGE_TYPE}
-        COMMAND ${CMAKE_COMMAND} -G "${CMAKE_GENERATOR}" -DPACKAGING_MODULE_PATH=${CMAKE_CURRENT_SOURCE_DIR}/Packaging -DCONFIG_BASE_DIR="${CONFIG_BASE_DIR}" -DCMAKE_C_COMPILER=${CMAKE_C_COMPILER} ../source
+        COMMAND ${CMAKE_COMMAND} -G "${CMAKE_GENERATOR}" -DPACKAGING_MODULE_PATH=${CMAKE_CURRENT_SOURCE_DIR}/Packaging -DCONFIG_PATH="${CONFIG_PATH}" -DCMAKE_C_COMPILER=${CMAKE_C_COMPILER} ../source
         COMMAND ${CMAKE_COMMAND} --build . --config $<CONFIG> --target package
         WORKING_DIRECTORY "${OC_PACKAGE_ROOT}/${PACKAGE_TYPE}/build"
     )
