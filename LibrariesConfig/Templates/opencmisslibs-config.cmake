@@ -50,7 +50,7 @@ include(OCMultiConfigEnvironment)
 
 find_package(MPI QUIET)
 if (MPI_FOUND)
-    set(OPENCMISS_MPI ${MPI})
+    set(OPENCMISS_MPI ${MPI_DETECTED})
 else ()
     set(OPENCMISS_MPI none)
 endif ()
