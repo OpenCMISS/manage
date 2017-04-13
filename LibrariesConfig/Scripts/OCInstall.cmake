@@ -1,9 +1,10 @@
 ########################################################################
 # Installation stuff - create & export config files
 #
-# Do not use relative paths for install destinations always use full path.
 string(REPLACE "${ARCHITECTURE_MPI_PATH}" "" _INSTALL_BASE_PATH ${OPENCMISS_LIBRARIES_INSTALL_MPI_PREFIX})
 set(OPENCMISS_CONTEXT_INSTALL_PATH "${OPENCMISS_LIBRARIES_INSTALL_NO_MPI_PREFIX}")
+
+set(CMAKE_INSTALL_PREFIX "${_INSTALL_BASE_PATH}")
 
 function(messaged MSG)
     #message(STATUS "OCInstall: ${MSG}")
@@ -121,7 +122,7 @@ do_export(${OPENCMISS_MPI_CONTEXT} TRUE "${EXPORT_MPI_VARS}")
 # Install it
 install(
     FILES ${OPENCMISS_CONTEXT} ${OPENCMISS_MPI_CONTEXT}
-    DESTINATION "${OPENCMISS_CONTEXT_INSTALL_PATH}"
+    DESTINATION ".${ARCHITECTURE_NO_MPI_PATH}"
     COMPONENT Development
 )
 unset(EXPORT_VARS)
@@ -154,7 +155,7 @@ WRITE_BASIC_PACKAGE_VERSION_FILE(
 install(
     FILES ${CMAKE_CURRENT_BINARY_DIR}/export/opencmisslibs-config.cmake
         ${CMAKE_CURRENT_BINARY_DIR}/export/opencmisslibs-config-version.cmake
-    DESTINATION "${_INSTALL_BASE_PATH}"
+    DESTINATION "."
     COMPONENT Development
 )
 
@@ -164,7 +165,7 @@ if (MINGW AND WIN32)
     get_filename_component(COMPILER_BIN_DIR ${CMAKE_C_COMPILER} PATH)
     file(GLOB MINGW_DLLS "${COMPILER_BIN_DIR}/*.dll")
     install(FILES ${MINGW_DLLS}
-        DESTINATION ${OPENCMISS_LIBRARIES_INSTALL_MPI_PREFIX}/bin
+        DESTINATION ${ARCHITECTURE_MPI_PATH}/bin
         COMPONENT Runtime)
 endif()
 
