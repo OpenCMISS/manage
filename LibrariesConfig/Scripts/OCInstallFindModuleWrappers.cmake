@@ -57,11 +57,8 @@ list(APPEND OPENCMISS_COMPONENT_MODULE_PATH
     ${OPENCMISS_CMAKE_MODULE_PATH}/FindModuleWrappers
     )
 
-#
-# Temporarily disabling this while DevelopmentSDK is offline.
-#
 # Even though the Wrappers are already at the OpenCMISS install dir,
 # we also use the install command to allow cpack get a hold of them
-#install(DIRECTORY ${OPENCMISS_CMAKE_MODULE_PATH}/FindModuleWrappers
-#    DESTINATION cmake
-#    COMPONENT DevelopmentSDK)
+install(DIRECTORY ${OPENCMISS_CMAKE_MODULE_PATH}/FindModuleWrappers
+    DESTINATION share/cmake
+    COMPONENT Development)
