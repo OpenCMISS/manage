@@ -25,6 +25,7 @@ function(GET_INSTALL_QUADS PACKAGE_TYPE VAR_NAME)
             list(APPEND _quads "${IRON_BINARY_DIR}" "Iron Development" Development "${ARCHITECTURE_MPI_PATH}")
             list(APPEND _quads "${ZINC_BINARY_DIR}" "Zinc Development" Development "${ARCHITECTURE_NO_MPI_PATH}")
             list(APPEND _quads "${CONFIG_BASE_DIR}/${_config_dir}" "OpenCMISSLibs Development" Development "/")
+            list(APPEND _quads "${CMAKE_MODULES_BINARY_DIR}" "OpenCMISSLibs Development" CMakeFiles "/")
         endif ()
     
         if ("${PACKAGE_TYPE}" STREQUAL "developersdk")
