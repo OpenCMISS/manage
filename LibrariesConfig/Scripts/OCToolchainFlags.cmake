@@ -120,7 +120,10 @@ elseif ("${CMAKE_C_COMPILER_ID}" STREQUAL "Intel" OR "${CMAKE_CXX_COMPILER_ID}" 
         addFlagAll("-fPIE" Fortran RELEASE)
     endif ()
     # Release - added for vector optimisation
-    addFlagAll("-xAVX" RELEASE)
+    check_c_compiler_flag(AVX _HAVE_AVX_FLAG)
+    if (_HAVE_AVX_FLAG)
+        addFlagAll("-xAVX" RELEASE)
+    endif ()
 
     # Debug
     addFlagAll("-traceback" DEBUG)
