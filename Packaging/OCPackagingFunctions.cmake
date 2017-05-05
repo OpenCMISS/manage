@@ -21,7 +21,7 @@ function(GET_INSTALL_QUADS PACKAGE_TYPE VAR_NAME)
             list(APPEND _quads "${IRON_BINARY_DIR}" "DLLs required by OpenCMISS Libraries" Redist "${CONFIG_PACKAGE_ARCHITECTURE_MPI_PATH}")
         endif ()
     
-        if ("${PACKAGE_TYPE}" STREQUAL "usersdk")
+        if ("${PACKAGE_TYPE}" STREQUAL "sdk")
             list(APPEND _quads "${IRON_BINARY_DIR}" "Iron Development" Development "${CONFIG_PACKAGE_ARCHITECTURE_MPI_PATH}")
             list(APPEND _quads "${ZINC_BINARY_DIR}" "Zinc Development" Development "${CONFIG_PACKAGE_ARCHITECTURE_NO_MPI_PATH}")
             list(APPEND _quads "${CONFIG_BASE_DIR}/${_config_dir}" "OpenCMISSLibs Development" Development "/")
@@ -44,5 +44,31 @@ function(GET_INSTALL_QUADS PACKAGE_TYPE VAR_NAME)
         endif ()
     endforeach()
     set(${VAR_NAME} ${_quads} PARENT_SCOPE)
+endfunction()
+
+function(GET_PACKAGE_SYSTEM_NAME _VAR_NAME)
+
+    if (CMAKE_SYSTEM_NAME STREQUAL "Linux")
+        message(STATUS "bingo")
+find_program(LSB_RELEASE lsb_release)
+if (LSB_RELEASE)
+execute_process(COMMAND ${LSB_RELEASE} -is
+    OUTPUT_VARIABLE LSB_RELEASE_ID_SHORT
+    OUTPUT_STRIP_TRAILING_WHITESPACE
+)
+execute_process(COMMAND ${LSB_RELEASE} -rs
+    OUTPUT_VARIABLE LSB_VERSION_ID_SHORT
+    OUTPUT_STRIP_TRAILING_WHITESPACE
+)
+
+set(PACKAGE_NAME ${LSB_RELEASE_ID_SHORT}_${LSB_VERSION_ID_SHORT})
+else ()
+set(PACKAGE_NAME ${CMAKE_SYSTEM_NAME})
+endif ()
+    else ()
+set(PACKAGE_NAME ${CMAKE_SYSTEM_NAME})
+    endif ()
+
+        set(${_VAR_NAME} ${PACKAGE_NAME} PARENT_SCOPE)
 endfunction()
 
