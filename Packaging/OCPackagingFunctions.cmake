@@ -49,26 +49,25 @@ endfunction()
 function(GET_PACKAGE_SYSTEM_NAME _VAR_NAME)
 
     if (CMAKE_SYSTEM_NAME STREQUAL "Linux")
-        message(STATUS "bingo")
-find_program(LSB_RELEASE lsb_release)
-if (LSB_RELEASE)
-execute_process(COMMAND ${LSB_RELEASE} -is
-    OUTPUT_VARIABLE LSB_RELEASE_ID_SHORT
-    OUTPUT_STRIP_TRAILING_WHITESPACE
-)
-execute_process(COMMAND ${LSB_RELEASE} -rs
-    OUTPUT_VARIABLE LSB_VERSION_ID_SHORT
-    OUTPUT_STRIP_TRAILING_WHITESPACE
-)
+        find_program(LSB_RELEASE lsb_release)
+        if (LSB_RELEASE)
+            execute_process(COMMAND ${LSB_RELEASE} -is
+                OUTPUT_VARIABLE LSB_RELEASE_ID_SHORT
+                OUTPUT_STRIP_TRAILING_WHITESPACE
+            )
+            execute_process(COMMAND ${LSB_RELEASE} -rs
+                OUTPUT_VARIABLE LSB_VERSION_ID_SHORT
+                OUTPUT_STRIP_TRAILING_WHITESPACE
+            )
 
-set(PACKAGE_NAME ${LSB_RELEASE_ID_SHORT}_${LSB_VERSION_ID_SHORT})
-else ()
-set(PACKAGE_NAME ${CMAKE_SYSTEM_NAME})
-endif ()
+            set(PACKAGE_NAME ${LSB_RELEASE_ID_SHORT}-${LSB_VERSION_ID_SHORT})
+        else ()
+            set(PACKAGE_NAME ${CMAKE_SYSTEM_NAME})
+        endif ()
     else ()
-set(PACKAGE_NAME ${CMAKE_SYSTEM_NAME})
+        set(PACKAGE_NAME ${CMAKE_SYSTEM_NAME})
     endif ()
 
-        set(${_VAR_NAME} ${PACKAGE_NAME} PARENT_SCOPE)
+    set(${_VAR_NAME} ${PACKAGE_NAME} PARENT_SCOPE)
 endfunction()
 

@@ -122,6 +122,15 @@ option(OPENCMISS_DEVELOP_ALL "Download/checkout development branches of all comp
 set(OPENCMISS_INSTALLATION_SUPPORT_EMAIL ${OPENCMISS_BUILD_SUPPORT_EMAIL} CACHE STRING "Please set this to your email address, especially if you plan to provide several architecture installations and expect people to use your installation")
 
 ##
+# OPENCMISS_RELEASE
+# -----------------
+#
+# Sets whether the current build is for making a tagged release.  This option effects the version number of the SDK package.  Not an option for general consumption, but for use in the release process.
+#
+option(OPENCMISS_RELEASE "Setting for determining if the built libraries are destined to become an official release." NO)
+mark_as_advanced(OPENCMISS_RELEASE)
+
+##
 # .. _`comp_version`:
 # 
 # <COMP>_VERSION

@@ -24,11 +24,19 @@ else()
 endif()
 
 get_package_system_name(_PACKAGE_SYSTEM_NAME)
-message(STATUS "_PACKAGE_SYSTEM_NAME: ${_PACKAGE_SYSTEM_NAME}")
+set(_PACKAGE_VERSION "${OpenCMISSLibs_VERSION}")
+if (NOT OPENCMISS_RELEASE)
+    string(TIMESTAMP _TIMESTAMP "%Y%m%d%H%M%S UTC)
+    set(_PACKAGE_VERSION "${_PACKAGE_VERSION}.${_TIMESTAMP}")
+endif ()
+
+# The website developer versions script relies on this package file name to be written in four parts with '_' between each section.  This
+# means that each individual section cannot use the '_' symbol.
+set(_PACKAGE_FILE_NAME @PACKAGE_BASE_NAME@_${_PACKAGE_VERSION}_@PACKAGE_TYPE_NAME@_${_PACKAGE_SYSTEM_NAME})
 set(CPACK_PROJECT_CONFIG_FILE ${CMAKE_CURRENT_BINARY_DIR}/CPackRunConfig.cmake)
 file(WRITE "${CPACK_PROJECT_CONFIG_FILE}"
 #"set(CPACK_PACKAGE_FILE_NAME \"@PACKAGE_NAME_BASE@_@OPENCMISS_MPI@_${CMAKE_SYSTEM_NAME}${MACHINE_ARCH}_\${CPACK_BUILD_CONFIG}\")"
-"set(CPACK_PACKAGE_FILE_NAME \"@PACKAGE_NAME_BASE@_${_PACKAGE_SYSTEM_NAME}\")"
+"set(CPACK_PACKAGE_FILE_NAME \"${_PACKAGE_FILE_NAME}\")"
 )
 
 # NEVER CHANGE THIS AFTER THE FIRST SDK RELEASES.
@@ -46,7 +54,7 @@ set(CPACK_PACKAGE_ICON "${OC_PACKAGE_FILES_DIR}${PSEP}opencmiss.png")
 #set(CPACK_INSTALL_COMMANDS "${CMAKE_COMMAND} -E echo \"@@@@@@@@@@@@@@@@@@@@ hello\"")
 
 if (WIN32)
-    set(CPACK_GENERATOR "NSIS")
+    set(CPACK_GENERATOR "NSIS;zip")
     
     # NSIS specific options
     set(CPACK_NSIS_PACKAGE_NAME "@PACKAGE_NAME@ @OpenCMISSLibs_VERSION@")
