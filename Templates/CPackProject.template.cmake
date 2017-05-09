@@ -54,7 +54,7 @@ set(CPACK_PACKAGE_ICON "${OC_PACKAGE_FILES_DIR}${PSEP}opencmiss.png")
 #set(CPACK_INSTALL_COMMANDS "${CMAKE_COMMAND} -E echo \"@@@@@@@@@@@@@@@@@@@@ hello\"")
 
 if (WIN32)
-    set(CPACK_GENERATOR "NSIS;zip")
+    set(CPACK_GENERATOR "NSIS;ZIP")
     
     # NSIS specific options
     set(CPACK_NSIS_PACKAGE_NAME "@PACKAGE_NAME@ @OpenCMISSLibs_VERSION@")
