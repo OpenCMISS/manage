@@ -238,7 +238,7 @@ if (NOT OPENCMISS_HAVE_MULTICONFIG_ENV)
 endif ()
 set(CREATE_CONFIG_STAMP_FILE "${CONFIG_PATH}/stamp/create_config.stamp")
 add_custom_target(usage ALL
-    COMMAND "${CMAKE_COMMAND}" -E echo "Perhaps try targets: create_config, build_config, do_config or help. For other options read the documentation."
+    COMMAND "${CMAKE_COMMAND}" -E echo "Perhaps try targets: create_config, build_config, do_config, or help. For other options read the documentation."
     VERBATIM
 )
 
