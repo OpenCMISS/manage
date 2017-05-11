@@ -18,6 +18,7 @@ if ("${DOLLAR_SYMBOL}{RESULT}" STREQUAL "0")
     set(RESULT_MESSAGE "Configuration successful: ${CONFIG_PATH}")
 else ()
     set(RESULT_MESSAGE "Failed to create configuration")
+    message(SEND_ERROR "${RESULT_MESSAGE}")
 endif ()
 
 message(STATUS "@")
