@@ -23,6 +23,7 @@ set(CONFIG_PACKAGE_ARCHITECTURE_NO_MPI_PATH ${CONFIG_PACKAGE_ARCHITECTURE_NO_MPI
     set(RESULT_MESSAGE "Build successful: ${CONFIG_PATH}")
 else ()
     set(RESULT_MESSAGE "Failed to build configuration")
+    message(SEND_ERROR "${RESULT_MESSAGE}")
 endif ()
 
 if (PRINT_MESSAGE)
