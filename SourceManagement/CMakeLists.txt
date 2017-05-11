@@ -30,7 +30,7 @@ function(addSourceManagementTargets COMPONENT_NAME SOURCE_DIR)
         )
 
         add_custom_target(${OC_SM_PREFIX}${REPO_NAME}_update
-            DEPENDS ${OC_SM_PREFIX}${COMPONENT_NAME}_sources
+            DEPENDS ${OC_SM_PREFIX}${REPO_NAME}_sources
             COMMAND ${GIT_EXECUTABLE} pull
             COMMAND ${GIT_EXECUTABLE} checkout ${${COMPONENT_NAME}_BRANCH}
             # We can't have this here which binary dir should we be removing the stamp files from?
@@ -91,6 +91,8 @@ function(addSourceManagementTargets COMPONENT_NAME SOURCE_DIR)
     set_target_properties(${OC_SM_PREFIX}${REPO_NAME}_update_force PROPERTIES FOLDER "Source management")
 
     set(SOURCE_MANAGEMENT_TARGET ${OC_SM_PREFIX}${REPO_NAME}_sources PARENT_SCOPE)
+    set(UPDATE_MANAGEMENT_TARGET ${OC_SM_PREFIX}${REPO_NAME}_update PARENT_SCOPE)
+    set(FORCE_MANAGEMENT_TARGET ${OC_SM_PREFIX}${REPO_NAME}_update PARENT_SCOPE)
 endfunction()
 
 
@@ -146,12 +148,18 @@ foreach (COMPONENT_NAME ${ALL_SOURCE_COMPONENTS})
 
     if (_VALID_TARGET)
         addSourceManagementTargets(${COMPONENT_NAME} ${COMPONENT_SOURCE_DIR})
-
         list(APPEND COMPONENT_SOURCE_TARGETS ${SOURCE_MANAGEMENT_TARGET})
+        list(APPEND COMPONENT_UPDATE_TARGETS ${UPDATE_MANAGEMENT_TARGET})
+        list(APPEND COMPONENT_UPDATE_FORCE_TARGETS ${UPDATE_FORCE_MANAGEMENT_TARGET})
     endif ()
 endforeach ()
 
 add_custom_target(get_sources
     DEPENDS ${COMPONENT_SOURCE_TARGETS})
 
+add_custom_target(update_all
+    DEPENDS ${COMPONENT_UPDATE_TARGETS})
+
+add_custom_target(update_force_all
+    DEPENDS ${COMPONENT_UPDATE_FORCE_TARGETS})
 
