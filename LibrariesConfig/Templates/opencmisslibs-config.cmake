@@ -92,9 +92,12 @@ messaged("CMAKE_MODULE_PATH=${CMAKE_MODULE_PATH}\nCMAKE_PREFIX_PATH=${CMAKE_PREF
 # Misc
 # For shared libs (default), use the correct install RPATH to enable binaries to find the shared libs.
 # See http://www.cmake.org/Wiki/CMake_RPATH_handling
-toAbsolutePaths(OPENCMISS_LIBRARY_PATH_IMPORT)
-set(CMAKE_INSTALL_RPATH ${OPENCMISS_LIBRARY_PATH_IMPORT})
+toAbsolutePaths(CONTEXT_OPENCMISS_LIBRARY_PATH_IMPORT)
+set(CMAKE_INSTALL_RPATH ${CONTEXT_OPENCMISS_LIBRARY_PATH_IMPORT})
 set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
+
+toAbsolutePaths(CONTEXT_OPENCMISS_BINARIES_PATH_IMPORT)
+set(OPENCMISS_BINARIES_PATH ${CONTEXT_OPENCMISS_BINARIES_PATH_IMPORT})
 
 ###########################################################################
 # Convenience targets
