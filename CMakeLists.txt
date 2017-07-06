@@ -299,9 +299,19 @@ add_custom_target(build_config
     )
 add_dependencies(build_config create_config)
 
-add_custom_target(do_config
-    )
+add_custom_target(do_config)
 add_dependencies(do_config create_config build_config)
+
+add_custom_target(support
+    COMMAND ${CMAKE_COMMAND} --build ${CONFIG_PATH} --target collect_logs --config $<CONFIG>
+    COMMAND ${CMAKE_COMMAND}
+        -DEMAIL=${OPENCMISS_INSTALLATION_SUPPORT_EMAIL}
+        -DCONFIG_DIR=${CONFIG_PATH}
+        -DSUPPORT_DIR=${SUPPORT_DIR}
+        -P ${CMAKE_CURRENT_SOURCE_DIR}/Scripts/OCCreateZip.cmake
+    WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
+    COMMENT "Generating support files archive"
+)
 
 if (EXISTS "${CREATE_CONFIG_STAMP_FILE}")
     file(REMOVE "${CREATE_CONFIG_STAMP_FILE}")

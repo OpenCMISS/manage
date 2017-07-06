@@ -308,7 +308,7 @@ Configure definitions:
             COMMAND ${CMAKE_COMMAND}
                 -DLOG_DIR=${BIN}/${OC_EXTPROJ_STAMP_DIR}
                 -DSUPPORT_DIR=${OPENCMISS_SUPPORT_DIR} 
-                -P ${CMAKE_CURRENT_SOURCE_DIR}/Scripts/OCSupport.cmake
+                -P ${PROJECT_SOURCE_DIR}/Scripts/OCCollectLogs.cmake
             COMMENT "Support: Collecting ${COMPONENT_NAME} log files"
         )
         add_dependencies(collect_logs ${OC_SM_PREFIX}${NAME}_collect_log)
@@ -317,10 +317,9 @@ Configure definitions:
 
     add_custom_target(${OC_SM_PREFIX}${NAME}_build_log
         COMMAND ${CMAKE_COMMAND}
-            -DBUILD_STAMP=YES 
             -DCOMPONENT_NAME=${NAME}
             -DLOGFILE="${OC_BUILD_LOG}"
-            -P ${PROJECT_SOURCE_DIR}/Scripts/OCSupport.cmake
+            -P ${PROJECT_SOURCE_DIR}/Scripts/OCBuildStamp.cmake
         COMMENT "Support: Creating ${COMPONENT_NAME} buildlog"             
         WORKING_DIRECTORY "${OPENCMISS_SUPPORT_DIR}")
     add_dependencies(${OC_EP_PREFIX}${NAME} ${OC_SM_PREFIX}${NAME}_build_log)

@@ -1,0 +1,4 @@
+
+file(GLOB LOGS "${LOG_DIR}/*.log")
+file(COPY ${LOGS} DESTINATION ${SUPPORT_DIR})
+
