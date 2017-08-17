@@ -30,14 +30,16 @@
 # List directories in "${CMAKE_CURRENT_BINARY_DIR}/config(s)" that contain a build_config.stamp file.
 set(CONFIG_BASE_DIR "${CMAKE_CURRENT_BINARY_DIR}/config${PLURAL_S}")
 
+# Set variables for determing the location of the CMake module binary directory.
 if (NOT OPENCMISS_HAVE_MULTICONFIG_ENV)
     set(_CMAKE_MODULES_BUILD_ELEM release)
 endif ()
+set(_CMAKE_MODULES_BINARY_DIR "${OPENCMISS_ROOT}/build/cmake_modules")
 
 # This is where additional packaging files are located
 set(OC_PACKAGE_FILES_DIR "${CMAKE_CURRENT_SOURCE_DIR}/Packaging")
 # Base directory for produced packages - you can specify your own one
-set(OC_PACKAGE_ROOT "${CMAKE_CURRENT_BINARY_DIR}/packaging" CACHE PATH "Base directory for produced packages")
+set(OC_PACKAGE_ROOT "${CMAKE_CURRENT_BINARY_DIR}/packaging")
 file(MAKE_DIRECTORY "${OC_PACKAGE_ROOT}")
 
 function(DIRECTORY_LIST result curdir)
@@ -59,7 +61,7 @@ macro(CREATE_PACKAGING_TARGET)
     )
     file(MAKE_DIRECTORY "${OC_PACKAGE_ROOT}/${PACKAGE_TYPE}/build")
     add_custom_target(package_${PACKAGE_TYPE}
-        COMMAND ${CMAKE_COMMAND} -G "${CMAKE_GENERATOR}" -DPACKAGING_MODULE_PATH="${CMAKE_CURRENT_SOURCE_DIR}/Packaging" -DCONFIG_BASE_DIR="${CONFIG_BASE_DIR}" -DCMAKE_MODULES_BINARY_DIR="${OPENCMISS_CMAKE_MODULES_BINARY_DIR}/${_CMAKE_MODULES_BUILD_ELEM}" -DOPENCMISS_RELEASE=${OPENCMISS_RELEASE} -DCMAKE_C_COMPILER=${CMAKE_C_COMPILER} ../source
+        COMMAND ${CMAKE_COMMAND} -G "${CMAKE_GENERATOR}" -DPACKAGING_MODULE_PATH="${CMAKE_CURRENT_SOURCE_DIR}/Packaging" -DCONFIG_BASE_DIR="${CONFIG_BASE_DIR}" -DCMAKE_MODULES_BINARY_DIR="${_CMAKE_MODULES_BINARY_DIR}/${_CMAKE_MODULES_BUILD_ELEM}" -DOPENCMISS_RELEASE=${OPENCMISS_RELEASE} -DCMAKE_C_COMPILER=${CMAKE_C_COMPILER} ../source
         COMMAND ${CMAKE_COMMAND} --build . --config $<CONFIG> --target package
         WORKING_DIRECTORY "${OC_PACKAGE_ROOT}/${PACKAGE_TYPE}/build"
     )

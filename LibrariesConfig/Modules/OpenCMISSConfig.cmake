@@ -18,9 +18,6 @@ include(OpenCMISSInterComponentConfig)
 ######################################################################
 # Postprocessing
 
-# Include the installation configuration
-include(${OPENCMISS_INSTALLATION_CACHE_FILE})
-
 # Load local configuration to allow overrides
 # First try at a given path, then local
 set(_CONFIG_FOUND NO)
@@ -50,20 +47,3 @@ if (HDF5_BUILD_FORTRAN)
   list(APPEND OPENCMISS_COMPONENTS_WITH_Fortran HDF5)
   list(APPEND OPENCMISS_COMPONENTS_WITH_F90 HDF5)
 endif ()
-
-# Disable iron/zinc if only dependencies should be built
-if (OC_DEPENDENCIES_ONLY)
-    set(OC_USE_IRON OFF)
-    set(OC_USE_ZINC OFF)
-endif ()
-
-if (OPENCMISS_DEVELOP_ALL)
-    set(OC_EXAMPLES_BRANCH develop)
-else ()
-    set(OC_EXAMPLES_BRANCH v${OpenCMISSLibs_VERSION})
-endif ()
-
-# Include the installation configuration again to stop local changes from being effective
-include(${OPENCMISS_INSTALLATION_CACHE_FILE})
-
-
