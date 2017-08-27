@@ -184,28 +184,3 @@ if (MINGW AND WIN32)
         COMPONENT Runtime)
 endif()
 
-# Additional User SDK files
-set(USERSDK_RESOURCE_DIR Resources)
-# Add the OpenCMISSLibs.cmake file to the UserSDK - it is a tool to help find the correct installation paths.
-# May reintroduce this concept if there is a need, we may have created an alternative which renders this irrelevant.
-#install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/Packaging/OpenCMISSLibs.cmake
-#    DESTINATION ${COMMON_PACKAGE_CONFIG_DIR}
-#    COMPONENT UserSDK)
-    
-message(STATUS "OpenCMISSLibs_VERSION: v${OpenCMISSLibs_VERSION}")
-if (OPENCMISS_DEVELOP_ALL)
-    set(_VERSION_BRANCH develop)
-else ()
-    set(_VERSION_BRANCH v${OpenCMISSLibs_VERSION})
-endif ()
-if(NOT EXISTS ${CMAKE_INSTALL_PREFIX}/${USERSDK_RESOURCE_DIR}/Examples)
-    foreach(_test_example ${OC_TEST_EXAMPLES})
-        install(CODE "
-           file(MAKE_DIRECTORY \"\${CMAKE_INSTALL_PREFIX}/${USERSDK_RESOURCE_DIR}/Examples\")
-           execute_process(COMMAND ${GIT_EXECUTABLE} clone -b ${_VERSION_BRANCH} https://github.com/OpenCMISS-Examples/${_test_example}
-               WORKING_DIRECTORY \"\${CMAKE_INSTALL_PREFIX}/${USERSDK_RESOURCE_DIR}/Examples\")
-           "
-           COMPONENT UserSDK)
-    endforeach()
-endif()
-unset(_VERSION_BRANCH)

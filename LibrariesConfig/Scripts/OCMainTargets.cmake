@@ -89,7 +89,7 @@ add_custom_target(reset_mpionly
     COMMAND ${CMAKE_COMMAND} -E remove_directory "${OPENCMISS_DEPENDENCIES_INSTALL_MPI_PREFIX}"
     COMMENT "Removing directories:
         ->${OPENCMISS_DEPENDENCIES_BINARY_MPI_DIR}
-        ->$OPENCMISS_DEPENDENCIES_INSTALL_MPI_PREFIX{}"
+        ->${OPENCMISS_DEPENDENCIES_INSTALL_MPI_PREFIX}"
 )
 
 ##
