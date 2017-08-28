@@ -103,7 +103,6 @@ set(IRON_MPI_FALLBACKS MPICH OPENMPI MVAPICH2)
 set(EXAMPLES classicalfield_laplace_simple)
 
 set(ALL_SOURCE_COMPONENTS IRON ZINC ${IRON_DEPENDENCIES} ${ZINC_DEPENDENCIES} ${IRON_MPI_FALLBACKS} ${COMMON_DEPENDENCIES} ${EXAMPLES})
-set(ALL_SOURCE_COMPONENTS ZINC BZIP2 JPEG NETGEN FTGL GLEW OPTPP PNG TIFF GTEST ZLIB LIBXML2 FIELDML-API classicalfield_laplace_simple)
 
 if (OPENCMISS_ZINC_ONLY OR OPENCMISS_DEPENDENCIES_ONLY)
     list(REMOVE_ITEM ALL_SOURCE_COMPONENTS IRON)
@@ -133,7 +132,7 @@ foreach (COMPONENT_NAME ${ALL_SOURCE_COMPONENTS})
     # Set "develop" branches for each component if OPENCMISS_DEVELOP_ALL is set,
     # but don't override any specified component branches.
     if (OPENCMISS_DEVELOP_ALL AND NOT ${COMPONENT_NAME}_BRANCH)
-        set(${COMPONENT_NAME}_BRANCH testing)
+        set(${COMPONENT_NAME}_BRANCH develop)
     elseif (NOT ${COMPONENT_NAME}_BRANCH)
         # Set default version number branch unless e.g. IRON_BRANCH is specified
         set(${COMPONENT_NAME}_BRANCH "v${${COMPONENT_NAME}_VERSION}")
