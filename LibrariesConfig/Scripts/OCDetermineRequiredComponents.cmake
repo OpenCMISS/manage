@@ -2,7 +2,6 @@
 # Remove components which are not required according to the configuration.
 
 set(OC_REQUIRED_COMPONENTS ${OPENCMISS_COMPONENTS})
-set(OC_REQUIRED_COMPONENTS ZINC BZIP2 JPEG NETGEN FREETYPE FTGL GLEW OPTPP PNG TIFF GTEST ZLIB LIBXML2 FIELDML-API) # Remove when testing finished
 if (OC_DEPENDENCIES_ONLY)
     list(REMOVE_ITEM OC_REQUIRED_COMPONENTS ZINC IRON)
 endif ()
