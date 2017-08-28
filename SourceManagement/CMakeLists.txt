@@ -132,7 +132,7 @@ foreach (COMPONENT_NAME ${ALL_SOURCE_COMPONENTS})
     # Set "develop" branches for each component if OPENCMISS_DEVELOP_ALL is set,
     # but don't override any specified component branches.
     if (OPENCMISS_DEVELOP_ALL AND NOT ${COMPONENT_NAME}_BRANCH)
-        set(${COMPONENT_NAME}_BRANCH testing)
+        set(${COMPONENT_NAME}_BRANCH develop)
     elseif (NOT ${COMPONENT_NAME}_BRANCH)
         # Set default version number branch unless e.g. IRON_BRANCH is specified
         set(${COMPONENT_NAME}_BRANCH "v${${COMPONENT_NAME}_VERSION}")
