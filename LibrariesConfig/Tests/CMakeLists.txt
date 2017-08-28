@@ -1,2 +1,4 @@
-list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}")
-include(OCKeyTests)
+if (NOT OC_DEPENDENCIES_ONLY)
+    list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}")
+    include(OCKeyTests)
+endif ()

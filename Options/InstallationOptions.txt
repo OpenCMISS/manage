@@ -1,0 +1,103 @@
+##
+# OPENCMISS_USE_ARCHITECTURE_PATH
+# -------------------------------
+#
+# Use architecture path to enable multiple configs in the same installation.
+#
+# .. default:: YES
+OPENCMISS_USE_ARCHITECTURE_PATH;TRUE;BOOL;Use architecture path to enable multiple configs in the same installation.
+
+##
+# OPENCMISS_DEVELOP_ALL
+# ---------------------
+#
+# Override any local variable and have CMake download/checkout the "develop" branch of any components repository
+#
+# See also: `<COMP>_DEVEL`_
+#
+# .. default:: NO
+OPENCMISS_DEVELOP_ALL;FALSE;BOOL;Download/checkout development branches of all components of the OpenCMISS build.
+
+##
+# OPENCMISS_INSTALLATION_SUPPORT_EMAIL
+# ------------------------------------
+# 
+# Please set this to your email address, especially if you plan to provide several architecture installations and
+# expect people to use your installation
+#
+# .. default:: OPENCMISS_BUILD_SUPPORT_EMAIL
+OPENCMISS_INSTALLATION_SUPPORT_EMAIL;developers@opencmiss.org;STRING;Please set this to your email address, especially if you plan to provide several architecture installations and expect people to use your installation.
+
+##
+# OPENCMISS_RELEASE
+# -----------------
+#
+# Sets whether the current build is for making a tagged release.  This option effects the version number of the SDK package.  Not an option for general consumption, but for use in the release process.
+#
+OPENCMISS_RELEASE;FALSE;BOOL;Setting for determining if the built libraries are destined to become an official release.
+
+# OPENCMISS_DISABLE_GIT
+# ---------------------
+#
+# Disable use of Git to obtain sources.
+# The build systems automatically looks for Git and uses that to clone the respective source repositories
+# If Git is not found, a the build system falls back to download :code:`.zip` files of the source.
+# To enforce that behaviour (e.g. for nightly tests), set this to :cmake:`YES`.
+#
+# .. caution::
+#
+#     If you want to switch from not using Git back to using Git, the update/download targets wont work
+#     since the source folders are not empty and are also no Git repositories - the "git clone" command
+#     is senseful enough not to simply overwrite possibly existing files. In this case, simply delete the
+#     source directory :path:`<OPENCMISS_ROOT>/src` before switching. The next build will automatically
+#     clone the Git repositories then.
+#
+# .. default:: NO
+OPENCMISS_DISABLE_GIT;FALSE;BOOL;Do not use Git to obtain and manage sources.
+
+##
+# OPENCMISS_GITHUB_USERNAME
+# -------------------------
+#
+# If you set a github username, CMake will automatically try and locate all the
+# components as repositories under that github account.
+# Currently applies to **all** repositories.
+#
+# .. default:: <empty>
+OPENCMISS_GITHUB_USERNAME;;STRING;Specify you own username for retreiving repositories from.
+
+##
+# OPENCMISS_ZINC_ONLY
+# -------------------
+#
+# Set this to true to only build the Zinc library.  OPENCMISS_IRON_ONLY and OPENCMISS_DEPENDENCIES_ONLY
+# must be FALSE if this variable is set to TRUE.
+#
+# See also: `OPENCMISS_IRON_ONLY`_ and `OPENCMISS_DEPENDENCIES_ONLY`_
+#
+# .. default:: FALSE
+OPENCMISS_ZINC_ONLY;FALSE;BOOL;Only build the Zinc library.
+
+##
+# OPENCMISS_IRON_ONLY
+# -------------------
+#
+# Set this to true to only build the Iron library.  OPENCMISS_ZINC_ONLY and OPENCMISS_DEPENDENCIES_ONLY
+# must be FALSE if this variable is set to TRUE.
+#
+# See also: `OPENCMISS_ZINC_ONLY`_ and `OPENCMISS_DEPENDENCIES_ONLY`_
+#
+# .. default:: FALSE
+OPENCMISS_IRON_ONLY;FALSE;BOOL;Only build the Iron library.
+
+##
+# OPENCMISS_DEPENDENCIES_ONLY
+# ---------------------------
+#
+# Set this to true to only build the Zinc library.  OPENCMISS_IRON_ONLY and OPENCMISS_ZINC_ONLY
+# must be FALSE if this variable is set to TRUE.
+#
+# See also: `OPENCMISS_IRON_ONLY`_ and `OPENCMISS_ZINC_ONLY`_
+#
+# .. default:: FALSE
+OPENCMISS_DEPENDENCIES_ONLY;FALSE;BOOL;Only build the dependencies for OpenCMISS libraries.
