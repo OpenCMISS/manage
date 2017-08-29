@@ -238,6 +238,17 @@ option(OC_CREATE_LOGS "Create logfiles instead of direct output to screen" YES)
 option(OC_DEPENDENCIES_ONLY "Build dependencies only (no Iron or Zinc)" NO)
 
 ##
+# OC_LIBRARIES_ONLY
+# --------------------
+#
+# If you want to compile only iron or zinc, enable this setting.  The dependencies will not be built
+# with this option set.
+#
+# See also OC_USE_<COMP>_
+#
+option(OC_LIBRARIES_ONLY "Build only Iron or Zinc (no dependencies)" NO)
+
+##
 # OC_MULTITHREADING
 # -----------------
 #
