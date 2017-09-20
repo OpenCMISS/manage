@@ -336,7 +336,7 @@ add_subdirectory(SourceManagement)
 
 set(BUILD_CONFIG_COMMAND "${CMAKE_COMMAND}" --build .)
 if (NOT OPENCMISS_DEPENDENCIES_ONLY)
-    list(APPEND --target install)
+    list(APPEND BUILD_CONFIG_COMMAND --target install)
 endif ()
 if (OPENCMISS_HAVE_MULTICONFIG_ENV)
     list(APPEND BUILD_CONFIG_COMMAND --config $<CONFIG>)
