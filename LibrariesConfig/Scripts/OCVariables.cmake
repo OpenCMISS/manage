@@ -12,7 +12,7 @@ set(OPENCMISS_ZINC_ONLY_COMPONENTS FREETYPE FTGL GDCM-ABI GLEW IMAGEMAGICK ITK J
 # List of all OpenCMISS components (used in default config)
 set(OPENCMISS_COMPONENTS ${OPENCMISS_COMMON_COMPONENTS} 
     ${OPENCMISS_IRON_ONLY_COMPONENTS}
-    ${OPENCMIS_ZINC_ONLY_COMPONENTS})
+    ${OPENCMISS_ZINC_ONLY_COMPONENTS})
 
 # Components using (any) MPI
 # Used to determine when MPI compilers etc should be passed down to packages
