@@ -31,6 +31,12 @@ else ()
     set(_INSTALLATION_CONFIG_FINALISED FALSE)
 endif ()
 
+if (CLEAR_MPI_HOME)
+    unset(MPI_HOME CACHE)
+    unset(MPI_HOME_BUILD_TYPE CACHE)
+    unset(CLEAR_MPI_HOME CACHE)
+endif ()
+
 # OPENCMISS_INSTALLATION_TYPE and OPENCMISS_INDEPENDENT_ROOTS define what variables should be set.  
 # If OPENCMISS_INDEPENDENT_ROOTS is FALSE then the root locations may be determined relative
 # to this file, otherwise the roots must be defined.  In either case the root directories must exist.
