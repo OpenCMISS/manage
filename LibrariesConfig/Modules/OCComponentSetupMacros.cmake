@@ -93,7 +93,7 @@ function(addAndConfigureLocalComponent COMPONENT_NAME)
         if (MPI_HOME)
             list(APPEND COMPONENT_DEFS -DMPI_HOME=${MPI_HOME})
         else()
-            LIST(APPEND COMPONENT_DEFS -UMPI_HOME)
+            list(APPEND COMPONENT_DEFS -UMPI_HOME)
         endif()
         # Override (=defined later in the args list) Compilers with MPI compilers
         # for all components that may use MPI
@@ -111,16 +111,16 @@ function(addAndConfigureLocalComponent COMPONENT_NAME)
                 )
                 # Define compiler flags
                 if (CMAKE_${lang}_FLAGS)
-                    SET(MPI_CMAKE_FLAGS "${CMAKE_${lang}_FLAGS} ${OC_MPI_ONLY_${lang}_FLAGS}")
-                    LIST(APPEND COMPONENT_DEFS
+                    set(MPI_CMAKE_FLAGS "${CMAKE_${lang}_FLAGS} ${OC_MPI_ONLY_${lang}_FLAGS}")
+                    list(APPEND COMPONENT_DEFS
                         -DCMAKE_${lang}_FLAGS=${MPI_CMAKE_FLAGS}
                     )
                 endif()
                 # Also forward build-type specific flags
                 foreach(BUILDTYPE RELEASE DEBUG)
                     if (CMAKE_${lang}_FLAGS_${BUILDTYPE})
-                        SET(MPI_CMAKE_FLAGS_${BUILDTYPE} "${CMAKE_${lang}_FLAGS_${BUILDTYPE}} ${OC_MPI_ONLY_${lang}_FLAGS_${BUILDTYPE}}")
-                        LIST(APPEND COMPONENT_DEFS
+                        set(MPI_CMAKE_FLAGS_${BUILDTYPE} "${CMAKE_${lang}_FLAGS_${BUILDTYPE}} ${OC_MPI_ONLY_${lang}_FLAGS_${BUILDTYPE}}")
+                        list(APPEND COMPONENT_DEFS
                             -DCMAKE_${lang}_FLAGS_${BUILDTYPE}=${MPI_CMAKE_FLAGS_${BUILDTYPE}}
                         )
                     endif()
@@ -135,14 +135,14 @@ function(addAndConfigureLocalComponent COMPONENT_NAME)
             )
             # Define compiler flags
             if (CMAKE_${lang}_FLAGS)
-                LIST(APPEND COMPONENT_DEFS
+                list(APPEND COMPONENT_DEFS
                     -DCMAKE_${lang}_FLAGS=${CMAKE_${lang}_FLAGS}
                 )
             endif()
             # Also forward build-type specific flags
             foreach(BUILDTYPE RELEASE DEBUG)
                 if (CMAKE_${lang}_FLAGS_${BUILDTYPE})
-                    LIST(APPEND COMPONENT_DEFS
+                    list(APPEND COMPONENT_DEFS
                         -DCMAKE_${lang}_FLAGS_${BUILDTYPE}=${CMAKE_${lang}_FLAGS_${BUILDTYPE}}
                     )
                 endif()
@@ -254,32 +254,32 @@ function(getBuildCommands BUILD_CMD_VAR INSTALL_CMD_VAR DIR PARALLEL)
         include(ProcessorCount)
         ProcessorCount(NUM_PROCESSORS)
         if (NUM_PROCESSORS EQUAL 0)
-            SET(NUM_PROCESSORS 1)
+            set(NUM_PROCESSORS 1)
         #else()
         #    MATH(EXPR NUM_PROCESSORS ${NUM_PROCESSORS}+4)
         endif()
 
         if (CMAKE_GENERATOR MATCHES "^Visual Studio")
-            SET(GENERATOR_MATCH_VISUAL_STUDIO TRUE)
+            set(GENERATOR_MATCH_VISUAL_STUDIO TRUE)
         elseif(CMAKE_GENERATOR MATCHES "^NMake Makefiles$")
-            SET(GENERATOR_MATCH_NMAKE TRUE)
+            set(GENERATOR_MATCH_NMAKE TRUE)
         elseif(CMAKE_GENERATOR MATCHES "^Unix Makefiles$"
             OR CMAKE_GENERATOR MATCHES "^MinGW Makefiles$"
             OR CMAKE_GENERATOR MATCHES "^MSYS Makefiles$")
-            SET(GENERATOR_MATCH_MAKE TRUE)
+            set(GENERATOR_MATCH_MAKE TRUE)
         endif()
 
         if(GENERATOR_MATCH_MAKE OR GENERATOR_MATCH_NMAKE)
-            LIST(APPEND BUILD_CMD -- "-j${NUM_PROCESSORS}")
-            LIST(APPEND INSTALL_CMD -- "-j${NUM_PROCESSORS}")
+            list(APPEND BUILD_CMD -- "-j${NUM_PROCESSORS}")
+            list(APPEND INSTALL_CMD -- "-j${NUM_PROCESSORS}")
         elseif(GENERATOR_MATCH_VISUAL_STUDIO)
-            #LIST(APPEND BUILD_CMD -- /MP)
-            #LIST(APPEND INSTALL_CMD -- /MP)
+            #list(APPEND BUILD_CMD -- /MP)
+            #list(APPEND INSTALL_CMD -- /MP)
         endif()
     endif()
 
-    SET(${BUILD_CMD_VAR} ${BUILD_CMD} PARENT_SCOPE)
-    SET(${INSTALL_CMD_VAR} ${INSTALL_CMD} PARENT_SCOPE)
+    set(${BUILD_CMD_VAR} ${BUILD_CMD} PARENT_SCOPE)
+    set(${INSTALL_CMD_VAR} ${INSTALL_CMD} PARENT_SCOPE)
 endfunction()
 
 # IN_PARENT_SCOPE: Set results in PARENT_SCOPE.
