@@ -83,7 +83,7 @@ function(addAndConfigureLocalComponent COMPONENT_NAME)
 
     # check if MPI compilers should be forwarded/set
     # so that the local FindMPI uses that
-    if(${COMPONENT_NAME} IN_LIST OPENCMISS_COMPONENTS_WITHMPI)
+    if(FALSE) # ${COMPONENT_NAME} IN_LIST OPENCMISS_COMPONENTS_WITHMPI)
         # Pass on settings and take care to undefine them if no longer used at this level
         if (OPENCMISS_MPI)
             list(APPEND COMPONENT_DEFS -DMPI=${OPENCMISS_MPI})
@@ -128,6 +128,17 @@ function(addAndConfigureLocalComponent COMPONENT_NAME)
             endif()
         endforeach()
     else()
+        if (OPENCMISS_MPI)
+            list(APPEND COMPONENT_DEFS -DMPI=${OPENCMISS_MPI})
+        else()
+            list(APPEND COMPONENT_DEFS -UMPI)
+        endif()
+        if (MPI_HOME)
+            list(APPEND COMPONENT_DEFS -DMPI_HOME=${MPI_HOME})
+            list(APPEND COMPONENT_DEFS -UMPI)
+        else()
+            list(APPEND COMPONENT_DEFS -UMPI_HOME)
+        endif()
         # No MPI: simply set the same compilers.
         foreach(lang C CXX Fortran)
             list(APPEND COMPONENT_DEFS
