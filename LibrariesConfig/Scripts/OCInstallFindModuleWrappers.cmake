@@ -49,6 +49,10 @@ foreach(PACKAGE_NAME ${PACKAGES_WITH_TARGETS})
     #endif()
 endforeach()
 
+# MPI is a special case handle it separatly.
+set(FILE ${OPENCMISS_CMAKE_MODULE_PATH}/FindModuleWrappers/FindMPI.cmake)
+configure_file("${CMAKE_CURRENT_SOURCE_DIR}/Templates/FindMPI.template.cmake" "${FILE}" @ONLY)
+
 # Add directory to module path
 list(APPEND CMAKE_MODULE_PATH 
     ${OPENCMISS_CMAKE_MODULE_PATH}/FindModuleWrappers
