@@ -104,7 +104,7 @@ if (NOT EXISTS "${OPENCMISS_CMAKE_MODULE_PATH}/Modules/OpenCMISS/OCArchitectureP
     message(FATAL_ERROR "'${OPENCMISS_CMAKE_MODULE_PATH}/Modules/OpenCMISS/OCArchitecturePathFunctions.cmake' does not exist.  The OpenCMISS CMake modules may not be installed/available.")
 endif ()
 
-list(APPEND CMAKE_MODULE_PATH "{CMAKE_CURRENT_SOURCE_DIR}/SharedModules")
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/SharedModules")
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/Scripts")
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/Modules")
 list(APPEND CMAKE_MODULE_PATH "${OPENCMISS_CMAKE_MODULE_PATH}/Modules")
