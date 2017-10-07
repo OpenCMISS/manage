@@ -117,6 +117,7 @@ set(CMAKE_INSTALL_PREFIX /georges/house) # Can't point this somewhere sensible a
 list(APPEND CMAKE_MODULE_PATH
     ${CMAKE_CURRENT_SOURCE_DIR}/Modules
     ${CMAKE_CURRENT_SOURCE_DIR}/Scripts
+    ${SHARED_MODULES_PATH}
 )
 
 # Pre-check for Python and Swig availability so that bindings will be built automatically (unless explicitly specified)
