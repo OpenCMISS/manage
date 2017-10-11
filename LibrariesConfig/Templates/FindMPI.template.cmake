@@ -31,6 +31,43 @@ unset(_ENTRY_ABSOLUTE)
 my_stupid_package_dependent_message_function_mpi("Trying to find version ${MPI_FIND_VERSION} on system in MODULE mode")
 my_stupid_package_dependent_message_function_debug_mpi("CMAKE_MODULE_PATH: ${CMAKE_MODULE_PATH}\nCMAKE_SYSTEM_PREFIX_PATH=${CMAKE_SYSTEM_PREFIX_PATH}\nPATH=$ENV{PATH}\nLD_LIBRARY_PATH=$ENV{LD_LIBRARY_PATH}")
 
+#=============================================================================
+# Convenience link targets
+#
+# This function creates imported targets mpi-$lang and an interface target mpi
+# to be linked against if no compiler wrappers are already used as project compilers
+function(create_mpi_target lang)
+    if (NOT TARGET mpi)
+        add_library(mpi UNKNOWN IMPORTED)
+    endif()
+    string(TOLOWER ${lang} _lang)
+    set(target mpi-${_lang})
+    if (MPI_${lang}_LIBRARIES AND NOT TARGET ${target})
+        add_library(${target} UNKNOWN IMPORTED)
+        # Get first library as "main" imported lib
+        list(GET MPI_${lang}_LIBRARIES 0 FIRSTLIB)
+        list(REMOVE_AT MPI_${lang}_LIBRARIES 0)
+
+        separate_arguments(MPI_${lang}_COMPILE_FLAGS)
+        separate_arguments(MPI_${lang}_LINK_FLAGS)
+        set_target_properties(${target} PROPERTIES
+          IMPORTED_LOCATION "${FIRSTLIB}"
+          INTERFACE_INCLUDE_DIRECTORIES "${MPI_${lang}_INCLUDE_PATH}"
+          INTERFACE_LINK_LIBRARIES "${MPI_${lang}_LINK_FLAGS} ${MPI_${lang}_LIBRARIES}"
+          INTERFACE_COMPILE_OPTIONS "${MPI_${lang}_COMPILE_FLAGS}"
+          IMPORTED_LINK_INTERFACE_LANGUAGES "${lang}"
+        )
+        my_stupid_package_dependent_message_function_debug_mpi("Creating imported target '${target}' with properties
+          IMPORTED_LOCATION \"${FIRSTLIB}\"
+          INTERFACE_INCLUDE_DIRECTORIES \"${MPI_${lang}_INCLUDE_PATH}\"
+          INTERFACE_LINK_LIBRARIES \"${MPI_${lang}_LINK_FLAGS} ${MPI_${lang}_LIBRARIES}\"
+          INTERFACE_COMPILE_OPTIONS \"${MPI_${lang}_COMPILE_FLAGS}\"
+          IMPORTED_LINK_INTERFACE_LANGUAGES \"${lang}\"
+        )")
+        set_property(TARGET mpi APPEND PROPERTY INTERFACE_LINK_LIBRARIES ${target})
+    endif()
+endfunction()
+
 # Temporarily disable the required flag (if set from outside)
 SET(_PKG_REQ_OLD ${MPI_FIND_REQUIRED})
 UNSET(MPI_FIND_REQUIRED)
@@ -66,58 +103,7 @@ unset(_readd)
 set(CMAKE_MODULE_PATH ${_ORIGINAL_CMAKE_MODULE_PATH})
 unset(_ORIGINAL_CMAKE_MODULE_PATH)
 
-if (MPI_FOUND)
-    # Also set the casename variant as this is checked upon at the end ("newer" version; config mode returns
-    # a xXx_FOUND variable that has the same case as used for the call find_package(xXx ..)
-    #=============================================================================
-    # Convenience link targets
-    #
-    # This function creates imported targets mpi-$lang and an interface target mpi
-    # to be linked against if no compiler wrappers are already used as project compilers
-    function(create_mpi_target lang)
-        if (NOT TARGET mpi)
-            add_library(mpi UNKNOWN IMPORTED)
-        endif()
-        string(TOLOWER ${lang} _lang)
-        set(target mpi-${_lang})
-        if (MPI_${lang}_LIBRARIES AND NOT TARGET ${target})
-            add_library(${target} UNKNOWN IMPORTED)
-            # Get first library as "main" imported lib
-            list(GET MPI_${lang}_LIBRARIES 0 FIRSTLIB)
-            list(REMOVE_AT MPI_${lang}_LIBRARIES 0)
-
-            separate_arguments(MPI_${lang}_COMPILE_FLAGS)
-            separate_arguments(MPI_${lang}_LINK_FLAGS)
-            set_target_properties(${target} PROPERTIES
-              IMPORTED_LOCATION "${FIRSTLIB}"
-              INTERFACE_INCLUDE_DIRECTORIES "${MPI_${lang}_INCLUDE_PATH}"
-              INTERFACE_LINK_LIBRARIES "${MPI_${lang}_LIBRARIES}"
-              INTERFACE_COMPILE_OPTIONS "${MPI_${lang}_COMPILE_FLAGS}"
-              LINK_FLAGS "${MPI_${lang}_LINK_FLAGS}"
-              IMPORTED_LINK_INTERFACE_LANGUAGES "${lang}"
-            )
-            my_stupid_package_dependent_message_function_debug_mpi("Creating imported target '${target}' with properties
-              IMPORTED_LOCATION \"${FIRSTLIB}\"
-              INTERFACE_INCLUDE_DIRECTORIES \"${MPI_${lang}_INCLUDE_PATH}\"
-              INTERFACE_LINK_LIBRARIES \"${MPI_${lang}_LIBRARIES}\"
-              INTERFACE_COMPILE_OPTIONS \"${MPI_${lang}_COMPILE_FLAGS}\"
-              LINK_FLAGS \"${MPI_${lang}_LINK_FLAGS}\"
-              IMPORTED_LINK_INTERFACE_LANGUAGES \"${lang}\"
-            )")
-            set_property(TARGET mpi APPEND PROPERTY INTERFACE_LINK_LIBRARIES ${target})
-        endif()
-    endfunction()
-    # Do the actual target creation.
-    # It is IMPORTANT that the order is with Fortran at first, as the include
-    # path is different from the one of the other languages (although it contains parts of the others)
-    # This is a problem of order whenever GNU/Intel compilers and MPI are mixed, as the gfortran mpi.mod file is located
-    # within the fortran include path.
-    foreach (lang Fortran C CXX)
-        if (CMAKE_${lang}_COMPILER_WORKS)
-            create_mpi_target(${lang})
-        endif ()
-    endforeach()
-else()
+if (NOT MPI_FOUND)
     my_stupid_package_dependent_message_function_mpi("Trying to find version ${MPI_FIND_VERSION} on system in CONFIG mode")
 
     # First look outside the prefix path
@@ -144,6 +130,19 @@ else()
         endif()
     endif()
 endif()
+
+if (MPI_FOUND)
+    # Do the actual target creation.
+    # It is IMPORTANT that the order is with Fortran at first, as the include
+    # path is different from the one of the other languages (although it contains parts of the others)
+    # This is a problem of order whenever GNU/Intel compilers and MPI are mixed, as the gfortran mpi.mod file is located
+    # within the fortran include path.
+    foreach (lang Fortran C CXX)
+        if (CMAKE_${lang}_COMPILER_WORKS)
+            create_mpi_target(${lang})
+        endif ()
+    endforeach()
+endif ()
 
 if (MPI_FIND_REQUIRED AND NOT MPI_FOUND)
     message(FATAL_ERROR "OpenCMISS FindModuleWrapper error!\n"
