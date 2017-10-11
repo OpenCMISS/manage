@@ -1,7 +1,7 @@
 foreach(COMPONENT_NAME ${OC_REQUIRED_COMPONENTS})
 
     # Force mandatory ones to be switched on
-    if (${COMPONENT_NAME} IN_LIST OC_MANDATORY_COMPONENTS)
+    if (${COMPONENT_NAME} IN_LIST OPENCMISS_MANDATORY_COMPONENTS)
         set(OC_USE_${COMPONENT_NAME} REQ)
     endif ()
 
