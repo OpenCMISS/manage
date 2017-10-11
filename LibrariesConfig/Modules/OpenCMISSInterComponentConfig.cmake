@@ -20,7 +20,7 @@
 ##
 #    CELLML_WITH_CSIM : YES
 #        Load CellML models through CSim (Only available on systems with compilers with C++11 support).
-if (OC_CAN_BUILD_LLVM)
+if (OC_HAVE_CXX11_CAPABLE_COMPILER)
     option(CELLML_WITH_CSIM "Load CellML models through CSim" YES)
 endif ()
 

@@ -211,6 +211,7 @@ endif ()
 
 include(OCToolchainCompilers)
 include(OCDetermineMPI)
+include(OCDetermineCXX11)
 include(OCVariables)
 include(OCDetermineRequiredComponents)
 
