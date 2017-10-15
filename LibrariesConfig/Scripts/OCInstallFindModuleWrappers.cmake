@@ -61,7 +61,7 @@ list(APPEND OPENCMISS_COMPONENT_MODULE_PATH
     ${OPENCMISS_CMAKE_MODULE_PATH}/FindModuleWrappers
     )
 
-if (NOT OC_DEPENDENCIES_ONLY)
+if (NOT OPENCMISS_DEPENDENCIES_ONLY)
     # Even though the Wrappers are already at the OpenCMISS install dir,
     # we also use the install command to allow cpack get a hold of them
     install(DIRECTORY ${OPENCMISS_CMAKE_MODULE_PATH}/FindModuleWrappers

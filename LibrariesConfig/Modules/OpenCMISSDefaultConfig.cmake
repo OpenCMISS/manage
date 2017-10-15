@@ -24,10 +24,9 @@
 set(BLA_VENDOR )
 
 ##
-# BUILD_PRECISION
-# ---------------
+# BUILD_PRECISIONS
+# ----------------
 # The flags :cmake:`sdcz` are available to be set in the :cmake:BUILD_PRECISIONS variable.
-# It is initialized as cache variable wherever suitable.
 # 
 # .. note::
 #    Currently LAPACK/BLAS is always built using dz minimum, as suitesparse has test
@@ -41,7 +40,7 @@ set(BLA_VENDOR )
 #     :z: Complex / double precision
 #
 # .. default:: sd
-set(BUILD_PRECISION sd CACHE STRING "Build precisions for OpenCMISS components. Choose any of [sdcz]")
+set(BUILD_PRECISIONS sd)# CACHE STRING "Build precisions for OpenCMISS components. Choose any of [sdcz]")
 
 ##
 # BUILD_SHARED_LIBS
@@ -55,7 +54,7 @@ set(BUILD_PRECISION sd CACHE STRING "Build precisions for OpenCMISS components. 
 # 
 # .. cmake-var:: BUILD_SHARED_LIBS
 # .. default:: NO
-option(BUILD_SHARED_LIBS "Build shared libraries within/for every component" NO)
+set(BUILD_SHARED_LIBS NO)  # "Build shared libraries within/for every component"
 
 ##
 # BUILD_TESTS
@@ -67,7 +66,7 @@ option(BUILD_SHARED_LIBS "Build shared libraries within/for every component" NO)
 # This does not mean they're run (which you should do, see :ref:`build targets`)
 #
 # .. default:: ON
-option(BUILD_TESTS "Build OpenCMISS(-components) tests" ON)
+set(BUILD_TESTS ON)  # "Build OpenCMISS(-components) tests"
 
 ##
 # OPENCMISS_DEFAULT_BUILD_TYPE
@@ -89,11 +88,12 @@ set(OPENCMISS_DEFAULT_BUILD_TYPE Release)
 # CMAKE_DEBUG_POSTFIX
 # -------------------
 #
-# Specifies a postfix for all libraries when build in :cmake:`CMAKE_BUILD_TYPE=Debug`
+# Specifies a postfix for the name of all libraries when building a
+# :cmake:`CMAKE_BUILD_TYPE=Debug` configuration.
 #
 # .. cmake-var:: CMAKE_DEBUG_POSTFIX
 # .. default:: d
-set(CMAKE_DEBUG_POSTFIX d CACHE STRING "Debug postfix for library names of DEBUG-builds") # Debug postfix
+set(CMAKE_DEBUG_POSTFIX d) # "Debug postfix for library names of DEBUG-builds"
 
 ##
 # CMAKE_VERBOSE_MAKEFILE
@@ -101,23 +101,7 @@ set(CMAKE_DEBUG_POSTFIX d CACHE STRING "Debug postfix for library names of DEBUG
 #
 # .. cmake-var:: CMAKE_VERBOSE_MAKEFILE
 # .. default:: NO
-option(CMAKE_VERBOSE_MAKEFILE "Generate verbose makefiles/projects for builds" NO)
-
-##
-# <COMP>_SHARED
-# -------------
-#
-# This flag determines if the specified component should be build as shared library rather than a static library.
-# The default is :cmake:`NO` for all components except Iron and Zinc.
-#
-# .. default:: NO
-foreach(COMPONENT ${OPENCMISS_COMPONENTS})
-    set(_VALUE OFF)
-    if (${COMPONENT} IN_LIST OPENCMISS_COMPONENTS_SHARED_BY_DEFAULT)
-        set(_VALUE ON)
-    endif()
-    option(${COMPONENT}_SHARED "Build all libraries of ${COMPONENT} as shared" ${_VALUE})
-endforeach()
+set(CMAKE_VERBOSE_MAKEFILE NO)  # "Generate verbose makefiles/projects for builds"
 
 ##
 # INT_TYPE
@@ -154,7 +138,7 @@ endif()
 # testing.
 #
 # .. default:: NO
-option(OC_BUILD_ZINC_TESTS "Build the Zinc tests in isolation" NO)
+set(OC_BUILD_ZINC_TESTS NO)  # "Build the Zinc tests in isolation"
 
 ##
 # OC_CHECK_ALL
@@ -163,20 +147,7 @@ option(OC_BUILD_ZINC_TESTS "Build the Zinc tests in isolation" NO)
 # Enable to have maximum compiler checks. Debug builds only.
 #
 # .. default:: YES
-option(OC_CHECK_ALL "Compiler flags choices - all checks on" YES)
-
-##
-# OC_COMPONENTS_SYSTEM
-# --------------------
-#
-# Global setting to control use of system components. Possible values:
-# 
-#     :DEFAULT: Holds only for the components specified in OPENCMISS_COMPONENTS_SYSTEM_BY_DEFAULT (Config/Variables.cmake)
-#     :NONE: The OpenCMISS build system exclusively builds components from its own repositories
-#     :ALL: Enable search for any component on the system 
-#
-# .. default:: DEFAULT
-set(OC_COMPONENTS_SYSTEM DEFAULT)
+set(OC_CHECK_ALL YES)  # "Compiler flags choices - all checks on"
 
 ##
 # .. _`loglevels`:
@@ -208,7 +179,7 @@ set(OC_CONFIG_LOG_LEVELS SCREEN WARNING ERROR)
 # Have all non SCREEN-level logs are also printed on the console (helps debugging).
 # See also OC_CONFIG_LOG_LEVELS_.
 # .. default:: NO
-option(OC_CONFIG_LOG_TO_SCREEN "Also print the created log file entries to console output" NO)
+set(OC_CONFIG_LOG_TO_SCREEN NO)  # "Also print the created log file entries to console output"
 
 ##
 # OC_CREATE_LOGS
@@ -218,35 +189,7 @@ option(OC_CONFIG_LOG_TO_SCREEN "Also print the created log file entries to conso
 # Selecting :cmake:`NO` will directly print the build process to the standard output.
 #
 # .. default:: YES
-option(OC_CREATE_LOGS "Create logfiles instead of direct output to screen" YES)
-
-##
-# OC_DEPENDENCIES_ONLY
-# --------------------
-# 
-# If you want to compile the dependencies for iron/zinc only, enable this setting.
-# This flag is useful for setting up sdk installations or continuous integration builds.
-#
-# .. caution::
-#     You can also disable building Iron or Zinc using the component variables, e.g. OC_USE_IRON=NO.
-#     However, this is considered a special top-level flag, which also causes any components that are
-#     exclusively required by e.g. Iron will not be build. 
-#
-# See also OC_USE_<COMP>_ 
-#
-# .. default:: NO
-option(OC_DEPENDENCIES_ONLY "Build dependencies only (no Iron or Zinc)" NO)
-
-##
-# OC_LIBRARIES_ONLY
-# --------------------
-#
-# If you want to compile only iron or zinc, enable this setting.  The dependencies will not be built
-# with this option set.
-#
-# See also OC_USE_<COMP>_
-#
-option(OC_LIBRARIES_ONLY "Build only Iron or Zinc (no dependencies)" NO)
+set(OC_CREATE_LOGS YES)  # "Create logfiles instead of direct output to screen"
 
 ##
 # OC_MULTITHREADING
@@ -258,7 +201,7 @@ option(OC_LIBRARIES_ONLY "Build only Iron or Zinc (no dependencies)" NO)
 # If used, the architecture path will also contain an extra segment “mt” between MPI and toolchain parts.
 #
 # .. default:: NO
-option(OC_MULTITHREADING "Use multithreading in OpenCMISS (where applicable)" NO)
+set(OC_MULTITHREADING NO)  # "Use multithreading in OpenCMISS (where applicable)"
 
 ##
 # OC_PYTHON_BINDINGS_USE_VIRTUALENV
@@ -275,72 +218,8 @@ set(_DEF NO)
 if (OC_PYTHON_PREREQ_FOUND AND VIRTUALENV_EXECUTABLE)
     set(_DEF YES)
 endif()
-option(OC_PYTHON_BINDINGS_USE_VIRTUALENV "Use Python virtual environments to install Python bindings" ${_DEF})
+set(OC_PYTHON_BINDINGS_USE_VIRTUALENV ${_DEF})  # "Use Python virtual environments to install Python bindings"
 unset(_DEF)
-
-##
-# OC_SYSTEM_<COMP>
-# ----------------
-#
-# Many libraries are also available via the default operating system package managers or
-# downloadable as precompiled binaries.
-# This flag determines if the respective component may be searched for on the local machine, i.e. the local environment.
-#
-# As there are frequent incompatibilities with pre-installed packages due to mismatching versions, these flags can be set 
-# to favor own component builds over consumption of local packages.
-# 
-# The search scripts for local packages (CMake: :cmake:`find_package` command and :path:`Find<COMP>.cmake` scripts)
-# are partially unreliable; CMake is improving them continuously and we also try to keep our own written ones
-# up-to-date and working on many platforms. This is another reason why the default policy is to
-# rather build our own packages than tediously looking for binaries that might not even have the
-# right version and/or components.
-#
-# .. caution::
-#     
-#    *Applies to setting in OpenCMISSLocalConfig only*: If you decide to enable one of those variables
-#    at some stage and later want to disable it, just *commenting* out like :cmake:`#set(OC_SYSTEM_MUMPS YES)` will
-#    **not** set its value to :cmake:`NO`, as it is registered as an CMake `option`__. You need to explicitly set the value
-#    to :cmake:`NO` to have the desired effect.
-#
-# .. __: https://cmake.org/cmake/help/v3.3/command/option.html   
-#
-# See also: OC_COMPONENTS_SYSTEM_ and the :cmake:`OPENCMISS_COMPONENTS_SYSTEM_BY_DEFAULT` variable in :path:`<manage>/Config/Variables.cmake`.
-# 
-# .. default:: OPENCMISS_COMPONENTS_SYSTEM_BY_DEFAULT
-foreach(COMPONENT ${OPENCMISS_COMPONENTS})
-    # Look for some components on the system first before building
-    set(_VALUE OFF)
-    if (${COMPONENT} IN_LIST OPENCMISS_COMPONENTS_SYSTEM_BY_DEFAULT)
-        set(_VALUE ON)
-    endif()
-    option(OC_SYSTEM_${COMPONENT} "Allow ${COMPONENT} to be used from local environment/system" ${_VALUE})
-    unset(_VALUE)
-endforeach()
-
-##
-# OC_USE_<COMP>
-# -------------
-#
-# For every OpenCMISS component, this flag determines if the respective component is to be used by the build environment.
-# This means it's searched for at configuration stage and built if not found.
-#
-# The list of possible components can be found in the :cmake:`OPENCMISS_COMPONENTS` variable in :path:`<manage>/Config/Variables.cmake`.
-#
-# .. caution::
-#    There is no advanced logic implemented to check if a custom selection of components breaks the overall build - e.g.
-#    if you disable OC_USE_LIBXML2 and there is no LibXML2 installed on your system, other components requiring LIBXML2 will
-#    not build correctly.
-#
-# See also OC_SYSTEM_<COMP>_ and the :cmake:`OPENCMISS_COMPONENTS_DISABLED_BY_DEFAULT` variable in :path:`<manage>/Config/Variables.cmake`.
-foreach(COMPONENT ${OPENCMISS_COMPONENTS})
-    set(_VALUE ON)
-    if (${COMPONENT} IN_LIST OPENCMISS_COMPONENTS_DISABLED_BY_DEFAULT)
-        set(_VALUE OFF)
-    endif()
-    # Use everything but the components in OPENCMISS_COMPONENTS_DISABLED_BY_DEFAULT
-    option(OC_USE_${COMPONENT} "Enable use/build of ${COMPONENT}" ${_VALUE})
-    unset(_VALUE)
-endforeach()
 
 ##
 # OC_WARN_ALL
@@ -349,7 +228,7 @@ endforeach()
 # Enable to have maximum compiler warnings. Debug builds only.
 #
 # .. default:: YES
-option(OC_WARN_ALL "Compiler flags choices - all warnings on" YES)
+set(OC_WARN_ALL YES)  # "Compiler flags choices - all warnings on"
 
 ##
 # .. _`sdk_install_dir_var`:
@@ -400,4 +279,6 @@ set(OPENCMISS_SDK_INSTALL_DIR_FORCE )
 # Enable this flag to have the build system automatically use multithreaded builds
 #
 # .. default:: ON
-option(PARALLEL_BUILDS "Use multithreading (-jN etc) for builds" ON)
+set(PARALLEL_BUILDS ON)  # "Use multithreading (-jN etc) for builds"
+
+

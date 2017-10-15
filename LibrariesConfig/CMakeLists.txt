@@ -178,6 +178,10 @@ include(OpenCMISSConfig)
 # Create a list of all the required components.
 include(OCDetermineRequiredComponents)
 
+foreach( _COMP ${OC_REQUIRED_COMPONENTS})
+    set(${COMPONENT_NAME}_SHARED ${BUILD_SHARED_LIBS})
+endforeach()
+
 if (OPENCMISS_HAVE_MULTICONFIG_ENV)
 	mark_as_advanced(CMAKE_CONFIGURATION_TYPES)
 else ()
@@ -374,7 +378,7 @@ add_subdirectory(Tests)
 add_subdirectory(Examples)
 
 # Installation of general opencmiss configuration helper scripts.
-if (NOT OC_DEPENDENCIES_ONLY AND NOT OC_LIBRARIES_ONLY)
+if (NOT OPENCMISS_DEPENDENCIES_ONLY AND NOT OPENCMISS_LIBRARIES_ONLY)
     include(OCInstall)
 endif ()
 

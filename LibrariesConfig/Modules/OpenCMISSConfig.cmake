@@ -1,5 +1,7 @@
 # Load default configuration
 include(OpenCMISSDefaultConfig)
+include(OpenCMISSComponentConfig)
+
 # This file is separate for documentation structural reasons (sphinx / rst)
 include(OpenCMISSInterComponentConfig)
 
