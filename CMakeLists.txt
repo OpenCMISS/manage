@@ -213,7 +213,7 @@ include(OCToolchainCompilers)
 include(OCDetermineMPI)
 include(OCDetermineCXX11)
 include(OCVariables)
-include(OpenCMISSComponentConfig)
+include(OpenCMISSDefaultComponentConfig)
 include(OCDetermineRequiredComponents)
 
 # Hide some of the variables in the interface that we don't want to see.

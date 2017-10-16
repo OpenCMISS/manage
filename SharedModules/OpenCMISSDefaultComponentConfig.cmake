@@ -7,11 +7,14 @@
 #
 # .. default:: NO
 foreach(COMPONENT ${OPENCMISS_COMPONENTS})
-    set(_VALUE OFF)
-    if (${COMPONENT} IN_LIST OPENCMISS_COMPONENTS_SHARED_BY_DEFAULT)
-        set(_VALUE ON)
-    endif()
-    set(${COMPONENT}_SHARED ${_VALUE})  # "Build all libraries of ${COMPONENT} as shared"
+    if (NOT DEFINED ${COMPONENT}_SHARED)
+        set(_VALUE OFF)
+        if (${COMPONENT} IN_LIST OPENCMISS_COMPONENTS_SHARED_BY_DEFAULT)
+            set(_VALUE ON)
+        endif()
+        set(${COMPONENT}_SHARED ${_VALUE})  # "Build all libraries of ${COMPONENT} as shared"
+        unset(_VALUE)
+    endif ()
 endforeach()
 
 ##
@@ -25,7 +28,9 @@ endforeach()
 #     :ALL: Enable search for any component on the system 
 #
 # .. default:: DEFAULT
-set(OC_COMPONENTS_SYSTEM DEFAULT)
+if (NOT DEFINED OC_COMPONENTS_SYSTEM)
+    set(OC_COMPONENTS_SYSTEM DEFAULT)
+endif ()
 
 ##
 # OC_SYSTEM_<COMP>
@@ -53,14 +58,17 @@ foreach(COMPONENT ${OPENCMISS_COMPONENTS})
     if (${COMPONENT} IN_LIST OPENCMISS_COMPONENTS_SYSTEM_BY_DEFAULT)
         set(_VALUE ON)
     endif()
-    # All local enabled? Set to local search.
-    if (OC_COMPONENTS_SYSTEM STREQUAL NONE)
-        set(OC_SYSTEM_${COMPONENT_NAME} OFF)
-    elseif (OC_COMPONENTS_SYSTEM STREQUAL ALL)
-        set(OC_SYSTEM_${COMPONENT_NAME} ON)
-    endif ()
     # Set all individual components build types to shared if the global BUILD_SHARED_LIBS is set
-    set(OC_SYSTEM_${COMPONENT} ${_VALUE})  # "Allow ${COMPONENT} to be used from local environment/system"
+    if (NOT DEFINED OC_SYSTEM_${COMPONENT})
+        # All local enabled? Set to local search.
+        if (OC_COMPONENTS_SYSTEM STREQUAL NONE)
+            set(OC_SYSTEM_${COMPONENT_NAME} OFF)
+        elseif (OC_COMPONENTS_SYSTEM STREQUAL ALL)
+            set(OC_SYSTEM_${COMPONENT_NAME} ON)
+        else ()
+            set(OC_SYSTEM_${COMPONENT} ${_VALUE})  # "Allow ${COMPONENT} to be used from local environment/system"
+        endif ()
+    endif ()
     unset(_VALUE)
 endforeach()
 
@@ -85,7 +93,9 @@ foreach(COMPONENT ${OPENCMISS_COMPONENTS})
         set(_VALUE OFF)
     endif()
     # Use everything but the components in OPENCMISS_COMPONENTS_DISABLED_BY_DEFAULT
-    set(OC_USE_${COMPONENT} ${_VALUE})  # "Enable use/build of ${COMPONENT}"
+    if (NOT DEFINED OC_USE_${COMPONENT})
+        set(OC_USE_${COMPONENT} ${_VALUE})  # "Enable use/build of ${COMPONENT}"
+    endif ()
     unset(_VALUE)
 endforeach()
 
