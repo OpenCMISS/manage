@@ -55,14 +55,13 @@ if (ZLIB IN_LIST OC_REQUIRED_COMPONENTS)
     find_package(ZLIB ${ZLIB_VERSION} QUIET)
     if (NOT ZLIB_FOUND)
         SET(ZLIB_FWD_DEPS 
-            SCOTCH PTSCOTCH 
+            SCOTCH
             MUMPS LIBXML2 HDF5 FIELDML-API
             IRON CSIM LLVM CELLML PNG
             TIFF GDCM-ABI FREETYPE)
         addAndConfigureLocalComponent(ZLIB)
     endif ()
 endif ()
-
 
 # libxml2
 if (LIBXML2 IN_LIST OC_REQUIRED_COMPONENTS)
@@ -101,7 +100,7 @@ endif ()
 if (BZIP2 IN_LIST OC_REQUIRED_COMPONENTS)
     find_package(BZIP2 ${BZIP2_VERSION} QUIET)
     if (NOT BZIP2_FOUND)
-        SET(BZIP2_FWD_DEPS SCOTCH PTSCOTCH GDCM-ABI IMAGEMAGICK FREETYPE ZINC)
+        SET(BZIP2_FWD_DEPS SCOTCH GDCM-ABI IMAGEMAGICK FREETYPE ZINC)
         addAndConfigureLocalComponent(BZIP2)
     endif ()
 endif ()
@@ -168,13 +167,10 @@ if (FIELDML-API IN_LIST OC_REQUIRED_COMPONENTS)
         )
     endif ()
 endif ()
-# ================================================================
-# Iron
-# ================================================================
-if (PTSCOTCH IN_LIST OC_REQUIRED_COMPONENTS)
-# Scotch 6.0
-    find_package(PTSCOTCH ${PTSCOTCH_VERSION} QUIET)
-    if (NOT PTSCOTCH_FOUND)
+
+if (SCOTCH IN_LIST OC_REQUIRED_COMPONENTS)
+    find_package(SCOTCH ${SCOTCH_VERSION} QUIET)
+    if (NOT SCOTCH_FOUND)
         set(SCOTCH_FWD_DEPS PASTIX PETSC MUMPS IRON)
         foreach(dependency IN_LIST BZIP2;ZLIB)
             if (SCOTCH_WITH_${dependency} AND OC_USE_${dependency})
@@ -184,30 +180,15 @@ if (PTSCOTCH IN_LIST OC_REQUIRED_COMPONENTS)
             endif ()
         endforeach()
 
-        addAndConfigureLocalComponent(SCOTCH
-            BUILD_PTSCOTCH=YES
-            BUILD_TESTS=${BUILD_TESTS}
-            USE_ZLIB=${SCOTCH_USE_ZLIB}
-            ZLIB_VERSION=${ZLIB_VERSION}
-            USE_BZ2=${SCOTCH_USE_BZIP2}
-            BZIP2_VERSION=${BZIP2_VERSION}
-            USE_THREADS=${SCOTCH_USE_THREADS})
-    endif ()
-elseif (SCOTCH IN_LIST OC_REQUIRED_COMPONENTS)
-    find_package(SCOTCH ${SCOTCH_VERSION} QUIET)
-    if (NOT SCOTCH_FOUND)
-        set(PTSCOTCH_FWD_DEPS PASTIX PETSC MUMPS IRON)
-        foreach(dependency IN_LIST BZIP2;ZLIB)
-            if (SCOTCH_WITH_${dependency} AND OC_USE_${dependency})
-                set(SCOTCH_USE_${dependency} ON)
-            else ()
-                set(SCOTCH_USE_${dependency} OFF)
-            endif ()
-        endforeach()
+        if (MUMPS_WITH_PTSCOTCH OR PASTIX_WITH_PTSCOTCH OR PETSC_WITH_PTSCOTCH)
+            set(BUILD_PTSCOTCH YES)
+        else ()
+            set(BUILD_PTSCOTCH NO)
+        endif ()
 
         addAndConfigureLocalComponent(SCOTCH
             BUILD_TESTS=${BUILD_TESTS}
-            BUILD_PTSCOTCH=NO
+            BUILD_PTSCOTCH=${BUILD_PTSCOTCH}
             USE_ZLIB=${SCOTCH_USE_ZLIB}
             ZLIB_VERSION=${ZLIB_VERSION}
             USE_BZ2=${SCOTCH_USE_BZIP2}
@@ -260,7 +241,7 @@ if (MUMPS IN_LIST OC_REQUIRED_COMPONENTS)
     find_package(MUMPS ${MUMPS_VERSION} QUIET)
     if (NOT MUMPS_FOUND)
         SET(MUMPS_FWD_DEPS PETSC IRON)
-        foreach(dependency IN_LIST METIS;PARMETIS;PTSCOTCH;SCOTCH)
+        foreach(dependency IN_LIST METIS;PARMETIS;SCOTCH)
             if (MUMPS_WITH_${dependency} AND OC_USE_${dependency})
                 set(MUMPS_USE_${dependency} ON)
             else ()
@@ -276,7 +257,6 @@ if (MUMPS IN_LIST OC_REQUIRED_COMPONENTS)
             USE_PTSCOTCH=${MUMPS_USE_PTSCOTCH}
             USE_PARMETIS=${MUMPS_USE_PARMETIS}
             USE_METIS=${MUMPS_USE_METIS}
-            PTSCOTCH_VERSION=${PTSCOTCH_VERSION}
             SCOTCH_VERSION=${SCOTCH_VERSION}
             PARMETIS_VERSION=${PARMETIS_VERSION}
             METIS_VERSION=${METIS_VERSION}
@@ -388,7 +368,7 @@ if (PASTIX IN_LIST OC_REQUIRED_COMPONENTS)
     find_package(PASTIX ${PASTIX_VERSION} QUIET)
     if (NOT PASTIX_FOUND)
         set(PASTIX_FWD_DEPS PETSC IRON)
-        foreach(dependency IN_LIST METIS;PTSCOTCH)
+        foreach(dependency IN_LIST METIS)
             if (PASTIX_WITH_${dependency} AND OC_USE_${dependency})
                 set(PASTIX_USE_${dependency} ON)
             else ()
@@ -406,7 +386,7 @@ if (PASTIX IN_LIST OC_REQUIRED_COMPONENTS)
             USE_METIS=${PASTIX_USE_METIS}
             USE_PTSCOTCH=${PASTIX_USE_PTSCOTCH}
             METIS_VERSION=${METIS_VERSION}
-            PTSCOTCH_VERSION=${PTSCOTCH_VERSION}
+            SCOTCH_VERSION=${SCOTCH_VERSION}
         )
     endif ()
 endif ()
@@ -425,7 +405,7 @@ if (PETSC IN_LIST OC_REQUIRED_COMPONENTS)
     find_package(PETSC ${PETSC_VERSION} QUIET)
     if (NOT PETSC_FOUND)
         set(PETSC_FWD_DEPS SLEPC IRON)
-        foreach(dependency IN_LIST HYPRE;MUMPS;PARMETIS;PASTIX;PTSCOTCH;SCALAPACK;SUITESPARSE;SUPERLU;SUPERLU_DIST;SUNDIALS)
+        foreach(dependency IN_LIST HYPRE;MUMPS;PARMETIS;PASTIX;SCOTCH;SCALAPACK;SUITESPARSE;SUPERLU;SUPERLU_DIST;SUNDIALS)
             if(PETSC_WITH_${dependency} AND OC_USE_${dependency})
                 set(PETSC_USE_${dependency} ON)
             else()
@@ -446,7 +426,7 @@ if (PETSC IN_LIST OC_REQUIRED_COMPONENTS)
             USE_SCALAPACK=${PETSC_USE_SCALAPACK}
             SCALAPACK_VERSION=${SCALAPACK_VERSION}
             USE_PTSCOTCH=${PETSC_USE_PTSCOTCH}
-            PTSCOTCH_VERSION=${PTSCOTCH_VERSION}
+            SCOTCH_VERSION=${SCOTCH_VERSION}
             USE_SUPERLU=${PETSC_USE_SUPERLU}
             SUPERLU_VERSION=${SUPERLU_VERSION}
             USE_SUNDIALS=${PETSC_USE_SUNDIALS}
@@ -468,7 +448,7 @@ if (SLEPC IN_LIST OC_REQUIRED_COMPONENTS)
     find_package(SLEPC ${SLEPC_VERSION} QUIET)
     if (NOT SLEPC_FOUND)
         set(SLEPC_FWD_DEPS IRON)
-        foreach(dependency IN_LIST HYPRE;MUMPS;PARMETIS;PASTIX;PTSCOTCH;SCALAPACK;SUITESPARSE;SUPERLU;SUPERLU_DIST;SUNDIALS)
+        foreach(dependency IN_LIST HYPRE;MUMPS;PARMETIS;PASTIX;SCOTCH;SCALAPACK;SUITESPARSE;SUPERLU;SUPERLU_DIST;SUNDIALS)
             if(PETSC_WITH_${dependency} AND OC_USE_${dependency})
                 set(PETSC_USE_${dependency} ON)
             else()
@@ -487,7 +467,7 @@ if (SLEPC IN_LIST OC_REQUIRED_COMPONENTS)
             USE_SCALAPACK=${PETSC_USE_SCALAPACK}
             SCALAPACK_VERSION=${SCALAPACK_VERSION}
             USE_PTSCOTCH=${PETSC_USE_PTSCOTCH}
-            PTSCOTCH_VERSION=${PTSCOTCH_VERSION}
+            SCOTCH_VERSION=${SCOTCH_VERSION}
             USE_SUPERLU=${PETSC_USE_SUPERLU}
             SUPERLU_VERSION=${SUPERLU_VERSION}
             USE_SUNDIALS=${PETSC_USE_SUNDIALS}
