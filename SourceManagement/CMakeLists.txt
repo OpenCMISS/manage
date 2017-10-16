@@ -141,6 +141,10 @@ foreach (COMPONENT_NAME ${OC_REQUIRED_COMPONENTS})
         endif ()
     endif ()
 
+    if (COMPONENT_NAME IN_LIST PSEUDO_COMPONENTS)
+        set(_VALID_TARGET FALSE)
+    endif ()
+
     if (_VALID_TARGET)
         addSourceManagementTargets(${COMPONENT_NAME} ${COMPONENT_SOURCE_DIR})
         list(APPEND COMPONENT_SOURCE_TARGETS ${SOURCE_MANAGEMENT_TARGET})

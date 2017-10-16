@@ -65,6 +65,8 @@ endif()
 
 set(OPENCMISS_MANDATORY_COMPONENTS FIELDML-API LIBXML2)
 
+set(PSEUDO_COMPONENTS BLAS PTSCOTCH)
+
 set(OPENCMISS_CMAKE_MIN_VERSION 3.4.0)
 
 # This is an email address being displayed for issues regarding (remote) installations.
