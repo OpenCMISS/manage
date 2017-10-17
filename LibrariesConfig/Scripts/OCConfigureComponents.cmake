@@ -237,7 +237,7 @@ endif ()
 if (MUMPS IN_LIST OC_REQUIRED_COMPONENTS)
     find_package(MUMPS ${MUMPS_VERSION} QUIET)
     if (NOT MUMPS_FOUND)
-        SET(MUMPS_FWD_DEPS PETSC IRON)
+        set(MUMPS_FWD_DEPS PETSC IRON)
         foreach(dependency IN_LIST METIS;PARMETIS;SCOTCH)
             if (MUMPS_WITH_${dependency} AND OC_USE_${dependency})
                 set(MUMPS_USE_${dependency} ON)
@@ -245,6 +245,7 @@ if (MUMPS IN_LIST OC_REQUIRED_COMPONENTS)
                 set(MUMPS_USE_${dependency} OFF)
             endif ()
         endforeach()
+        set(MUMPS_USE_PTSCOTCH ${MUMPS_WITH_PTSCOTCH})
 
         addAndConfigureLocalComponent(MUMPS
             BUILD_TESTS=${BUILD_TESTS}
@@ -370,6 +371,7 @@ if (PASTIX IN_LIST OC_REQUIRED_COMPONENTS)
                 set(PASTIX_USE_${dependency} OFF)
             endif ()
         endforeach()
+        set(PASTIX_USE_PTSCOTCH ${PASTIX_WITH_PTSCOTCH})
 
         addAndConfigureLocalComponent(PASTIX
             BUILD_PRECISION=${BUILD_PRECISIONS}
@@ -408,6 +410,7 @@ if (PETSC IN_LIST OC_REQUIRED_COMPONENTS)
                 set(PETSC_USE_${dependency} OFF)
             endif()
         endforeach()
+        set(PETSC_USE_PTSCOTCH ${PETSC_WITH_PTSCOTCH})
 
         addAndConfigureLocalComponent(PETSC
             BUILD_TESTS=${BUILD_TESTS}
@@ -450,6 +453,7 @@ if (SLEPC IN_LIST OC_REQUIRED_COMPONENTS)
                 set(PETSC_USE_${dependency} OFF)
             endif()
         endforeach()
+        set(PETSC_USE_PTSCOTCH ${PETSC_WITH_PTSCOTCH})
 
         addAndConfigureLocalComponent(SLEPC
             BUILD_TESTS=${BUILD_TESTS}
