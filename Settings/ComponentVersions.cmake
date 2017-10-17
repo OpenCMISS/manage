@@ -24,7 +24,6 @@
 # Moreover, those variables are also defined for all MPI implementations that can be built by the OpenCMISS build environment.
 #
 # See also: :ref:`component_branches`
-set(BLAS_VERSION 3.5.0)
 set(HYPRE_VERSION 2.10.0) # Alternatives: 2.9.0
 set(LAPACK_VERSION 3.5.0)
 set(LIBCELLML_VERSION 1.0)
