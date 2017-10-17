@@ -27,7 +27,7 @@ endif ()
 
 # Pass on local lookup flags (consumed by find_package calls)
 foreach(COMP ${OPENCMISS_COMPONENTS})
-    LIST(APPEND COMPONENT_COMMON_DEFS 
+    list(APPEND COMPONENT_COMMON_DEFS 
         -DOC_SYSTEM_${COMP}=${OC_SYSTEM_${COMP}}
     )
 endforeach()
