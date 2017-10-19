@@ -55,7 +55,7 @@ if (OPENCMISS_INSTALLATION_TYPE STREQUAL "standard" AND NOT OPENCMISS_INDEPENDEN
     endif ()
     if (NOT DEFINED OPENCMISS_CMAKE_MODULE_PATH)
         # Standard installation scenario and the module path can be found from OPENCMISS_ROOT.
-        set(OPENCMISS_CMAKE_MODULE_PATH "${OPENCMISS_ROOT}/install/share/cmake")
+        set(OPENCMISS_CMAKE_MODULE_PATH "${OPENCMISS_ROOT}/install/share/cmake/Modules")
     endif ()
     set(OC_EXAMPLES TRUE)
     set(OPENCMISS_ROOT_CONFIG OpenCMISSStandardRoots)
@@ -85,7 +85,7 @@ elseif (OPENCMISS_INSTALLATION_TYPE STREQUAL "dependencies" AND NOT OPENCMISS_IN
     set(OPENCMISS_OWN_MPI_INSTALL_BASE "${OPENCMISS_DEPENDENCIES_ROOT}/install")
     if (NOT DEFINED OPENCMISS_CMAKE_MODULE_PATH)
         # Standard installation scenario and the module path can be found from OPENCMISS_ROOT.
-        set(OPENCMISS_CMAKE_MODULE_PATH "${OPENCMISS_DEPENDENCIES_ROOT}/install/share/cmake")
+        set(OPENCMISS_CMAKE_MODULE_PATH "${OPENCMISS_DEPENDENCIES_ROOT}/install/share/cmake/Modules")
     endif ()
     set(OC_EXAMPLES FALSE)
     set(OPENCMISS_ROOT_CONFIG OpenCMISSDependenciesRoots)
@@ -100,15 +100,15 @@ endif ()
 
 set(OPENCMISS_CMAKE_MODULE_PATH "${OPENCMISS_CMAKE_MODULE_PATH}" CACHE PATH "Location of the OpenCMISS CMake modules.")
 # Validate settings - First check we have the modules that we need
-if (NOT EXISTS "${OPENCMISS_CMAKE_MODULE_PATH}/Modules/OpenCMISS/OCArchitecturePathFunctions.cmake")
-    message(FATAL_ERROR "'${OPENCMISS_CMAKE_MODULE_PATH}/Modules/OpenCMISS/OCArchitecturePathFunctions.cmake' does not exist.  The OpenCMISS CMake modules may not be installed/available.")
+if (NOT EXISTS "${OPENCMISS_CMAKE_MODULE_PATH}/OpenCMISS/OCArchitecturePathFunctions.cmake")
+    message(FATAL_ERROR "'${OPENCMISS_CMAKE_MODULE_PATH}/OpenCMISS/OCArchitecturePathFunctions.cmake' does not exist.  The OpenCMISS CMake modules may not be installed/available.")
 endif ()
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/SharedModules")
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/Scripts")
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/Modules")
-list(APPEND CMAKE_MODULE_PATH "${OPENCMISS_CMAKE_MODULE_PATH}/Modules")
-list(APPEND CMAKE_MODULE_PATH "${OPENCMISS_CMAKE_MODULE_PATH}/Modules/OpenCMISS")
+list(APPEND CMAKE_MODULE_PATH "${OPENCMISS_CMAKE_MODULE_PATH}")
+list(APPEND CMAKE_MODULE_PATH "${OPENCMISS_CMAKE_MODULE_PATH}/OpenCMISS")
 
 set(CONFIGURED_FILES_DIR "${CMAKE_CURRENT_BINARY_DIR}/ConfiguredFiles")
 list(APPEND CMAKE_MODULE_PATH "${CONFIGURED_FILES_DIR}")

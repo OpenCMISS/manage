@@ -84,17 +84,17 @@ cmake_minimum_required(VERSION 3.4.0 FATAL_ERROR)
 if (NOT DEFINED OPENCMISS_CMAKE_MODULE_PATH)
   message(FATAL_ERROR "OPENCMISS_CMAKE_MODULE_PATH is not defined.")
 endif ()
-if (NOT EXISTS "${OPENCMISS_CMAKE_MODULE_PATH}/Modules/OpenCMISS/OCToolchainCompilers.cmake")
-    message(FATAL_ERROR "'${OPENCMISS_CMAKE_MODULE_PATH}/Modules/OpenCMISS/OCToolchainCompilers.cmake' does not exists.  The OpenCMISS CMake modules may not be installed/available.")
+if (NOT EXISTS "${OPENCMISS_CMAKE_MODULE_PATH}OpenCMISS/OCToolchainCompilers.cmake")
+    message(FATAL_ERROR "'${OPENCMISS_CMAKE_MODULE_PATH}/OpenCMISS/OCToolchainCompilers.cmake' does not exists.  The OpenCMISS CMake modules may not be installed/available.")
 endif ()
 set(OPENCMISS_CMAKE_MODULE_PATH "${OPENCMISS_CMAKE_MODULE_PATH}" CACHE INTERNAL "Internalise the module path so that it is available for CMake GUIs." FORCE)
 
 # Set up include path required at this stage
 list(APPEND CMAKE_MODULE_PATH
-    ${OPENCMISS_CMAKE_MODULE_PATH}/Modules/OpenCMISS
+    ${OPENCMISS_CMAKE_MODULE_PATH}/OpenCMISS
     )
 list(APPEND OPENCMISS_COMPONENT_MODULE_PATH
-    ${OPENCMISS_CMAKE_MODULE_PATH}/Modules/OpenCMISS
+    ${OPENCMISS_CMAKE_MODULE_PATH}/OpenCMISS
     )
 
 if (NOT DEFINED OPENCMISS_TOOLCHAIN)
@@ -198,17 +198,13 @@ string(TIMESTAMP NOW "%Y-%m-%d_%H-%M")
 set(OC_BUILD_LOG ${OPENCMISS_SUPPORT_DIR}/configure_builds_${NOW}.log)
 log("Starting configuration in ${CMAKE_CURRENT_BINARY_DIR} at ${NOW}")
 
-########################################################################
-
-include(OCInstallFindModuleWrappers)
-# Add CMakeModules directory after wrapper module directory (set in above script)
-# This folder is also exported to the install tree upon "make install" and
-# then used within the FindOpenCMISS.cmake module script
-list(APPEND CMAKE_MODULE_PATH
-    ${OPENCMISS_CMAKE_MODULE_PATH}/Modules
-    )
+# Add directory to module path
 list(APPEND OPENCMISS_COMPONENT_MODULE_PATH
-    ${OPENCMISS_CMAKE_MODULE_PATH}/Modules
+    ${OPENCMISS_CMAKE_MODULE_PATH}/FindModuleWrappers
+    )
+# Add CMakeModules directory after wrapper module directory
+list(APPEND OPENCMISS_COMPONENT_MODULE_PATH
+    ${OPENCMISS_CMAKE_MODULE_PATH}
     )
 
 # No point in building ZINC if there's no OpenGL around
