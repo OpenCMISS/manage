@@ -93,11 +93,7 @@ set(OPENCMISS_CMAKE_MODULE_PATH "${OPENCMISS_CMAKE_MODULE_PATH}" CACHE INTERNAL 
 list(APPEND CMAKE_MODULE_PATH
     ${OPENCMISS_CMAKE_MODULE_PATH}
     ${OPENCMISS_CMAKE_MODULE_PATH}/OpenCMISS
-    )
-list(APPEND OPENCMISS_COMPONENT_MODULE_PATH
-    ${OPENCMISS_CMAKE_MODULE_PATH}
-    ${OPENCMISS_CMAKE_MODULE_PATH}/OpenCMISS
-    )
+)
 
 if (NOT DEFINED OPENCMISS_TOOLCHAIN)
     message(FATAL_ERROR "OPENCMISS_TOOLCHAIN is not defined.")
@@ -201,13 +197,12 @@ set(OC_BUILD_LOG ${OPENCMISS_SUPPORT_DIR}/configure_builds_${NOW}.log)
 log("Starting configuration in ${CMAKE_CURRENT_BINARY_DIR} at ${NOW}")
 
 # Add directory to module path
-list(APPEND OPENCMISS_COMPONENT_MODULE_PATH
-    ${OPENCMISS_CMAKE_MODULE_PATH}/FindModuleWrappers
-    )
 # Add CMakeModules directory after wrapper module directory
 list(APPEND OPENCMISS_COMPONENT_MODULE_PATH
+    ${OPENCMISS_CMAKE_MODULE_PATH}/OpenCMISS
+    ${OPENCMISS_CMAKE_MODULE_PATH}/FindModuleWrappers
     ${OPENCMISS_CMAKE_MODULE_PATH}
-    )
+)
 
 # No point in building ZINC if there's no OpenGL around
 find_package(OpenGL QUIET)
