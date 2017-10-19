@@ -24,7 +24,7 @@ foreach(COMPONENT_NAME ${OC_REQUIRED_COMPONENTS})
     if (NOT COMPONENT_NAME STREQUAL MPI) # Dont show that for MPI - have different implementations
         string(SUBSTRING "${COMPONENT_NAME}                  " 0 12 COMPONENT_FIXED_SIZE)
         string(SUBSTRING "${_OC_USE}       " 0 3 OC_USE_FIXED_SIZE)
-        string(SUBSTRING "${OC_SYSTEM_${COMPONENT_NAME}}    " 0 3 OC_SYSTEM_FIXED_SIZE)
+        string(SUBSTRING "${${COMPONENT_NAME}_FIND_SYSTEM}    " 0 3 OC_SYSTEM_FIXED_SIZE)
         # string(SUBSTRING "${${COMPONENT_NAME}_VERSION}       " 0 7 OC_VERSION_FIXED_SIZE) now using the branch from the git repository only
         string(SUBSTRING "${${COMPONENT_NAME}_SHARED}        " 0 3 OC_SHARED_FIXED_SIZE)
         # ${COMPONENT_NAME}_BRANCH is as good as version (this is what is effectively checked out) and will also display "develop" correctly

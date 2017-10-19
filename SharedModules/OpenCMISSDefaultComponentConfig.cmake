@@ -62,11 +62,11 @@ foreach(COMPONENT ${OPENCMISS_COMPONENTS})
     if (NOT DEFINED OC_SYSTEM_${COMPONENT})
         # All local enabled? Set to local search.
         if (OC_COMPONENTS_SYSTEM STREQUAL NONE)
-            set(OC_SYSTEM_${COMPONENT_NAME} OFF)
+            set(${COMPONENT_NAME}_FIND_SYSTEM OFF)
         elseif (OC_COMPONENTS_SYSTEM STREQUAL ALL)
-            set(OC_SYSTEM_${COMPONENT_NAME} ON)
+            set(${COMPONENT_NAME}_FIND_SYSTEM ON)
         else ()
-            set(OC_SYSTEM_${COMPONENT} ${_VALUE})  # "Allow ${COMPONENT} to be used from local environment/system"
+            set(${COMPONENT}_FIND_SYSTEM ${_VALUE})  # "Allow ${COMPONENT} to be used from local environment/system"
         endif ()
     endif ()
     unset(_VALUE)
