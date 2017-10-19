@@ -1,0 +1,1 @@
+# Set the component configurtion in this file.
