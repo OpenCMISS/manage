@@ -109,6 +109,7 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/Scripts")
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/Modules")
 list(APPEND CMAKE_MODULE_PATH "${OPENCMISS_CMAKE_MODULE_PATH}")
 list(APPEND CMAKE_MODULE_PATH "${OPENCMISS_CMAKE_MODULE_PATH}/OpenCMISS")
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_BINARY_DIR}/SharedSettings")
 
 set(CONFIGURED_FILES_DIR "${CMAKE_CURRENT_BINARY_DIR}/ConfiguredFiles")
 list(APPEND CMAKE_MODULE_PATH "${CONFIGURED_FILES_DIR}")
@@ -150,15 +151,8 @@ if (NOT _INSTALLATION_CONFIG_FINALISED)
     read_options(${OC_INSTALLATION_CONFIG})
 endif ()
 
-# Configure setting files
-configure_file("${CMAKE_CURRENT_SOURCE_DIR}/Settings/ComponentGitValues.cmake"
-    "${CMAKE_CURRENT_BINARY_DIR}/Settings/ComponentGitValues.cmake" COPYONLY)
-message(STATUS "Applying OpenCMISS component Git settings at: ${CMAKE_CURRENT_BINARY_DIR}/Settings/ComponentGitValues.cmake")
-include("${CMAKE_CURRENT_BINARY_DIR}/Settings/ComponentGitValues.cmake")
-configure_file("${CMAKE_CURRENT_SOURCE_DIR}/Settings/ComponentVersions.cmake"
-    "${CMAKE_CURRENT_BINARY_DIR}/Settings/ComponentVersions.cmake" COPYONLY)
-message(STATUS "Applying OpenCMISS component version settings at: ${CMAKE_CURRENT_BINARY_DIR}/Settings/ComponentVersions.cmake")
-include("${CMAKE_CURRENT_BINARY_DIR}/Settings/ComponentVersions.cmake")
+# Configure settings for components
+include(OCComponentSettings)
 
 set(VISIBLE_GUI_ENTRIES OPENCMISS_ROOT OPENCMISS_LIBRARIES_ROOT OPENCMISS_DEPENDENCIES_ROOT OPENCMISS_EXAMPLES_ROOT OPENCMISS_IRON_ROOT OPENCMISS_ZINC_ROOT OPENCMISS_DEPENDENCIES_INSTALL_PREFIX)
 set(VISIBLE_standard_GUI_ENTRIES OPENCMISS_ROOT)
@@ -213,7 +207,7 @@ include(OCToolchainCompilers)
 include(OCDetermineMPI)
 include(OCDetermineCXX11)
 include(OCVariables)
-include(OpenCMISSDefaultComponentConfig)
+include(OCDefaultComponentConfig)
 include(OCDetermineRequiredComponents)
 
 # Hide some of the variables in the interface that we don't want to see.
@@ -324,6 +318,7 @@ list(APPEND CURRENT_CONFIGURATION_ARGS -DOPENCMISS_USE_ARCHITECTURE_PATH=${OPENC
 list(APPEND CURRENT_CONFIGURATION_ARGS -DARCH_MPI_PATH=${ACTIVE_ARCHITECTURE_MPI_PATH})
 list(APPEND CURRENT_CONFIGURATION_ARGS -DARCH_NO_MPI_PATH=${ACTIVE_ARCHITECTURE_NO_MPI_PATH})
 list(APPEND CURRENT_CONFIGURATION_ARGS -DSHARED_MODULES_PATH=${CMAKE_CURRENT_LIST_DIR}/SharedModules)
+list(APPEND CURRENT_CONFIGURATION_ARGS -DSHARED_SETTINGS_PATH=${CMAKE_CURRENT_BINARY_DIR}/SharedSettings)
 
 if ("${OPENCMISS_INSTRUMENTATION}" STREQUAL "scorep")
     foreach(_lang C CXX Fortran)

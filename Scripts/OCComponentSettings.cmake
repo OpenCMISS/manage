@@ -1,0 +1,23 @@
+configure_file("${CMAKE_CURRENT_SOURCE_DIR}/Settings/OCComponentGitValues.cmake"
+    "${CMAKE_CURRENT_BINARY_DIR}/Settings/OCComponentGitValues.cmake" COPYONLY)
+log("Applying component Git settings at: ${CMAKE_CURRENT_BINARY_DIR}/Settings/OCComponentGitValues.cmake")
+include("${CMAKE_CURRENT_BINARY_DIR}/Settings/OCComponentGitValues.cmake")
+configure_file("${CMAKE_CURRENT_SOURCE_DIR}/Settings/OCComponentVersions.cmake"
+    "${CMAKE_CURRENT_BINARY_DIR}/SharedSettings/OCComponentVersions.cmake" COPYONLY)
+log("Applying component version settings from: OCComponentVersions")
+include(OCComponentVersions)
+if (WIN32)
+    set(_NL "\r\n")
+else()
+    set(_NL "\n")
+endif()
+set(OC_COMP_VERSIONS)
+foreach(COMPONENT ${OPENCMISS_COMPONENTS})
+    set(OC_COMP_VERSIONS "${OC_COMP_VERSIONS}#set(${COMPONENT}_VERSION ${COMPONENT}_VERSION)${_NL}")
+endforeach()
+configure_file("${CMAKE_CURRENT_SOURCE_DIR}/Settings/OCComponentBranches.cmake"
+    "${CMAKE_CURRENT_BINARY_DIR}/Settings/OCComponentBranches.cmake")
+unset(OC_COMP_VERSIONS)
+unset(_NL)
+log("Applying component branch settings from: ${CMAKE_CURRENT_BINARY_DIR}/Settings/OCComponentBranches.cmake")
+include("${CMAKE_CURRENT_BINARY_DIR}/Settings/OCComponentBranches.cmake")

@@ -1,9 +1,10 @@
 # Load default configuration
-include(OpenCMISSDefaultConfig)
-include(OpenCMISSDefaultComponentConfig)
+include(OCDefaultConfig)
+include(OCDefaultComponentConfig)
+include(OCComponentConfig)
 
 # This file is separate for documentation structural reasons (sphinx / rst)
-include(OpenCMISSInterComponentConfig)
+include(OCInterComponentConfig)
 
 # Half hack: The CMAKE_BUILD_TYPE variable is not initialized in the cache if it's "only" set
 # as a variable via cmake script. Consequently, issuing a project() command looks in the cache

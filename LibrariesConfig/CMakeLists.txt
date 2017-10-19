@@ -91,6 +91,7 @@ set(OPENCMISS_CMAKE_MODULE_PATH "${OPENCMISS_CMAKE_MODULE_PATH}" CACHE INTERNAL 
 
 # Set up include path required at this stage
 list(APPEND CMAKE_MODULE_PATH
+    ${OPENCMISS_CMAKE_MODULE_PATH}/FindModuleWrappers
     ${OPENCMISS_CMAKE_MODULE_PATH}
     ${OPENCMISS_CMAKE_MODULE_PATH}/OpenCMISS
 )
@@ -116,6 +117,7 @@ list(APPEND CMAKE_MODULE_PATH
     ${CMAKE_CURRENT_SOURCE_DIR}/Modules
     ${CMAKE_CURRENT_SOURCE_DIR}/Scripts
     ${SHARED_MODULES_PATH}
+    ${SHARED_SETTINGS_PATH}
 )
 
 # Pre-check for Python and Swig availability so that bindings will be built automatically (unless explicitly specified)
@@ -156,6 +158,7 @@ include(OCMultiConfigEnvironment)
 
 # General paths & preps
 include(OCPaths)
+include(OCComponentVersions)
 
 # Introduce miscellaneous helper functions and macros
 include(OCMiscFunctions)
@@ -171,7 +174,7 @@ endif ()
 include(OCCreateLocalConfig)
 
 # Load configuration files.
-include(OpenCMISSConfig)
+include(OCConfig)
 
 # Create a list of all the required components.
 include(OCDetermineRequiredComponents)

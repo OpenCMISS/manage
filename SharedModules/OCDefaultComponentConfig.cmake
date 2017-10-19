@@ -59,7 +59,7 @@ foreach(COMPONENT ${OPENCMISS_COMPONENTS})
         set(_VALUE ON)
     endif()
     # Set all individual components build types to shared if the global BUILD_SHARED_LIBS is set
-    if (NOT DEFINED OC_SYSTEM_${COMPONENT})
+    if (NOT DEFINED ${COMPONENT}_FIND_SYSTEM)
         # All local enabled? Set to local search.
         if (OC_COMPONENTS_SYSTEM STREQUAL NONE)
             set(${COMPONENT_NAME}_FIND_SYSTEM OFF)
