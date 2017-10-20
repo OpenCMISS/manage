@@ -72,6 +72,10 @@ foreach(COMPONENT ${OPENCMISS_COMPONENTS})
     unset(_VALUE)
 endforeach()
 
+# BLAS is a special case: It is part of LAPACK OpenCMISS component but it can be found separately
+# so we copy the settings for LAPACK to BLAS.
+set(BLAS_FIND_SYSTEM ${LAPACK_FIND_SYSTEM})
+
 ##
 # OC_USE_<COMP>
 # -------------
