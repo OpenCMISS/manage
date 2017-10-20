@@ -445,6 +445,7 @@ if (PETSC IN_LIST OC_REQUIRED_COMPONENTS)
                 set(PETSC_USE_${dependency} OFF)
             endif()
         endforeach()
+        set(PETSC_USE_PTSCOTCH ${PETSC_WITH_PTSCOTCH})
 
         addAndConfigureLocalComponent(PETSC
             BUILD_TESTS=${BUILD_TESTS}
@@ -498,6 +499,7 @@ if (SLEPC IN_LIST OC_REQUIRED_COMPONENTS)
                 set(PETSC_USE_${dependency} OFF)
             endif()
         endforeach()
+        set(PETSC_USE_PTSCOTCH ${PETSC_WITH_PTSCOTCH})
 
         addAndConfigureLocalComponent(SLEPC
             BUILD_TESTS=${BUILD_TESTS}
