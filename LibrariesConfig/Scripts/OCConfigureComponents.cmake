@@ -781,7 +781,7 @@ endif ()
 
 # png
 if (PNG IN_LIST OC_REQUIRED_COMPONENTS)
-    find_package(PNG ${LIBPNG_VERSION} QUIET)
+    find_package(PNG ${PNG_VERSION} QUIET)
     if (NOT PNG_FOUND)
         set(PNG_FWD_DEPS ZINC ITK IMAGEMAGICK)
         addAndConfigureLocalComponent(PNG
@@ -851,6 +851,8 @@ if (IMAGEMAGICK IN_LIST OC_REQUIRED_COMPONENTS)
             TIFF_VERSION=${TIFF_VERSION}
             JPEG_FIND_SYSTEM=${JPEG_FIND_SYSTEM}
             JPEG_VERSION=${JPEG_VERSION}
+            PNG_FIND_SYSTEM=${PNG_FIND_SYSTEM}
+            PNG_VERSION=${PNG_VERSION}
         )
     endif ()
 endif ()
