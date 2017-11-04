@@ -49,6 +49,12 @@ option(HDF5_WITH_SZIP "Have HDF5 use szip" YES)
 option(HDF5_WITH_ZLIB "Have HDF5 use zlib" YES)
 option(HDF5_BUILD_FORTRAN "Build Fortran interface for HDF5" NO)
 
+
+##
+#    HYPRE_WITH_SUPERLU : YES
+#       Build Hypre with SUPERLU   
+option(HYPRE_WITH_SUPERLU "Build Hypre with SUPERLU" YES)
+
 ##
 #    IRON_WITH_CELLML : YES
 #        Have Iron use CellML
