@@ -11,7 +11,7 @@ endif ()
 
 # Set up include path required at this stage
 list(APPEND CMAKE_MODULE_PATH
-    ${OPENCMISS_CMAKE_MODULE_PATH}/Modules/OpenCMISS
+    ${OPENCMISS_CMAKE_MODULE_PATH}/OpenCMISS
     )
 
 # Need to set the compilers before any project call
