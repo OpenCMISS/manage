@@ -241,7 +241,6 @@ endif ()
 # Architecture paths
 # First extra path segment for single configuration case - will give release/debug/...
 getBuildTypePathElem(BUILD_TYPE_PATH_ELEM)
-message(STATUS "BUILD_TYPE_PATH_ELEM: ${BUILD_TYPE_PATH_ELEM}")
 
 # Second architecture path for configuration passed in through command line
 set(ARCHITECTURE_NO_MPI_PATH ${ARCH_NO_MPI_PATH})
