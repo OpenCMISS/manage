@@ -34,7 +34,20 @@ set(CONFIG_BASE_DIR "${CMAKE_CURRENT_BINARY_DIR}/config${PLURAL_S}")
 if (NOT OPENCMISS_HAVE_MULTICONFIG_ENV)
     set(_CMAKE_MODULES_BUILD_ELEM release)
 endif ()
-set(_CMAKE_MODULES_BINARY_DIR "${OPENCMISS_ROOT}/build/cmake_modules")
+
+set(_DEVELOPER_SDK_POSSIBLE FALSE)
+set(_USER_SDK_POSSIBLE FALSE)
+if (EXISTS "${OPENCMISS_ROOT}/build/cmake_modules")
+    set(_CMAKE_MODULES_BINARY_DIR "${OPENCMISS_ROOT}/build/cmake_modules")
+    set(_DEVELOPER_SDK_POSSIBLE TRUE)
+    set(_USER_SDK_POSSIBLE TRUE)
+elseif (EXISTS "${OPENCMISS_DEPENDENCIES_ROOT}/build/cmake_modules")
+    set(_CMAKE_MODULES_BINARY_DIR "${OPENCMISS_DEPENDENCIES_ROOT}/build/cmake_modules")
+    set(_DEVELOPER_SDK_POSSIBLE TRUE)
+else ()
+    message(STATUS "Cannot add packaging, could not find the CMake modules binary directory.")
+    return()
+endif ()
 
 # This is where additional packaging files are located
 set(OC_PACKAGE_FILES_DIR "${CMAKE_CURRENT_SOURCE_DIR}/Packaging")
@@ -61,9 +74,10 @@ macro(CREATE_PACKAGING_TARGET)
     )
     file(MAKE_DIRECTORY "${OC_PACKAGE_ROOT}/${PACKAGE_TYPE}/build")
     add_custom_target(package_${PACKAGE_TYPE}
-        COMMAND ${CMAKE_COMMAND} -G "${CMAKE_GENERATOR}" -DPACKAGING_MODULE_PATH="${CMAKE_CURRENT_SOURCE_DIR}/Packaging" -DCONFIG_BASE_DIR="${CONFIG_BASE_DIR}" -DCMAKE_MODULES_BINARY_DIR="${_CMAKE_MODULES_BINARY_DIR}/${_CMAKE_MODULES_BUILD_ELEM}" -DOPENCMISS_RELEASE=${OPENCMISS_RELEASE} -DCMAKE_C_COMPILER=${CMAKE_C_COMPILER} ../source
+        COMMAND ${CMAKE_COMMAND} -G "${CMAKE_GENERATOR}" -DPACKAGING_MODULE_PATH=${CMAKE_CURRENT_SOURCE_DIR}/Packaging -DCONFIG_BASE_DIR=${CONFIG_BASE_DIR} -DCMAKE_MODULES_BINARY_DIR=${_CMAKE_MODULES_BINARY_DIR}/${_CMAKE_MODULES_BUILD_ELEM} -DOPENCMISS_RELEASE=${OPENCMISS_RELEASE} -DCMAKE_C_COMPILER=${CMAKE_C_COMPILER} ../source
         COMMAND ${CMAKE_COMMAND} --build . --config $<CONFIG> --target package
         WORKING_DIRECTORY "${OC_PACKAGE_ROOT}/${PACKAGE_TYPE}/build"
+        VERBATIM
     )
     set_target_properties(package_${PACKAGE_TYPE} PROPERTIES FOLDER "Packaging")
 endmacro()
@@ -76,19 +90,24 @@ endmacro()
 
 #CREATE_PACKAGING_TARGET()
 
-set(PACKAGE_NAME "OpenCMISS Libraries SDK")
-set(PACKAGE_TYPE "sdk")
-set(PACKAGE_TYPE_NAME "SDK")
-#set(PACKAGE_REGISTRY_KEY "OpenCMISSLibsUserSDK")
-set(PACKAGE_NAME_BASE "OpenCMISS-Libraries")
-set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "OpenCMISS Libraries SDK Summary")
+if (_USER_SDK_POSSIBLE)
+    set(PACKAGE_NAME "OpenCMISS Libraries SDK")
+    set(PACKAGE_TYPE "sdk")
+    set(PACKAGE_TYPE_NAME "SDK")
+    #set(PACKAGE_REGISTRY_KEY "OpenCMISSLibsUserSDK")
+    set(PACKAGE_NAME_BASE "OpenCMISS-Libraries")
+    set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "OpenCMISS Libraries SDK Summary")
 
-CREATE_PACKAGING_TARGET()
+    CREATE_PACKAGING_TARGET()
+endif ()
 
-#set(PACKAGE_NAME "OpenCMISS Libraries Developer SDK")
-#set(PACKAGE_TYPE "developersdk")
-#set(PACKAGE_REGISTRY_KEY "OpenCMISSLibsDeveloperSDK")
-#set(PACKAGE_NAME_BASE "OpenCMISS_Libraries_${OpenCMISSLibs_VERSION}_DeveloperSDK")
-#set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "OpenCMISS Libraries Developer SDK Summary")
+if (_DEVELOPER_SDK_POSSIBLE)
+    set(PACKAGE_NAME "OpenCMISS Libraries Developer SDK")
+    set(PACKAGE_TYPE "developersdk")
+    set(PACKAGE_TYPE_NAME "DeveloperSDK")
+    #set(PACKAGE_REGISTRY_KEY "OpenCMISSLibsDeveloperSDK")
+    set(PACKAGE_NAME_BASE "OpenCMISS-Libraries")
+    set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "OpenCMISS Libraries Developer SDK Summary")
 
-#CREATE_PACKAGING_TARGET()
+    CREATE_PACKAGING_TARGET()
+endif ()
