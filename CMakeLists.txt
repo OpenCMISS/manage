@@ -338,13 +338,8 @@ if (NOT OPENCMISS_HAVE_MULTICONFIG_ENV)
     set(CONFIG_PATH "${CONFIG_PATH}/${OPENCMISS_BUILD_TYPE}")
 endif ()
 
-add_custom_target(usage ALL
-    COMMAND "${CMAKE_COMMAND}" -E echo "Perhaps try targets: create_config, build_config, do_config, or help. For other options read the documentation."
-    VERBATIM
-)
-
 # Packaging, creating SDKs etc.
-if (OPENCMISS_INSTALLATION_TYPE STREQUAL "standard" AND NOT OPENCMISS_INDEPENDENT_ROOTS)
+if (OPENCMISS_INSTALLATION_TYPE STREQUAL "standard" OR OPENCMISS_INSTALLATION_TYPE STREQUAL "dependencies" AND NOT OPENCMISS_INDEPENDENT_ROOTS)
     include(OCPackaging)
 endif ()
 
@@ -353,61 +348,101 @@ endif ()
 # Iron, Zinc, Dependencies, ...
 add_subdirectory(SourceManagement)
 
-set(BUILD_CONFIG_COMMAND "${CMAKE_COMMAND}" --build .)
+set(BUILD_CONFIG_COMMAND ${CMAKE_COMMAND} --build .)
 if (NOT OPENCMISS_DEPENDENCIES_ONLY)
     list(APPEND BUILD_CONFIG_COMMAND --target install)
 endif ()
 if (OPENCMISS_HAVE_MULTICONFIG_ENV)
     list(APPEND BUILD_CONFIG_COMMAND --config $<CONFIG>)
-#    set(BUILD_CONFIG_STAMP_FILES)
-#    foreach(_possible_config ${CMAKE_CONFIGURATION_TYPES})
-#        list(APPEND BUILD_CONFIG_STAMP_FILES "${CONFIG_PATH}/${_possible_config}/stamp/build_config.stamp")
-#    endforeach()
-#    set(BUILD_CONFIG_STAMP_FILE "${CONFIG_PATH}/$<CONFIG>/stamp/build_config.stamp")
-else ()
-    string(TOLOWER ${OPENCMISS_BUILD_TYPE} SINGLE_CONFIG_BUILD_TYPE)
 endif ()
 
 # Stamp file definitions.
-set(CREATE_CONFIG_STAMP_FILE "${CONFIG_PATH}/stamp/create_config.stamp")
-set(BUILD_CONFIG_STAMP_FILE "${CONFIG_PATH}/stamp/build_config.stamp")
-set(BUILD_CONFIG_STAMP_FILES ${BUILD_CONFIG_STAMP_FILE})
+set(name manage_config)
+get_configuration_subdir_suffix(cfgdir)
 
-# Indirection for configuring variable in create_config.in.cmake
-set(DOLLAR_SYMBOL $)
+set(stamp_dir "${CONFIG_PATH}${cfgdir}/stamp")
+set(create_config_stamp_file "${stamp_dir}/${name}-create")
+set(build_config_stamp_file "${stamp_dir}/${name}-build")
 
-configure_file("${CMAKE_CURRENT_SOURCE_DIR}/Templates/create_config.in.cmake"
-    "${CMAKE_CURRENT_BINARY_DIR}/Scripts/create_config.cmake")
+set(cmf_dir ${CMAKE_CURRENT_BINARY_DIR}/CMakeFiles)
+set(complete_stamp_file "${cmf_dir}${cfgdir}/${name}-complete")
 
-configure_file("${CMAKE_CURRENT_SOURCE_DIR}/Templates/build_config.in.cmake"
-    "${CMAKE_CURRENT_BINARY_DIR}/Scripts/build_config.cmake")
+set(done_stamp_file "${stamp_dir}${cfgdir}/${name}-done")
+set(mkdir_stamp_file ${stamp_dir}${cfgdir}/${name}-mkdir)
 
-add_custom_command(OUTPUT "${CREATE_CONFIG_STAMP_FILE}"
-    DEPENDS "${CMAKE_CURRENT_BINARY_DIR}/Scripts/create_config.cmake"
-    COMMAND "${CMAKE_COMMAND}" -DSTAMP_FILE="${CREATE_CONFIG_STAMP_FILE}" -DBUILD_STAMP_FILE="${BUILD_CONFIG_STAMP_FILE}" -P "${CMAKE_CURRENT_BINARY_DIR}/Scripts/create_config.cmake"
+add_custom_target(${name} ALL DEPENDS ${complete_stamp_file})
+
+set(complete_outputs ${complete_stamp_file})
+add_custom_command(
+    OUTPUT ${complete_outputs}
+    COMMENT "Completed '${name}'"
+    COMMAND ${CMAKE_COMMAND} -E make_directory ${cmf_dir}${cfgdir}
+    COMMAND ${CMAKE_COMMAND} -E touch ${complete_stamp_file}
+    COMMAND ${CMAKE_COMMAND} -E touch ${done_stamp_file}
+    DEPENDS ${build_config_stamp_file}
+    VERBATIM
+)
+
+add_custom_command(APPEND
+    OUTPUT ${complete_stamp_file}
+    DEPENDS ${mkdir_stamp_file}
+)
+
+add_custom_command(OUTPUT ${mkdir_stamp_file}
+    COMMENT "Creating directories."
+    COMMAND ${CMAKE_COMMAND} -E make_directory ${stamp_dir}${cfgdir}
+    COMMAND ${CMAKE_COMMAND} -E touch ${mkdir_stamp_file}
+    DEPENDS get_sources
+    VERBATIM
+)
+
+add_custom_command(OUTPUT ${create_config_stamp_file}
+    COMMENT "Creating config."
+    COMMAND ${CMAKE_COMMAND} "-G${CMAKE_GENERATOR}" ${CURRENT_CONFIGURATION_ARGS} ${CMAKE_CURRENT_SOURCE_DIR}/LibrariesConfig
+    COMMAND ${CMAKE_COMMAND} -E touch ${create_config_stamp_file}
+    WORKING_DIRECTORY ${CONFIG_PATH}
+    VERBATIM
+)
+
+add_custom_command(APPEND
+    OUTPUT ${create_config_stamp_file}
+    DEPENDS ${mkdir_stamp_file}
 )
 
 add_custom_target(create_config
-    DEPENDS "${CREATE_CONFIG_STAMP_FILE}")
-add_dependencies(create_config get_sources)
+    DEPENDS "${create_config_stamp_file}"
+)
 
-string(REPLACE ";" "-<semi-colon>-" BUILD_CONFIG_COMMAND_TMP "${BUILD_CONFIG_COMMAND}")
-add_custom_command(OUTPUT "${BUILD_CONFIG_STAMP_FILES}"
-    DEPENDS "${CMAKE_CURRENT_BINARY_DIR}/Scripts/build_config.cmake"
-    COMMAND "${CMAKE_COMMAND}" -DBUILD_COMMAND="${BUILD_CONFIG_COMMAND_TMP}" -DSTAMP_FILE="${BUILD_CONFIG_STAMP_FILE}" -P "${CMAKE_CURRENT_BINARY_DIR}/Scripts/build_config.cmake"
+add_custom_command(APPEND
+    OUTPUT ${complete_stamp_file}
+    DEPENDS ${build_config_stamp_file}
+)
+
+add_custom_command(OUTPUT ${build_config_stamp_file}
+    COMMENT "Building configuration."
+    COMMAND ${BUILD_CONFIG_COMMAND}
+    COMMAND ${CMAKE_COMMAND} -E touch ${build_config_stamp_file}
+    WORKING_DIRECTORY ${CONFIG_PATH}
+    VERBATIM
+)
+
+add_custom_command(APPEND
+    OUTPUT ${build_config_stamp_file}
+    DEPENDS ${create_config_stamp_file}
 )
 
 add_custom_target(build_config
-    DEPENDS "${BUILD_CONFIG_STAMP_FILES}")
-add_dependencies(build_config create_config)
-
-add_custom_target(remove_stamp_files
-    COMMAND "${CMAKE_COMMAND}" -E remove "${CREATE_CONFIG_STAMP_FILE}"
-    COMMAND "${CMAKE_COMMAND}" -E remove "${BUILD_CONFIG_STAMP_FILE}"
+    DEPENDS ${build_config_stamp_files}
 )
+#add_dependencies(build_config create_config)
 
-add_custom_target(do_config)
-add_dependencies(do_config remove_stamp_files create_config build_config)
+add_custom_target(redo_config
+    COMMAND ${CMAKE_COMMAND} -E remove ${create_config_stamp_file}
+    COMMAND ${CMAKE_COMMAND} -E remove ${build_config_stamp_file}
+    COMMAND ${CMAKE_COMMAND} -E remove ${done_stamp_file}
+    COMMAND ${CMAKE_COMMAND} --build . --target ${name} --config $<CONFIG>
+    VERBATIM
+)
 
 add_custom_target(support
     COMMAND ${CMAKE_COMMAND} --build ${CONFIG_PATH} --target collect_logs --config $<CONFIG>
@@ -418,10 +453,11 @@ add_custom_target(support
         -P ${CMAKE_CURRENT_SOURCE_DIR}/Scripts/OCCreateZip.cmake
     WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
     COMMENT "Generating support files archive"
+    VERBATIM
 )
 
-if (EXISTS "${CREATE_CONFIG_STAMP_FILE}")
-    file(REMOVE "${CREATE_CONFIG_STAMP_FILE}")
+if (EXISTS "${create_config_stamp_file}")
+    file(REMOVE "${create_config_stamp_file}")
 endif ()
 
 message(STATUS "@")
