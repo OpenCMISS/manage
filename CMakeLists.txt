@@ -439,6 +439,11 @@ add_custom_target(redo_config
     VERBATIM
 )
 
+add_custom_target(keytests
+    COMMAND ${CMAKE_COMMAND} --build . --target keytests --config $<CONFIG>
+    WORKING_DIRECTORY ${CONFIG_PATH}
+    COMMENT "Running keytests for active configuration."
+)
 add_custom_target(support
     COMMAND ${CMAKE_COMMAND} --build ${CONFIG_PATH} --target collect_logs --config $<CONFIG>
     COMMAND ${CMAKE_COMMAND}
