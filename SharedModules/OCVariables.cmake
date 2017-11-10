@@ -71,6 +71,11 @@ set(OPENCMISS_CMAKE_MIN_VERSION 3.4.0)
 # If not set, a warning will be issued!
 set(OPENCMISS_INSTALLATION_SUPPORT_EMAIL FALSE)
 
+# Some component names don't match with the CMake module name these two lists create a
+# map between different naming conventions.
+set(OPENCMISS_COMPONENTS_WITH_DIFFERENT_MODULE_NAME LIBXML2 FREETYPE)
+set(OPENCMISS_COMPONENTS_MODULE_NAMES LibXml2 Freetype)
+
 # The prefix for opencmiss source manaagement targets
 set(OC_SM_PREFIX "SM_")
 

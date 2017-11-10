@@ -107,6 +107,7 @@ endif ()
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/SharedModules")
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/Scripts")
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/Modules")
+list(APPEND CMAKE_MODULE_PATH "${OPENCMISS_CMAKE_MODULE_PATH}/FindModuleWrappers")
 list(APPEND CMAKE_MODULE_PATH "${OPENCMISS_CMAKE_MODULE_PATH}")
 list(APPEND CMAKE_MODULE_PATH "${OPENCMISS_CMAKE_MODULE_PATH}/OpenCMISS")
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_BINARY_DIR}/SharedSettings")
@@ -348,13 +349,7 @@ endif ()
 # Iron, Zinc, Dependencies, ...
 add_subdirectory(SourceManagement)
 
-set(BUILD_CONFIG_COMMAND ${CMAKE_COMMAND} --build .)
-if (NOT OPENCMISS_DEPENDENCIES_ONLY)
-    list(APPEND BUILD_CONFIG_COMMAND --target install)
-endif ()
-if (OPENCMISS_HAVE_MULTICONFIG_ENV)
-    list(APPEND BUILD_CONFIG_COMMAND --config $<CONFIG>)
-endif ()
+set(BUILD_CONFIG_COMMAND ${CMAKE_COMMAND} --build . --target install --config $<CONFIG>)
 
 # Stamp file definitions.
 set(name manage_config)

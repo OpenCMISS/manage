@@ -105,7 +105,7 @@ endif()
 
 # GITHUB_ORGANIZATION: For the default source locations, we use the OpenCMISS github organizations to group the components sources.
 #                      Those are used to both clone the git repo in development mode or generate the path to the zipped source file on github. 
-foreach (COMPONENT_NAME ${OC_REQUIRED_COMPONENTS})
+foreach (COMPONENT_NAME ${OC_BUILD_LOCAL_COMPONENTS})
     string(TOLOWER ${COMPONENT_NAME} FOLDER_NAME)
     # Set "develop" branches for each component if OPENCMISS_DEVELOP_ALL is set,
     # but don't override any specified component branches.
