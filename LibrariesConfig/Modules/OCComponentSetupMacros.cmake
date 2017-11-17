@@ -68,7 +68,7 @@ function(addAndConfigureLocalComponent COMPONENT_NAME)
     # Collect component definitions
     set(COMPONENT_DEFS
         ${COMPONENT_COMMON_DEFS} 
-        -DCMAKE_INSTALL_PREFIX:STRING=${_INSTALL_PREFIX}
+        -DCMAKE_INSTALL_PREFIX:PATH=${_INSTALL_PREFIX}
     )
 
     # Shared or static?
