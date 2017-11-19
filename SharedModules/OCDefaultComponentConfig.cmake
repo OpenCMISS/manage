@@ -1,4 +1,67 @@
 ##
+# OPENCMISS_DEPENDENCIES_ONLY
+# ---------------------------
+#
+# If you want to compile the dependencies for iron/zinc only, enable this setting.
+# This flag is useful for setting up sdk installations or continuous integration builds.
+#
+# .. caution::
+#     You can also disable building Iron or Zinc using the component variables, e.g. OC_USE_IRON=NO.
+#     However, this is considered a special top-level flag, which also causes any components that are
+#     exclusively required by e.g. Iron will not be build.
+#
+# See also OC_USE_<COMP>_
+#
+# .. default:: NO
+if (NOT DEFINED OPENCMISS_DEPENDENCIES_ONLY)
+    set(OPENCMISS_DEPENDENCIES_ONLY NO)  # "Build dependencies only (no Iron or Zinc)"
+endif ()
+
+##
+# OPENCMISS_LIBRARIES_ONLY
+# ------------------------
+#
+# If you want to compile only iron or zinc, enable this setting.  The dependencies will not be built
+# with this option set.
+#
+# See also OC_USE_<COMP>_
+#
+if (NOT DEFINED OPENCMISS_LIBRARIES_ONLY)
+    set(OPENCMISS_LIBRARIES_ONLY NO)  # "Build only Iron or Zinc (no dependencies)"
+endif ()
+
+##
+# OC_COMPONENTS_SYSTEM
+# --------------------
+#
+# Global setting to control use of system components. Possible values:
+# 
+#     :DEFAULT: Holds only for the components specified in OPENCMISS_COMPONENTS_SYSTEM_BY_DEFAULT (Config/Variables.cmake)
+#     :NONE: The OpenCMISS build system exclusively builds components from its own repositories
+#     :ALL: Enable search for any component on the system 
+#
+# .. default:: DEFAULT
+if (NOT DEFINED OC_COMPONENTS_SYSTEM)
+    set(OC_COMPONENTS_SYSTEM DEFAULT)
+endif ()
+
+# Load in values from dependencies context if only building libraries.
+if (OPENCMISS_LIBRARIES_ONLY)
+    # _FIND_SYSTEM variables are defined by the dependencies context.
+    # Find the context-dependencies file
+    set(_POSSIBLE_CONTEXT_DEPENDENCIES_FILE ${OPENCMISS_DEPENDENCIES_INSTALL_PREFIX}${ARCHITECTURE_NO_MPI_PATH}/context-dependencies.cmake)
+    if (EXISTS "${_POSSIBLE_CONTEXT_DEPENDENCIES_FILE}")
+        message(STATUS "Loading configuration from dependencies context file: '${_POSSIBLE_CONTEXT_DEPENDENCIES_FILE}'")
+        include(${_POSSIBLE_CONTEXT_DEPENDENCIES_FILE})
+        # Have OPENCMISS_TOOLCHAIN compare this with context-dependencies toolchain
+        if (NOT OPENCMISS_TOOLCHAIN STREQUAL CONTEXT_DEPENDENCIES_OPENCMISS_TOOLCHAIN)
+            message(FATAL_ERROR "Libraries toolchain '${OPENCMISS_TOOLCHAIN}' does not match dependencies toolchain '${CONTEXT_DEPENDENCIES_OPENCMISS_TOOLCHAIN}'.")
+        endif ()
+    endif ()
+else ()
+endif ()
+
+##
 # <COMP>_SHARED
 # -------------
 #
@@ -16,21 +79,6 @@ foreach(COMPONENT ${OPENCMISS_COMPONENTS})
         unset(_VALUE)
     endif ()
 endforeach()
-
-##
-# OC_COMPONENTS_SYSTEM
-# --------------------
-#
-# Global setting to control use of system components. Possible values:
-# 
-#     :DEFAULT: Holds only for the components specified in OPENCMISS_COMPONENTS_SYSTEM_BY_DEFAULT (Config/Variables.cmake)
-#     :NONE: The OpenCMISS build system exclusively builds components from its own repositories
-#     :ALL: Enable search for any component on the system 
-#
-# .. default:: DEFAULT
-if (NOT DEFINED OC_COMPONENTS_SYSTEM)
-    set(OC_COMPONENTS_SYSTEM DEFAULT)
-endif ()
 
 ##
 # OC_SYSTEM_<COMP>
@@ -103,34 +151,3 @@ foreach(COMPONENT ${OPENCMISS_COMPONENTS})
     unset(_VALUE)
 endforeach()
 
-##
-# OPENCMISS_DEPENDENCIES_ONLY
-# ---------------------------
-#
-# If you want to compile the dependencies for iron/zinc only, enable this setting.
-# This flag is useful for setting up sdk installations or continuous integration builds.
-#
-# .. caution::
-#     You can also disable building Iron or Zinc using the component variables, e.g. OC_USE_IRON=NO.
-#     However, this is considered a special top-level flag, which also causes any components that are
-#     exclusively required by e.g. Iron will not be build.
-#
-# See also OC_USE_<COMP>_
-#
-# .. default:: NO
-if (NOT DEFINED OPENCMISS_DEPENDENCIES_ONLY)
-    set(OPENCMISS_DEPENDENCIES_ONLY NO)  # "Build dependencies only (no Iron or Zinc)"
-endif ()
-
-##
-# OPENCMISS_LIBRARIES_ONLY
-# ------------------------
-#
-# If you want to compile only iron or zinc, enable this setting.  The dependencies will not be built
-# with this option set.
-#
-# See also OC_USE_<COMP>_
-#
-if (NOT DEFINED OPENCMISS_LIBRARIES_ONLY)
-    set(OPENCMISS_LIBRARIES_ONLY NO)  # "Build only Iron or Zinc (no dependencies)"
-endif ()
