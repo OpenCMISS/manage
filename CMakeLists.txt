@@ -205,6 +205,10 @@ if (INVALID_SETTINGS)
 endif ()
 
 include(OCToolchainCompilers)
+
+getToolchain(CURRENT_TOOLCHAIN)
+set(OPENCMISS_TOOLCHAIN ${CURRENT_TOOLCHAIN} CACHE STRING "Specify the toolchain mnemonic.")
+
 include(OCDetermineMPI)
 include(OCDetermineCXX11)
 include(OCVariables)
@@ -218,9 +222,7 @@ tidy_gui_variables()
 # Misc targets for convenience
 # include(OCMainTargets) # TODO: Add this back in
 
-getToolchain(CURRENT_TOOLCHAIN)
 
-set(OPENCMISS_TOOLCHAIN ${CURRENT_TOOLCHAIN} CACHE STRING "Specify the toolchain mnemonic.")
 set(OPENCMISS_MPI ${OPENCMISS_MPI} CACHE STRING "Specify the MPI mnemonic.")
 set(OPENCMISS_BUILD_OWN_MPI NO CACHE BOOL "Build own MPI if system MPI is unavailable.")
 set(OPENCMISS_INSTRUMENTATION "none" CACHE STRING "Specify the instrumentation.")
