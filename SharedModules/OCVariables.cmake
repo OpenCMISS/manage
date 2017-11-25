@@ -17,8 +17,7 @@ set(OPENCMISS_COMPONENTS ${OPENCMISS_COMMON_COMPONENTS}
 # Components using (any) MPI
 # Used to determine when MPI compilers etc should be passed down to packages
 set(OPENCMISS_COMPONENTS_WITHMPI MUMPS PARMETIS PASTIX PETSC
-    PLAPACK SCALAPACK SCOTCH SUITESPARSE
-    SUNDIALS SUPERLU_DIST SLEPC HYPRE IRON)
+    PLAPACK SCALAPACK SCOTCH SUNDIALS SUPERLU_DIST SLEPC HYPRE IRON)
 
 # Components using OPENMP local threading
 # Used to determine which dependencies get the WITH_OPENMP flag

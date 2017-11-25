@@ -234,7 +234,7 @@ endif()
 if (OPENCMISS_MPI STREQUAL none)
     # Do nothing.
 else ()
-    include(OCDetermineMPI)
+    include(OCSelectMPI)
 endif ()
 
 ########################################################################

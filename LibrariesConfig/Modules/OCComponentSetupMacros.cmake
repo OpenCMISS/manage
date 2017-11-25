@@ -81,85 +81,41 @@ function(addAndConfigureLocalComponent COMPONENT_NAME)
         )
     endif()
 
-    # check if MPI compilers should be forwarded/set
-    # so that the local FindMPI uses that
-    if(FALSE) # ${COMPONENT_NAME} IN_LIST OPENCMISS_COMPONENTS_WITHMPI)
-        # Pass on settings and take care to undefine them if no longer used at this level
-        if (OPENCMISS_MPI)
-            list(APPEND COMPONENT_DEFS -DMPI=${OPENCMISS_MPI})
-        else()
-            list(APPEND COMPONENT_DEFS -UMPI)
-        endif()
-        if (MPI_HOME)
-            list(APPEND COMPONENT_DEFS -DMPI_HOME=${MPI_HOME})
-        else()
-            list(APPEND COMPONENT_DEFS -UMPI_HOME)
-        endif()
-        # Override (=defined later in the args list) Compilers with MPI compilers
-        # for all components that may use MPI
-        # This takes precedence over the first definition of the compilers
-        # collected in COMPONENT_COMMON_DEFS
-        foreach(lang C CXX Fortran)
+    if (COMPONENT_NAME IN_LIST OPENCMISS_COMPONENTS_WITHMPI)
+        # Set the MPI Executable we have found.
+        list(APPEND COMPONENT_DEFS
+            -DMPIEXEC_EXECUTABLE=${MPIEXEC_EXECUTABLE}
+            -DMPI_VERSION=${MPI_VERSION})
+    endif ()
+    foreach(lang C CXX Fortran)
+        # check if MPI compilers should be forwarded/set
+        # so that the local FindMPI uses that
+        if(COMPONENT_NAME IN_LIST OPENCMISS_COMPONENTS_WITHMPI)
+            # Set the MPI compiler we have found for this language.
             if(MPI_${lang}_COMPILER)
                 list(APPEND COMPONENT_DEFS
-                    # Directly specify the compiler wrapper as compiler!
-                    # That is a perfect workaround for the "finding MPI after compilers have been initialized" problem
-                    # that occurs when building a component directly. 
-                    -DCMAKE_${lang}_COMPILER=${MPI_${lang}_COMPILER}
-                    # Also specify the MPI_ versions so that FindMPI is faster (checks them directly)
                     -DMPI_${lang}_COMPILER=${MPI_${lang}_COMPILER}
                 )
-                # Define compiler flags
-                if (CMAKE_${lang}_FLAGS)
-                    set(MPI_CMAKE_FLAGS "${CMAKE_${lang}_FLAGS} ${OC_MPI_ONLY_${lang}_FLAGS}")
-                    list(APPEND COMPONENT_DEFS
-                        -DCMAKE_${lang}_FLAGS=${MPI_CMAKE_FLAGS}
-                    )
-                endif()
-                # Also forward build-type specific flags
-                foreach(BUILDTYPE RELEASE DEBUG)
-                    if (CMAKE_${lang}_FLAGS_${BUILDTYPE})
-                        set(MPI_CMAKE_FLAGS_${BUILDTYPE} "${CMAKE_${lang}_FLAGS_${BUILDTYPE}} ${OC_MPI_ONLY_${lang}_FLAGS_${BUILDTYPE}}")
-                        list(APPEND COMPONENT_DEFS
-                            -DCMAKE_${lang}_FLAGS_${BUILDTYPE}=${MPI_CMAKE_FLAGS_${BUILDTYPE}}
-                        )
-                    endif()
-                endforeach()
             endif()
-        endforeach()
-    else()
-        if (OPENCMISS_MPI)
-            list(APPEND COMPONENT_DEFS -DMPI=${OPENCMISS_MPI})
-        else()
-            list(APPEND COMPONENT_DEFS -UMPI)
         endif()
-        if (MPI_HOME)
-            list(APPEND COMPONENT_DEFS -DMPI_HOME=${MPI_HOME})
-            list(APPEND COMPONENT_DEFS -UMPI)
-        else()
-            list(APPEND COMPONENT_DEFS -UMPI_HOME)
-        endif()
-        # No MPI: simply set the same compilers.
-        foreach(lang C CXX Fortran)
+        list(APPEND COMPONENT_DEFS
+            -DCMAKE_${lang}_COMPILER=${CMAKE_${lang}_COMPILER}
+        )
+        # Define compiler flags
+        if (CMAKE_${lang}_FLAGS)
             list(APPEND COMPONENT_DEFS
-                -DCMAKE_${lang}_COMPILER=${CMAKE_${lang}_COMPILER}
+                -DCMAKE_${lang}_FLAGS=${CMAKE_${lang}_FLAGS}
             )
-            # Define compiler flags
-            if (CMAKE_${lang}_FLAGS)
+        endif()
+        # Also forward build-type specific flags
+        foreach(BUILDTYPE RELEASE DEBUG)
+            if (CMAKE_${lang}_FLAGS_${BUILDTYPE})
                 list(APPEND COMPONENT_DEFS
-                    -DCMAKE_${lang}_FLAGS=${CMAKE_${lang}_FLAGS}
+                    -DCMAKE_${lang}_FLAGS_${BUILDTYPE}=${CMAKE_${lang}_FLAGS_${BUILDTYPE}}
                 )
             endif()
-            # Also forward build-type specific flags
-            foreach(BUILDTYPE RELEASE DEBUG)
-                if (CMAKE_${lang}_FLAGS_${BUILDTYPE})
-                    list(APPEND COMPONENT_DEFS
-                        -DCMAKE_${lang}_FLAGS_${BUILDTYPE}=${CMAKE_${lang}_FLAGS_${BUILDTYPE}}
-                    )
-                endif()
-            endforeach()
         endforeach()
-    endif()
+    endforeach()
 
     # Forward any other variables
     foreach(extra_def ${ARGN})

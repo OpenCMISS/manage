@@ -33,6 +33,8 @@ macro(clearFindMPIVariables)
     unset(MPIEXEC_MAX_NUMPROCS CACHE)
 endmacro()
 
+find_package(MPI QUEIT)
+
 set(_DEFAULT_MPI mpich)
 unset(SUGGESTED_MPI)
 # MPI_HOME specified - use that and fail if there's no MPI
