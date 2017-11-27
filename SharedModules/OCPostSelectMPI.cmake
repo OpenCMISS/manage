@@ -3,13 +3,10 @@ if (OPENCMISS_MPI AND NOT MPI_FOUND)
     message(FATAL_ERROR "Requested MPI: ${OPENCMISS_MPI} was not found.")
 endif ()
 
-# Determine MPI_IMPLEMENTATION
-set(MPI_IMPLEMENTATION bob)
+determine_mpi_mnemonic(MPI_DETECTED)
 
-message(STATUS "Pass these variables onto dependencies that use MPI.")
-message(STATUS "MPIEXEC_EXECUTABLE: ${MPIEXEC_EXECUTABLE}")
-message(STATUS "MPI_VERSION: ${MPI_VERSION}")
-foreach(_lang C CXX Fortran)
-    message(STATUS "MPI_${_lang}_FOUND: ${MPI_${_lang}_FOUND}")
-    message(STATUS "MPI_${_lang}_COMPILER: ${MPI_${_lang}_COMPILER}")
-endforeach()
+if (OPENCMISS_MPI AND NOT OPENCMISS_MPI STREQUAL MPI_DETECTED)
+    message(FATAL_ERROR "The MPI requested '${OPENCMISS_MPI}' and the MPI detected '${MPI_DETECTED}' do not match.")
+endif ()
+
+set(MPI_IMPLEMENTATION ${MPI_DETECTED})
