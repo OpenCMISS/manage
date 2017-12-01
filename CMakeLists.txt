@@ -209,7 +209,7 @@ include(OCToolchainCompilers)
 getToolchain(CURRENT_TOOLCHAIN)
 set(OPENCMISS_TOOLCHAIN ${CURRENT_TOOLCHAIN} CACHE STRING "Specify the toolchain mnemonic.")
 
-include(OCDetermineMPIMnemonicFunctions)
+include(OCDetermineMPIFunctions)
 include(OCPreSelectMPI)
 include(OCSelectMPI)
 include(OCPostSelectMPI)

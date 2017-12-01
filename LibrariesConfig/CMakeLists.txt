@@ -162,6 +162,7 @@ include(OCComponentVersions)
 
 # Introduce miscellaneous helper functions and macros
 include(OCMiscFunctions)
+include(OCDetermineMPIFunctions)
 
 set(OPENCMISS_CONFIG_DIR ${OPENCMISS_CONFIG_DIR} CACHE PATH "Location of OpenCMISSLocalConfig.cmake to use for this configuration.")
 if (OPENCMISS_HAVE_MULTICONFIG_ENV)
