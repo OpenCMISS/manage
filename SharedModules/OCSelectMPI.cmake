@@ -1,3 +1,3 @@
 
-find_package(MPI QUIET)
+find_mpi_implementation()
 
