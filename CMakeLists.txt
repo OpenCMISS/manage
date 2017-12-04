@@ -370,8 +370,8 @@ set(build_config_stamp_file "${stamp_dir}/${name}-build")
 set(cmf_dir ${CMAKE_CURRENT_BINARY_DIR}/CMakeFiles)
 set(complete_stamp_file "${cmf_dir}${cfgdir}/${name}-complete")
 
-set(done_stamp_file "${stamp_dir}${cfgdir}/${name}-done")
-set(mkdir_stamp_file ${stamp_dir}${cfgdir}/${name}-mkdir)
+set(done_stamp_file "${stamp_dir}/${name}-done")
+set(mkdir_stamp_file ${stamp_dir}/${name}-mkdir)
 
 add_custom_target(${name} ALL DEPENDS ${complete_stamp_file})
 
