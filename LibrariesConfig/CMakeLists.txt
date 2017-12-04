@@ -389,7 +389,7 @@ else ()
     set(BUILD_ARCH 32)
 endif ()
 
-set(BUILD_CONFIG_FILE "${CMAKE_CURRENT_BINARY_DIR}/stamp/build.config")
+set(BUILD_CONFIG_FILE "${CMAKE_CURRENT_BINARY_DIR}/stamp/build_config.cmake")
 configure_file("${CMAKE_CURRENT_SOURCE_DIR}/Templates/build.in.config"
     ${BUILD_CONFIG_FILE}
 )
@@ -401,7 +401,7 @@ message(STATUS "@")
 if (OPENCMISS_SDK_INSTALL_DIR)
     message(STATUS "@ OPENCMISS_SDK_INSTALL_DIR: ${OPENCMISS_SDK_INSTALL_DIR}")
 endif ()
-message(STATUS "@ MPI implementation: ${OPENCMISS_MPI}")
+message(STATUS "@ MPI implementation: ${OPENCMISS_MPI_IMPLEMENTATION}")
 if (MPI_HOME)
     message(STATUS "@ MPI HOME: ${MPI_HOME}")
 endif ()
