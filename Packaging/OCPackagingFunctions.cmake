@@ -2,7 +2,7 @@ function(GET_INSTALL_QUADS PACKAGE_TYPE VAR_NAME)
 
     set(_quads)
     # Find configurations that have successfully built.
-    file(GLOB_RECURSE children RELATIVE ${CONFIG_BASE_DIR} ${CONFIG_BASE_DIR}/*build_config.stamp)
+    file(GLOB_RECURSE children RELATIVE ${CONFIG_BASE_DIR} ${CONFIG_BASE_DIR}/*build_config.cmake)
 message(STATUS "children: ${children}")
 message(STATUS "CONFIG_BASE_DIR: ${CONFIG_BASE_DIR}")
     foreach(_build_config_stamps ${children})
