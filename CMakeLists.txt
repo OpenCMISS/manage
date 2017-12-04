@@ -370,12 +370,11 @@ get_configuration_subdir_suffix(cfgdir)
 set(stamp_dir "${CONFIG_PATH}${cfgdir}/stamp")
 set(create_config_stamp_file "${stamp_dir}/${name}-create")
 set(build_config_stamp_file "${stamp_dir}/${name}-build")
+set(done_stamp_file "${stamp_dir}/${name}-done")
+set(mkdir_stamp_file ${stamp_dir}/${name}-mkdir)
 
 set(cmf_dir ${CMAKE_CURRENT_BINARY_DIR}/CMakeFiles)
 set(complete_stamp_file "${cmf_dir}${cfgdir}/${name}-complete")
-
-set(done_stamp_file "${stamp_dir}/${name}-done")
-set(mkdir_stamp_file ${stamp_dir}/${name}-mkdir)
 
 add_custom_target(${name} ALL DEPENDS ${complete_stamp_file})
 
