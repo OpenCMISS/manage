@@ -21,10 +21,6 @@ LIST(APPEND COMPONENT_COMMON_DEFS
     -DCMAKE_INSTALL_DEFAULT_COMPONENT_NAME=Development
 )
 
-if (NOT OPENCMISS_HAVE_MULTICONFIG_ENV)
-    list(APPEND COMPONENT_COMMON_DEFS -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE})
-endif ()
-
 # Use the correct install RPATH to enable binaries to find the shared libs (if any, ignored otherwise).
 # See http://www.cmake.org/Wiki/CMake_RPATH_handling
 #STRING(REPLACE ";" ${OC_LIST_SEPARATOR} OPENCMISS_LIBRARY_PATH_ESC "${OPENCMISS_LIBRARY_PATH}")
