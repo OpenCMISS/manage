@@ -49,16 +49,10 @@ if (NOT TARGET opencmisslibs)
     #    messageo("No build type specified. Using OpenCMISS default type @CMAKE_BUILD_TYPE@")
     #endif()
 
-    find_package(MPI QUIET)
-    if (MPI_FOUND)
-        if (MPI)
-            set(OPENCMISS_MPI ${MPI})
-        else ()
-            set(OPENCMISS_MPI ${MPI_DETECTED})
-        endif ()
-    else ()
-        set(OPENCMISS_MPI none)
-    endif ()
+    include(OCDetermineMPIFunctions)
+    include(OCPreSelectMPI)
+    include(OCSelectMPI)
+    include(OCPostSelectMPI)
 
     #############################################################################
     # Assemble architecture-path dependent search locations
