@@ -42,7 +42,7 @@
 #
 # ============== MPI ====================
 #
-# OPENCMISS_MPI: []|mpich|mpich2|openmpi|mvapich2|intel|none
+# OPENCMISS_MPI_IMPLEMENTATION: []|mpich|mpich2|openmpi|mvapich2|intel|msmpi|none
 #    MPI is a crucial part of OpenCMISS and defaults to be used.
 #    You should not have to specify a specific MPI implementation, as CMake will find your system default automatically.
 #     
@@ -232,7 +232,7 @@ endif()
 
 # MPI
 # Unless we said to not have MPI, see that it's available.
-if (OPENCMISS_MPI STREQUAL none)
+if (OPENCMISS_MPI_INSTALLATION STREQUAL none)
     # Do nothing.
 else ()
     include(OCSelectMPI)
@@ -254,7 +254,7 @@ include(OCComponentsReport)
 #
 # Setup build of MPI if required
 include(OCBuildMPI)
-if (OPENCMISS_MPI STREQUAL none)
+if (OPENCMISS_MPI_IMPLEMENTATION STREQUAL none)
     set(OC_USE_MPI FALSE)
 else ()
     set(OC_USE_MPI TRUE)
