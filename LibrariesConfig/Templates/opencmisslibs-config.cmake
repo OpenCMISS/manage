@@ -113,8 +113,8 @@ if (NOT TARGET opencmisslibs)
     if(iron IN_LIST OpenCMISSLibs_FIND_COMPONENTS OR NOT OpenCMISSLibs_FIND_COMPONENTS)
         # Add top level libraries of OpenCMISS framework if configured
         # Validate MPI for the found context
-        if (NOT OPENCMISS_MPI STREQUAL CONTEXT_OPENCMISS_MPI_IMPLEMENTATION)
-            message(FATAL_ERROR "Mismatch between the current context MPI (${CONTEXT_OPENCMISS_MPI_IMPLEMENTATION}) and the MPI found (${OPENCMISS_MPI}).")
+        if (NOT OPENCMISS_MPI_IMPLEMENTATION STREQUAL CONTEXT_OPENCMISS_MPI_IMPLEMENTATION)
+            message(FATAL_ERROR "Mismatch between the current context MPI (${CONTEXT_OPENCMISS_MPI_IMPLEMENTATION}) and the MPI found (${OPENCMISS_MPI_IMPLEMENTATION}).")
         endif ()
         message(STATUS "Looking for OpenCMISS-Iron ...")
         find_package(IRON ${IRON_VERSION} QUIET)
