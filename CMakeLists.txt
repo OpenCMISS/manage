@@ -366,7 +366,7 @@ set(BUILD_CONFIG_COMMAND ${CMAKE_COMMAND} --build . --target install --config $<
 set(name manage_config)
 get_configuration_subdir_suffix(cfgdir)
 
-set(stamp_dir "${CONFIG_PATH}${cfgdir}/stamp")
+set(stamp_dir "${CONFIG_PATH}/stamp${cfgdir}")
 set(create_config_stamp_file "${stamp_dir}/${name}-create")
 set(build_config_stamp_file "${stamp_dir}/${name}-build")
 set(done_stamp_file "${stamp_dir}/${name}-done")
