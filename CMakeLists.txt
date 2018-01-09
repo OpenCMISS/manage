@@ -395,7 +395,7 @@ add_custom_command(APPEND
 
 add_custom_command(OUTPUT ${mkdir_stamp_file}
     COMMENT "Creating directories."
-    COMMAND ${CMAKE_COMMAND} -E make_directory ${stamp_dir}${cfgdir}
+    COMMAND ${CMAKE_COMMAND} -E make_directory ${stamp_dir}
     COMMAND ${CMAKE_COMMAND} -E touch ${mkdir_stamp_file}
     DEPENDS get_sources
     VERBATIM
@@ -437,7 +437,7 @@ add_custom_command(APPEND
 )
 
 add_custom_target(build_config
-    DEPENDS ${build_config_stamp_files}
+    DEPENDS ${build_config_stamp_file}
 )
 #add_dependencies(build_config create_config)
 
