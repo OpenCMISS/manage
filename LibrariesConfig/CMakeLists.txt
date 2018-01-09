@@ -389,7 +389,8 @@ else ()
     set(BUILD_ARCH 32)
 endif ()
 
-set(BUILD_CONFIG_FILE "${CMAKE_CURRENT_BINARY_DIR}/stamp/build_config.cmake")
+get_configuration_subdir_suffix(cfgdir)
+set(BUILD_CONFIG_FILE "${CMAKE_CURRENT_BINARY_DIR}/stamp${cfgdir}/build_config.cmake")
 configure_file("${CMAKE_CURRENT_SOURCE_DIR}/Templates/build.in.config"
     ${BUILD_CONFIG_FILE}
 )
