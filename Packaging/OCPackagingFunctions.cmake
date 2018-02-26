@@ -6,6 +6,10 @@ function(GET_INSTALL_QUADS PACKAGE_TYPE VAR_NAME)
     foreach(_build_config_stamps ${children})
         file(TO_CMAKE_PATH "${_build_config_stamps}" _cmaked_build_config_stamps)
         get_filename_component(_build_config_dir ${_cmaked_build_config_stamps} DIRECTORY)
+        if (CMAKE_CONFIGURATION_TYPES)
+            # We have an extra configuration directory if this condition holds
+            get_filename_component(_build_config_dir ${_build_config_dir} DIRECTORY)
+        endif ()
         get_filename_component(_config_dir ${_build_config_dir} DIRECTORY)
         include(${CONFIG_BASE_DIR}/${_cmaked_build_config_stamps})
 
