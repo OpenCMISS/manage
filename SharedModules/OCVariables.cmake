@@ -62,8 +62,12 @@ if (MSVC)
 endif()
 
 set(OPENCMISS_MANDATORY_COMPONENTS FIELDML-API LIBXML2 ZLIB)
-set(OPENCMISS_COMPONENTS_RELEASE_ONLY LLVM CLANG)
-
+if (MSVC)
+    # Sadly it is not possible to mix Debug and Release builds with Visual Studio.
+    set(OPENCMISS_COMPONENTS_RELEASE_ONLY)
+else ()
+    set(OPENCMISS_COMPONENTS_RELEASE_ONLY LLVM CLANG)
+endif ()
 set(OPENCMISS_CMAKE_MIN_VERSION 3.4.0)
 
 # This is an email address being displayed for issues regarding (remote) installations.
