@@ -228,7 +228,7 @@ tidy_gui_variables()
 
 set(OPENCMISS_MPI ${OPENCMISS_MPI} CACHE STRING "Specify the MPI mnemonic.")
 set(OPENCMISS_BUILD_OWN_MPI NO CACHE BOOL "Build own MPI if system MPI is unavailable.")
-set(OPENCMISS_INSTRUMENTATION "none" CACHE STRING "Specify the instrumentation.")
+set(OC_INSTRUMENTATION "none" CACHE STRING "Specify the instrumentation.")
 set(OPENCMISS_USER_PART_ARCHITECTURE_PATH "" CACHE STRING "User specifed part of the architecture path.")
 mark_as_advanced(OPENCMISS_USER_PART_ARCHITECTURE_PATH)
 
@@ -245,6 +245,10 @@ else()
     set(CONFIG_PACKAGE_ARCHITECTURE_MPI_PATH .)
     set(CONFIG_PACKAGE_ARCHITECTURE_NO_MPI_PATH .)
 endif()
+
+if(DEFINED OPENCMISS_INSTRUMENTATION)
+set(OC_INSTRUMENTATION  "${OPENCMISS_INSTRUMENTATION}" CACHE STRING "Specify the instrumentation.")
+endif ()
 
 if (FINALISE_INSTALLATION)
     finalise_options(${OC_INSTALLATION_CONFIG})
@@ -265,6 +269,8 @@ if (FINALISE_INSTALLATION)
         endif ()
     endforeach()
 endif ()
+
+message(STATUS "IronManage::Instrumentation: ${OC_INSTRUMENTATION}")
 
 # Checks for known issues in toolchain configuration
 include(OCToolchainChecks)

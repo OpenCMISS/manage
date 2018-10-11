@@ -153,6 +153,23 @@ elseif ("${CMAKE_C_COMPILER_ID}" STREQUAL "Intel" OR "${CMAKE_CXX_COMPILER_ID}" 
         endif ()
     endif ()
 
+    message(STATUS "Toolchain: Instrumentation: ${OC_INSTRUMENTATION}")
+    if ("${OC_INSTRUMENTATION}" STREQUAL "vtune")
+        foreach(lang C CXX Fortran)
+                SET(CMAKE_${lang}_FLAGS_RELEASE  "${CMAKE_${lang}_FLAGS_RELEASE} -g -shared-intel -debug inline-debug-info -D TBB_USE_THREADING_TOOLS -qopenmp-link dynamic -parallel-source-info=2 -fno-omit-frame-pointer")
+                SET(CMAKE_${lang}_FLAGS_DEBUG  "${CMAKE_${lang}_FLAGS_DEBUG} -g -shared-intel -debug inline-debug-info -D TBB_USE_THREADING_TOOLS -qopenmp-link dynamic -parallel-source-info=2 -fno-omit-frame-pointer")
+                SET(CMAKE_${lang}_FLAGS  "${CMAKE_${lang}_FLAGS} -g -shared-intel -debug inline-debug-info -D TBB_USE_THREADING_TOOLS -qopenmp-link dynamic -parallel-source-info=2 -fno-omit-frame-pointer")
+        endforeach()
+        SET(CMAKE_EXE_LINKER_FLAGS  "${CMAKE_EXE_LINKER_FLAGS} -qopenmp -g -shared-intel -qopenmp-link dynamic -tcollect")
+    elseif ("${OC_INSTRUMENTATION}" STREQUAL "gprof")
+        foreach(lang C CXX Fortran)
+                SET(CMAKE_${lang}_FLAGS_RELEASE  "${CMAKE_${lang}_FLAGS_RELEASE} -g -pg -fno-omit-frame-pointer")
+                SET(CMAKE_${lang}_FLAGS_DEBUG  "${CMAKE_${lang}_FLAGS_DEBUG} -g -pg -fno-omit-frame-pointer")
+                SET(CMAKE_${lang}_FLAGS  "${CMAKE_${lang}_FLAGS} -g -pg -fno-omit-frame-pointer")
+        endforeach()
+        SET(CMAKE_EXE_LINKER_FLAGS  "${CMAKE_EXE_LINKER_FLAGS} -pg -g")
+    endif()
+
 elseif(CMAKE_C_COMPILER_ID STREQUAL "XL" OR CMAKE_CXX_COMPILER_ID STREQUAL "XL") # IBM case
     if (OC_MULTITHREADING)
         # FindOpenMP uses "-qsmp" for multithreading.. will need to see.
