@@ -19,6 +19,17 @@
 #     If you want to initialize your OpenCMISS installation to developer defaults, define the EVEL variable to any value.
 #     It's not a typo, the command line for this results in -DEVEL=<myvalue> :-)
 #
+# =========== Instrumentation ===========
+# 
+# INSTRUMENTATION: []|none|scorep|vtune
+#    Specify any code instrumentation systems for use in performance analysis.
+#
+#    none  : no instrumentation
+#    scorep: score-p instrumentation
+#    vtune : Intel vtune instrumentation (only available with Intel compilers)
+#    Note that this variable will be used case-insensitive.
+#    If no instrumentation is specified none will be used as the default.
+#
 # ============== Toolchain ==============
 # 
 # OPENCMISS_TOOLCHAIN: []|gnu|clang|mingw|intel|ibm
@@ -103,6 +114,8 @@ set(OPENCMISS_TOOLCHAIN ${OPENCMISS_TOOLCHAIN} CACHE INTERNAL "Internalise the t
 
 # Need to set the compilers before any project call
 include(OCToolchainCompilers)
+# Set any instrumentation options before any project call
+include(OCInstrumentation)
 setCMakeCompilersForToolchain(${OPENCMISS_TOOLCHAIN})
 ########################################################################
 # Ready to start the "build project"
