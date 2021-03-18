@@ -18,6 +18,44 @@ if (NOT DEFINED OPENCMISS_DEPENDENCIES_ONLY)
 endif ()
 
 ##
+# OPENCMISS_ZINC_DEPENDENCIES_ONLY
+# --------------------------------
+#
+# If you want to compile the dependencies for iron/zinc only, enable this setting.
+# This flag is useful for setting up sdk installations or continuous integration builds.
+#
+# .. caution::
+#     You can also disable building Iron or Zinc using the component variables, e.g. OC_USE_IRON=NO.
+#     However, this is considered a special top-level flag, which also causes any components that are
+#     exclusively required by e.g. Iron will not be build.
+#
+# See also OC_USE_<COMP>_
+#
+# .. default:: NO
+if (NOT DEFINED OPENCMISS_ZINC_DEPENDENCIES_ONLY)
+    set(OPENCMISS_ZINC_DEPENDENCIES_ONLY NO)  # "Build dependencies only (no Iron or Zinc)"
+endif ()
+
+##
+# OPENCMISS_IRON_DEPENDENCIES_ONLY
+# --------------------------------
+#
+# If you want to compile the dependencies for iron/zinc only, enable this setting.
+# This flag is useful for setting up sdk installations or continuous integration builds.
+#
+# .. caution::
+#     You can also disable building Iron or Zinc using the component variables, e.g. OC_USE_IRON=NO.
+#     However, this is considered a special top-level flag, which also causes any components that are
+#     exclusively required by e.g. Iron will not be build.
+#
+# See also OC_USE_<COMP>_
+#
+# .. default:: NO
+if (NOT DEFINED OPENCMISS_IRON_DEPENDENCIES_ONLY)
+    set(OPENCMISS_IRON_DEPENDENCIES_ONLY NO)  # "Build dependencies only (no Iron or Zinc)"
+endif ()
+
+##
 # OPENCMISS_LIBRARIES_ONLY
 # ------------------------
 #

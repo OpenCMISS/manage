@@ -187,16 +187,38 @@ install(
 )
 unset(EXPORT_VARS)
 
-if (NOT OPENCMISS_DEPENDENCIES_ONLY)
+set(OPENCMISS_MODULE_PATH_EXPORT
+    ${OPENCMISS_CMAKE_MODULE_PATH}/FindModuleWrappers
+    ${OPENCMISS_CMAKE_MODULE_PATH}
+    ${OPENCMISS_CMAKE_MODULE_PATH}/OpenCMISS)
+
+if (OPENCMISS_DEPENDENCIES_ONLY)
+    ###########################################################################################
+    # Create opencmissdependencies-config.cmake
+
+    relativize_path_list(OPENCMISS_MODULE_PATH_EXPORT "${_INSTALL_BASE_PATH}" _OPENCMISS_DEPENDENCIES_IMPORT_PREFIX)
+
+    configure_file(${CMAKE_CURRENT_SOURCE_DIR}/Templates/opencmissdependencies-config.cmake
+        ${CMAKE_CURRENT_BINARY_DIR}/export/opencmissdependencies-config.cmake @ONLY
+    )
+
+    # Version file
+    include(CMakePackageConfigHelpers)
+    WRITE_BASIC_PACKAGE_VERSION_FILE(
+        ${CMAKE_CURRENT_BINARY_DIR}/export/opencmissdependencies-config-version.cmake
+        COMPATIBILITY AnyNewerVersion
+    )
+    install(
+        FILES ${CMAKE_CURRENT_BINARY_DIR}/export/opencmissdependencies-config.cmake
+            ${CMAKE_CURRENT_BINARY_DIR}/export/opencmissdependencies-config-version.cmake
+        DESTINATION "."
+        COMPONENT Development
+    )
+else ()
     ###########################################################################################
     # Create opencmisslibs-config.cmake
 
-    set(OPENCMISS_MODULE_PATH_EXPORT
-        ${OPENCMISS_CMAKE_MODULE_PATH}/FindModuleWrappers
-        ${OPENCMISS_CMAKE_MODULE_PATH}
-        ${OPENCMISS_CMAKE_MODULE_PATH}/OpenCMISS)
     relativize_path_list(OPENCMISS_MODULE_PATH_EXPORT "${_INSTALL_BASE_PATH}" _OPENCMISS_IMPORT_PREFIX)
-
     if (OC_DEVELOPER AND NOT OPENCMISS_INSTALLATION_SUPPORT_EMAIL)
         message(WARNING "Dear developer! Please set the OPENCMISS_INSTALLATION_SUPPORT_EMAIL variable in OpenCMISSInstallationConfig.cmake "
                         "to your eMail address so that people using your installation can contact you for support. Thanks!")
@@ -230,3 +252,4 @@ if (NOT OPENCMISS_DEPENDENCIES_ONLY)
             COMPONENT Runtime)
     endif ()
 endif ()
+
