@@ -238,7 +238,9 @@ if (NOT DISABLE_GIT)
     endif()
 endif()
 
-include(OCDetectFortranMangling)
+if( NOT OPENCMISS_ZINC_ONLY AND NOT OPENCMISS_ZINC_DEPENDENCIES_ONLY)
+    include(OCDetectFortranMangling)
+endif ()
 
 # Multithreading
 if(OC_MULTITHREADING)
@@ -247,7 +249,7 @@ endif()
 
 # MPI
 # Unless we said to not have MPI, see that it's available.
-if (OPENCMISS_MPI_INSTALLATION STREQUAL none)
+if (OPENCMISS_MPI_IMPLEMENTATION STREQUAL none)
     # Do nothing.
 else ()
     include(OCSelectMPI)
