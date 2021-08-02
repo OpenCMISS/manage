@@ -100,6 +100,21 @@ if (USE_OPENCMISSDEPENDENCIES AND NOT _USED_OPENCMISSDEPENDENCIES OR NOT TARGET 
     unset(_CONTEXT_PATH)
     unset(_OPENCMISS_DEPENDENCIES_IMPORT_PREFIX)
 
+    set(_REQUIRED_COMPONENTS @OC_REQUIRED_COMPONENTS@)
+    set(_found_targets)
+    foreach(_component ${_REQUIRED_COMPONENTS})
+        message(STATUS "Looking for ${_component} ...")
+        get_module_case_sensitive_name(${_component} _case_name)
+        find_package(${_case_name} QUIET)
+        if (${_component}_FOUND)
+            get_module_targets(${_component} _targets)
+            list(APPEND _found_targets ${_targets})
+            message(STATUS "Looking for ${_component} ... Success")
+        else ()
+            message(STATUS "Looking for ${_component} ... Not found")
+        endif ()
+    endforeach()
+
 endif ()
 
 if (NOT USE_OPENCMISSDEPENDENCIES AND NOT TARGET opencmissdependencies)
@@ -109,20 +124,7 @@ if (NOT USE_OPENCMISSDEPENDENCIES AND NOT TARGET opencmissdependencies)
     #
     # Add the opencmisslibs library (INTERFACE type is new since 3.0)
     add_library(opencmissdependencies INTERFACE)
-
-    set(_REQUIRED_COMPONENTS @OC_REQUIRED_COMPONENTS@)
-    foreach(_component ${_REQUIRED_COMPONENTS})
-        message(STATUS "Looking for ${_component} ...")
-        get_module_case_sensitive_name(${_component} _case_name)
-        find_package(${_case_name} QUIET)
-        if (${_component}_FOUND)
-            get_module_targets(${_component} _targets)
-            target_link_libraries(opencmissdependencies INTERFACE ${_targets})
-            message(STATUS "Looking for ${_component} ... Success")
-        else ()
-            message(STATUS "Looking for ${_component} ... Not found")
-        endif ()
-    endforeach()
+    target_link_libraries(opencmissdependencies INTERFACE ${_found_targets})
 
 endif ()
 
