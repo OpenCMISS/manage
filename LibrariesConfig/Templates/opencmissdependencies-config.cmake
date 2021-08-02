@@ -7,34 +7,36 @@
 # This script essentially defines an INTERFACE target opencmisslibs which is
 # then poulated with all the top level libraries configured in OpenCMISS.
 
-if (NOT TARGET opencmissdependencies)
-    # Make sure we have a sufficient cmake version before doing anything else
-    cmake_minimum_required(VERSION @OPENCMISS_CMAKE_MIN_VERSION@ FATAL_ERROR)
+# Make sure we have a sufficient cmake version before doing anything else
+cmake_minimum_required(VERSION @OPENCMISS_CMAKE_MIN_VERSION@ FATAL_ERROR)
 
-    # Compute the installation prefix relative to this file. It might be a mounted location or whatever.
-    get_filename_component(_OPENCMISS_DEPENDENCIES_IMPORT_PREFIX "${CMAKE_CURRENT_LIST_FILE}" DIRECTORY)
-    #get_filename_component(_OPENCMISS_DEPENDENCIES_IMPORT_PREFIX "${_OPENCMISS_DEPENDENCIES_IMPORT_PREFIX}" DIRECTORY)
+# Compute the installation prefix relative to this file. It might be a mounted location or whatever.
+get_filename_component(_OPENCMISS_DEPENDENCIES_IMPORT_PREFIX "${CMAKE_CURRENT_LIST_FILE}" DIRECTORY)
+#get_filename_component(_OPENCMISS_DEPENDENCIES_IMPORT_PREFIX "${_OPENCMISS_DEPENDENCIES_IMPORT_PREFIX}" DIRECTORY)
 
-    #############################################################################
-    # Helper functions
-    # Debug verbose helper
-    function(messaged TEXT)
-        #message(STATUS "OpenCMISS Libraries (${_OPENCMISS_DEPENDENCIES_IMPORT_PREFIX}/opencmisslibs-config.cmake): ${TEXT}")
-    endfunction()
-    function(messageo TEXT)
-        message(STATUS "OpenCMISS Libraries: ${TEXT}")
-    endfunction()
-    function(toAbsolutePaths LIST_VARNAME)
-        set(RES )
-        foreach(entry ${${LIST_VARNAME}})
-            get_filename_component(abs_entry "${entry}" ABSOLUTE)
-            list(APPEND RES "${abs_entry}")
-        endforeach()
-        set(${LIST_VARNAME} ${RES} PARENT_SCOPE)
-    endfunction()
+#############################################################################
+# Helper functions
+# Debug verbose helper
+function(messaged TEXT)
+    #message(STATUS "OpenCMISS Libraries (${_OPENCMISS_DEPENDENCIES_IMPORT_PREFIX}/opencmisslibs-config.cmake): ${TEXT}")
+endfunction()
+function(messageo TEXT)
+    message(STATUS "OpenCMISS Libraries: ${TEXT}")
+endfunction()
+function(toAbsolutePaths LIST_VARNAME)
+    set(RES )
+    foreach(entry ${${LIST_VARNAME}})
+        get_filename_component(abs_entry "${entry}" ABSOLUTE)
+        list(APPEND RES "${abs_entry}")
+    endforeach()
+    set(${LIST_VARNAME} ${RES} PARENT_SCOPE)
+endfunction()
 
-    set(SUPPORT_EMAIL @OPENCMISS_INSTALLATION_SUPPORT_EMAIL@)
+set(SUPPORT_EMAIL @OPENCMISS_INSTALLATION_SUPPORT_EMAIL@)
 
+if (USE_OPENCMISSDEPENDENCIES AND NOT _USED_OPENCMISSDEPENDENCIES OR NOT TARGET opencmissdependencies)
+
+    set(_USED_OPENCMISSDEPENDENCIES TRUE)
     # Append the OpenCMISS module path to the current module path
     set(OPENCMISS_MODULE_PATH @OPENCMISS_MODULE_PATH_EXPORT@)
     toAbsolutePaths(OPENCMISS_MODULE_PATH)
@@ -42,6 +44,7 @@ if (NOT TARGET opencmissdependencies)
 
     # Sets OPENCMISS_HAVE_MULTICONFIG_ENV variable
     include(OCMultiConfigEnvironment)
+    include(OCMiscFunctions)
 
     # Set the build type to OpenCMISS default if not explicitly given (and single-config env)
     #if (NOT OPENCMISS_HAVE_MULTICONFIG_ENV AND (CMAKE_BUILD_TYPE_INITIALIZED_TO_DEFAULT OR NOT CMAKE_BUILD_TYPE))
@@ -93,6 +96,14 @@ if (NOT TARGET opencmissdependencies)
     set(CMAKE_INSTALL_RPATH ${CONTEXT_DEPENDENCIES_OPENCMISS_LIBRARY_PATH_IMPORT})
     set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 
+    # Be a tidy kiwi
+    unset(_CONTEXT_PATH)
+    unset(_OPENCMISS_DEPENDENCIES_IMPORT_PREFIX)
+
+endif ()
+
+if (NOT USE_OPENCMISSDEPENDENCIES AND NOT TARGET opencmissdependencies)
+
     ###########################################################################
     # Convenience targets
     #
@@ -102,22 +113,16 @@ if (NOT TARGET opencmissdependencies)
     set(_REQUIRED_COMPONENTS @OC_REQUIRED_COMPONENTS@)
     foreach(_component ${_REQUIRED_COMPONENTS})
         message(STATUS "Looking for ${_component} ...")
-        find_package(${_component} QUIET)
-if(TARGET ${${_component}_TARGETS})
-message(STATUS "this component is a target: ${${_component}_TARGETS}")
-else()
-message(STATUS "this component is *not* a target: ${${_component}_TARGETS}")
-endif()
+        get_module_case_sensitive_name(${_component} _case_name)
+        find_package(${_case_name} QUIET)
         if (${_component}_FOUND)
-            target_link_libraries(opencmissdependencies INTERFACE ${${_component}_TARGETS})
+            get_module_targets(${_component} _targets)
+            target_link_libraries(opencmissdependencies INTERFACE ${_targets})
             message(STATUS "Looking for ${_component} ... Success")
         else ()
             message(STATUS "Looking for ${_component} ... Not found")
         endif ()
     endforeach()
 
-    # Be a tidy kiwi
-    unset(_OPENCMISS_DEPENDENCIES_IMPORT_PREFIX)
-    unset(_CONTEXT_PATH)
 endif ()
 
